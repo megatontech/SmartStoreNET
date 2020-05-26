@@ -578,10 +578,6 @@
     <Compile Include="Migrations\201804090744324_ForceSslForAllPages.Designer.cs">
       <DependentUpon>201804090744324_ForceSslForAllPages.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201804200835273_V310Resources.cs" />
-    <Compile Include="Migrations\201804200835273_V310Resources.Designer.cs">
-      <DependentUpon>201804200835273_V310Resources.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201804252356096_TopicSlugs.cs" />
     <Compile Include="Migrations\201804252356096_TopicSlugs.Designer.cs">
       <DependentUpon>201804252356096_TopicSlugs.cs</DependentUpon>
@@ -1146,9 +1142,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804090744324_ForceSslForAllPages.resx">
       <DependentUpon>201804090744324_ForceSslForAllPages.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804200835273_V310Resources.resx">
-      <DependentUpon>201804200835273_V310Resources.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804252356096_TopicSlugs.resx">
       <DependentUpon>201804252356096_TopicSlugs.cs</DependentUpon>
