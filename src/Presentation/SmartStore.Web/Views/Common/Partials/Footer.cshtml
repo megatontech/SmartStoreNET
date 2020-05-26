@@ -104,7 +104,7 @@
 			<div class="col-md-3">
 				@{ Html.RenderWidget("footer_col_4_before"); }
 				
-				@if (!Model.HideNewsletterBlock)
+				@if (false)
 				{
 					<div class="footer-newsletter nav-collapsible" data-subscription-url="@(Url.RouteUrl("SubscribeNewsletter"))">
 						<h4 class="footer-title nav-toggler collapsed" data-toggle="collapse" data-target="#footer-newsletter" aria-controls="footer-newsletter" aria-expanded="false">@T("Newsletter.Title")</h4>
@@ -176,14 +176,14 @@
 			@if (Model.ShowLegalInfo)
 			{
 				<div class="col pb-1 pb-sm-0">
-					@Html.Raw(Model.LegalInfo)
+					@*@Html.Raw(Model.LegalInfo)*@
 				</div>
 			}
 
 			@if (Model.SmartStoreHint.HasValue())
 			{
 				<div class="col-12 col-sm-auto pb-1 pb-sm-0 text-sm-center">
-					@Html.Raw(Model.SmartStoreHint)
+					@*@Html.Raw(Model.SmartStoreHint)*@
 				</div>
 			}
 
