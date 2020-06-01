@@ -49,6 +49,7 @@ using SmartStore.Web.Framework.Modelling;
 using SmartStore.Web.Framework.Security;
 using Telerik.Web.Mvc;
 using NuGet;
+using AutoMapper;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -60,7 +61,7 @@ namespace SmartStore.Admin.Controllers
     {
         #region Fields
 
-        private readonly IProductService _productService;
+        private readonly IDeclarationProductService _productService;
         private readonly IProductTemplateService _productTemplateService;
         private readonly ICategoryService _categoryService;
         private readonly IManufacturerService _manufacturerService;
@@ -112,7 +113,7 @@ namespace SmartStore.Admin.Controllers
         #region Constructors
 
         public DeclarationProductController(
-            IProductService productService,
+            IDeclarationProductService productService,
             IProductTemplateService productTemplateService,
             ICategoryService categoryService,
             IManufacturerService manufacturerService,
@@ -306,78 +307,92 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        [NonAction]
-        protected void UpdateProductTags(Product product, params string[] rawProductTags)
+        private Product convertDeclaration(DeclarationProduct dproduct)
         {
-            Guard.NotNull(product, nameof(product));
-
-            if (rawProductTags == null || rawProductTags.Length == 0)
-            {
-                product.ProductTags.Clear();
-                _productService.UpdateProduct(product);
-                return;
-            }
-
-            var productTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (string str in rawProductTags)
-            {
-                string tag = str.TrimSafe();
-                if (tag.HasValue())
-                    productTags.Add(tag);
-            }
-
-            var existingProductTags = product.ProductTags;
-            var productTagsToRemove = new List<ProductTag>();
-
-            foreach (var existingProductTag in existingProductTags)
-            {
-                bool found = false;
-                foreach (string newProductTag in productTags)
-                {
-                    if (existingProductTag.Name.Equals(newProductTag, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    productTagsToRemove.Add(existingProductTag);
-                }
-            }
-
-            foreach (var productTag in productTagsToRemove)
-            {
-                product.ProductTags.Remove(productTag);
-                _productService.UpdateProduct(product);
-                _services.DbContext.ChangeState(product, System.Data.Entity.EntityState.Modified);
-            }
-
-            foreach (string productTagName in productTags)
-            {
-                ProductTag productTag = null;
-                var productTag2 = _productTagService.GetProductTagByName(productTagName);
-
-                if (productTag2 == null)
-                {
-                    // Add new product tag
-                    productTag = new ProductTag { Name = productTagName };
-                    _productTagService.InsertProductTag(productTag);
-                }
-                else
-                {
-                    productTag = productTag2;
-                }
-
-                if (!product.ProductTagExists(productTag.Id))
-                {
-                    product.ProductTags.Add(productTag);
-                    _productService.UpdateProduct(product);
-                    _services.DbContext.ChangeState(product, System.Data.Entity.EntityState.Modified);
-                }
-            }
+            Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+            Product dto = Mapper.Map<Product>(dproduct);
+            return dto;
         }
+
+        private DeclarationProduct convertDeclaration(Product dproduct)
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+            DeclarationProduct dto = Mapper.Map<DeclarationProduct>(dproduct);
+            return dto;
+        }
+
+        //[NonAction]
+        //protected void UpdateProductTags(DeclarationProduct product, params string[] rawProductTags)
+        //{
+        //    Guard.NotNull(product, nameof(product));
+
+        //    if (rawProductTags == null || rawProductTags.Length == 0)
+        //    {
+        //        product.ProductTags.Clear();
+        //        _productService.UpdateProduct(product);
+        //        return;
+        //    }
+
+        //    var productTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        //    foreach (string str in rawProductTags)
+        //    {
+        //        string tag = str.TrimSafe();
+        //        if (tag.HasValue())
+        //            productTags.Add(tag);
+        //    }
+
+        //    var existingProductTags = product.ProductTags;
+        //    var productTagsToRemove = new List<ProductTag>();
+
+        //    foreach (var existingProductTag in existingProductTags)
+        //    {
+        //        bool found = false;
+        //        foreach (string newProductTag in productTags)
+        //        {
+        //            if (existingProductTag.Name.Equals(newProductTag, StringComparison.InvariantCultureIgnoreCase))
+        //            {
+        //                found = true;
+        //                break;
+        //            }
+        //        }
+        //        if (!found)
+        //        {
+        //            productTagsToRemove.Add(existingProductTag);
+        //        }
+        //    }
+
+        //    foreach (var productTag in productTagsToRemove)
+        //    {
+        //        product.ProductTags.Remove(productTag);
+        //        _productService.UpdateProduct(product);
+        //        _services.DbContext.ChangeState(product, System.Data.Entity.EntityState.Modified);
+        //    }
+
+        //    foreach (string productTagName in productTags)
+        //    {
+        //        ProductTag productTag = null;
+        //        var productTag2 = _productTagService.GetProductTagByName(productTagName);
+
+        //        if (productTag2 == null)
+        //        {
+        //            // Add new product tag
+        //            productTag = new ProductTag { Name = productTagName };
+        //            _productTagService.InsertProductTag(productTag);
+        //        }
+        //        else
+        //        {
+        //            productTag = productTag2;
+        //        }
+
+        //        if (!product.ProductTagExists(productTag.Id))
+        //        {
+        //            product.ProductTags.Add(productTag);
+        //            _productService.UpdateProduct(product);
+        //            _services.DbContext.ChangeState(product, System.Data.Entity.EntityState.Modified);
+        //        }
+        //    }
+        //}
 
         [NonAction]
         protected void UpdateProductInventory(Product product, ProductModel model)
@@ -416,7 +431,7 @@ namespace SmartStore.Admin.Controllers
 
             if (p.StockQuantity != prevStockQuantity && p.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
             {
-                _productService.AdjustInventory(p, true, 0, string.Empty);
+                _productService.AdjustInventory(convertDeclaration(p), true, 0, string.Empty);
             }
         }
 
@@ -494,7 +509,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        protected void UpdateProductDiscounts(Product product, ProductModel model)
+        protected void UpdateProductDiscounts(DeclarationProduct product, ProductModel model)
         {
             var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToSkus, null, true);
             foreach (var discount in allDiscounts)
@@ -568,7 +583,7 @@ namespace SmartStore.Admin.Controllers
             if (editMode)
             {
                 // we need the event to be fired
-                _productService.UpdateProduct(p);
+                _productService.UpdateProduct(convertDeclaration(p));
             }
 
             foreach (var localized in model.Locales)
@@ -589,7 +604,7 @@ namespace SmartStore.Admin.Controllers
             }
 
             // product tags
-            UpdateProductTags(p, m.ProductTags);
+            //UpdateProductTags(p, m.ProductTags);
         }
 
         #endregion Update[...]
@@ -1197,8 +1212,9 @@ namespace SmartStore.Admin.Controllers
                 {
                     product.BundleTitleText = _localizationService.GetResource("Products.Bundle.BundleIncludes");
                 }
-
-                _productService.InsertProduct(product);
+                Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+                DeclarationProduct dto = Mapper.Map<DeclarationProduct>(product);
+                _productService.InsertProduct(dto);
 
                 UpdateDataOfExistingProduct(product, model, false);
 
@@ -1249,7 +1265,7 @@ namespace SmartStore.Admin.Controllers
 
             var model = product.ToModel();
             model.IsTaxExempt = true;
-            PrepareProductModel(model, product, false, false);
+            PrepareProductModel(model, product.convertProduct(), false, false);
 
             AddLocales(_languageService, model.Locales, (locale, languageId) =>
             {
@@ -1263,9 +1279,9 @@ namespace SmartStore.Admin.Controllers
                 locale.BundleTitleText = product.GetLocalized(x => x.BundleTitleText, languageId, false, false);
             });
 
-            PrepareProductPictureThumbnailModel(model, product, _pictureService.GetPictureInfo(product.MainPictureId));
-            PrepareAclModel(model, product, false);
-            PrepareStoresMappingModel(model, product, false);
+            PrepareProductPictureThumbnailModel(model, product.convertProduct(), _pictureService.GetPictureInfo(product.MainPictureId));
+            PrepareAclModel(model, product.convertProduct(), false);
+            PrepareStoresMappingModel(model, product.convertProduct(), false);
 
             return View(model);
         }
@@ -1306,8 +1322,9 @@ namespace SmartStore.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                MapModelToProduct(model, product, form);
-                UpdateDataOfExistingProduct(product, model, true);
+                
+                MapModelToProduct(model, product.convertProduct(), form);
+                UpdateDataOfExistingProduct(product.convertProduct(), model, true);
 
                 // activity log
                 _customerActivityService.InsertActivity("EditProduct", _localizationService.GetResource("ActivityLog.EditProduct"), product.Name);
@@ -1315,15 +1332,15 @@ namespace SmartStore.Admin.Controllers
                 NotifySuccess(_localizationService.GetResource("Admin.Catalog.Products.Updated"));
                 return continueEditing ? RedirectToAction("Edit", new { id = product.Id }) : RedirectToAction("List");
             }
-
+            
             // If we got this far, something failed, redisplay form
-            PrepareProductModel(model, product, false, true);
+            PrepareProductModel(model, product.convertProduct(), false, true);
 
-            PrepareProductPictureThumbnailModel(model, product, _pictureService.GetPictureInfo(product.MainPictureId));
+            PrepareProductPictureThumbnailModel(model, product.convertProduct(), _pictureService.GetPictureInfo(product.MainPictureId));
 
-            PrepareAclModel(model, product, true);
+            PrepareAclModel(model, product.convertProduct(), true);
 
-            PrepareStoresMappingModel(model, product, true);
+            PrepareStoresMappingModel(model, product.convertProduct(), true);
 
             return View(model);
         }
@@ -1331,6 +1348,8 @@ namespace SmartStore.Admin.Controllers
         [NonAction]
         protected void MapModelToProduct(ProductModel model, Product product, FormCollection form)
         {
+            Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+            DeclarationProduct dproduct = Mapper.Map<DeclarationProduct>(product);
             if (model.LoadedTabs == null || model.LoadedTabs.Length == 0)
             {
                 model.LoadedTabs = new string[] { "Info" };
@@ -1357,7 +1376,7 @@ namespace SmartStore.Admin.Controllers
                         break;
 
                     case "discounts":
-                        UpdateProductDiscounts(product, model);
+                        UpdateProductDiscounts(dproduct, model);
                         break;
 
                     case "downloads":
@@ -1407,7 +1426,7 @@ namespace SmartStore.Admin.Controllers
 
                 var model = product.ToModel();
 
-                PrepareProductModel(model, product, false, false);
+                PrepareProductModel(model, product.convertProduct(), false, false);
 
                 AddLocales(_languageService, model.Locales, (locale, languageId) =>
                 {
@@ -1421,11 +1440,11 @@ namespace SmartStore.Admin.Controllers
                     locale.BundleTitleText = product.GetLocalized(x => x.BundleTitleText, languageId, false, false);
                 });
 
-                PrepareProductPictureThumbnailModel(model, product, _pictureService.GetPictureInfo(product.MainPictureId));
+                PrepareProductPictureThumbnailModel(model, product.convertProduct(), _pictureService.GetPictureInfo(product.MainPictureId));
 
-                PrepareAclModel(model, product, false);
+                PrepareAclModel(model, product.convertProduct(), false);
 
-                PrepareStoresMappingModel(model, product, false);
+                PrepareStoresMappingModel(model, product.convertProduct(), false);
 
                 return PartialView(viewPath.NullEmpty() ?? "_CreateOrUpdate." + tabName, model);
             }
@@ -1457,7 +1476,7 @@ namespace SmartStore.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
 
-            var products = new List<Product>();
+            var products = new List<DeclarationProduct>();
             if (selectedIds != null)
             {
                 var ids = selectedIds
@@ -1491,7 +1510,7 @@ namespace SmartStore.Admin.Controllers
                 for (var i = 1; i <= copyModel.NumberOfCopies; ++i)
                 {
                     var newName = copyModel.NumberOfCopies > 1 ? $"{copyModel.Name} {i}" : copyModel.Name;
-                    newProduct = _copyProductService.CopyProduct(product, newName, copyModel.Published, copyModel.CopyImages);
+                    newProduct = _copyProductService.CopyProduct(convertDeclaration(product), newName, copyModel.Published, copyModel.CopyImages);
                 }
 
                 if (newProduct != null)
@@ -1933,34 +1952,34 @@ namespace SmartStore.Admin.Controllers
             return CrossSellProductList(command, productId);
         }
 
-        [HttpPost]
-        public ActionResult CrossSellProductAdd(int productId, int[] selectedProductIds)
-        {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                var products = _productService.GetProductsByIds(selectedProductIds);
+        //[HttpPost]
+        //public ActionResult CrossSellProductAdd(int productId, int[] selectedProductIds)
+        //{
+        //    if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+        //    {
+        //        var products = _productService.GetProductsByIds(selectedProductIds);
 
-                foreach (var product in products)
-                {
-                    var existingRelations = _productService.GetCrossSellProductsByProductId1(productId);
+        //        foreach (var product in products)
+        //        {
+        //            var existingRelations = _productService.GetCrossSellProductsByProductId1(productId);
 
-                    if (existingRelations.FindCrossSellProduct(productId, product.Id) == null)
-                    {
-                        _productService.InsertCrossSellProduct(new CrossSellProduct
-                        {
-                            ProductId1 = productId,
-                            ProductId2 = product.Id
-                        });
-                    }
-                }
-            }
-            else
-            {
-                NotifyAccessDenied();
-            }
+        //            if (existingRelations.FindCrossSellProduct(productId, product.Id) == null)
+        //            {
+        //                _productService.InsertCrossSellProduct(new CrossSellProduct
+        //                {
+        //                    ProductId1 = productId,
+        //                    ProductId2 = product.Id
+        //                });
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        NotifyAccessDenied();
+        //    }
 
-            return new EmptyResult();
-        }
+        //    return new EmptyResult();
+        //}
 
         [HttpPost, ValidateInput(false)]
         public ActionResult CreateAllMutuallyCrossSellProducts(int productId)
@@ -2909,7 +2928,7 @@ namespace SmartStore.Admin.Controllers
                                 !product.Deleted &&
                                 !product.IsSystemProduct)
                             {
-                                _backInStockSubscriptionService.SendNotificationsToSubscribers(product);
+                                _backInStockSubscriptionService.SendNotificationsToSubscribers(convertDeclaration(product));
                             }
 
                             if (product.StockQuantity != prevStockQuantity && product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
@@ -3734,7 +3753,7 @@ namespace SmartStore.Admin.Controllers
                     pvacModel.ProductId = product.Id;
                     pvacModel.ProductUrlTitle = productUrlTitle;
                     pvacModel.ProductUrl = _productUrlHelper.GetProductUrl(product.Id, productSeName, x.AttributesXml);
-                    pvacModel.AttributesXml = _productAttributeFormatter.FormatAttributes(product, x.AttributesXml, customer, "<br />", true, true, true, false);
+                    pvacModel.AttributesXml = _productAttributeFormatter.FormatAttributes(convertDeclaration(product), x.AttributesXml, customer, "<br />", true, true, true, false);
 
                     // Not really necessary here:
                     //var warnings = _shoppingCartService.GetShoppingCartItemAttributeWarnings(
@@ -3794,9 +3813,9 @@ namespace SmartStore.Admin.Controllers
 
             var model = new ProductVariantAttributeCombinationModel();
 
-            PrepareProductAttributeCombinationModel(model, null, product);
-            PrepareVariantCombinationAttributes(model, product);
-            PrepareVariantCombinationPictures(model, product);
+            PrepareProductAttributeCombinationModel(model, null, convertDeclaration(product));
+            PrepareVariantCombinationAttributes(model, convertDeclaration(product));
+            PrepareVariantCombinationPictures(model, convertDeclaration(product));
             PrepareDeliveryTimes(model);
             PrepareViewBag(btnId, formId, false, false);
 
@@ -3824,7 +3843,7 @@ namespace SmartStore.Admin.Controllers
             var attributeXml = query.CreateSelectedAttributesXml(product.Id, 0, variantAttributes, _productAttributeParser, _localizationService,
                 _downloadService, _catalogSettings, this.Request, warnings);
 
-            warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, product, attributeXml));
+            warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, convertDeclaration(product), attributeXml));
 
             if (_productAttributeParser.FindProductVariantAttributeCombination(product.Id, attributeXml) != null)
             {
@@ -3842,9 +3861,9 @@ namespace SmartStore.Admin.Controllers
                 _productService.UpdateLowestAttributeCombinationPriceProperty(product);
             }
 
-            PrepareProductAttributeCombinationModel(model, null, product);
-            PrepareVariantCombinationAttributes(model, product);
-            PrepareVariantCombinationPictures(model, product);
+            PrepareProductAttributeCombinationModel(model, null, convertDeclaration(product));
+            PrepareVariantCombinationAttributes(model, convertDeclaration(product));
+            PrepareVariantCombinationPictures(model, convertDeclaration(product));
             PrepareDeliveryTimes(model);
             PrepareViewBag(btnId, formId, warnings.Count == 0, false);
 
@@ -3871,9 +3890,9 @@ namespace SmartStore.Admin.Controllers
 
             var model = combination.ToModel();
 
-            PrepareProductAttributeCombinationModel(model, combination, product, true);
-            PrepareVariantCombinationAttributes(model, product);
-            PrepareVariantCombinationPictures(model, product);
+            PrepareProductAttributeCombinationModel(model, combination, convertDeclaration(product), true);
+            PrepareVariantCombinationAttributes(model, convertDeclaration(product));
+            PrepareVariantCombinationPictures(model, convertDeclaration(product));
             PrepareDeliveryTimes(model, model.DeliveryTimeId);
             PrepareViewBag(btnId, formId);
 
@@ -3900,7 +3919,7 @@ namespace SmartStore.Admin.Controllers
 
                 _productAttributeService.UpdateProductVariantAttributeCombination(combination);
 
-                _productService.UpdateLowestAttributeCombinationPriceProperty(combination.Product);
+                _productService.UpdateLowestAttributeCombinationPriceProperty(convertDeclaration(combination.Product));
 
                 PrepareViewBag(btnId, formId, true);
             }
@@ -3918,7 +3937,7 @@ namespace SmartStore.Admin.Controllers
             if (product == null)
                 throw new ArgumentException(T("Products.NotFound", productId));
 
-            _productAttributeService.CreateAllProductVariantAttributeCombinations(product);
+            _productAttributeService.CreateAllProductVariantAttributeCombinations(convertDeclaration(product));
 
             _productService.UpdateLowestAttributeCombinationPriceProperty(product);
 
@@ -3958,7 +3977,7 @@ namespace SmartStore.Admin.Controllers
             {
                 var product = _productService.GetProductById(productId);
                 if (product != null)
-                    warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, product, attributeXml));
+                    warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, convertDeclaration(product), attributeXml));
             }
 
             if (warnings.Count > 0)

@@ -65,7 +65,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Category
 
         #region Manufacturer
 
@@ -84,13 +84,18 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Manufacturer
 
         #region Products
 
         public static ProductModel ToModel(this Product entity)
         {
             return Mapper.Map<Product, ProductModel>(entity);
+        }
+
+        public static ProductModel ToModel(this DeclarationProduct entity)
+        {
+            return Mapper.Map<DeclarationProduct, ProductModel>(entity);
         }
 
         public static Product ToEntity(this ProductModel model)
@@ -103,7 +108,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Products
 
         #region Product attributes
 
@@ -122,27 +127,27 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-		public static ProductAttributeOptionModel ToModel(this ProductAttributeOption entity)
-		{
-			return Mapper.Map<ProductAttributeOption, ProductAttributeOptionModel>(entity);
-		}
+        public static ProductAttributeOptionModel ToModel(this ProductAttributeOption entity)
+        {
+            return Mapper.Map<ProductAttributeOption, ProductAttributeOptionModel>(entity);
+        }
 
-		public static ProductAttributeOption ToEntity(this ProductAttributeOptionModel model)
-		{
-			return Mapper.Map<ProductAttributeOptionModel, ProductAttributeOption>(model);
-		}
+        public static ProductAttributeOption ToEntity(this ProductAttributeOptionModel model)
+        {
+            return Mapper.Map<ProductAttributeOptionModel, ProductAttributeOption>(model);
+        }
 
-		public static ProductAttributeOption ToEntity(this ProductAttributeOptionModel model, ProductAttributeOption destination)
-		{
-			return Mapper.Map(model, destination);
-		}
+        public static ProductAttributeOption ToEntity(this ProductAttributeOptionModel model, ProductAttributeOption destination)
+        {
+            return Mapper.Map(model, destination);
+        }
 
-		#endregion
+        #endregion Product attributes
 
-		#region Specification attributes
+        #region Specification attributes
 
-		//attributes
-		public static SpecificationAttributeModel ToModel(this SpecificationAttribute entity)
+        //attributes
+        public static SpecificationAttributeModel ToModel(this SpecificationAttribute entity)
         {
             return Mapper.Map<SpecificationAttribute, SpecificationAttributeModel>(entity);
         }
@@ -172,7 +177,8 @@ namespace SmartStore.Admin
         {
             return Mapper.Map(model, destination);
         }
-        #endregion
+
+        #endregion Specification attributes
 
         #region Checkout attributes
 
@@ -207,30 +213,31 @@ namespace SmartStore.Admin
         {
             return Mapper.Map(model, destination);
         }
-        #endregion
 
-		#region Product bundle items
+        #endregion Checkout attributes
 
-		public static ProductBundleItemModel ToModel(this ProductBundleItem entity)
-		{
-			return Mapper.Map<ProductBundleItem, ProductBundleItemModel>(entity);
-		}
+        #region Product bundle items
 
-		public static ProductBundleItem ToEntity(this ProductBundleItemModel model)
-		{
-			return Mapper.Map<ProductBundleItemModel, ProductBundleItem>(model);
-		}
+        public static ProductBundleItemModel ToModel(this ProductBundleItem entity)
+        {
+            return Mapper.Map<ProductBundleItem, ProductBundleItemModel>(entity);
+        }
 
-		public static ProductBundleItem ToEntity(this ProductBundleItemModel model, ProductBundleItem destination)
-		{
-			return Mapper.Map(model, destination);
-		}
+        public static ProductBundleItem ToEntity(this ProductBundleItemModel model)
+        {
+            return Mapper.Map<ProductBundleItemModel, ProductBundleItem>(model);
+        }
 
-		#endregion
+        public static ProductBundleItem ToEntity(this ProductBundleItemModel model, ProductBundleItem destination)
+        {
+            return Mapper.Map(model, destination);
+        }
 
-		#region Languages
+        #endregion Product bundle items
 
-		public static LanguageModel ToModel(this Language entity)
+        #region Languages
+
+        public static LanguageModel ToModel(this Language entity)
         {
             return Mapper.Map<Language, LanguageModel>(entity);
         }
@@ -244,8 +251,8 @@ namespace SmartStore.Admin
         {
             return Mapper.Map(model, destination);
         }
-        
-        #endregion
+
+        #endregion Languages
 
         #region Email account
 
@@ -264,7 +271,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Email account
 
         #region Message templates
 
@@ -283,7 +290,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Message templates
 
         #region Queued email
 
@@ -302,7 +309,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Queued email
 
         #region Campaigns
 
@@ -321,7 +328,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Campaigns
 
         #region Topics
 
@@ -340,7 +347,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Topics
 
         #region Log
 
@@ -369,8 +376,8 @@ namespace SmartStore.Admin
             return Mapper.Map<ActivityLog, ActivityLogModel>(entity);
         }
 
-        #endregion
-        
+        #endregion Log
+
         #region Currencies
 
         public static CurrencyModel ToModel(this Currency entity)
@@ -387,7 +394,8 @@ namespace SmartStore.Admin
         {
             return Mapper.Map(model, destination);
         }
-        #endregion
+
+        #endregion Currencies
 
         #region Delivery Times
 
@@ -406,7 +414,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Delivery Times
 
         #region Attribute combinations
 
@@ -425,7 +433,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Attribute combinations
 
         #region Measure weights
 
@@ -444,7 +452,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Measure weights
 
         #region Measure dimension
 
@@ -463,7 +471,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Measure dimension
 
         #region Quantity units
 
@@ -482,16 +490,16 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Quantity units
 
         #region Tax providers
 
         public static TaxProviderModel ToModel(this Provider<ITaxProvider> entity)
         {
-			return Mapper.Map<Provider<ITaxProvider>, TaxProviderModel>(entity);
+            return Mapper.Map<Provider<ITaxProvider>, TaxProviderModel>(entity);
         }
 
-        #endregion
+        #endregion Tax providers
 
         #region Tax categories
 
@@ -510,8 +518,8 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
-        
+        #endregion Tax categories
+
         #region Shipping rate computation method
 
         public static ShippingRateComputationMethodModel ToModel(this IShippingRateComputationMethod entity)
@@ -519,7 +527,7 @@ namespace SmartStore.Admin
             return Mapper.Map<IShippingRateComputationMethod, ShippingRateComputationMethodModel>(entity);
         }
 
-        #endregion
+        #endregion Shipping rate computation method
 
         #region Shipping methods
 
@@ -538,7 +546,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Shipping methods
 
         #region Address
 
@@ -547,18 +555,18 @@ namespace SmartStore.Admin
             return ToModel(entity, null);
         }
 
-		public static AddressModel ToModel(this Address entity, IAddressService addressService)
-		{
-			var addressModel = Mapper.Map<Address, AddressModel>(entity);
-			addressModel.EmailMatch = entity.Email;
+        public static AddressModel ToModel(this Address entity, IAddressService addressService)
+        {
+            var addressModel = Mapper.Map<Address, AddressModel>(entity);
+            addressModel.EmailMatch = entity.Email;
 
-			if(addressService != null)
-				addressModel.FormattedAddress = addressService.FormatAddress(entity, true);
+            if (addressService != null)
+                addressModel.FormattedAddress = addressService.FormatAddress(entity, true);
 
-			return addressModel;
-		}
+            return addressModel;
+        }
 
-		public static Address ToEntity(this AddressModel model)
+        public static Address ToEntity(this AddressModel model)
         {
             return Mapper.Map<AddressModel, Address>(model);
         }
@@ -568,7 +576,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Address
 
         #region NewsLetter subscriptions
 
@@ -587,7 +595,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion NewsLetter subscriptions
 
         #region Discounts
 
@@ -606,7 +614,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Discounts
 
         #region Forums
 
@@ -625,6 +633,7 @@ namespace SmartStore.Admin
         {
             return Mapper.Map(model, destination);
         }
+
         //forums
         public static ForumModel ToModel(this Forum entity)
         {
@@ -640,7 +649,8 @@ namespace SmartStore.Admin
         {
             return Mapper.Map(model, destination);
         }
-        #endregion
+
+        #endregion Forums
 
         #region Blog
 
@@ -660,7 +670,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Blog
 
         #region News
 
@@ -680,7 +690,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion News
 
         #region Polls
 
@@ -700,9 +710,10 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Polls
 
         #region Customers/users/customer roles
+
         //customer roles
         public static CustomerRoleModel ToModel(this CustomerRole entity)
         {
@@ -719,7 +730,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Customers/users/customer roles
 
         #region Gift Cards
 
@@ -738,7 +749,7 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-        #endregion
+        #endregion Gift Cards
 
         #region Countries / states
 
@@ -772,18 +783,20 @@ namespace SmartStore.Admin
             return Mapper.Map(model, destination);
         }
 
-
-        #endregion
+        #endregion Countries / states
 
         #region Settings
+
         public static ThemeListModel ToModel(this ThemeSettings entity)
         {
             return Mapper.Map<ThemeSettings, ThemeListModel>(entity);
         }
+
         public static ThemeSettings ToEntity(this ThemeListModel model)
         {
             return Mapper.Map<ThemeListModel, ThemeSettings>(model);
         }
+
         public static ThemeSettings ToEntity(this ThemeListModel model, ThemeSettings destination)
         {
             return Mapper.Map(model, destination);
@@ -793,137 +806,147 @@ namespace SmartStore.Admin
         {
             return Mapper.Map<TaxSettings, TaxSettingsModel>(entity);
         }
+
         public static TaxSettings ToEntity(this TaxSettingsModel model)
         {
             return Mapper.Map<TaxSettingsModel, TaxSettings>(model);
         }
+
         public static TaxSettings ToEntity(this TaxSettingsModel model, TaxSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static ShippingSettingsModel ToModel(this ShippingSettings entity)
         {
             return Mapper.Map<ShippingSettings, ShippingSettingsModel>(entity);
         }
+
         public static ShippingSettings ToEntity(this ShippingSettingsModel model)
         {
             return Mapper.Map<ShippingSettingsModel, ShippingSettings>(model);
         }
+
         public static ShippingSettings ToEntity(this ShippingSettingsModel model, ShippingSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static ForumSettingsModel ToModel(this ForumSettings entity)
         {
             return Mapper.Map<ForumSettings, ForumSettingsModel>(entity);
         }
+
         public static ForumSettings ToEntity(this ForumSettingsModel model)
         {
             return Mapper.Map<ForumSettingsModel, ForumSettings>(model);
         }
+
         public static ForumSettings ToEntity(this ForumSettingsModel model, ForumSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static BlogSettingsModel ToModel(this BlogSettings entity)
         {
             return Mapper.Map<BlogSettings, BlogSettingsModel>(entity);
         }
+
         public static BlogSettings ToEntity(this BlogSettingsModel model)
         {
             return Mapper.Map<BlogSettingsModel, BlogSettings>(model);
         }
+
         public static BlogSettings ToEntity(this BlogSettingsModel model, BlogSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static NewsSettingsModel ToModel(this NewsSettings entity)
         {
             return Mapper.Map<NewsSettings, NewsSettingsModel>(entity);
         }
+
         public static NewsSettings ToEntity(this NewsSettingsModel model)
         {
             return Mapper.Map<NewsSettingsModel, NewsSettings>(model);
         }
+
         public static NewsSettings ToEntity(this NewsSettingsModel model, NewsSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static CatalogSettingsModel ToModel(this CatalogSettings entity)
         {
             return Mapper.Map<CatalogSettings, CatalogSettingsModel>(entity);
         }
+
         public static CatalogSettings ToEntity(this CatalogSettingsModel model)
         {
             return Mapper.Map<CatalogSettingsModel, CatalogSettings>(model);
         }
+
         public static CatalogSettings ToEntity(this CatalogSettingsModel model, CatalogSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static RewardPointsSettingsModel ToModel(this RewardPointsSettings entity)
         {
             return Mapper.Map<RewardPointsSettings, RewardPointsSettingsModel>(entity);
         }
+
         public static RewardPointsSettings ToEntity(this RewardPointsSettingsModel model)
         {
             return Mapper.Map<RewardPointsSettingsModel, RewardPointsSettings>(model);
         }
+
         public static RewardPointsSettings ToEntity(this RewardPointsSettingsModel model, RewardPointsSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static OrderSettingsModel ToModel(this OrderSettings entity)
         {
             return Mapper.Map<OrderSettings, OrderSettingsModel>(entity);
         }
+
         public static OrderSettings ToEntity(this OrderSettingsModel model)
         {
             return Mapper.Map<OrderSettingsModel, OrderSettings>(model);
         }
+
         public static OrderSettings ToEntity(this OrderSettingsModel model, OrderSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
         public static ShoppingCartSettingsModel ToModel(this ShoppingCartSettings entity)
         {
             return Mapper.Map<ShoppingCartSettings, ShoppingCartSettingsModel>(entity);
         }
+
         public static ShoppingCartSettings ToEntity(this ShoppingCartSettingsModel model)
         {
             return Mapper.Map<ShoppingCartSettingsModel, ShoppingCartSettings>(model);
         }
+
         public static ShoppingCartSettings ToEntity(this ShoppingCartSettingsModel model, ShoppingCartSettings destination)
         {
             return Mapper.Map(model, destination);
         }
 
-
-
-		public static MediaSettingsModel ToModel(this MediaSettings entity)
+        public static MediaSettingsModel ToModel(this MediaSettings entity)
         {
             return Mapper.Map<MediaSettings, MediaSettingsModel>(entity);
         }
+
         public static MediaSettings ToEntity(this MediaSettingsModel model)
         {
             return Mapper.Map<MediaSettingsModel, MediaSettings>(model);
         }
+
         public static MediaSettings ToEntity(this MediaSettingsModel model, MediaSettings destination)
         {
             return Mapper.Map(model, destination);
@@ -934,68 +957,75 @@ namespace SmartStore.Admin
         {
             return Mapper.Map<CustomerSettings, CustomerUserSettingsModel.CustomerSettingsModel>(entity);
         }
+
         public static CustomerSettings ToEntity(this CustomerUserSettingsModel.CustomerSettingsModel model)
         {
             return Mapper.Map<CustomerUserSettingsModel.CustomerSettingsModel, CustomerSettings>(model);
         }
+
         public static CustomerSettings ToEntity(this CustomerUserSettingsModel.CustomerSettingsModel model, CustomerSettings destination)
         {
             return Mapper.Map(model, destination);
         }
+
         public static CustomerUserSettingsModel.AddressSettingsModel ToModel(this AddressSettings entity)
         {
             return Mapper.Map<AddressSettings, CustomerUserSettingsModel.AddressSettingsModel>(entity);
         }
+
         public static AddressSettings ToEntity(this CustomerUserSettingsModel.AddressSettingsModel model)
         {
             return Mapper.Map<CustomerUserSettingsModel.AddressSettingsModel, AddressSettings>(model);
         }
+
         public static AddressSettings ToEntity(this CustomerUserSettingsModel.AddressSettingsModel model, AddressSettings destination)
         {
             return Mapper.Map(model, destination);
         }
-		public static CustomerUserSettingsModel.PrivacySettingsModel ToModel(this PrivacySettings entity)
-		{
-			return Mapper.Map<PrivacySettings, CustomerUserSettingsModel.PrivacySettingsModel>(entity);
-		}
-		public static PrivacySettings ToEntity(this CustomerUserSettingsModel.PrivacySettingsModel model)
-		{
-			return Mapper.Map<CustomerUserSettingsModel.PrivacySettingsModel, PrivacySettings>(model);
-		}
-		public static PrivacySettings ToEntity(this CustomerUserSettingsModel.PrivacySettingsModel model, PrivacySettings destination)
-		{
-			return Mapper.Map(model, destination);
-		}
-		#endregion
 
+        public static CustomerUserSettingsModel.PrivacySettingsModel ToModel(this PrivacySettings entity)
+        {
+            return Mapper.Map<PrivacySettings, CustomerUserSettingsModel.PrivacySettingsModel>(entity);
+        }
 
-		#region Plugins
+        public static PrivacySettings ToEntity(this CustomerUserSettingsModel.PrivacySettingsModel model)
+        {
+            return Mapper.Map<CustomerUserSettingsModel.PrivacySettingsModel, PrivacySettings>(model);
+        }
 
-		public static PluginModel ToModel(this PluginDescriptor entity)
+        public static PrivacySettings ToEntity(this CustomerUserSettingsModel.PrivacySettingsModel model, PrivacySettings destination)
+        {
+            return Mapper.Map(model, destination);
+        }
+
+        #endregion Settings
+
+        #region Plugins
+
+        public static PluginModel ToModel(this PluginDescriptor entity)
         {
             return Mapper.Map<PluginDescriptor, PluginModel>(entity);
         }
 
-        #endregion
+        #endregion Plugins
 
+        #region Stores
 
-		#region Stores
+        public static StoreModel ToModel(this Store entity)
+        {
+            return Mapper.Map<Store, StoreModel>(entity);
+        }
 
-		public static StoreModel ToModel(this Store entity)
-		{
-			return Mapper.Map<Store, StoreModel>(entity);
-		}
+        public static Store ToEntity(this StoreModel model)
+        {
+            return Mapper.Map<StoreModel, Store>(model);
+        }
 
-		public static Store ToEntity(this StoreModel model)
-		{
-			return Mapper.Map<StoreModel, Store>(model);
-		}
+        public static Store ToEntity(this StoreModel model, Store destination)
+        {
+            return Mapper.Map(model, destination);
+        }
 
-		public static Store ToEntity(this StoreModel model, Store destination)
-		{
-			return Mapper.Map(model, destination);
-		}
-
-		#endregion
+        #endregion Stores
     }
 }
