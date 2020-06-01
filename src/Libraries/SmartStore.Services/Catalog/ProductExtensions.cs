@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Directory;
@@ -401,13 +402,37 @@ namespace SmartStore.Services.Catalog
 
 			return string.Empty;
 		}
+		public static string GetProductTypeLabel(this DeclarationProduct product, ILocalizationService localizationService)
+		{
+			if (product != null && product.ProductType != ProductType.SimpleProduct)
+			{
+				var key = "Admin.Catalog.Products.ProductType.{0}.Label".FormatInvariant(product.ProductType.ToString());
+				return localizationService.GetResource(key);
+			}
 
+			return string.Empty;
+		}
 		public static bool CanBeBundleItem(this Product product)
 		{
 			return product != null && product.ProductType == ProductType.SimpleProduct && !product.IsRecurring && !product.IsDownload;
 		}
-
-        public static bool FilterOut(this ProductBundleItem bundleItem, ProductVariantAttributeValue value, out ProductBundleItemAttributeFilter filter)
+		public static bool CanBeBundleItem(this DeclarationProduct product)
+		{
+			return product != null && product.ProductType == ProductType.SimpleProduct && !product.IsRecurring && !product.IsDownload;
+		}
+		public static DeclarationProduct convertProduct(this Product product) 
+		{
+			Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+			DeclarationProduct dto = Mapper.Map<DeclarationProduct>(product);
+			return dto;
+		}
+		public static Product convertProduct(this DeclarationProduct product)
+		{
+			Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+			Product dto = Mapper.Map<Product>(product);
+			return dto;
+		}
+		public static bool FilterOut(this ProductBundleItem bundleItem, ProductVariantAttributeValue value, out ProductBundleItemAttributeFilter filter)
         {
             if (bundleItem != null && value != null && bundleItem.FilterAttributes)
             {
