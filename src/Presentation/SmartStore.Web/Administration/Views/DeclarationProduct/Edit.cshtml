@@ -10,7 +10,7 @@
             @if (!String.IsNullOrEmpty(Model.PictureThumbnailUrl)) {
                 <img src="@Url.Content(Model.PictureThumbnailUrl)" />
 			}
-            @T("Admin.Catalog.Products.EditProductDetails") - <span title="@Model.Name">@Model.Name.Truncate(45, "...")</span> 
+            @T("编辑报单产品详情") - <span title="@Model.Name">@Model.Name.Truncate(45, "...")</span> 
 			<a href='@Url.Action("List")'>(@T("Admin.Catalog.Products.BackToList"))</a>
         </div>
         <div class="options">
