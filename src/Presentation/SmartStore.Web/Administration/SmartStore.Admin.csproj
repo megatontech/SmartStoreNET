@@ -185,9 +185,20 @@
     <Compile Include="Controllers\CurrencyController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\CustomerRoleController.cs" />
+    <Compile Include="Controllers\DeclarationBalanceOverviewController.cs" />
+    <Compile Include="Controllers\DeclarationControlcenterController.cs" />
+    <Compile Include="Controllers\DeclarationCustomOverviewController.cs" />
+    <Compile Include="Controllers\DeclarationFinaduitController.cs" />
+    <Compile Include="Controllers\DeclarationFinwithdraladuitController.cs" />
+    <Compile Include="Controllers\DeclarationParamControlController.cs" />
+    <Compile Include="Controllers\DeclarationProductOverviewController.cs" />
+    <Compile Include="Controllers\DeclarationUserController.cs" />
+    <Compile Include="Controllers\DeclarationWalletControlController.cs" />
+    <Compile Include="Controllers\DeclarationWithdrawControlController.cs" />
     <Compile Include="Controllers\ExportController.cs" />
     <Compile Include="Controllers\ImportController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
+    <Compile Include="Controllers\DeclarationProductController.cs" />
     <Compile Include="Controllers\QuantityUnitController.cs" />
     <Compile Include="Controllers\DeliveryTimeController.cs" />
     <Compile Include="Controllers\DiscountController.cs" />
@@ -602,6 +613,48 @@
     <Content Include="Views\Shared\EditorTemplates\AccessPermissions.cshtml" />
     <Content Include="Views\Shared\Menus\Admin.cshtml" />
     <Content Include="Views\Shared\Partials\FontAwesomeIcon.cshtml" />
+    <Content Include="Views\DeclarationProduct\_Create.SaveFirst.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Acl.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.AssociatedProducts.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Attributes.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.BundleItems.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Categories.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Discounts.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Downloads.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Info.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Inventory.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Manufacturers.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Pictures.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Price.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Promotion.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.SEO.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.SpecificationAttributes.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdate.Stores.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdateAttributeCombinationPopup.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdateProductAttributeValue.cshtml" />
+    <Content Include="Views\DeclarationProduct\_CreateOrUpdateProductTag.cshtml" />
+    <Content Include="Views\DeclarationProduct\_ProductAttributes.cshtml" />
+    <Content Include="Views\DeclarationProduct\AttributeCombinationCreatePopup.cshtml" />
+    <Content Include="Views\DeclarationProduct\AttributeCombinationEditPopup.cshtml" />
+    <Content Include="Views\DeclarationProduct\BulkEdit.cshtml" />
+    <Content Include="Views\DeclarationProduct\BundleItemEditPopup.cshtml" />
+    <Content Include="Views\DeclarationProduct\Create.cshtml" />
+    <Content Include="Views\DeclarationProduct\Edit.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditAttributeValues.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\AttributeControlType.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\ProductAttribute.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\ProductCategory.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\ProductManufacturer.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\TierPriceCalculationMethod.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\TierPriceCustomer.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditorTemplates\TierPriceStore.cshtml" />
+    <Content Include="Views\DeclarationProduct\EditProductTag.cshtml" />
+    <Content Include="Views\DeclarationProduct\List.cshtml" />
+    <Content Include="Views\DeclarationProduct\LowStockReport.cshtml" />
+    <Content Include="Views\DeclarationProduct\ProductAttributeValueCreatePopup.cshtml" />
+    <Content Include="Views\DeclarationProduct\ProductAttributeValueEditPopup.cshtml" />
+    <Content Include="Views\DeclarationProduct\ProductTags.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />
@@ -1181,7 +1234,18 @@
   <ItemGroup>
     <Content Include="Views\Product\_CreateOrUpdateProductTag.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\DeclarationBalanceOverview\" />
+    <Folder Include="Views\DeclarationControlcenter\" />
+    <Folder Include="Views\DeclarationCustomOverview\" />
+    <Folder Include="Views\DeclarationFinaduit\" />
+    <Folder Include="Views\DeclarationFinwithdraladuit\" />
+    <Folder Include="Views\DeclarationParamControl\" />
+    <Folder Include="Views\DeclarationProductOverview\" />
+    <Folder Include="Views\DeclarationUser\" />
+    <Folder Include="Views\DeclarationWalletControl\" />
+    <Folder Include="Views\DeclarationWithdrawControl\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DeliveryTime\List.cshtml" />
   </ItemGroup>
