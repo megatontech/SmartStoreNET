@@ -21,12 +21,9 @@ namespace SmartStore.Services.Catalog
     public partial class DeclarationProductService : IDeclarationProductService
     {
         private readonly IRepository<DeclarationProduct> _productRepository;
-        private readonly IRepository<RelatedProduct> _relatedProductRepository;
-        private readonly IRepository<CrossSellProduct> _crossSellProductRepository;
         private readonly IRepository<TierPrice> _tierPriceRepository;
         private readonly IRepository<ProductPicture> _productPictureRepository;
         private readonly IRepository<ProductVariantAttributeCombination> _productVariantAttributeCombinationRepository;
-        private readonly IRepository<ProductBundleItem> _productBundleItemRepository;
         private readonly IRepository<ShoppingCartItem> _shoppingCartItemRepository;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeParser _productAttributeParser;
@@ -36,12 +33,9 @@ namespace SmartStore.Services.Catalog
 
         public DeclarationProductService(
             IRepository<DeclarationProduct> productRepository,
-            IRepository<RelatedProduct> relatedProductRepository,
-            IRepository<CrossSellProduct> crossSellProductRepository,
             IRepository<TierPrice> tierPriceRepository,
             IRepository<ProductPicture> productPictureRepository,
             IRepository<ProductVariantAttributeCombination> productVariantAttributeCombinationRepository,
-            IRepository<ProductBundleItem> productBundleItemRepository,
             IRepository<ShoppingCartItem> shoppingCartItemRepository,
             IProductAttributeService productAttributeService,
             IProductAttributeParser productAttributeParser,
@@ -50,12 +44,9 @@ namespace SmartStore.Services.Catalog
             ICommonServices services)
         {
             _productRepository = productRepository;
-            _relatedProductRepository = relatedProductRepository;
-            _crossSellProductRepository = crossSellProductRepository;
             _tierPriceRepository = tierPriceRepository;
             _productPictureRepository = productPictureRepository;
             _productVariantAttributeCombinationRepository = productVariantAttributeCombinationRepository;
-            _productBundleItemRepository = productBundleItemRepository;
             _shoppingCartItemRepository = shoppingCartItemRepository;
             _productAttributeService = productAttributeService;
             _productAttributeParser = productAttributeParser;
@@ -64,84 +55,6 @@ namespace SmartStore.Services.Catalog
             _services = services;
         }
 
-        #region Utilities
-
-        protected virtual int EnsureMutuallyRelatedProducts(List<int> productIds)
-        {
-            int count = 0;
-
-            foreach (int id1 in productIds)
-            {
-                var mutualAssociations = (
-                    from rp in _relatedProductRepository.Table
-                    join p in _productRepository.Table on rp.ProductId2 equals p.Id
-                    where rp.ProductId2 == id1 && !p.Deleted
-                    select rp).ToList();
-
-                foreach (int id2 in productIds)
-                {
-                    if (id1 == id2)
-                        continue;
-
-                    if (!mutualAssociations.Any(x => x.ProductId1 == id2))
-                    {
-                        int maxDisplayOrder = _relatedProductRepository.TableUntracked
-                            .Where(x => x.ProductId1 == id2)
-                            .OrderByDescending(x => x.DisplayOrder)
-                            .Select(x => x.DisplayOrder)
-                            .FirstOrDefault();
-
-                        var newRelatedProduct = new RelatedProduct
-                        {
-                            ProductId1 = id2,
-                            ProductId2 = id1,
-                            DisplayOrder = maxDisplayOrder + 1
-                        };
-
-                        InsertRelatedProduct(newRelatedProduct);
-                        ++count;
-                    }
-                }
-            }
-
-            return count;
-        }
-
-        protected virtual int EnsureMutuallyCrossSellProducts(List<int> productIds)
-        {
-            int count = 0;
-
-            foreach (int id1 in productIds)
-            {
-                var mutualAssociations = (
-                    from rp in _crossSellProductRepository.Table
-                    join p in _productRepository.Table on rp.ProductId2 equals p.Id
-                    where rp.ProductId2 == id1 && !p.Deleted
-                    select rp).ToList();
-
-                foreach (int id2 in productIds)
-                {
-                    if (id1 == id2)
-                        continue;
-
-                    if (!mutualAssociations.Any(x => x.ProductId1 == id2))
-                    {
-                        var newCrossSellProduct = new CrossSellProduct
-                        {
-                            ProductId1 = id2,
-                            ProductId2 = id1
-                        };
-
-                        InsertCrossSellProduct(newCrossSellProduct);
-                        ++count;
-                    }
-                }
-            }
-
-            return count;
-        }
-
-        #endregion Utilities
 
         #region Products
 
@@ -228,25 +141,25 @@ namespace SmartStore.Services.Catalog
                 query = query.Include(x => x.ProductVariantAttributeCombinations);
             }
 
-            if (flags.HasFlag(ProductLoadFlags.WithBundleItems))
-            {
-                query = query.Include(x => x.ProductBundleItems.Select(y => y.Product));
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithBundleItems))
+            //{
+            //    query = query.Include(x => x.ProductBundleItems.Select(y => y.Product));
+            //}
 
             if (flags.HasFlag(ProductLoadFlags.WithCategories))
             {
                 query = query.Include(x => x.ProductCategories.Select(y => y.Category));
             }
 
-            if (flags.HasFlag(ProductLoadFlags.WithDiscounts))
-            {
-                query = query.Include(x => x.AppliedDiscounts);
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithDiscounts))
+            //{
+            //    query = query.Include(x => x.AppliedDiscounts);
+            //}
 
-            if (flags.HasFlag(ProductLoadFlags.WithManufacturers))
-            {
-                query = query.Include(x => x.ProductManufacturers.Select(y => y.Manufacturer));
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithManufacturers))
+            //{
+            //    query = query.Include(x => x.ProductManufacturers.Select(y => y.Manufacturer));
+            //}
 
             if (flags.HasFlag(ProductLoadFlags.WithPictures))
             {
@@ -263,10 +176,10 @@ namespace SmartStore.Services.Catalog
                 query = query.Include(x => x.ProductSpecificationAttributes.Select(y => y.SpecificationAttributeOption));
             }
 
-            if (flags.HasFlag(ProductLoadFlags.WithTags))
-            {
-                query = query.Include(x => x.ProductTags);
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithTags))
+            //{
+            //    query = query.Include(x => x.ProductTags);
+            //}
 
             if (flags.HasFlag(ProductLoadFlags.WithTierPrices))
             {
@@ -439,18 +352,14 @@ namespace SmartStore.Services.Catalog
                 {
                     foreach (var child in sci.ChildItems.Where(x => x.Item.Id != sci.Item.Id))
                     {
-                        Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
-                        DeclarationProduct product = Mapper.Map<DeclarationProduct>(child.Item.Product);
-                        AdjustInventory(product, decrease, sci.Item.Quantity * child.Item.Quantity, child.Item.AttributesXml);
+                        AdjustInventory(child.Item.Product.convertProduct(), decrease, sci.Item.Quantity * child.Item.Quantity, child.Item.AttributesXml);
                     }
                 }
                 return new AdjustInventoryResult();
             }
             else
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
-                DeclarationProduct product = Mapper.Map<DeclarationProduct>(sci.Item.Product);
-                return AdjustInventory(product, decrease, sci.Item.Quantity, sci.Item.AttributesXml);
+                return AdjustInventory(sci.Item.Product.convertProduct(), decrease, sci.Item.Quantity, sci.Item.AttributesXml);
             }
         }
 
@@ -479,9 +388,7 @@ namespace SmartStore.Services.Catalog
             }
             else
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
-                DeclarationProduct product = Mapper.Map<DeclarationProduct>(orderItem.Product);
-                return AdjustInventory(product, decrease, quantity, orderItem.AttributesXml);
+                return AdjustInventory(orderItem.Product.convertProduct(), decrease, quantity, orderItem.AttributesXml);
             }
         }
 
@@ -595,45 +502,6 @@ namespace SmartStore.Services.Catalog
                 UpdateProduct(product);
         }
 
-        public virtual void UpdateHasDiscountsApplied(DeclarationProduct product)
-        {
-            Guard.NotNull(product, nameof(product));
-
-            var prevValue = product.HasDiscountsApplied;
-            product.HasDiscountsApplied = product.AppliedDiscounts.Count > 0;
-            if (prevValue != product.HasDiscountsApplied)
-                UpdateProduct(product);
-        }
-
-        public virtual Multimap<int, ProductTag> GetProductTagsByProductIds(int[] productIds)
-        {
-            Guard.NotNull(productIds, nameof(productIds));
-
-            var map = new Multimap<int, ProductTag>();
-            if (!productIds.Any())
-            {
-                return map;
-            }
-
-            var query = _productRepository.TableUntracked
-                .Expand(x => x.ProductTags)
-                .Where(x => productIds.Contains(x.Id))
-                .Select(x => new
-                {
-                    ProductId = x.Id,
-                    Tags = x.ProductTags
-                });
-
-            var list = query.ToList();
-
-            foreach (var item in list)
-            {
-                foreach (var tag in item.Tags)
-                    map.Add(item.ProductId, tag);
-            }
-
-            return map;
-        }
 
         public virtual Multimap<int, DeclarationProduct> GetAssociatedProductsByProductIds(int[] productIds, bool showHidden = false)
         {
@@ -658,187 +526,9 @@ namespace SmartStore.Services.Catalog
             return map;
         }
 
-        public virtual Multimap<int, Discount> GetAppliedDiscountsByProductIds(int[] productIds)
-        {
-            Guard.NotNull(productIds, nameof(productIds));
-
-            var map = new Multimap<int, Discount>();
-            if (!productIds.Any())
-            {
-                return map;
-            }
-
-            var query = _productRepository.Table // .TableUntracked does not seem to eager load
-                .Expand(x => x.AppliedDiscounts.Select(y => y.DiscountRequirements))
-                .Where(x => productIds.Contains(x.Id))
-                .Select(x => new
-                {
-                    ProductId = x.Id,
-                    Discounts = x.AppliedDiscounts
-                });
-
-            foreach (var item in query.ToList())
-            {
-                map.AddRange(item.ProductId, item.Discounts);
-            }
-
-            return map;
-        }
 
         #endregion Products
-
-        #region Related products
-
-        public virtual void DeleteRelatedProduct(RelatedProduct relatedProduct)
-        {
-            Guard.NotNull(relatedProduct, nameof(relatedProduct));
-
-            _relatedProductRepository.Delete(relatedProduct);
-        }
-
-        public virtual IList<RelatedProduct> GetRelatedProductsByProductId1(int productId1, bool showHidden = false)
-        {
-            var query = from rp in _relatedProductRepository.Table
-                        join p in _productRepository.Table on rp.ProductId2 equals p.Id
-                        where rp.ProductId1 == productId1 && !p.Deleted && (showHidden || p.Published)
-                        orderby rp.DisplayOrder
-                        select rp;
-
-            var relatedProducts = query.ToList();
-            return relatedProducts;
-        }
-
-        public virtual RelatedProduct GetRelatedProductById(int relatedProductId)
-        {
-            if (relatedProductId == 0)
-                return null;
-
-            var relatedProduct = _relatedProductRepository.GetById(relatedProductId);
-            return relatedProduct;
-        }
-
-        public virtual void InsertRelatedProduct(RelatedProduct relatedProduct)
-        {
-            Guard.NotNull(relatedProduct, nameof(relatedProduct));
-
-            _relatedProductRepository.Insert(relatedProduct);
-        }
-
-        public virtual void UpdateRelatedProduct(RelatedProduct relatedProduct)
-        {
-            Guard.NotNull(relatedProduct, nameof(relatedProduct));
-
-            _relatedProductRepository.Update(relatedProduct);
-        }
-
-        public virtual int EnsureMutuallyRelatedProducts(int productId1)
-        {
-            var relatedProducts = GetRelatedProductsByProductId1(productId1, true);
-            var productIds = relatedProducts.Select(x => x.ProductId2).ToList();
-
-            if (productIds.Count > 0 && !productIds.Any(x => x == productId1))
-                productIds.Add(productId1);
-
-            int count = EnsureMutuallyRelatedProducts(productIds);
-            return count;
-        }
-
-        #endregion Related products
-
-        #region Cross-sell products
-
-        public virtual void DeleteCrossSellProduct(CrossSellProduct crossSellProduct)
-        {
-            Guard.NotNull(crossSellProduct, nameof(crossSellProduct));
-
-            _crossSellProductRepository.Delete(crossSellProduct);
-        }
-
-        public virtual IList<CrossSellProduct> GetCrossSellProductsByProductId1(int productId1, bool showHidden = false)
-        {
-            var query = from csp in _crossSellProductRepository.Table
-                        join p in _productRepository.Table on csp.ProductId2 equals p.Id
-                        where csp.ProductId1 == productId1 && !p.Deleted && (showHidden || p.Published)
-                        orderby csp.Id
-                        select csp;
-
-            var crossSellProducts = query.ToList();
-            return crossSellProducts;
-        }
-
-        public virtual IList<CrossSellProduct> GetCrossSellProductsByProductIds(IEnumerable<int> productIds, bool showHidden = false)
-        {
-            Guard.NotNull(productIds, nameof(productIds));
-
-            var query = from csp in _crossSellProductRepository.Table
-                        join p in _productRepository.Table on csp.ProductId2 equals p.Id
-                        where productIds.Contains(csp.ProductId1) && !p.Deleted && (showHidden || p.Published)
-                        orderby csp.Id
-                        select csp;
-
-            var crossSellProducts = query.ToList();
-            return crossSellProducts;
-        }
-
-        public virtual CrossSellProduct GetCrossSellProductById(int crossSellProductId)
-        {
-            if (crossSellProductId == 0)
-                return null;
-
-            var crossSellProduct = _crossSellProductRepository.GetById(crossSellProductId);
-            return crossSellProduct;
-        }
-
-        public virtual void InsertCrossSellProduct(CrossSellProduct crossSellProduct)
-        {
-            Guard.NotNull(crossSellProduct, nameof(crossSellProduct));
-
-            _crossSellProductRepository.Insert(crossSellProduct);
-        }
-
-        public virtual void UpdateCrossSellProduct(CrossSellProduct crossSellProduct)
-        {
-            Guard.NotNull(crossSellProduct, nameof(crossSellProduct));
-
-            _crossSellProductRepository.Update(crossSellProduct);
-        }
-
-        public virtual IList<DeclarationProduct> GetCrosssellProductsByShoppingCart(IList<OrganizedShoppingCartItem> cart, int numberOfProducts)
-        {
-            var result = new List<DeclarationProduct>();
-
-            if (numberOfProducts == 0)
-                return result;
-
-            if (cart == null || cart.Count == 0)
-                return result;
-
-            var cartProductIds = new HashSet<int>(cart.Select(x => x.Item.ProductId));
-            var csItems = GetCrossSellProductsByProductIds(cartProductIds);
-            var productIdsToLoad = new HashSet<int>(csItems.Select(x => x.ProductId2).Except(cartProductIds));
-
-            if (productIdsToLoad.Count > 0)
-            {
-                result.AddRange(GetProductsByIds(productIdsToLoad.Take(numberOfProducts).ToArray()));
-            }
-
-            return result;
-        }
-
-        public virtual int EnsureMutuallyCrossSellProducts(int productId1)
-        {
-            var crossSellProducts = GetCrossSellProductsByProductId1(productId1, true);
-            var productIds = crossSellProducts.Select(x => x.ProductId2).ToList();
-
-            if (productIds.Count > 0 && !productIds.Any(x => x == productId1))
-                productIds.Add(productId1);
-
-            int count = EnsureMutuallyCrossSellProducts(productIds);
-            return count;
-        }
-
-        #endregion Cross-sell products
-
+        
         #region Tier prices
 
         public virtual void DeleteTierPrice(TierPrice tierPrice)
@@ -1015,133 +705,12 @@ namespace SmartStore.Services.Catalog
             _productPictureRepository.Update(productPicture);
         }
 
+        public Multimap<int, Discount> GetAppliedDiscountsByProductIds(int[] productIds)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion Product pictures
 
-        #region Bundled products
-
-        public virtual void InsertBundleItem(ProductBundleItem bundleItem)
-        {
-            Guard.NotNull(bundleItem, nameof(bundleItem));
-
-            if (bundleItem.BundleProductId == 0)
-                throw new SmartException("BundleProductId of a bundle item cannot be 0.");
-
-            if (bundleItem.ProductId == 0)
-                throw new SmartException("ProductId of a bundle item cannot be 0.");
-
-            if (bundleItem.ProductId == bundleItem.BundleProductId)
-                throw new SmartException("A bundle item cannot be an element of itself.");
-
-            _productBundleItemRepository.Insert(bundleItem);
-        }
-
-        public virtual void UpdateBundleItem(ProductBundleItem bundleItem)
-        {
-            Guard.NotNull(bundleItem, nameof(bundleItem));
-
-            _productBundleItemRepository.Update(bundleItem);
-        }
-
-        public virtual void DeleteBundleItem(ProductBundleItem bundleItem)
-        {
-            Guard.NotNull(bundleItem, nameof(bundleItem));
-
-            // remove bundles from shopping carts (otherwise bundle item cannot be deleted)
-            var parentCartItemIds = _shoppingCartItemRepository.TableUntracked
-                .Where(x => x.BundleItemId == bundleItem.Id && x.ParentItemId != null)
-                .Select(x => x.ParentItemId)
-                .ToList();
-
-            if (parentCartItemIds.Any())
-            {
-                var cartItems = _shoppingCartItemRepository.Table
-                    .Where(x => parentCartItemIds.Contains(x.Id))
-                    .ToList();
-
-                foreach (var parentItem in cartItems)
-                {
-                    var childItems = _shoppingCartItemRepository.Table
-                        .Where(x => x.ParentItemId != null && x.ParentItemId.Value == parentItem.Id && x.Id != parentItem.Id)
-                        .ToList();
-
-                    childItems.Each(x => _shoppingCartItemRepository.Delete(x));
-
-                    _shoppingCartItemRepository.Delete(parentItem);
-                }
-            }
-
-            // delete bundle item
-            _productBundleItemRepository.Delete(bundleItem);
-        }
-
-        public virtual ProductBundleItem GetBundleItemById(int bundleItemId)
-        {
-            if (bundleItemId == 0)
-                return null;
-
-            return _productBundleItemRepository.GetById(bundleItemId);
-        }
-
-        public virtual IList<ProductBundleItemData> GetBundleItems(int bundleProductId, bool showHidden = false)
-        {
-            var query =
-                from pbi in _productBundleItemRepository.Table
-                join p in _productRepository.Table on pbi.ProductId equals p.Id
-                where pbi.BundleProductId == bundleProductId && !p.Deleted && (showHidden || (pbi.Published && p.Published))
-                orderby pbi.DisplayOrder
-                select pbi;
-
-            query = query.Include(x => x.Product);
-
-            var bundleItemData = new List<ProductBundleItemData>();
-
-            query.ToList().Each(x => bundleItemData.Add(new ProductBundleItemData(x)));
-
-            return bundleItemData;
-        }
-
-        public virtual Multimap<int, ProductBundleItem> GetBundleItemsByProductIds(int[] productIds, bool showHidden = false)
-        {
-            Guard.NotNull(productIds, nameof(productIds));
-
-            if (!productIds.Any())
-            {
-                return new Multimap<int, ProductBundleItem>();
-            }
-
-            var query =
-                from pbi in _productBundleItemRepository.TableUntracked
-                join p in _productRepository.TableUntracked on pbi.ProductId equals p.Id
-                where productIds.Contains(pbi.BundleProductId) && !p.Deleted && (showHidden || (pbi.Published && p.Published))
-                orderby pbi.DisplayOrder
-                select pbi;
-
-            var map = query
-                .Include(x => x.Product)
-                .Include(x => x.BundleProduct)
-                .ToList()
-                .ToMultimap(x => x.BundleProductId, x => x);
-
-            return map;
-        }
-
-        public virtual bool IsBundleItem(int productId)
-        {
-            if (productId == 0)
-            {
-                return false;
-            }
-
-            var query =
-                from pbi in _productBundleItemRepository.TableUntracked
-                join bundle in _productRepository.TableUntracked on pbi.BundleProductId equals bundle.Id
-                where pbi.ProductId == productId && !bundle.Deleted
-                select pbi;
-
-            var result = query.Any();
-            return result;
-        }
-
-        #endregion Bundled products
     }
 }
