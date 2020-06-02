@@ -609,7 +609,7 @@ namespace SmartStore.Web.Controllers
 
                 bool isApproved = _customerSettings.UserRegistrationType == UserRegistrationType.Standard;
                 var registrationRequest = new CustomerRegistrationRequest(customer, model.Email,
-                    _customerSettings.CustomerLoginType != CustomerLoginType.Email ? model.Username : model.Email, model.Password, _customerSettings.DefaultPasswordFormat, isApproved);
+                    _customerSettings.CustomerLoginType != CustomerLoginType.Email ? model.Username : model.Email, model.Password, model.Mobile, model.ParentMobile, _customerSettings.DefaultPasswordFormat, isApproved);
                 var registrationResult = _customerRegistrationService.RegisterCustomer(registrationRequest);
 
                 if (registrationResult.Success)
@@ -760,7 +760,7 @@ namespace SmartStore.Web.Controllers
                             {
                                 // email validation message
                                 _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.AccountActivationToken, Guid.NewGuid().ToString());
-								Services.MessageFactory.SendCustomerEmailValidationMessage(customer, _workContext.WorkingLanguage.Id);
+								//Services.MessageFactory.SendCustomerEmailValidationMessage(customer, _workContext.WorkingLanguage.Id);
 
                                 return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.EmailValidation });
                             }
@@ -771,7 +771,7 @@ namespace SmartStore.Web.Controllers
                         case UserRegistrationType.Standard:
                             {
 								// send customer welcome message
-								Services.MessageFactory.SendCustomerWelcomeMessage(customer, _workContext.WorkingLanguage.Id);
+								//Services.MessageFactory.SendCustomerWelcomeMessage(customer, _workContext.WorkingLanguage.Id);
 
                                 var redirectUrl = Url.RouteUrl("RegisterResult", new { resultId = (int)UserRegistrationType.Standard });
                                 if (!String.IsNullOrEmpty(returnUrl))

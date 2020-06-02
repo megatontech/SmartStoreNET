@@ -93,7 +93,12 @@ namespace SmartStore.Services.Customers
         /// <param name="username">Username</param>
         /// <returns>Customer</returns>
         Customer GetCustomerByUsername(string username);
-
+		/// <summary>
+		/// GetCustomerByMobile
+		/// </summary>
+		/// <param name="Mobile"></param>
+		/// <returns></returns>
+		Customer GetCustomerByMobile(string Mobile);
 		/// <summary>
 		/// Insert a guest customer
 		/// </summary>

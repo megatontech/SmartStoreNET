@@ -6,13 +6,15 @@ namespace SmartStore.Services.Customers
     {
         public Customer Customer { get; set; }
         public string Email { get; set; }
+        public string Mobile { get; set; }
+        public string ParentMobile { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public PasswordFormat PasswordFormat { get; set; }
         public bool IsApproved { get; set; }
 
         public CustomerRegistrationRequest(Customer customer, string email, string username,
-            string password, 
+            string password, string Mobile, string ParentMobile,
             PasswordFormat passwordFormat,
             bool isApproved = true)
         {
@@ -22,6 +24,8 @@ namespace SmartStore.Services.Customers
             this.Password = password;
             this.PasswordFormat = passwordFormat;
             this.IsApproved = isApproved;
+            this.Mobile = Mobile;
+            this.ParentMobile = ParentMobile;
         }
 
         //public bool IsValid  

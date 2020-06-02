@@ -170,7 +170,58 @@ namespace SmartStore.Core.Domain.Customers
 
 		[DataMember, Index("IX_Customer_BirthDate")]
 		public DateTime? BirthDate { get; set; }
-
+		#region 报单系统
+		/// <summary>
+		/// 手机号码
+		/// </summary>
+		[DataMember]
+		public string Mobile { get; set; }
+		/// <summary>
+		/// 头像
+		/// </summary>
+		[DataMember]
+		public string HeadImage { get; set; }
+		/// <summary>
+		/// 身份证号
+		/// </summary>
+		[DataMember]
+		public string IDCardNo { get; set; }
+		/// <summary>
+		/// 当前层级
+		/// </summary>
+		[DataMember]
+		public int Level { get; set; }
+		/// <summary>
+		/// 上级id
+		/// </summary>
+		[DataMember]
+		public int ParentID { get; set; }
+		/// <summary>
+		/// 上级手机
+		/// </summary>
+		[DataMember]
+		public string ParentMobile { get; set; }
+		/// <summary>
+		/// 上级guid
+		/// </summary>
+		[DataMember]
+		public Guid ParentCustomerGuid { get; set; }
+		/// <summary>
+		/// 是否锁定
+		/// </summary>
+		[DataMember]
+		public bool IsLock { get; set; }
+		/// <summary>
+		/// 是否为报单员
+		/// </summary>
+		[DataMember]
+		public bool IsCustomer { get; set; }
+		/// <summary>
+		/// 邀请码
+		/// </summary>
+		[DataMember]
+		public string InviteCode { get; set; }
+		#endregion
 		#region Navigation properties
 
 		/// <summary>

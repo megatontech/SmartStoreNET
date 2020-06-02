@@ -126,7 +126,7 @@ namespace SmartStore.Services.Authentication.External
 
                     bool isApproved = _customerSettings.UserRegistrationType == UserRegistrationType.Standard;
                     var registrationRequest = new CustomerRegistrationRequest(currentCustomer, details.EmailAddress,
-                        _customerSettings.CustomerLoginType != CustomerLoginType.Email ? details.UserName : details.EmailAddress, randomPassword, PasswordFormat.Clear, isApproved);
+                        _customerSettings.CustomerLoginType != CustomerLoginType.Email ? details.UserName : details.EmailAddress, details.Mobile, details.ParentMobile, randomPassword, PasswordFormat.Clear, isApproved);
                     var registrationResult = _customerRegistrationService.RegisterCustomer(registrationRequest);
                     if (registrationResult.Success)
                     {

@@ -32,6 +32,8 @@ namespace SmartStore.Services.Authentication.External
         }
 
         public string UserName { get; set; }
+        public string Mobile { get; set; }
+        public string ParentMobile { get; set; }
         public string EmailAddress { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

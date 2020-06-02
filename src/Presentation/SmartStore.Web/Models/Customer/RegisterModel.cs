@@ -89,6 +89,16 @@ namespace SmartStore.Web.Models.Customer
         public bool CityRequired { get; set; }
         [SmartResourceDisplayName("Account.Fields.City")]
         public string City { get; set; }
+        //[SmartResourceDisplayName("Account.Fields.Email")]
+        [SmartResourceDisplayName("手机号码", "手机号码")]
+        [DataType(DataType.PhoneNumber)]
+        public string Mobile { get; set; }
+        [SmartResourceDisplayName("身份证号码", "身份证号码")]
+        public string IDCardNo { get; set; }
+        //[SmartResourceDisplayName("Account.Fields.Email")]
+        [SmartResourceDisplayName("推荐人手机号码", "推荐人手机号码")]
+        [DataType(DataType.PhoneNumber)]
+        public string ParentMobile { get; set; }
 
         public bool CountryEnabled { get; set; }
         [SmartResourceDisplayName("Account.Fields.Country")]
@@ -136,8 +146,8 @@ namespace SmartStore.Web.Models.Customer
     {
         public RegisterValidator(Localizer T, CustomerSettings customerSettings, TaxSettings taxSettings)
         {
-            RuleFor(x => x.Email).NotEmpty();
-            RuleFor(x => x.Email).EmailAddress();
+            //RuleFor(x => x.Email).NotEmpty();
+            //RuleFor(x => x.Email).EmailAddress();
 
             RuleFor(x => x.Password).NotEmpty();
             RuleFor(x => x.Password).Length(customerSettings.PasswordMinLength, 999);

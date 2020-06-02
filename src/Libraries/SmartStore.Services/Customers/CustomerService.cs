@@ -385,8 +385,21 @@ namespace SmartStore.Services.Customers
             var customer = query.FirstOrDefault();
             return customer;
         }
+		public virtual Customer GetCustomerByMobile(string Mobile)
+		{
+			if (string.IsNullOrWhiteSpace(Mobile))
+				return null;
 
-        public virtual Customer InsertGuestCustomer(Guid? customerGuid = null)
+			var query = from c in IncludeShoppingCart(_customerRepository.Table)
+						orderby c.Id
+						where c.Mobile == Mobile
+						select c;
+
+			var customer = query.FirstOrDefault();
+			return customer;
+		}
+
+		public virtual Customer InsertGuestCustomer(Guid? customerGuid = null)
         {
 			var customer = new Customer
             {

@@ -118,17 +118,17 @@ namespace SmartStore.Services.Customers
                 return result;
             }
 
-            if (!request.Email.HasValue())
-            {
-                result.AddError(T("Account.Register.Errors.EmailIsNotProvided"));
-                return result;
-            }
+   //         if (!request.Email.HasValue())
+   //         {
+   //             result.AddError(T("Account.Register.Errors.EmailIsNotProvided"));
+   //             return result;
+   //         }
 
-			if (!request.Email.IsEmail())
-            {
-                result.AddError(T("Common.WrongEmail"));
-                return result;
-            }
+			//if (!request.Email.IsEmail())
+   //         {
+   //             result.AddError(T("Common.WrongEmail"));
+   //             return result;
+   //         }
 
             if (!request.Password.HasValue())
             {
@@ -159,7 +159,10 @@ namespace SmartStore.Services.Customers
             request.Customer.Username = request.Username;
             request.Customer.Email = request.Email;
             request.Customer.PasswordFormat = request.PasswordFormat;
-
+            request.Customer.Mobile = request.Mobile;
+            request.Customer.ParentMobile = request.ParentMobile;
+            request.Customer.IsCustomer = true;
+            request.Customer.IsLock = false;
             switch (request.PasswordFormat)
             {
 				case PasswordFormat.Clear:
@@ -199,12 +202,35 @@ namespace SmartStore.Services.Customers
 				request.Customer.CustomerRoles.Remove(guestRole);
 			}
 
-			// Add reward points for customer registration (if enabled)
-			if (_rewardPointsSettings.Enabled && _rewardPointsSettings.PointsForRegistration > 0)
-			{
-				request.Customer.AddRewardPointsHistoryEntry(_rewardPointsSettings.PointsForRegistration, T("RewardPoints.Message.RegisteredAsCustomer"));
-			}
-
+            //// Add reward points for customer registration (if enabled)
+            //if (_rewardPointsSettings.Enabled && _rewardPointsSettings.PointsForRegistration > 0)
+            //{
+            //	request.Customer.AddRewardPointsHistoryEntry(_rewardPointsSettings.PointsForRegistration, T("RewardPoints.Message.RegisteredAsCustomer"));
+            //}
+            if (string.IsNullOrEmpty(request.Customer.Mobile))
+            {
+                result.AddError(T("手机号必须填写"));
+                return result;
+            }
+            if (string.IsNullOrEmpty(request.Customer.ParentMobile))
+            {
+                result.AddError(T("推荐人手机号必须填写"));
+                return result;
+            }
+            if (_customerService.GetCustomerByMobile(request.Customer.ParentMobile) == null)
+            {
+                result.AddError(T("推荐人手机号不正确"));
+                return result;
+            }
+           
+            if (!string.IsNullOrEmpty(request.Customer.ParentMobile)&& _customerService.GetCustomerByMobile(request.Customer.ParentMobile)!=null)
+            {
+                var parent = _customerService.GetCustomerByMobile(request.Customer.ParentMobile);
+                request.Customer.ParentID = parent.Id;
+                request.Customer.ParentCustomerGuid = parent.CustomerGuid;
+                request.Customer.ParentMobile = parent.Mobile;
+            }
+            
             _customerService.UpdateCustomer(request.Customer);
             _eventPublisher.Publish(new CustomerRegisteredEvent { Customer = request.Customer });
 
