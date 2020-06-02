@@ -422,13 +422,13 @@ namespace SmartStore.Services.Catalog
 		}
 		public static DeclarationProduct convertProduct(this Product product) 
 		{
-			Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+			//Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
 			DeclarationProduct dto = Mapper.Map<DeclarationProduct>(product);
 			return dto;
 		}
 		public static Product convertProduct(this DeclarationProduct product)
 		{
-			Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+			//Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
 			Product dto = Mapper.Map<Product>(product);
 			return dto;
 		}
