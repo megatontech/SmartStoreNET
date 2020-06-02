@@ -715,24 +715,24 @@ namespace SmartStore.Data.Migrations
             builder.AddOrUpdate("Common.QueryString", "Query string", "Query String");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus", "Menus", "Menüs");
-            builder.AddOrUpdate("Admin.ContentManagement.AddMenu", "Add menu", "Menü hinzufügen");
-            builder.AddOrUpdate("Admin.ContentManagement.EditMenu", "Edit menu", "Menü bearbeiten");
+            builder.AddOrUpdate("Admin.ContentManagement.AddMenu", "Add menu", "Men?hinzufügen");
+            builder.AddOrUpdate("Admin.ContentManagement.EditMenu", "Edit menu", "Men?bearbeiten");
 
-            builder.AddOrUpdate("Admin.ContentManagement.MenuLinks", "Menu items", "Menü Links");
-            builder.AddOrUpdate("Admin.ContentManagement.AddMenuItem", "Add menu item", "Menü Link hinzufügen");
-            builder.AddOrUpdate("Admin.ContentManagement.EditMenuItem", "Edit menu item", "Menü Link bearbeiten");
+            builder.AddOrUpdate("Admin.ContentManagement.MenuLinks", "Menu items", "Men?Links");
+            builder.AddOrUpdate("Admin.ContentManagement.AddMenuItem", "Add menu item", "Men?Link hinzufügen");
+            builder.AddOrUpdate("Admin.ContentManagement.EditMenuItem", "Edit menu item", "Men?Link bearbeiten");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.NoMenuItemsAvailable",
                 "There are no menu links available.",
-                "Es sind keine Menü Links vorhanden.");
+                "Es sind keine Men?Links vorhanden.");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.CannotBeDeleted",
                 "This menu is required by your shop and can therefore not be deleted.",
-                "Dieses Menü wird von Ihrem Shop benötigt und kann daher nicht gelöscht werden.");
+                "Dieses Men?wird von Ihrem Shop benötigt und kann daher nicht gelöscht werden.");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.CatalogNote",
                 "The category tree is dynamically integrated into the menu.",
-                "Der Warengruppenbaum wird dynamisch in das Menü eingebunden.");
+                "Der Warengruppenbaum wird dynamisch in das Men?eingebunden.");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.SpecifyLinkTarget",
                 "Please specify link target",
@@ -761,7 +761,7 @@ namespace SmartStore.Data.Migrations
                 "Widget zone",
                 "Widget Zone",
                 "Specifies widget zones in which the menu should be displayed.",
-                "Legt Widget Zonen fest, in denen das Menü dargestellt werden soll.");
+                "Legt Widget Zonen fest, in denen das Men?dargestellt werden soll.");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.Title",
                 "Title",
@@ -773,7 +773,7 @@ namespace SmartStore.Data.Migrations
                 "Published",
                 "Veröffentlicht",
                 "Specifies whether the menu is visible in the shop.",
-                "Legt fest, ob das Menü im Shop sichtbar ist.");
+                "Legt fest, ob das Men?im Shop sichtbar ist.");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.DisplayOrder",
                 "Display order",
@@ -827,7 +827,7 @@ namespace SmartStore.Data.Migrations
                 "Show expanded",
                 "Geöffnet anzeigen",
                 "If selected and this menu item has children, the menu will initially appear expanded.",
-                "Legt fest, ob das Menü anfänglich geöffnet ist, sofern es Kindelemente besitzt.");
+                "Legt fest, ob das Men?anfänglich geöffnet ist, sofern es Kindelemente besitzt.");
 
             builder.AddOrUpdate("Admin.ContentManagement.Menus.Item.NoFollow",
                 "nofollow",
