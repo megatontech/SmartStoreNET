@@ -136,10 +136,10 @@ namespace SmartStore.Services.Catalog
 
         private IQueryable<DeclarationProduct> ApplyLoadFlags(IQueryable<DeclarationProduct> query, ProductLoadFlags flags)
         {
-            if (flags.HasFlag(ProductLoadFlags.WithAttributeCombinations))
-            {
-                query = query.Include(x => x.ProductVariantAttributeCombinations);
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithAttributeCombinations))
+            //{
+            //    query = query.Include(x => x.ProductVariantAttributeCombinations);
+            //}
 
             //if (flags.HasFlag(ProductLoadFlags.WithBundleItems))
             //{
@@ -171,10 +171,10 @@ namespace SmartStore.Services.Catalog
                 query = query.Include(x => x.ProductReviews);
             }
 
-            if (flags.HasFlag(ProductLoadFlags.WithSpecificationAttributes))
-            {
-                query = query.Include(x => x.ProductSpecificationAttributes.Select(y => y.SpecificationAttributeOption));
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithSpecificationAttributes))
+            //{
+            //    query = query.Include(x => x.ProductSpecificationAttributes.Select(y => y.SpecificationAttributeOption));
+            //}
 
             //if (flags.HasFlag(ProductLoadFlags.WithTags))
             //{
@@ -186,15 +186,15 @@ namespace SmartStore.Services.Catalog
                 query = query.Include(x => x.TierPrices);
             }
 
-            if (flags.HasFlag(ProductLoadFlags.WithAttributes))
-            {
-                query = query.Include(x => x.ProductVariantAttributes.Select(y => y.ProductAttribute));
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithAttributes))
+            //{
+            //    query = query.Include(x => x.ProductVariantAttributes.Select(y => y.ProductAttribute));
+            //}
 
-            if (flags.HasFlag(ProductLoadFlags.WithAttributeValues))
-            {
-                query = query.Include(x => x.ProductVariantAttributes.Select(y => y.ProductVariantAttributeValues));
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithAttributeValues))
+            //{
+            //    query = query.Include(x => x.ProductVariantAttributes.Select(y => y.ProductVariantAttributeValues));
+            //}
 
             if (flags.HasFlag(ProductLoadFlags.WithDeliveryTime))
             {
@@ -248,38 +248,38 @@ namespace SmartStore.Services.Catalog
             UpdateProduct(product);
         }
 
-        public virtual IList<DeclarationProduct> GetLowStockProducts()
-        {
-            // Track inventory for product
-            var query1 = from p in _productRepository.Table
-                         orderby p.MinStockQuantity
-                         where !p.Deleted &&
-                            p.ManageInventoryMethodId == (int)ManageInventoryMethod.ManageStock &&
-                            p.MinStockQuantity >= p.StockQuantity
-                         select p;
-            var products1 = query1.ToList();
+        //public virtual IList<DeclarationProduct> GetLowStockProducts()
+        //{
+        //    // Track inventory for product
+        //    var query1 = from p in _productRepository.Table
+        //                 orderby p.MinStockQuantity
+        //                 where !p.Deleted &&
+        //                    p.ManageInventoryMethodId == (int)ManageInventoryMethod.ManageStock &&
+        //                    p.MinStockQuantity >= p.StockQuantity
+        //                 select p;
+        //    var products1 = query1.ToList();
 
-            // Track inventory for product by product attributes
-            var query2 = from p in _productRepository.Table
-                         from pvac in p.ProductVariantAttributeCombinations
-                         where !p.Deleted &&
-                            p.ManageInventoryMethodId == (int)ManageInventoryMethod.ManageStockByAttributes &&
-                            pvac.StockQuantity <= 0
-                         select p;
+        //    // Track inventory for product by product attributes
+        //    var query2 = from p in _productRepository.Table
+        //                 from pvac in p.ProductVariantAttributeCombinations
+        //                 where !p.Deleted &&
+        //                    p.ManageInventoryMethodId == (int)ManageInventoryMethod.ManageStockByAttributes &&
+        //                    pvac.StockQuantity <= 0
+        //                 select p;
 
-            // only distinct products (group by ID)
-            // if we use standard Distinct() method, then all fields will be compared (low performance)
-            query2 = from p in query2
-                     group p by p.Id into pGroup
-                     orderby pGroup.Key
-                     select pGroup.FirstOrDefault();
-            var products2 = query2.ToList();
+        //    // only distinct products (group by ID)
+        //    // if we use standard Distinct() method, then all fields will be compared (low performance)
+        //    query2 = from p in query2
+        //             group p by p.Id into pGroup
+        //             orderby pGroup.Key
+        //             select pGroup.FirstOrDefault();
+        //    var products2 = query2.ToList();
 
-            var result = new List<DeclarationProduct>();
-            result.AddRange(products1);
-            result.AddRange(products2);
-            return result;
-        }
+        //    var result = new List<DeclarationProduct>();
+        //    result.AddRange(products1);
+        //    result.AddRange(products2);
+        //    return result;
+        //}
 
         public virtual DeclarationProduct GetProductBySku(string sku)
         {
