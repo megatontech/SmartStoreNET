@@ -54,6 +54,7 @@ namespace SmartStore.Admin.Controllers
         #region Fields
 
         private readonly IOrderService _orderService;
+        private readonly IDeclarationOrderService _DeclarationOrderService;
         private readonly IOrderReportService _orderReportService;
         private readonly IOrderProcessingService _orderProcessingService;
         private readonly IDateTimeHelper _dateTimeHelper;
@@ -142,7 +143,9 @@ namespace SmartStore.Admin.Controllers
             AddressSettings addressSettings,
             AdminAreaSettings adminAreaSettings,
             SearchSettings searchSettings,
-            ShoppingCartSettings shoppingCartSettings)
+            ShoppingCartSettings shoppingCartSettings,
+           IDeclarationOrderService declarationOrderService
+            )
         {
             _orderService = orderService;
             _orderReportService = orderReportService;
@@ -187,6 +190,7 @@ namespace SmartStore.Admin.Controllers
             _adminAreaSettings = adminAreaSettings;
             _searchSettings = searchSettings;
             _shoppingCartSettings = shoppingCartSettings;
+            _DeclarationOrderService = declarationOrderService;
         }
 
         #endregion
@@ -947,26 +951,28 @@ namespace SmartStore.Admin.Controllers
                 var paymentMethods = new Dictionary<string, Provider<IPaymentMethod>>(StringComparer.OrdinalIgnoreCase);
                 Provider<IPaymentMethod> paymentMethod = null;
 
-                var orders = _orderService.SearchOrders(model.StoreId, 0, startDateValue, endDateValue, orderStatusIds, paymentStatusIds, shippingStatusIds,
+                //var orders = _orderService.SearchOrders(model.StoreId, 0, startDateValue, endDateValue, orderStatusIds, paymentStatusIds, shippingStatusIds,
+                //    model.CustomerEmail, model.OrderGuid, model.OrderNumber, command.Page - 1, command.PageSize, model.CustomerName, model.PaymentMethods.SplitSafe(","));
+                var dorders = _DeclarationOrderService.SearchOrders(model.StoreId, 0, startDateValue, endDateValue, orderStatusIds, paymentStatusIds, shippingStatusIds,
                     model.CustomerEmail, model.OrderGuid, model.OrderNumber, command.Page - 1, command.PageSize, model.CustomerName, model.PaymentMethods.SplitSafe(","));
 
-                gridModel.Data = orders.Select(x =>
+                gridModel.Data = dorders.Select(x =>
                 {
                     var store = Services.StoreService.GetStoreById(x.StoreId);
 
                     var orderModel = new OrderModel
                     {
                         Id = x.Id,
-                        OrderNumber = x.GetOrderNumber(),
+                        OrderNumber = x.Id.ToString(),
                         StoreName = store != null ? store.Name : "".NaIfEmpty(),
                         OrderTotal = _priceFormatter.FormatPrice(x.OrderTotal, true, false),
                         OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
                         StatusOrder = x.OrderStatus,
                         PaymentStatus = x.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext),
                         StatusPayment = x.PaymentStatus,
-                        IsShippable = x.ShippingStatus != ShippingStatus.ShippingNotRequired,
-                        ShippingStatus = x.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext),
-                        StatusShipping = x.ShippingStatus,
+                        IsShippable = true,
+                        ShippingStatus = ShippingStatus.Delivered.GetLocalizedEnum(_localizationService, _workContext),
+                        StatusShipping = ShippingStatus.Delivered,
                         ShippingMethod = x.ShippingMethod.NullEmpty() ?? "".NaIfEmpty(),
                         CustomerName = x.BillingAddress.GetFullName(),
                         CustomerEmail = x.BillingAddress.Email,
@@ -1015,7 +1021,7 @@ namespace SmartStore.Admin.Controllers
                     return orderModel;
                 });
 
-                gridModel.Total = orders.TotalCount;
+                gridModel.Total = dorders.TotalCount;
 
                 // Summary report.
                 // Implemented as a workaround described here: http://www.telerik.com/community/forums/aspnet-mvc/grid/gridmodel-aggregates-how-to-use.aspx.
