@@ -22,7 +22,7 @@ namespace SmartStore.Services.Customers
 		/// <param name="q">The filter query</param>
 		/// <returns>Customer collection</returns>
 		IPagedList<Customer> SearchCustomers(CustomerSearchQuery q);
-
+		List<Customer> BuildTree();
 		/// <summary>
 		/// Gets all customers by customer format (including deleted ones)
 		/// </summary>

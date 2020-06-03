@@ -27,6 +27,7 @@ namespace SmartStore.Services.Customers
     public partial class CustomerService : ICustomerService
     {
         private readonly IRepository<Customer> _customerRepository;
+        private readonly IRepository<DeclarationOrder> _declarationOrderRepository;
         private readonly IRepository<CustomerRole> _customerRoleRepository;
         private readonly IRepository<GenericAttribute> _gaRepository;
 		private readonly IRepository<RewardPointsHistory> _rewardPointsHistoryRepository;
@@ -41,7 +42,8 @@ namespace SmartStore.Services.Customers
 
 		public CustomerService(
             IRepository<Customer> customerRepository,
-            IRepository<CustomerRole> customerRoleRepository,
+			IRepository<DeclarationOrder>  declarationOrderRepository,
+			IRepository<CustomerRole> customerRoleRepository,
             IRepository<GenericAttribute> gaRepository,
 			IRepository<RewardPointsHistory> rewardPointsHistoryRepository,
             IRepository<ShoppingCartItem> shoppingCartItemRepository,
@@ -65,7 +67,7 @@ namespace SmartStore.Services.Customers
 			_userAgent = userAgent;
 			_customerSettings = customerSettings;
 			_gdprTool = gdprTool;
-
+			_declarationOrderRepository = declarationOrderRepository;
 			T = NullLocalizer.Instance;
 			Logger = NullLogger.Instance;
         }
@@ -761,6 +763,21 @@ namespace SmartStore.Services.Customers
 				.ToMultimap(x => x.CustomerId, x => x);
 
 			return map;
+		}
+
+		public List<Customer> BuildTree()
+		{
+			List<Customer> tree = new List<Customer>();
+			var query = from c in IncludeShoppingCart(_customerRepository.Table)
+						join d in _declarationOrderRepository.Table on c.Id equals d.CustomerId into custom
+						orderby c.Id
+						where c.IsCustomer == true
+						select c;
+			var dorder = from d in _declarationOrderRepository.Table
+						 where d.PaidDateUtc == DateTime.Now
+						 select d;
+			tree.AddRange(query);
+			return tree;
 		}
 
 		#endregion Reward points

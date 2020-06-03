@@ -146,10 +146,10 @@ namespace SmartStore.Services.Catalog
             //    query = query.Include(x => x.ProductBundleItems.Select(y => y.Product));
             //}
 
-            if (flags.HasFlag(ProductLoadFlags.WithCategories))
-            {
-                query = query.Include(x => x.ProductCategories.Select(y => y.Category));
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithCategories))
+            //{
+            //    query = query.Include(x => x.ProductCategories.Select(y => y.Category));
+            //}
 
             //if (flags.HasFlag(ProductLoadFlags.WithDiscounts))
             //{
@@ -166,10 +166,10 @@ namespace SmartStore.Services.Catalog
                 query = query.Include(x => x.ProductPictures);
             }
 
-            if (flags.HasFlag(ProductLoadFlags.WithReviews))
-            {
-                query = query.Include(x => x.ProductReviews);
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithReviews))
+            //{
+            //    query = query.Include(x => x.ProductReviews);
+            //}
 
             //if (flags.HasFlag(ProductLoadFlags.WithSpecificationAttributes))
             //{
@@ -181,10 +181,10 @@ namespace SmartStore.Services.Catalog
             //    query = query.Include(x => x.ProductTags);
             //}
 
-            if (flags.HasFlag(ProductLoadFlags.WithTierPrices))
-            {
-                query = query.Include(x => x.TierPrices);
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithTierPrices))
+            //{
+            //    query = query.Include(x => x.TierPrices);
+            //}
 
             //if (flags.HasFlag(ProductLoadFlags.WithAttributes))
             //{
@@ -196,10 +196,10 @@ namespace SmartStore.Services.Catalog
             //    query = query.Include(x => x.ProductVariantAttributes.Select(y => y.ProductVariantAttributeValues));
             //}
 
-            if (flags.HasFlag(ProductLoadFlags.WithDeliveryTime))
-            {
-                query = query.Include(x => x.DeliveryTime);
-            }
+            //if (flags.HasFlag(ProductLoadFlags.WithDeliveryTime))
+            //{
+            //    query = query.Include(x => x.DeliveryTime);
+            //}
 
             return query;
         }
@@ -218,35 +218,35 @@ namespace SmartStore.Services.Catalog
             _productRepository.Update(product);
         }
 
-        public virtual void UpdateProductReviewTotals(DeclarationProduct product)
-        {
-            Guard.NotNull(product, nameof(product));
+        //public virtual void UpdateProductReviewTotals(DeclarationProduct product)
+        //{
+        //    Guard.NotNull(product, nameof(product));
 
-            int approvedRatingSum = 0;
-            int notApprovedRatingSum = 0;
-            int approvedTotalReviews = 0;
-            int notApprovedTotalReviews = 0;
-            var reviews = product.ProductReviews;
-            foreach (var pr in reviews)
-            {
-                if (pr.IsApproved)
-                {
-                    approvedRatingSum += pr.Rating;
-                    approvedTotalReviews++;
-                }
-                else
-                {
-                    notApprovedRatingSum += pr.Rating;
-                    notApprovedTotalReviews++;
-                }
-            }
+        //    int approvedRatingSum = 0;
+        //    int notApprovedRatingSum = 0;
+        //    int approvedTotalReviews = 0;
+        //    int notApprovedTotalReviews = 0;
+        //    var reviews = product.ProductReviews;
+        //    foreach (var pr in reviews)
+        //    {
+        //        if (pr.IsApproved)
+        //        {
+        //            approvedRatingSum += pr.Rating;
+        //            approvedTotalReviews++;
+        //        }
+        //        else
+        //        {
+        //            notApprovedRatingSum += pr.Rating;
+        //            notApprovedTotalReviews++;
+        //        }
+        //    }
 
-            product.ApprovedRatingSum = approvedRatingSum;
-            product.NotApprovedRatingSum = notApprovedRatingSum;
-            product.ApprovedTotalReviews = approvedTotalReviews;
-            product.NotApprovedTotalReviews = notApprovedTotalReviews;
-            UpdateProduct(product);
-        }
+        //    product.ApprovedRatingSum = approvedRatingSum;
+        //    product.NotApprovedRatingSum = notApprovedRatingSum;
+        //    product.ApprovedTotalReviews = approvedTotalReviews;
+        //    product.NotApprovedTotalReviews = notApprovedTotalReviews;
+        //    UpdateProduct(product);
+        //}
 
         //public virtual IList<DeclarationProduct> GetLowStockProducts()
         //{
