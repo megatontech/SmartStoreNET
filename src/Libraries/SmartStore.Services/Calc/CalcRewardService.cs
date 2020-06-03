@@ -147,7 +147,7 @@ namespace SmartStore.Services.Calc
         /// </summary>
         /// <param name="treeNode"></param>
         /// <param name="StoreTotal"></param>
-        public void CalcRewardFour(TreeNode<Customer> treeNode, decimal StoreTotal)
+        public void CalcRewardFour( decimal StoreTotal)
         {
             //商城利润红包
             var storeReward = Math.Round(StoreTotal * (decimal)0.1, 2);
@@ -206,13 +206,35 @@ namespace SmartStore.Services.Calc
                 Dictionary<Guid, decimal> keyValuePairsDirect = new Dictionary<Guid, decimal>();
                 //每条线业绩累加到最下级
                 item.LineTotalpairs = keyValuePairsTotal;
+                foreach (var subcustomer in customers.Where(x => x.ParentCustomerGuid == item.CustomerGuid))
+                {
+                    keyValuePairsTotal.Add(subcustomer.CustomerGuid, CalcLineTotal(customers, subcustomer));
+                }
 
-
-                TreeNode<Customer> tree = new TreeNode<Customer>(item);
-                tree.AppendRange(customers.Where(x => x.ParentCustomerGuid == item.CustomerGuid));
-                item.ChildNode = tree;
+                //TreeNode<Customer> tree = new TreeNode<Customer>(item);
+                //tree.AppendRange(customers.Where(x => x.ParentCustomerGuid == item.CustomerGuid));
+                //item.ChildNode = tree;
             }
             return customers;
+        }
+        /// <summary>
+        /// 递归计算下级所有业绩
+        /// </summary>
+        /// <param name="customers"></param>
+        /// <returns></returns>
+        public decimal CalcLineTotal(List<Customer> customers, Customer customer) 
+        {
+            decimal total = 0M;
+            total += customer.OrderList.Sum(x => x.OrderTotal);
+            if (customers.Any(x => x.ParentCustomerGuid == customer.CustomerGuid)) 
+            {
+                foreach (var item in customers.Where(x => x.ParentCustomerGuid == customer.CustomerGuid))
+                {
+                    total += item.OrderList.Sum(x => x.OrderTotal);
+                    total += CalcLineTotal(customers, item);
+                }
+            }
+            return total;
         }
     }
 }

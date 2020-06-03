@@ -774,8 +774,12 @@ namespace SmartStore.Services.Customers
 						where c.IsCustomer == true
 						select c;
 			var dorder = from d in _declarationOrderRepository.Table
-						 where d.PaidDateUtc == DateTime.Now
+						 where d.PaidDateUtc.Value.Date == DateTime.Now.Date
 						 select d;
+			foreach (var item in query)
+			{
+				item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
+			}
 			tree.AddRange(query);
 			return tree;
 		}

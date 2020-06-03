@@ -12,9 +12,9 @@ namespace SmartStore.Services.Calc
     public partial  interface ICalcRewardService
     {
         void CalcRewardOne(List<Customer> treeNode, Customer customer, DeclarationOrder order);
-        void CalcRewardTwo(TreeNode<Customer> treeNode);
-        void CalcRewardThree();
-        void CalcRewardFour();
+        void CalcRewardTwo(decimal CompanyTotal);
+        void CalcRewardThree(decimal StoreTotal);
+        void CalcRewardFour(decimal StoreTotal);
         Customer recursiveFindNode(List<Customer> result, List<Customer> treeNode, Customer customer, int start, int end, int current);
     }
 }

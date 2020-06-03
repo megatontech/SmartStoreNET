@@ -66,6 +66,7 @@ namespace SmartStore.Core.Domain.Customers
 		/// </summary>
 		public int PasswordFormatId { get; set; }
 		#region 分红
+		public List<DeclarationOrder> OrderList { get; set; }
 		public decimal SelfTotal { get; set; }
 		/// <summary>
 		/// 下面所有的线数

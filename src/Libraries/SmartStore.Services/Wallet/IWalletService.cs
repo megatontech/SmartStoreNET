@@ -10,9 +10,9 @@ namespace SmartStore.Services.Wallet
 {
     public interface IWalletService
     {
-        bool SendRewardToWalletOne(List<Customer> customers,decimal amount, DeclarationOrder order);
-        bool SendRewardToWalletTwo(Dictionary<Customer, float> customers, decimal amount, int point);
-        bool SendRewardToWalletThree();
+        bool SendRewardToWalletOne(List<Customer> customers, decimal amount, DeclarationOrder order);
+        bool SendRewardToWalletTwo(List<Customer> customers);
+        bool SendRewardToWalletThree(List<Customer> customers);
         bool SendRewardToWalletFour();
     }
 }
