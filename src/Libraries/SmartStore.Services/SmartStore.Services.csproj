@@ -673,8 +673,26 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration\SettingService.cs" />
     <Compile Include="Catalog\SpecificationAttributeService.cs" />
+    <Compile Include="Wallet\ICustomerPointsDetailService.cs" />
+    <Compile Include="Wallet\ICustomerPointsTotalService.cs" />
+    <Compile Include="Wallet\IDailyCustomerContributionDetailService.cs" />
+    <Compile Include="Wallet\IDailyTotalContributionService.cs" />
+    <Compile Include="Wallet\IDailyTotalContributionDetailService.cs" />
     <Compile Include="Wallet\IWalletService.cs" />
+    <Compile Include="Wallet\ILuckMoneyService.cs" />
     <Compile Include="Wallet\WalletService.cs" />
+    <Compile Include="Wallet\IWithdrawalTotalService.cs" />
+    <Compile Include="Wallet\CustomerPointsDetailService.cs" />
+    <Compile Include="Wallet\CustomerPointsTotalService.cs" />
+    <Compile Include="Wallet\DailyCustomerContributionDetailService.cs" />
+    <Compile Include="Wallet\DailyTotalContributionService.cs" />
+    <Compile Include="Wallet\DailyTotalContributionDetailService.cs" />
+    <Compile Include="Wallet\LuckMoneyService.cs" />
+    <Compile Include="Wallet\IWithdrawalApplyService.cs" />
+    <Compile Include="Wallet\WithdrawalApplyService.cs" />
+    <Compile Include="Wallet\IWithdrawalDetailService.cs" />
+    <Compile Include="Wallet\WithdrawalDetailService.cs" />
+    <Compile Include="Wallet\WithdrawalTotalService.cs" />
     <Compile Include="Web References\EuropaCheckVatService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

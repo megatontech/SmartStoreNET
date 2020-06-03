@@ -1242,6 +1242,9 @@
   <ItemGroup>
     <Content Include="Caching\Credits.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mapping\Wallet\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

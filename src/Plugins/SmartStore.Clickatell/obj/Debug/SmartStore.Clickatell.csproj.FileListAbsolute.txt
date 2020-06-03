@@ -29,3 +29,4 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.C
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Clickatell\obj\Debug\SmartStore.Clickatell.csproj.CopyComplete
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Clickatell\obj\Debug\SmartStore.Clickatell.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Clickatell\obj\Debug\SmartStore.Clickatell.pdb
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Clickatell\obj\Debug\SmartStore.Clickatell.csprojAssemblyReference.cache

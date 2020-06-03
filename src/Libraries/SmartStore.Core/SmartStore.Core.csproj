@@ -255,6 +255,15 @@
     <Compile Include="Domain\Seo\UrlRecordCollection.cs" />
     <Compile Include="Domain\Tasks\ScheduleTaskHistory.cs" />
     <Compile Include="Domain\Tax\AuxiliaryServicesTaxType.cs" />
+    <Compile Include="Domain\Wallet\CustomerPointsDetail.cs" />
+    <Compile Include="Domain\Wallet\CustomerPointsTotal.cs" />
+    <Compile Include="Domain\Wallet\DailyCustomerContributionDetail.cs" />
+    <Compile Include="Domain\Wallet\DailyTotalContribution.cs" />
+    <Compile Include="Domain\Wallet\DailyTotalContributionDetail.cs" />
+    <Compile Include="Domain\Wallet\LuckMoney.cs" />
+    <Compile Include="Domain\Wallet\WithdrawalApply.cs" />
+    <Compile Include="Domain\Wallet\WithdrawalDetail.cs" />
+    <Compile Include="Domain\Wallet\WithdrawalTotal.cs" />
     <Compile Include="Events\AmbigousConsumerException.cs" />
     <Compile Include="Events\CommonMessages\AppStartedEvent.cs" />
     <Compile Include="Events\ConsumeContext.cs" />
