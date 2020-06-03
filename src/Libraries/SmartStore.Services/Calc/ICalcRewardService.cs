@@ -14,7 +14,7 @@ namespace SmartStore.Services.Calc
         void CalcRewardOne(List<Customer> treeNode, Customer customer, DeclarationOrder order);
         void CalcRewardTwo(decimal CompanyTotal);
         void CalcRewardThree(decimal StoreTotal);
-        void CalcRewardFour(decimal StoreTotal);
+        void CalcRewardFour(decimal StoreTotal, bool isEqual = false);
         Customer recursiveFindNode(List<Customer> result, List<Customer> treeNode, Customer customer, int start, int end, int current);
     }
 }

@@ -1,7 +1,5 @@
-﻿using SmartStore.Collections;
-using SmartStore.Core.Domain.Customers;
+﻿using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Declaration;
-using SmartStore.Core.Domain.Directory;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Declaration;
@@ -14,10 +12,17 @@ namespace SmartStore.Services.Calc
 {
     public class CalcRewardService : ICalcRewardService
     {
-        private readonly IWalletService _walletService;
+        #region Private Fields
+
         private readonly ICustomerService _CustomerService;
         private readonly IDeclarationCapRuleService _DeclarationCapRuleService;
         private readonly List<DeclarationCapRule> _rule;
+        private readonly IWalletService _walletService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
         public CalcRewardService(IWalletService walletService, ICustomerService customerService, IDeclarationCapRuleService declarationCapRuleService)
         {
             _walletService = walletService;
@@ -25,6 +30,42 @@ namespace SmartStore.Services.Calc
             _DeclarationCapRuleService = declarationCapRuleService;
             _rule = _DeclarationCapRuleService.GetAllRule().ToList();
         }
+
+        #endregion Public Constructors
+
+        #region 发钱算法
+
+        /// <summary>
+        /// 商城红包,佣金来源四：平台每日拿出商城利润的10%进行红包发放，
+        /// 系统可设置发放时间段例如8:00~8:30 ; 10:00~10:30 ; 14:00~14:30 等
+        /// ，系统根据要分红的额度以及会员数、时间段自动进行红包额度的分配
+        /// 随机发放
+        /// </summary>
+        /// <param name="treeNode"></param>
+        /// <param name="StoreTotal"></param>
+        public void CalcRewardFour(decimal StoreTotal, bool isEqual = false)
+        {
+            //商城利润红包
+            var storeReward = Math.Round(StoreTotal * (decimal)0.1, 2);
+            List<Customer> customers = _CustomerService.BuildTree();
+            LeftMoneyPackage package = new LeftMoneyPackage();
+            package.remainMoney = (double)storeReward;
+            package.remainSize = customers.Count();
+            foreach (var item in customers)
+            {
+                if (isEqual)
+                {
+                    item.TotalPointsValue4 = Math.Round(storeReward / customers.Count(), 2);
+                }
+                else
+                {
+                    item.TotalPointsValue4 = (decimal)getRandomMoney(package);
+                }
+            }
+
+            _walletService.SendRewardToWalletFour(customers);
+        }
+
         /// <summary>
         /// 佣金（可提现额度的增长值）来源一：直推一代（表示下级录单）奖金，报单金额15%，
         /// 同时上找5层每人再返15个点的10个点，例如单额100，直推15，往上5层每人再给1.5，
@@ -55,34 +96,33 @@ namespace SmartStore.Services.Calc
         }
 
         /// <summary>
-        /// 传入当前节点，查询上级N层节点
+        /// 商城利润分红
         /// </summary>
-        /// <param name="result"></param>
         /// <param name="treeNode"></param>
-        /// <param name="customer"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <param name="current"></param>
-        /// <returns></returns>
-        public Customer recursiveFindNode(List<Customer> result, List<Customer> treeNode, Customer customer, int start, int end, int current)
+        /// <param name="StoreTotal"></param>
+        public void CalcRewardThree(decimal StoreTotal)
         {
-            var customer1 = treeNode.Where(x => x.CustomerGuid == customer.ParentCustomerGuid).FirstOrDefault();
-            ++current;
-            if (current >= start && current <= end && customer1 != null)
+            //商城利润分红
+            var storeReward = Math.Round(StoreTotal * (decimal)0.5, 2);
+            //贡献值总数
+            var totalPoint = (decimal)0;
+            //计算并填充贡献点数计算业绩计算活跃线数
+            var allCustomer = GenetateeNode();
+            //计算每个人点数
+            List<Customer> list = CalcCustomersPoints(allCustomer);
+            totalPoint = (decimal)list.Sum(x => x.TotalPoints);
+            //每个贡献值的价值
+            var pointValue = (decimal)0;
+            pointValue = Math.Round(storeReward / totalPoint);
+            //每个人的贡献值
+            foreach (var item in list)
             {
-                if (current == start) { result.Add(customer1); }
-
-                result.Add(recursiveFindNode(result, treeNode, customer1, start, end, current));
+                item.TotalPointsValue3 = pointValue * (decimal)item.TotalPoints;
             }
-            else if (current < start)
-            {
-                result.Add(recursiveFindNode(result, treeNode, customer1, start, end, current));
-                customer1 = null;
-            }
-            else { return null; }
-            result.Remove(x => x == null);
-            return customer1;
+            //按每个人的贡献值发放分红*
+            _walletService.SendRewardToWalletThree(list);
         }
+
         /// <summary>
         /// 佣金来源二：公司当日总体业绩（销售总额）25%商城利润分红，分红按个人贡献值的个数加权分红，贡献值个数的算法：
         ///1.公司当日总体业绩2.8万；
@@ -115,47 +155,36 @@ namespace SmartStore.Services.Calc
             //按每个人的贡献值发放分红*
             _walletService.SendRewardToWalletTwo(list);
         }
+
+        #endregion 发钱算法
+
+        #region 辅助算法
+
         /// <summary>
-        /// 商城利润分红
+        /// 红包算法
         /// </summary>
-        /// <param name="treeNode"></param>
-        /// <param name="StoreTotal"></param>
-        public void CalcRewardThree( decimal StoreTotal)
+        /// <param name="_leftMoneyPackage"></param>
+        /// <returns></returns>
+        public static double getRandomMoney(LeftMoneyPackage _leftMoneyPackage)
         {
-            //商城利润分红
-            var storeReward = Math.Round(StoreTotal * (decimal)0.5, 2);
-            //贡献值总数
-            var totalPoint = (decimal)0;
-            //计算并填充贡献点数计算业绩计算活跃线数
-            var allCustomer = GenetateeNode();
-            //计算每个人点数
-            List<Customer> list = CalcCustomersPoints(allCustomer);
-            totalPoint = (decimal)list.Sum(x => x.TotalPoints);
-            //每个贡献值的价值
-            var pointValue = (decimal)0;
-            pointValue = Math.Round(storeReward / totalPoint);
-            //每个人的贡献值
-            foreach (var item in list)
+            // remainSize 剩余的红包数量
+            // remainMoney 剩余的钱
+            if (_leftMoneyPackage.remainSize == 1)
             {
-                item.TotalPointsValue3 = pointValue * (decimal)item.TotalPoints;
+                _leftMoneyPackage.remainSize--;
+                return (double)Math.Round(_leftMoneyPackage.remainMoney * 100) / 100;
             }
-            //按每个人的贡献值发放分红*
-            _walletService.SendRewardToWalletThree(list);
+            Random r = new Random();
+            double min = 0.01;
+            double max = _leftMoneyPackage.remainMoney / _leftMoneyPackage.remainSize * 2;
+            double money = r.NextDouble() * max;
+            money = money <= min ? 0.01 : money;
+            money = Math.Floor(money * 100) / 100;
+            _leftMoneyPackage.remainSize--;
+            _leftMoneyPackage.remainMoney -= money;
+            return money;
         }
-        /// <summary>
-        /// 商城红包,佣金来源四：平台每日拿出商城利润的10%进行红包发放，
-        /// 系统可设置发放时间段例如8:00~8:30 ; 10:00~10:30 ; 14:00~14:30 等
-        /// ，系统根据要分红的额度以及会员数、时间段自动进行红包额度的分配
-        /// 随机发放
-        /// </summary>
-        /// <param name="treeNode"></param>
-        /// <param name="StoreTotal"></param>
-        public void CalcRewardFour( decimal StoreTotal)
-        {
-            //商城利润红包
-            var storeReward = Math.Round(StoreTotal * (decimal)0.1, 2);
-            _walletService.SendRewardToWalletFour();
-        }
+
         /// <summary>
         /// 计算每个人点数
         /// </summary>
@@ -176,28 +205,36 @@ namespace SmartStore.Services.Calc
                 {
                     item.CapLinesTotal += GetActiveLineCapValue(i);
                 }
-                if (pair.Count() > 0) 
+                if (pair.Count() > 0)
                 {
                     pair.Remove(item.LineTotalpairs.FirstOrDefault(x => x.Value == item.LineTotalpairs.Values.Max()).Key);
                 }
-                
+
                 item.TotalPoints = (float)(pair.Sum(x => x.Value) / 100);
-                
             }
             return customers;
+        }
 
-        }
         /// <summary>
-        /// 查询每一级封顶值
+        /// 递归计算下级所有业绩
         /// </summary>
-        /// <param name="line">当前级别</param>
+        /// <param name="customers"></param>
         /// <returns></returns>
-        public decimal GetActiveLineCapValue(int line)
+        public decimal CalcLineTotal(List<Customer> customers, Customer customer)
         {
-            decimal result = 0.00M;
-            result = _rule.Any(x=>x.LineCount==line)? _rule.First(x=> x.LineCount == line).RewardAmount:0M;
-            return result;
+            decimal total = 0M;
+            total += customer.OrderList.Sum(x => x.OrderTotal);
+            if (customers.Any(x => x.ParentCustomerGuid == customer.CustomerGuid))
+            {
+                foreach (var item in customers.Where(x => x.ParentCustomerGuid == customer.CustomerGuid))
+                {
+                    //total += item.OrderList.Sum(x => x.OrderTotal);
+                    total += CalcLineTotal(customers, item);
+                }
+            }
+            return total;
         }
+
         /// <summary>
         /// 填充客户。计算每人每个线中业绩
         /// </summary>
@@ -224,24 +261,59 @@ namespace SmartStore.Services.Calc
             }
             return customers;
         }
+
         /// <summary>
-        /// 递归计算下级所有业绩
+        /// 查询每一级封顶值
         /// </summary>
-        /// <param name="customers"></param>
+        /// <param name="line">当前级别</param>
         /// <returns></returns>
-        public decimal CalcLineTotal(List<Customer> customers, Customer customer) 
+        public decimal GetActiveLineCapValue(int line)
         {
-            decimal total = 0M;
-            total += customer.OrderList.Sum(x => x.OrderTotal);
-            if (customers.Any(x => x.ParentCustomerGuid == customer.CustomerGuid)) 
-            {
-                foreach (var item in customers.Where(x => x.ParentCustomerGuid == customer.CustomerGuid))
-                {
-                    //total += item.OrderList.Sum(x => x.OrderTotal);
-                    total += CalcLineTotal(customers, item);
-                }
-            }
-            return total;
+            decimal result = 0.00M;
+            result = _rule.Any(x => x.LineCount == line) ? _rule.First(x => x.LineCount == line).RewardAmount : 0M;
+            return result;
         }
+
+        /// <summary>
+        /// 传入当前节点，查询上级N层节点
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="treeNode"></param>
+        /// <param name="customer"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="current"></param>
+        /// <returns></returns>
+        public Customer recursiveFindNode(List<Customer> result, List<Customer> treeNode, Customer customer, int start, int end, int current)
+        {
+            var customer1 = treeNode.Where(x => x.CustomerGuid == customer.ParentCustomerGuid).FirstOrDefault();
+            ++current;
+            if (current >= start && current <= end && customer1 != null)
+            {
+                if (current == start) { result.Add(customer1); }
+
+                result.Add(recursiveFindNode(result, treeNode, customer1, start, end, current));
+            }
+            else if (current < start)
+            {
+                result.Add(recursiveFindNode(result, treeNode, customer1, start, end, current));
+                customer1 = null;
+            }
+            else { return null; }
+            result.Remove(x => x == null);
+            return customer1;
+        }
+
+        #endregion 辅助算法
+    }
+
+    public class LeftMoneyPackage
+    {
+        #region Public Properties
+
+        public double remainMoney { get; set; }
+        public int remainSize { get; set; }
+
+        #endregion Public Properties
     }
 }

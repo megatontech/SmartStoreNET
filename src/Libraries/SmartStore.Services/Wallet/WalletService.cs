@@ -2,16 +2,31 @@
 using SmartStore.Core.Domain.Orders;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartStore.Services.Wallet
 {
     public class WalletService : IWalletService
     {
+        #region Public Constructors
+
         public WalletService()
         {
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        /// <summary>
+        /// 发红包
+        /// </summary>
+        /// <param name="customers"></param>
+        /// <returns></returns>
+        public bool SendRewardToWalletFour(List<Customer> customers)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -31,8 +46,19 @@ namespace SmartStore.Services.Wallet
             }
             return true;
         }
+
         /// <summary>
-        /// 按每个用户的贡献值发放分红
+        /// 按每个用户的贡献值发放商城利润分红
+        /// </summary>
+        /// <param name="customers"></param>
+        /// <returns></returns>
+        public bool SendRewardToWalletThree(List<Customer> customers)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 按每个用户的贡献值发放营业额度分红
         /// </summary>
         /// <param name="customers"></param>
         /// <param name="amount"></param>
@@ -41,15 +67,7 @@ namespace SmartStore.Services.Wallet
         {
             throw new NotImplementedException();
         }
-        public bool SendRewardToWalletThree(List<Customer> customers)
-        {
-            throw new NotImplementedException();
-        }
 
-       
-        public bool SendRewardToWalletFour()
-        {
-            throw new NotImplementedException();
-        }
+        #endregion Public Methods
     }
 }

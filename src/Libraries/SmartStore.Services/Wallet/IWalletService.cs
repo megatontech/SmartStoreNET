@@ -13,6 +13,6 @@ namespace SmartStore.Services.Wallet
         bool SendRewardToWalletOne(List<Customer> customers, decimal amount, DeclarationOrder order);
         bool SendRewardToWalletTwo(List<Customer> customers);
         bool SendRewardToWalletThree(List<Customer> customers);
-        bool SendRewardToWalletFour();
+        bool SendRewardToWalletFour(List<Customer> customers);
     }
 }
