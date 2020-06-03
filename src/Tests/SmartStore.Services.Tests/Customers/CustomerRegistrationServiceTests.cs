@@ -134,22 +134,22 @@ namespace SmartStore.Services.Tests.Customers
 
 			_gdprTool = MockRepository.GenerateMock<Lazy<IGdprTool>>();
 
-			_customerService = new CustomerService(
-				_customerRepo, 
-				_customerRoleRepo,
-                _genericAttributeRepo, 
-				_rewardPointsHistoryRepo, 
-                _shoppingCartItemRepo,
-				_genericAttributeService,
-				_rewardPointsSettings, 
-				_services, 
-				new FakeHttpContext("~/"), 
-				_userAgent, 
-				new CustomerSettings(),
-				_gdprTool);
+			//_customerService = new CustomerService(
+			//	_customerRepo, 
+			//	_customerRoleRepo,
+   //             _genericAttributeRepo, 
+			//	_rewardPointsHistoryRepo, 
+   //             _shoppingCartItemRepo,
+			//	_genericAttributeService,
+			//	_rewardPointsSettings, 
+			//	_services, 
+			//	new FakeHttpContext("~/"), 
+			//	_userAgent, 
+			//	new CustomerSettings(),
+			//	_gdprTool);
 
-            _customerRegistrationService = new CustomerRegistrationService(_customerService,
-                _encryptionService, _newsLetterSubscriptionService, _rewardPointsSettings, _customerSettings, _storeContext, _eventPublisher);
+   //         _customerRegistrationService = new CustomerRegistrationService(_customerService,
+   //             _encryptionService, _newsLetterSubscriptionService, _rewardPointsSettings, _customerSettings, _storeContext, _eventPublisher);
         }
 
         //[Test]
