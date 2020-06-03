@@ -10,7 +10,10 @@ namespace SmartStore.Services.Wallet
 {
     public class WalletService : IWalletService
     {
-        
+        public WalletService()
+        {
+        }
+
         /// <summary>
         /// 向列表中每个客户打钱，并且记录此次交易细节
         /// </summary>

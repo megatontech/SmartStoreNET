@@ -14,11 +14,11 @@ namespace SmartStore.Services.Calc
 {
     public class CalcRewardService : ICalcRewardService
     {
-        private readonly WalletService _walletService;
-        private readonly CustomerService _CustomerService;
-        private readonly DeclarationCapRuleService _DeclarationCapRuleService;
+        private readonly IWalletService _walletService;
+        private readonly ICustomerService _CustomerService;
+        private readonly IDeclarationCapRuleService _DeclarationCapRuleService;
         private readonly List<DeclarationCapRule> _rule;
-        public CalcRewardService(WalletService walletService, CustomerService customerService, DeclarationCapRuleService declarationCapRuleService)
+        public CalcRewardService(IWalletService walletService, ICustomerService customerService, IDeclarationCapRuleService declarationCapRuleService)
         {
             _walletService = walletService;
             _CustomerService = customerService;
@@ -143,7 +143,10 @@ namespace SmartStore.Services.Calc
             _walletService.SendRewardToWalletThree(list);
         }
         /// <summary>
-        /// 商城红包
+        /// 商城红包,佣金来源四：平台每日拿出商城利润的10%进行红包发放，
+        /// 系统可设置发放时间段例如8:00~8:30 ; 10:00~10:30 ; 14:00~14:30 等
+        /// ，系统根据要分红的额度以及会员数、时间段自动进行红包额度的分配
+        /// 随机发放
         /// </summary>
         /// <param name="treeNode"></param>
         /// <param name="StoreTotal"></param>
@@ -164,17 +167,22 @@ namespace SmartStore.Services.Calc
             foreach (var item in customers)
             {
                 var pair = item.LineTotalpairs;
-                pair.Remove(item.LineTotalpairs.Max().Key);
-                item.TotalPoints = (float)(pair.Sum(x => x.Value) / 100);
                 //活跃线数
-                item.ActiveLines = pair.Count(x => x.Value != 0);
+                item.ActiveLines = item.LineTotalpairs.Count(x => x.Value != 0);
                 //封顶线数
                 item.CapLines = item.ActiveLines;
                 //封顶钱数
-                for (int i = 1; i < item.CapLines; i++)
+                for (int i = 1; i <= item.CapLines; i++)
                 {
-                    item.CapLinesTotal += GetActiveLineCapValue(1);
+                    item.CapLinesTotal += GetActiveLineCapValue(i);
                 }
+                if (pair.Count() > 0) 
+                {
+                    pair.Remove(item.LineTotalpairs.FirstOrDefault(x => x.Value == item.LineTotalpairs.Values.Max()).Key);
+                }
+                
+                item.TotalPoints = (float)(pair.Sum(x => x.Value) / 100);
+                
             }
             return customers;
 
@@ -205,12 +213,11 @@ namespace SmartStore.Services.Calc
                 Dictionary<Guid, decimal> keyValuePairsTotal = new Dictionary<Guid, decimal>();
                 Dictionary<Guid, decimal> keyValuePairsDirect = new Dictionary<Guid, decimal>();
                 //每条线业绩累加到最下级
-                item.LineTotalpairs = keyValuePairsTotal;
                 foreach (var subcustomer in customers.Where(x => x.ParentCustomerGuid == item.CustomerGuid))
                 {
                     keyValuePairsTotal.Add(subcustomer.CustomerGuid, CalcLineTotal(customers, subcustomer));
                 }
-
+                item.LineTotalpairs = keyValuePairsTotal;
                 //TreeNode<Customer> tree = new TreeNode<Customer>(item);
                 //tree.AppendRange(customers.Where(x => x.ParentCustomerGuid == item.CustomerGuid));
                 //item.ChildNode = tree;
@@ -230,7 +237,7 @@ namespace SmartStore.Services.Calc
             {
                 foreach (var item in customers.Where(x => x.ParentCustomerGuid == customer.CustomerGuid))
                 {
-                    total += item.OrderList.Sum(x => x.OrderTotal);
+                    //total += item.OrderList.Sum(x => x.OrderTotal);
                     total += CalcLineTotal(customers, item);
                 }
             }
