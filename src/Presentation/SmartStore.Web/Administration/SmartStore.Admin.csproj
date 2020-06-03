@@ -679,6 +679,49 @@
     <Content Include="Views\DeclarationFinaduit\ShipmentDetails.Print.cshtml" />
     <Content Include="Views\DeclarationFinaduit\ShipmentList.cshtml" />
     <Content Include="Views\DeclarationFinaduit\UploadLicenseFilePopup.cshtml" />
+    <Content Include="Views\DeclarationControlcenter\About.cshtml" />
+    <Content Include="Views\DeclarationControlcenter\Index.cshtml" />
+    <Content Include="Views\DeclarationControlcenter\MarketplaceFeed.cshtml" />
+    <Content Include="Views\DeclarationControlcenter\UaTester.cshtml" />
+    <Content Include="Views\DeclarationUser\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationUser\_CreateOrUpdateAddress.cshtml" />
+    <Content Include="Views\DeclarationUser\_ReportBestCustomersByNumberOfOrders.cshtml" />
+    <Content Include="Views\DeclarationUser\_ReportBestCustomersByOrderTotal.cshtml" />
+    <Content Include="Views\DeclarationUser\AddressCreate.cshtml" />
+    <Content Include="Views\DeclarationUser\AddressEdit.cshtml" />
+    <Content Include="Views\DeclarationUser\Create.cshtml" />
+    <Content Include="Views\DeclarationUser\Edit.cshtml" />
+    <Content Include="Views\DeclarationUser\List.cshtml" />
+    <Content Include="Views\DeclarationUser\ReportRegisteredCustomers.cshtml" />
+    <Content Include="Views\DeclarationUser\Reports.cshtml" />
+    <Content Include="Views\DeclarationParamControl\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationParamControl\Create.cshtml" />
+    <Content Include="Views\DeclarationParamControl\Edit.cshtml" />
+    <Content Include="Views\DeclarationParamControl\List.cshtml" />
+    <Content Include="Views\DeclarationFinwithdraladuit\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationFinwithdraladuit\Create.cshtml" />
+    <Content Include="Views\DeclarationFinwithdraladuit\Edit.cshtml" />
+    <Content Include="Views\DeclarationFinwithdraladuit\List.cshtml" />
+    <Content Include="Views\DeclarationBalanceOverview\About.cshtml" />
+    <Content Include="Views\DeclarationBalanceOverview\Index.cshtml" />
+    <Content Include="Views\DeclarationBalanceOverview\MarketplaceFeed.cshtml" />
+    <Content Include="Views\DeclarationBalanceOverview\UaTester.cshtml" />
+    <Content Include="Views\DeclarationCustomOverview\About.cshtml" />
+    <Content Include="Views\DeclarationCustomOverview\Index.cshtml" />
+    <Content Include="Views\DeclarationCustomOverview\MarketplaceFeed.cshtml" />
+    <Content Include="Views\DeclarationCustomOverview\UaTester.cshtml" />
+    <Content Include="Views\DeclarationProductOverview\About.cshtml" />
+    <Content Include="Views\DeclarationProductOverview\Index.cshtml" />
+    <Content Include="Views\DeclarationProductOverview\MarketplaceFeed.cshtml" />
+    <Content Include="Views\DeclarationProductOverview\UaTester.cshtml" />
+    <Content Include="Views\DeclarationWalletControl\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationWalletControl\Create.cshtml" />
+    <Content Include="Views\DeclarationWalletControl\Edit.cshtml" />
+    <Content Include="Views\DeclarationWalletControl\List.cshtml" />
+    <Content Include="Views\DeclarationWithdrawControl\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationWithdrawControl\Create.cshtml" />
+    <Content Include="Views\DeclarationWithdrawControl\Edit.cshtml" />
+    <Content Include="Views\DeclarationWithdrawControl\List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />
@@ -1258,17 +1301,7 @@
   <ItemGroup>
     <Content Include="Views\Product\_CreateOrUpdateProductTag.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\DeclarationBalanceOverview\" />
-    <Folder Include="Views\DeclarationControlcenter\" />
-    <Folder Include="Views\DeclarationCustomOverview\" />
-    <Folder Include="Views\DeclarationFinwithdraladuit\" />
-    <Folder Include="Views\DeclarationParamControl\" />
-    <Folder Include="Views\DeclarationProductOverview\" />
-    <Folder Include="Views\DeclarationUser\" />
-    <Folder Include="Views\DeclarationWalletControl\" />
-    <Folder Include="Views\DeclarationWithdrawControl\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Views\DeliveryTime\List.cshtml" />
   </ItemGroup>

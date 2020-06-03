@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SmartStore.Services.Calc;
+using SmartStore.Web.Framework.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,11 +8,19 @@ using System.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-    public class DeclarationControlcenterController : Controller
+    public class DeclarationControlcenterController : AdminControllerBase
     {
+        private readonly ICalcRewardService _CalcRewardService;
+
+        public DeclarationControlcenterController(ICalcRewardService calcRewardService)
+        {
+            _CalcRewardService = calcRewardService;
+        }
+
         // GET: DeclarationControlcenter
         public ActionResult Index()
         {
+            _CalcRewardService.CalcRewardTwo(1400M);
             return View();
         }
 

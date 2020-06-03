@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartStore.Web.Framework.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,7 +10,7 @@ namespace SmartStore.Admin.Controllers
     /// <summary>
     /// 报单系统管理/钱包算法控制
     /// </summary>
-    public class DeclarationWalletControlController : Controller
+    public class DeclarationWalletControlController : AdminControllerBase
     {
         // GET: DeclarationWalletControl
         public ActionResult Index()

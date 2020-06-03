@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartStore.Web.Framework.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,7 +10,7 @@ namespace SmartStore.Admin.Controllers
     /// <summary>
     /// 数据报表/报单产品统计
     /// </summary>
-    public class DeclarationProductOverviewController : Controller
+    public class DeclarationProductOverviewController : AdminControllerBase
     {
         // GET: DeclarationProductOverview
         public ActionResult Index()

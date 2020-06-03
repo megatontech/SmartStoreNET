@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartStore.Web.Framework.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,7 +10,7 @@ namespace SmartStore.Admin.Controllers
     /// <summary>
     /// 报单系统管理/佣金算法控制
     /// </summary>
-    public class DeclarationParamControlController : Controller
+    public class DeclarationParamControlController : AdminControllerBase
     {
         // GET: DeclarationParamControl
         public ActionResult Index()
