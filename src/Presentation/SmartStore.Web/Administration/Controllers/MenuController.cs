@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Menus;
+﻿using SmartStore.Admin.Models.Menus;
 using SmartStore.ComponentModel;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Cms;
@@ -18,6 +14,10 @@ using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Modelling;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Framework.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -25,14 +25,20 @@ namespace SmartStore.Admin.Controllers
     [AdminAuthorize]
     public class MenuController : AdminControllerBase
     {
-        private readonly IMenuStorage _menuStorage;
+        #region Private Fields
+
+        private readonly IAclService _aclService;
+        private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly ICustomerService _customerService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizedEntityService _localizedEntityService;
-        private readonly IStoreMappingService _storeMappingService;
-        private readonly IAclService _aclService;
-        private readonly ICustomerService _customerService;
         private readonly IDictionary<string, Lazy<IMenuItemProvider, MenuItemProviderMetadata>> _menuItemProviders;
-        private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly IMenuStorage _menuStorage;
+        private readonly IStoreMappingService _storeMappingService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public MenuController(
             IMenuStorage menuStorage,
@@ -54,58 +60,11 @@ namespace SmartStore.Admin.Controllers
             _adminAreaSettings = adminAreaSettings;
         }
 
-        public ActionResult Index()
-        {
-            return RedirectToAction("List");
-        }
+        #endregion Public Constructors
 
-        public ActionResult List()
-        {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
-            {
-                return AccessDeniedView();
-            }
 
-            var model = new MenuRecordListModel
-            {
-                GridPageSize = _adminAreaSettings.GridPageSize,
-                AvailableStores = Services.StoreService.GetAllStores().ToSelectListItems()
-            };
 
-            return View(model);
-        }
-
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult List(GridCommand command, MenuRecordListModel model)
-        {
-            var gridModel = new GridModel<MenuRecordModel>();
-
-            if (Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
-            {
-                var menus = _menuStorage.GetAllMenus(model.SystemName, model.StoreId, true, command.Page - 1, command.PageSize);
-
-                gridModel.Data = menus.Select(x =>
-                {
-                    var itemModel = new MenuRecordModel();
-                    MiniMapper.Map(x, itemModel);
-
-                    return itemModel;
-                });
-
-                gridModel.Total = menus.TotalCount;
-            }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<MenuRecordModel>();
-                NotifyAccessDenied();
-            }
-
-            return new JsonResult
-            {
-                MaxJsonLength = int.MaxValue,
-                Data = gridModel
-            };
-        }
+        #region Public Methods
 
         public ActionResult Create()
         {
@@ -149,6 +108,32 @@ namespace SmartStore.Admin.Controllers
             PrepareModel(model, null);
 
             return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
+            {
+                return AccessDeniedView();
+            }
+
+            var menu = _menuStorage.GetMenuById(id);
+            if (menu == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (menu.IsSystemMenu)
+            {
+                NotifyError(T("Admin.ContentManagement.Menus.CannotBeDeleted"));
+                return RedirectToAction("Edit", new { id = menu.Id });
+            }
+
+            _menuStorage.DeleteMenu(menu);
+
+            NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+            return RedirectToAction("List");
         }
 
         public ActionResult Edit(int id)
@@ -212,48 +197,62 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
+
+        public ActionResult List()
         {
             if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
             {
                 return AccessDeniedView();
             }
 
-            var menu = _menuStorage.GetMenuById(id);
-            if (menu == null)
+            var model = new MenuRecordListModel
             {
-                return HttpNotFound();
-            }
+                GridPageSize = _adminAreaSettings.GridPageSize,
+                AvailableStores = Services.StoreService.GetAllStores().ToSelectListItems()
+            };
 
-            if (menu.IsSystemMenu)
-            {
-                NotifyError(T("Admin.ContentManagement.Menus.CannotBeDeleted"));
-                return RedirectToAction("Edit", new { id = menu.Id });
-            }
-
-            _menuStorage.DeleteMenu(menu);
-
-            NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
-            return RedirectToAction("List");
+            return View(model);
         }
+
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command, MenuRecordListModel model)
+        {
+            var gridModel = new GridModel<MenuRecordModel>();
+
+            if (Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
+            {
+                var menus = _menuStorage.GetAllMenus(model.SystemName, model.StoreId, true, command.Page - 1, command.PageSize);
+
+                gridModel.Data = menus.Select(x =>
+                {
+                    var itemModel = new MenuRecordModel();
+                    MiniMapper.Map(x, itemModel);
+
+                    return itemModel;
+                });
+
+                gridModel.Total = menus.TotalCount;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<MenuRecordModel>();
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                MaxJsonLength = int.MaxValue,
+                Data = gridModel
+            };
+        }
+
+        #endregion Public Methods
 
         #region Menu items
-
-        // Ajax.
-        public ActionResult ItemList(int id)
-        {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
-            {
-                NotifyAccessDenied();
-                return new EmptyResult();
-            }
-
-            var model = new MenuRecordModel { Id = id };
-            PrepareModel(model, null);
-
-            return PartialView(model);
-        }
 
         // Do not use model binding because of input validation.
         public ActionResult CreateItem(string providerName, int menuId, int parentItemId)
@@ -316,6 +315,35 @@ namespace SmartStore.Admin.Controllers
             PrepareModel(itemModel, null);
 
             return View(itemModel);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteItem(int id)
+        {
+            var isAjax = Request.IsAjaxRequest();
+
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
+            {
+                return isAjax ? new EmptyResult() : AccessDeniedView();
+            }
+
+            var item = _menuStorage.GetMenuItemById(id);
+            if (item == null)
+            {
+                if (isAjax)
+                {
+                    return new EmptyResult();
+                }
+
+                return HttpNotFound();
+            }
+
+            var menuId = item.MenuId;
+            _menuStorage.DeleteMenuItem(item);
+
+            NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+
+            return RedirectToAction(isAjax ? "ItemList" : "Edit", new { id = menuId });
         }
 
         public ActionResult EditItem(int id)
@@ -387,6 +415,21 @@ namespace SmartStore.Admin.Controllers
         }
 
         // Ajax.
+        public ActionResult ItemList(int id)
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
+            {
+                NotifyAccessDenied();
+                return new EmptyResult();
+            }
+
+            var model = new MenuRecordModel { Id = id };
+            PrepareModel(model, null);
+
+            return PartialView(model);
+        }
+
+        // Ajax.
         [HttpPost]
         public ActionResult MoveItem(int menuId, int sourceId, string direction)
         {
@@ -432,36 +475,7 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("ItemList", new { id = menuId });
         }
 
-        [HttpPost]
-        public ActionResult DeleteItem(int id)
-        {
-            var isAjax = Request.IsAjaxRequest();
-
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMenus))
-            {
-                return isAjax ? new EmptyResult() : AccessDeniedView();
-            }
-
-            var item = _menuStorage.GetMenuItemById(id);
-            if (item == null)
-            {
-                if (isAjax)
-                {
-                    return new EmptyResult();
-                }
-
-                return HttpNotFound();
-            }
-
-            var menuId = item.MenuId;
-            _menuStorage.DeleteMenuItem(item);
-
-            NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
-
-            return RedirectToAction(isAjax ? "ItemList" : "Edit", new { id = menuId });
-        }
-
-        #endregion
+        #endregion Menu items
 
         #region Utilities
 
@@ -532,7 +546,7 @@ namespace SmartStore.Admin.Controllers
                     // Ignore. Element cannot be parent itself.
                     model.TitlePlaceholder = x.Value.Text;
                 }
-                else if (entities.TryGetValue(x.Value.EntityId, out var record) && 
+                else if (entities.TryGetValue(x.Value.EntityId, out var record) &&
                     _menuItemProviders.TryGetValue(record.ProviderName, out provider) &&
                     provider.Metadata.AppendsMultipleItems)
                 {
@@ -574,6 +588,6 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        #endregion
+        #endregion Utilities
     }
 }

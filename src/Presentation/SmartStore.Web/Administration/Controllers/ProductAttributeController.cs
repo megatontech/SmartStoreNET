@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Catalog;
+﻿using SmartStore.Admin.Models.Catalog;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Logging;
@@ -13,158 +10,112 @@ using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
+    [AdminAuthorize]
     public class ProductAttributeController : AdminControllerBase
     {
-		#region Fields
+        #region Fields
 
-		private readonly IProductService _productService;
-		private readonly IProductAttributeService _productAttributeService;
+        private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly ICustomerActivityService _customerActivityService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizedEntityService _localizedEntityService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly IPermissionService _permissionService;
-		private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductService _productService;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Constructors
+        #region Constructors
 
-		public ProductAttributeController(
-			IProductService productService,
-			IProductAttributeService productAttributeService,
+        public ProductAttributeController(
+            IProductService productService,
+            IProductAttributeService productAttributeService,
             ILanguageService languageService,
-			ILocalizedEntityService localizedEntityService,
-			ICustomerActivityService customerActivityService,
+            ILocalizedEntityService localizedEntityService,
+            ICustomerActivityService customerActivityService,
             IPermissionService permissionService,
-			AdminAreaSettings adminAreaSettings)
+            AdminAreaSettings adminAreaSettings)
         {
-			_productService = productService;
+            _productService = productService;
             _productAttributeService = productAttributeService;
             _languageService = languageService;
             _localizedEntityService = localizedEntityService;
             _customerActivityService = customerActivityService;
             _permissionService = permissionService;
-			_adminAreaSettings = adminAreaSettings;
+            _adminAreaSettings = adminAreaSettings;
         }
 
-		#endregion
+        #endregion Constructors
 
-		#region Utilities
+        #region Utilities
 
-		private void PrepareProductAttributeOptionModel(ProductAttributeOptionModel model, ProductAttributeOption option)
-		{
-			// TODO: DRY, similar code in ProductController (ProductAttributeValueList, ProductAttributeValueEditPopup...)
-			if (option != null)
-			{
-				model.NameString = Server.HtmlEncode(option.Color.IsEmpty() ? option.Name : $"{option.Name} - {option.Color}");
-				model.PriceAdjustmentString = (option.ValueType == ProductVariantAttributeValueType.Simple ? option.PriceAdjustment.ToString("G29") : "");
-				model.WeightAdjustmentString = (option.ValueType == ProductVariantAttributeValueType.Simple ? option.WeightAdjustment.ToString("G29") : "");
-				model.TypeName = option.ValueType.GetLocalizedEnum(Services.Localization, Services.WorkContext);
-				model.TypeNameClass = (option.ValueType == ProductVariantAttributeValueType.ProductLinkage ? "fa fa-link mr-2" : "d-none hide hidden-xs-up");
+        private void PrepareProductAttributeOptionModel(ProductAttributeOptionModel model, ProductAttributeOption option)
+        {
+            // TODO: DRY, similar code in ProductController (ProductAttributeValueList, ProductAttributeValueEditPopup...)
+            if (option != null)
+            {
+                model.NameString = Server.HtmlEncode(option.Color.IsEmpty() ? option.Name : $"{option.Name} - {option.Color}");
+                model.PriceAdjustmentString = (option.ValueType == ProductVariantAttributeValueType.Simple ? option.PriceAdjustment.ToString("G29") : "");
+                model.WeightAdjustmentString = (option.ValueType == ProductVariantAttributeValueType.Simple ? option.WeightAdjustment.ToString("G29") : "");
+                model.TypeName = option.ValueType.GetLocalizedEnum(Services.Localization, Services.WorkContext);
+                model.TypeNameClass = (option.ValueType == ProductVariantAttributeValueType.ProductLinkage ? "fa fa-link mr-2" : "d-none hide hidden-xs-up");
 
-				var linkedProduct = _productService.GetProductById(option.LinkedProductId);
-				if (linkedProduct != null)
-				{
-					model.LinkedProductName = linkedProduct.GetLocalized(p => p.Name);
-					model.LinkedProductTypeName = linkedProduct.GetProductTypeLabel(Services.Localization);
-					model.LinkedProductTypeLabelHint = linkedProduct.ProductTypeLabelHint;
+                var linkedProduct = _productService.GetProductById(option.LinkedProductId);
+                if (linkedProduct != null)
+                {
+                    model.LinkedProductName = linkedProduct.GetLocalized(p => p.Name);
+                    model.LinkedProductTypeName = linkedProduct.GetProductTypeLabel(Services.Localization);
+                    model.LinkedProductTypeLabelHint = linkedProduct.ProductTypeLabelHint;
 
-					if (model.Quantity > 1)
-						model.QuantityInfo = $" × {model.Quantity}";
-				}
+                    if (model.Quantity > 1)
+                        model.QuantityInfo = $" × {model.Quantity}";
+                }
 
-				AddLocales(_languageService, model.Locales, (locale, languageId) =>
-				{
-					locale.Name = option.GetLocalized(x => x.Name, languageId, false, false);
-					locale.Alias = option.GetLocalized(x => x.Alias, languageId, false, false);
-				});
-			}
-		}
+                AddLocales(_languageService, model.Locales, (locale, languageId) =>
+                {
+                    locale.Name = option.GetLocalized(x => x.Name, languageId, false, false);
+                    locale.Alias = option.GetLocalized(x => x.Alias, languageId, false, false);
+                });
+            }
+        }
 
-		private void UpdateLocales(ProductAttribute productAttribute, ProductAttributeModel model)
+        private void UpdateLocales(ProductAttribute productAttribute, ProductAttributeModel model)
         {
             foreach (var localized in model.Locales)
             {
                 _localizedEntityService.SaveLocalizedValue(productAttribute, x => x.Name, localized.Name, localized.LanguageId);
-				_localizedEntityService.SaveLocalizedValue(productAttribute, x => x.Alias, localized.Alias, localized.LanguageId);
-				_localizedEntityService.SaveLocalizedValue(productAttribute, x => x.Description, localized.Description, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(productAttribute, x => x.Alias, localized.Alias, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(productAttribute, x => x.Description, localized.Description, localized.LanguageId);
             }
         }
 
-		private void UpdateOptionLocales(ProductAttributeOption productAttributeOption, ProductAttributeOptionModel model)
-		{
-			foreach (var localized in model.Locales)
-			{
-				_localizedEntityService.SaveLocalizedValue(productAttributeOption, x => x.Name, localized.Name, localized.LanguageId);
-				_localizedEntityService.SaveLocalizedValue(productAttributeOption, x => x.Alias, localized.Alias, localized.LanguageId);
-			}
-		}
-
-		#endregion
-
-		#region Product attribute
-
-		public ActionResult Index()
+        private void UpdateOptionLocales(ProductAttributeOption productAttributeOption, ProductAttributeOptionModel model)
         {
-            return RedirectToAction("List");
-        }
-
-        public ActionResult List()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
-
-			ViewData["GridPageSize"] = _adminAreaSettings.GridPageSize;
-
-            return View();
-        }
-
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult List(GridCommand command)
-        {
-			var gridModel = new GridModel<ProductAttributeModel>();
-
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var productAttributes = _productAttributeService.GetAllProductAttributes();
-
-				var data = productAttributes
-					.ForCommand(command)
-					.Select(x =>
-					{
-						var model = x.ToModel();
-						return model;
-					})
-					.ToList();
-
-				gridModel.Data = data.PagedForCommand(command);
-				gridModel.Total = data.Count;
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<ProductAttributeModel>();
-
-				NotifyAccessDenied();
-			}
-
-            return new JsonResult
+            foreach (var localized in model.Locales)
             {
-                Data = gridModel
-            };
+                _localizedEntityService.SaveLocalizedValue(productAttributeOption, x => x.Name, localized.Name, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(productAttributeOption, x => x.Alias, localized.Alias, localized.LanguageId);
+            }
         }
-        
+
+        #endregion Utilities
+
+        #region Product attribute
+
         public ActionResult Create()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
 
             var model = new ProductAttributeModel();
-			model.AllowFiltering = true;
+            model.AllowFiltering = true;
 
             AddLocales(_languageService, model.Locales);
             return View(model);
@@ -180,88 +131,30 @@ namespace SmartStore.Admin.Controllers
             {
                 var productAttribute = model.ToEntity();
 
-				try
-				{
-					_productAttributeService.InsertProductAttribute(productAttribute);
-				}
-				catch (Exception exception)
-				{
-					ModelState.AddModelError("", exception.Message);
-					return View(model);
-				}
+                try
+                {
+                    _productAttributeService.InsertProductAttribute(productAttribute);
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError("", exception.Message);
+                    return View(model);
+                }
 
-				try
-				{
-					UpdateLocales(productAttribute, model);
-				}
-				catch (Exception)
-				{
-					// TODO: what?
-				}
+                try
+                {
+                    UpdateLocales(productAttribute, model);
+                }
+                catch (Exception)
+                {
+                    // TODO: what?
+                }
 
-				// activity log
-				_customerActivityService.InsertActivity("AddNewProductAttribute", T("ActivityLog.AddNewProductAttribute", productAttribute.Name));
+                // activity log
+                _customerActivityService.InsertActivity("AddNewProductAttribute", T("ActivityLog.AddNewProductAttribute", productAttribute.Name));
 
                 NotifySuccess(T("Admin.Catalog.Attributes.ProductAttributes.Added"));
                 return continueEditing ? RedirectToAction("Edit", new { id = productAttribute.Id }) : RedirectToAction("List");
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        public ActionResult Edit(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
-
-            var productAttribute = _productAttributeService.GetProductAttributeById(id);
-            if (productAttribute == null)
-                return RedirectToAction("List");
-
-            var model = productAttribute.ToModel();
-
-            AddLocales(_languageService, model.Locales, (locale, languageId) =>
-            {
-                locale.Name = productAttribute.GetLocalized(x => x.Name, languageId, false, false);
-				locale.Alias = productAttribute.GetLocalized(x => x.Alias, languageId, false, false);
-				locale.Description = productAttribute.GetLocalized(x => x.Description, languageId, false, false);
-            });
-
-            return View(model);
-        }
-
-        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
-        public ActionResult Edit(ProductAttributeModel model, bool continueEditing)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
-
-            var productAttribute = _productAttributeService.GetProductAttributeById(model.Id);
-            if (productAttribute == null)
-                return RedirectToAction("List");
-            
-            if (ModelState.IsValid)
-            {
-                productAttribute = model.ToEntity(productAttribute);
-
-				try
-				{
-					_productAttributeService.UpdateProductAttribute(productAttribute);
-
-					UpdateLocales(productAttribute, model);
-				}
-				catch (Exception exception)
-				{
-					ModelState.AddModelError("", exception.Message);
-					return View(model);
-				}
-
-				// activity log
-				_customerActivityService.InsertActivity("EditProductAttribute", T("ActivityLog.EditProductAttribute", productAttribute.Name));
-
-                NotifySuccess(T("Admin.Catalog.Attributes.ProductAttributes.Updated"));
-                return continueEditing ? RedirectToAction("Edit", productAttribute.Id) : RedirectToAction("List");
             }
 
             // If we got this far, something failed, redisplay form
@@ -287,255 +180,362 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("List");
         }
 
-		#endregion
+        public ActionResult Edit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
 
-		#region Product attribute options sets
+            var productAttribute = _productAttributeService.GetProductAttributeById(id);
+            if (productAttribute == null)
+                return RedirectToAction("List");
 
-		[HttpPost, GridAction(EnableCustomBinding = true)]
-		public ActionResult OptionsSetList(int productAttributeId, GridCommand command)
-		{
-			var gridModel = new GridModel<ProductAttributeOptionsSetModel>();
+            var model = productAttribute.ToModel();
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var optionsSets = _productAttributeService.GetProductAttributeOptionsSetsByAttributeId(productAttributeId);
+            AddLocales(_languageService, model.Locales, (locale, languageId) =>
+            {
+                locale.Name = productAttribute.GetLocalized(x => x.Name, languageId, false, false);
+                locale.Alias = productAttribute.GetLocalized(x => x.Alias, languageId, false, false);
+                locale.Description = productAttribute.GetLocalized(x => x.Description, languageId, false, false);
+            });
 
-				gridModel.Total = optionsSets.Count();
-				gridModel.Data = optionsSets.Select(x =>
-				{
-					return new ProductAttributeOptionsSetModel
-					{
-						Id = x.Id,
-						ProductAttributeId = productAttributeId,
-						Name = x.Name
-					};
-				});
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<ProductAttributeOptionsSetModel>();
+            return View(model);
+        }
 
-				NotifyAccessDenied();
-			}
+        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
+        public ActionResult Edit(ProductAttributeModel model, bool continueEditing)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
 
-			return new JsonResult
-			{
-				Data = gridModel
-			};
-		}
+            var productAttribute = _productAttributeService.GetProductAttributeById(model.Id);
+            if (productAttribute == null)
+                return RedirectToAction("List");
 
-		[HttpPost, GridAction(EnableCustomBinding = true)]
-		public ActionResult OptionsSetListDetails(int id)
-		{
-			var gridModel = new GridModel<ProductAttributeOptionModel>();
+            if (ModelState.IsValid)
+            {
+                productAttribute = model.ToEntity(productAttribute);
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var options = _productAttributeService.GetProductAttributeOptionsByOptionsSetId(id);
+                try
+                {
+                    _productAttributeService.UpdateProductAttribute(productAttribute);
 
-				gridModel.Total = options.Count();
-				gridModel.Data = options.Select(x =>
-				{
-					var model = x.ToModel();
-					PrepareProductAttributeOptionModel(model, x);
-					return model;
-				});
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<ProductAttributeOptionModel>();
+                    UpdateLocales(productAttribute, model);
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError("", exception.Message);
+                    return View(model);
+                }
 
-				NotifyAccessDenied();
-			}
+                // activity log
+                _customerActivityService.InsertActivity("EditProductAttribute", T("ActivityLog.EditProductAttribute", productAttribute.Name));
 
-			return new JsonResult
-			{
-				Data = gridModel
-			};
-		}
+                NotifySuccess(T("Admin.Catalog.Attributes.ProductAttributes.Updated"));
+                return continueEditing ? RedirectToAction("Edit", productAttribute.Id) : RedirectToAction("List");
+            }
 
-		[GridAction(EnableCustomBinding = true)]
-		public ActionResult OptionsSetInsert(ProductAttributeOptionsSetModel model, GridCommand command)
-		{
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var entity = new ProductAttributeOptionsSet
-				{
-					Name = model.Name,
-					ProductAttributeId = model.ProductAttributeId
-				};
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
 
-				_productAttributeService.InsertProductAttributeOptionsSet(entity);
-			}
-			else
-			{
-				NotifyAccessDenied();
-			}
+        public ActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
-			return OptionsSetList(model.ProductAttributeId, command);
-		}
+        public ActionResult List()
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
 
-		[GridAction(EnableCustomBinding = true)]
-		public ActionResult OptionsSetUpdate(ProductAttributeOptionsSetModel model, GridCommand command)
-		{
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var entity = _productAttributeService.GetProductAttributeOptionsSetById(model.Id);
-				entity.Name = model.Name;
+            ViewData["GridPageSize"] = _adminAreaSettings.GridPageSize;
 
-				_productAttributeService.UpdateProductAttributeOptionsSet(entity);
-			}
-			else
-			{
-				NotifyAccessDenied();
-			}
+            return View();
+        }
 
-			return OptionsSetList(model.ProductAttributeId, command);
-		}
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command)
+        {
+            var gridModel = new GridModel<ProductAttributeModel>();
 
-		[GridAction(EnableCustomBinding = true)]
-		public ActionResult OptionsSetDelete(int id, int productAttributeId, GridCommand command)
-		{
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var entity = _productAttributeService.GetProductAttributeOptionsSetById(id);
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var productAttributes = _productAttributeService.GetAllProductAttributes();
 
-				_productAttributeService.DeleteProductAttributeOptionsSet(entity);
-			}
+                var data = productAttributes
+                    .ForCommand(command)
+                    .Select(x =>
+                    {
+                        var model = x.ToModel();
+                        return model;
+                    })
+                    .ToList();
 
-			return OptionsSetList(productAttributeId, command);
-		}
+                gridModel.Data = data.PagedForCommand(command);
+                gridModel.Total = data.Count;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<ProductAttributeModel>();
 
-		#endregion
+                NotifyAccessDenied();
+            }
 
-		#region Product attribute options
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
-		public ActionResult OptionCreatePopup(int id)
-		{
-			if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-				return AccessDeniedView();
+        #endregion Product attribute
 
-			var optionsSet = _productAttributeService.GetProductAttributeOptionsSetById(id);
-			if (optionsSet == null)
-				return RedirectToAction("List");
+        #region Product attribute options sets
 
-			var model = new ProductAttributeOptionModel
-			{
-				ProductAttributeOptionsSetId = id,
-				Color = string.Empty,
-				Quantity = 1
-			};
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult OptionsSetDelete(int id, int productAttributeId, GridCommand command)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var entity = _productAttributeService.GetProductAttributeOptionsSetById(id);
 
-			PrepareProductAttributeOptionModel(model, null);
-			AddLocales(_languageService, model.Locales);
+                _productAttributeService.DeleteProductAttributeOptionsSet(entity);
+            }
 
-			return View(model);
-		}
+            return OptionsSetList(productAttributeId, command);
+        }
 
-		[HttpPost]
-		public ActionResult OptionCreatePopup(string btnId, string formId, ProductAttributeOptionModel model)
-		{
-			if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-				return AccessDeniedView();
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult OptionsSetInsert(ProductAttributeOptionsSetModel model, GridCommand command)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var entity = new ProductAttributeOptionsSet
+                {
+                    Name = model.Name,
+                    ProductAttributeId = model.ProductAttributeId
+                };
 
-			if (ModelState.IsValid)
-			{
-				var entity = model.ToEntity();
+                _productAttributeService.InsertProductAttributeOptionsSet(entity);
+            }
+            else
+            {
+                NotifyAccessDenied();
+            }
 
-				MediaHelper.UpdatePictureTransientStateFor(entity, m => m.PictureId);
+            return OptionsSetList(model.ProductAttributeId, command);
+        }
 
-				try
-				{
-					_productAttributeService.InsertProductAttributeOption(entity);
-				}
-				catch (Exception exception)
-				{
-					ModelState.AddModelError("", exception.Message);
-					return View(model);
-				}
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult OptionsSetList(int productAttributeId, GridCommand command)
+        {
+            var gridModel = new GridModel<ProductAttributeOptionsSetModel>();
 
-				try
-				{
-					UpdateOptionLocales(entity, model);
-				}
-				catch (Exception)
-				{
-					// TODO: what?
-				}
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var optionsSets = _productAttributeService.GetProductAttributeOptionsSetsByAttributeId(productAttributeId);
 
-				ViewBag.RefreshPage = true;
-				ViewBag.btnId = btnId;
-				ViewBag.formId = formId;
-			}
+                gridModel.Total = optionsSets.Count();
+                gridModel.Data = optionsSets.Select(x =>
+                {
+                    return new ProductAttributeOptionsSetModel
+                    {
+                        Id = x.Id,
+                        ProductAttributeId = productAttributeId,
+                        Name = x.Name
+                    };
+                });
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<ProductAttributeOptionsSetModel>();
 
-			return View(model);
-		}
+                NotifyAccessDenied();
+            }
 
-		public ActionResult OptionEditPopup(int id)
-		{
-			if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-				return AccessDeniedView();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
-			var option = _productAttributeService.GetProductAttributeOptionById(id);
-			if (option == null)
-				return RedirectToAction("List");
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult OptionsSetListDetails(int id)
+        {
+            var gridModel = new GridModel<ProductAttributeOptionModel>();
 
-			var model = option.ToModel();
-			PrepareProductAttributeOptionModel(model, option);
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var options = _productAttributeService.GetProductAttributeOptionsByOptionsSetId(id);
 
-			return View(model);
-		}
+                gridModel.Total = options.Count();
+                gridModel.Data = options.Select(x =>
+                {
+                    var model = x.ToModel();
+                    PrepareProductAttributeOptionModel(model, x);
+                    return model;
+                });
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<ProductAttributeOptionModel>();
 
-		[HttpPost]
-		public ActionResult OptionEditPopup(string btnId, string formId, ProductAttributeOptionModel model)
-		{
-			if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-				return AccessDeniedView();
+                NotifyAccessDenied();
+            }
 
-			var entity = _productAttributeService.GetProductAttributeOptionById(model.Id);
-			if (entity == null)
-				return RedirectToAction("List");
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
-			if (ModelState.IsValid)
-			{
-				entity = model.ToEntity(entity);
-				entity.LinkedProductId = entity.ValueType == ProductVariantAttributeValueType.Simple ? 0 : model.LinkedProductId;
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult OptionsSetUpdate(ProductAttributeOptionsSetModel model, GridCommand command)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var entity = _productAttributeService.GetProductAttributeOptionsSetById(model.Id);
+                entity.Name = model.Name;
 
-				MediaHelper.UpdatePictureTransientStateFor(entity, m => m.PictureId);
+                _productAttributeService.UpdateProductAttributeOptionsSet(entity);
+            }
+            else
+            {
+                NotifyAccessDenied();
+            }
 
-				try
-				{
-					_productAttributeService.UpdateProductAttributeOption(entity);
+            return OptionsSetList(model.ProductAttributeId, command);
+        }
 
-					UpdateOptionLocales(entity, model);
-				}
-				catch (Exception exception)
-				{
-					ModelState.AddModelError("", exception.Message);
-					return View(model);
-				}
+        #endregion Product attribute options sets
 
-				ViewBag.RefreshPage = true;
-				ViewBag.btnId = btnId;
-				ViewBag.formId = formId;
-			}
+        #region Product attribute options
 
-			return View(model);
-		}
+        public ActionResult OptionCreatePopup(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
 
-		[HttpPost]
-		public ActionResult OptionDelete(int id)
-		{
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var entity = _productAttributeService.GetProductAttributeOptionById(id);
+            var optionsSet = _productAttributeService.GetProductAttributeOptionsSetById(id);
+            if (optionsSet == null)
+                return RedirectToAction("List");
 
-				_productAttributeService.DeleteProductAttributeOption(entity);
-			}
+            var model = new ProductAttributeOptionModel
+            {
+                ProductAttributeOptionsSetId = id,
+                Color = string.Empty,
+                Quantity = 1
+            };
 
-			return new EmptyResult();
-		}
+            PrepareProductAttributeOptionModel(model, null);
+            AddLocales(_languageService, model.Locales);
 
-		#endregion
-	}
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult OptionCreatePopup(string btnId, string formId, ProductAttributeOptionModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
+
+            if (ModelState.IsValid)
+            {
+                var entity = model.ToEntity();
+
+                MediaHelper.UpdatePictureTransientStateFor(entity, m => m.PictureId);
+
+                try
+                {
+                    _productAttributeService.InsertProductAttributeOption(entity);
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError("", exception.Message);
+                    return View(model);
+                }
+
+                try
+                {
+                    UpdateOptionLocales(entity, model);
+                }
+                catch (Exception)
+                {
+                    // TODO: what?
+                }
+
+                ViewBag.RefreshPage = true;
+                ViewBag.btnId = btnId;
+                ViewBag.formId = formId;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult OptionDelete(int id)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var entity = _productAttributeService.GetProductAttributeOptionById(id);
+
+                _productAttributeService.DeleteProductAttributeOption(entity);
+            }
+
+            return new EmptyResult();
+        }
+
+        public ActionResult OptionEditPopup(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
+
+            var option = _productAttributeService.GetProductAttributeOptionById(id);
+            if (option == null)
+                return RedirectToAction("List");
+
+            var model = option.ToModel();
+            PrepareProductAttributeOptionModel(model, option);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult OptionEditPopup(string btnId, string formId, ProductAttributeOptionModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
+
+            var entity = _productAttributeService.GetProductAttributeOptionById(model.Id);
+            if (entity == null)
+                return RedirectToAction("List");
+
+            if (ModelState.IsValid)
+            {
+                entity = model.ToEntity(entity);
+                entity.LinkedProductId = entity.ValueType == ProductVariantAttributeValueType.Simple ? 0 : model.LinkedProductId;
+
+                MediaHelper.UpdatePictureTransientStateFor(entity, m => m.PictureId);
+
+                try
+                {
+                    _productAttributeService.UpdateProductAttributeOption(entity);
+
+                    UpdateOptionLocales(entity, model);
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError("", exception.Message);
+                    return View(model);
+                }
+
+                ViewBag.RefreshPage = true;
+                ViewBag.btnId = btnId;
+                ViewBag.formId = formId;
+            }
+
+            return View(model);
+        }
+
+        #endregion Product attribute options
+    }
 }

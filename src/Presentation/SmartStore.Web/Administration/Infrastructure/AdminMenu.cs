@@ -1,23 +1,21 @@
-﻿using System;
-using SmartStore.Collections;
+﻿using SmartStore.Collections;
 using SmartStore.Web.Framework.UI;
+using System;
 
 namespace SmartStore.Admin.Infrastructure
 {
     public partial class AdminMenu : MenuBase
     {
-        public override string Name => "Admin";
+        #region Public Properties
 
         public override bool ApplyPermissions => true;
+        public override string Name => "Admin";
 
-        protected override string GetCacheKey()
-        {
-            var cacheKey = "{0}-{1}".FormatInvariant(
-                Services.WorkContext.WorkingLanguage.Id,
-                Services.WorkContext.CurrentCustomer.GetRolesIdent());
+        #endregion Public Properties
 
-            return cacheKey;
-        }
+
+
+        #region Protected Methods
 
         protected override TreeNode<MenuItem> Build()
         {
@@ -95,5 +93,16 @@ namespace SmartStore.Admin.Infrastructure
 
             return root;
         }
+
+        protected override string GetCacheKey()
+        {
+            var cacheKey = "{0}-{1}".FormatInvariant(
+                Services.WorkContext.WorkingLanguage.Id,
+                Services.WorkContext.CurrentCustomer.GetRolesIdent());
+
+            return cacheKey;
+        }
+
+        #endregion Protected Methods
     }
 }

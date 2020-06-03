@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Catalog;
+﻿using SmartStore.Admin.Models.Catalog;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Html;
 using SmartStore.Services.Catalog;
@@ -14,21 +10,25 @@ using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
+    [AdminAuthorize]
     public class ProductReviewController : AdminControllerBase
     {
         #region Fields
 
         private readonly ICustomerContentService _customerContentService;
-        private readonly IProductService _productService;
+        private readonly ICustomerService _customerService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly ILocalizationService _localizationService;
         private readonly IPermissionService _permissionService;
-		private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
 
         #endregion Fields
 
@@ -37,17 +37,17 @@ namespace SmartStore.Admin.Controllers
         public ProductReviewController(ICustomerContentService customerContentService,
             IProductService productService, IDateTimeHelper dateTimeHelper,
             ILocalizationService localizationService, IPermissionService permissionService,
-			ICustomerService customerService)
+            ICustomerService customerService)
         {
             this._customerContentService = customerContentService;
             this._productService = productService;
             this._dateTimeHelper = dateTimeHelper;
             this._localizationService = localizationService;
             this._permissionService = permissionService;
-			this._customerService = customerService;
+            this._customerService = customerService;
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Utilities
 
@@ -63,18 +63,18 @@ namespace SmartStore.Admin.Controllers
             model.Id = productReview.Id;
             model.ProductId = productReview.ProductId;
             model.ProductName = productReview.Product.Name;
-			model.ProductTypeName = productReview.Product.GetProductTypeLabel(_localizationService);
-			model.ProductTypeLabelHint = productReview.Product.ProductTypeLabelHint;
+            model.ProductTypeName = productReview.Product.GetProductTypeLabel(_localizationService);
+            model.ProductTypeLabelHint = productReview.Product.ProductTypeLabelHint;
             model.CustomerId = productReview.CustomerId;
-			model.CustomerName = productReview.Customer.GetFullName();
+            model.CustomerName = productReview.Customer.GetFullName();
             model.IpAddress = productReview.IpAddress;
             model.Rating = productReview.Rating;
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(productReview.CreatedOnUtc, DateTimeKind.Utc);
 
-			if (string.IsNullOrWhiteSpace(model.CustomerName) && !productReview.Customer.IsRegistered())
-			{
-				model.CustomerName = _localizationService.GetResource("Admin.Customers.Guest");
-			}
+            if (string.IsNullOrWhiteSpace(model.CustomerName) && !productReview.Customer.IsRegistered())
+            {
+                model.CustomerName = _localizationService.GetResource("Admin.Customers.Guest");
+            }
 
             if (!excludeProperties)
             {
@@ -87,60 +87,133 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        #endregion
+        #endregion Utilities
 
         #region Methods
 
-        //list
-        public ActionResult Index()
+        [HttpPost]
+        public ActionResult ApproveSelected(ICollection<int> selectedIds)
         {
-            return RedirectToAction("List");
+            var result = true;
+
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                if (selectedIds != null)
+                {
+                    foreach (var id in selectedIds)
+                    {
+                        var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
+                        if (productReview != null)
+                        {
+                            productReview.IsApproved = true;
+                            _customerContentService.UpdateCustomerContent(productReview);
+
+                            //update product totals
+                            _productService.UpdateProductReviewTotals(productReview.Product);
+
+                            _customerService.RewardPointsForProductReview(productReview.Customer, productReview.Product, true);
+                        }
+                    }
+                }
+
+                NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+            }
+            else
+            {
+                result = false;
+                NotifyAccessDenied();
+            }
+
+            return Json(new { Result = result });
         }
 
-        public ActionResult List()
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
 
-            var model = new ProductReviewListModel();
-            return View(model);
+            var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
+            if (productReview == null)
+                return RedirectToAction("List");
+
+            var product = productReview.Product;
+            _customerContentService.DeleteCustomerContent(productReview);
+
+            //update product totals
+            _productService.UpdateProductReviewTotals(product);
+
+            NotifySuccess(_localizationService.GetResource("Admin.Catalog.ProductReviews.Deleted"));
+            return RedirectToAction("List");
         }
 
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult List(GridCommand command, ProductReviewListModel model)
+        [HttpPost]
+        public ActionResult DeleteSelected(ICollection<int> selectedIds)
         {
-			var gridModel = new GridModel<ProductReviewModel>();
+            var result = true;
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				DateTime? createdOnFromValue = (model.CreatedOnFrom == null) ? null
-					: (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnFrom.Value, _dateTimeHelper.CurrentTimeZone);
-
-				DateTime? createdToFromValue = (model.CreatedOnTo == null) ? null
-					: (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnTo.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
-
-				var productReviews = _customerContentService.GetAllCustomerContent<ProductReview>(0, null, createdOnFromValue, createdToFromValue);
-
-				gridModel.Data = productReviews.PagedForCommand(command).Select(x =>
-				{
-					var m = new ProductReviewModel();
-					PrepareProductReviewModel(m, x, false, true);
-					return m;
-				});
-
-				gridModel.Total = productReviews.Count;
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<ProductReviewModel>();
-
-				NotifyAccessDenied();
-			}
-
-            return new JsonResult
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
-                Data = gridModel
-            };
+                if (selectedIds != null)
+                {
+                    foreach (var id in selectedIds)
+                    {
+                        var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
+                        if (productReview != null)
+                        {
+                            var product = productReview.Product;
+                            _customerContentService.DeleteCustomerContent(productReview);
+                            //update product totals
+                            _productService.UpdateProductReviewTotals(product);
+                        }
+                    }
+                }
+
+                NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+            }
+            else
+            {
+                result = false;
+                NotifyAccessDenied();
+            }
+
+            return Json(new { Result = result });
+        }
+
+        [HttpPost]
+        public ActionResult DisapproveSelected(ICollection<int> selectedIds)
+        {
+            var result = true;
+
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                if (selectedIds != null)
+                {
+                    foreach (var id in selectedIds)
+                    {
+                        var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
+                        if (productReview != null)
+                        {
+                            productReview.IsApproved = false;
+                            _customerContentService.UpdateCustomerContent(productReview);
+
+                            //update product totals
+                            _productService.UpdateProductReviewTotals(productReview.Product);
+
+                            _customerService.RewardPointsForProductReview(productReview.Customer, productReview.Product, false);
+                        }
+                    }
+                }
+
+                NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+            }
+            else
+            {
+                result = false;
+                NotifyAccessDenied();
+            }
+
+            return Json(new { Result = result });
         }
 
         public ActionResult Edit(int id)
@@ -174,11 +247,11 @@ namespace SmartStore.Admin.Controllers
                 productReview.ReviewText = model.ReviewText;
                 productReview.IsApproved = model.IsApproved;
                 _customerContentService.UpdateCustomerContent(productReview);
-                
+
                 //update product totals
                 _productService.UpdateProductReviewTotals(productReview.Product);
 
-				_customerService.RewardPointsForProductReview(productReview.Customer, productReview.Product, productReview.IsApproved);
+                _customerService.RewardPointsForProductReview(productReview.Customer, productReview.Product, productReview.IsApproved);
 
                 NotifySuccess(_localizationService.GetResource("Admin.Catalog.ProductReviews.Updated"));
                 return continueEditing ? RedirectToAction("Edit", productReview.Id) : RedirectToAction("List");
@@ -188,132 +261,59 @@ namespace SmartStore.Admin.Controllers
             PrepareProductReviewModel(model, productReview, true, false);
             return View(model);
         }
-        
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+
+        //list
+        public ActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
+
+        public ActionResult List()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
 
-            var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
-            if (productReview == null)
-                return RedirectToAction("List");
-
-            var product = productReview.Product;
-            _customerContentService.DeleteCustomerContent(productReview);
-
-            //update product totals
-            _productService.UpdateProductReviewTotals(product);
-
-            NotifySuccess(_localizationService.GetResource("Admin.Catalog.ProductReviews.Deleted"));
-            return RedirectToAction("List");
-        }
-        
-        [HttpPost]
-        public ActionResult ApproveSelected(ICollection<int> selectedIds)
-        {
-			var result = true;
-
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				if (selectedIds != null)
-				{
-					foreach (var id in selectedIds)
-					{
-						var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
-						if (productReview != null)
-						{
-							productReview.IsApproved = true;
-							_customerContentService.UpdateCustomerContent(productReview);
-
-							//update product totals
-							_productService.UpdateProductReviewTotals(productReview.Product);
-
-							_customerService.RewardPointsForProductReview(productReview.Customer, productReview.Product, true);
-						}
-					}
-				}
-
-				NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
-			}
-			else
-			{
-				result = false;
-				NotifyAccessDenied();
-			}
-
-            return Json(new { Result = result });
+            var model = new ProductReviewListModel();
+            return View(model);
         }
 
-        [HttpPost]
-        public ActionResult DeleteSelected(ICollection<int> selectedIds)
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command, ProductReviewListModel model)
         {
-			var result = true;
+            var gridModel = new GridModel<ProductReviewModel>();
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				if (selectedIds != null)
-				{
-					foreach (var id in selectedIds)
-					{
-						var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
-						if (productReview != null)
-						{
-							var product = productReview.Product;
-							_customerContentService.DeleteCustomerContent(productReview);
-							//update product totals
-							_productService.UpdateProductReviewTotals(product);
-						}
-					}
-				}
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                DateTime? createdOnFromValue = (model.CreatedOnFrom == null) ? null
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnFrom.Value, _dateTimeHelper.CurrentTimeZone);
 
-				NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
-			}
-			else
-			{
-				result = false;
-				NotifyAccessDenied();
-			}
+                DateTime? createdToFromValue = (model.CreatedOnTo == null) ? null
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnTo.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
 
-			return Json(new { Result = result });
-		}
+                var productReviews = _customerContentService.GetAllCustomerContent<ProductReview>(0, null, createdOnFromValue, createdToFromValue);
 
-        [HttpPost]
-        public ActionResult DisapproveSelected(ICollection<int> selectedIds)
-        {
-			var result = true;
+                gridModel.Data = productReviews.PagedForCommand(command).Select(x =>
+                {
+                    var m = new ProductReviewModel();
+                    PrepareProductReviewModel(m, x, false, true);
+                    return m;
+                });
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				if (selectedIds != null)
-				{
-					foreach (var id in selectedIds)
-					{
-						var productReview = _customerContentService.GetCustomerContentById(id) as ProductReview;
-						if (productReview != null)
-						{
-							productReview.IsApproved = false;
-							_customerContentService.UpdateCustomerContent(productReview);
+                gridModel.Total = productReviews.Count;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<ProductReviewModel>();
 
-							//update product totals
-							_productService.UpdateProductReviewTotals(productReview.Product);
+                NotifyAccessDenied();
+            }
 
-							_customerService.RewardPointsForProductReview(productReview.Customer, productReview.Product, false);
-						}
-					}
-				}
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
-				NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
-			}
-			else
-			{
-				result = false;
-				NotifyAccessDenied();
-			}
-
-			return Json(new { Result = result });
-		}
-
-        #endregion
+        #endregion Methods
     }
 }

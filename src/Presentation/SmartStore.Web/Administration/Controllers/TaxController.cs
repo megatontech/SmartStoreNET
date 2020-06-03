@@ -1,10 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
-using SmartStore.Admin.Models.Tax;
+﻿using SmartStore.Admin.Models.Tax;
 using SmartStore.Core.Domain.Tax;
-using SmartStore.Core.Plugins;
 using SmartStore.Services.Configuration;
 using SmartStore.Services.Localization;
 using SmartStore.Services.Security;
@@ -13,46 +8,49 @@ using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Plugins;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
+    [AdminAuthorize]
     public class TaxController : AdminControllerBase
-	{
-		#region Fields
+    {
+        #region Fields
 
-        private readonly ITaxService _taxService;
-        private readonly ITaxCategoryService _taxCategoryService;
-        private readonly TaxSettings _taxSettings;
-        private readonly ISettingService _settingService;
+        private readonly ILocalizationService _localizationService;
         private readonly IPermissionService _permissionService;
-		private readonly ILocalizationService _localizationService;
-		private readonly PluginMediator _pluginMediator;
+        private readonly PluginMediator _pluginMediator;
+        private readonly ISettingService _settingService;
+        private readonly ITaxCategoryService _taxCategoryService;
+        private readonly ITaxService _taxService;
+        private readonly TaxSettings _taxSettings;
 
-	    #endregion
+        #endregion Fields
 
-		#region Constructors
+        #region Constructors
 
         public TaxController(
-			ITaxService taxService,
-            ITaxCategoryService taxCategoryService, 
-			TaxSettings taxSettings,
-            ISettingService settingService, 
-			IPermissionService permissionService,
-			ILocalizationService localizationService,
-			PluginMediator pluginMediator)
-		{
+            ITaxService taxService,
+            ITaxCategoryService taxCategoryService,
+            TaxSettings taxSettings,
+            ISettingService settingService,
+            IPermissionService permissionService,
+            ILocalizationService localizationService,
+            PluginMediator pluginMediator)
+        {
             this._taxService = taxService;
             this._taxCategoryService = taxCategoryService;
             this._taxSettings = taxSettings;
             this._settingService = settingService;
             this._permissionService = permissionService;
-			this._localizationService = localizationService;
-			this._pluginMediator = pluginMediator;
-		}
+            this._localizationService = localizationService;
+            this._pluginMediator = pluginMediator;
+        }
 
-		#endregion 
+        #endregion Constructors
 
         #region Tax Providers
 
@@ -69,31 +67,31 @@ namespace SmartStore.Admin.Controllers
                 {
                     _taxSettings.ActiveTaxProviderSystemName = systemName;
                     _settingService.SaveSetting(_taxSettings);
-					_pluginMediator.ActivateDependentWidgets(taxProvider.Metadata, true);
+                    _pluginMediator.ActivateDependentWidgets(taxProvider.Metadata, true);
                 }
             }
-			
+
             var taxProviderModels = _taxService.LoadAllTaxProviders()
-				.Select(x => 
-				{
-					var model = _pluginMediator.ToProviderModel<ITaxProvider, TaxProviderModel>(x);
-					if (x.Metadata.SystemName.Equals(_taxSettings.ActiveTaxProviderSystemName, StringComparison.InvariantCultureIgnoreCase))
-					{
-						model.IsPrimaryTaxProvider = true;
-					}
-					else
-					{
-						_pluginMediator.ActivateDependentWidgets(x.Metadata, false);
-					}
+                .Select(x =>
+                {
+                    var model = _pluginMediator.ToProviderModel<ITaxProvider, TaxProviderModel>(x);
+                    if (x.Metadata.SystemName.Equals(_taxSettings.ActiveTaxProviderSystemName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        model.IsPrimaryTaxProvider = true;
+                    }
+                    else
+                    {
+                        _pluginMediator.ActivateDependentWidgets(x.Metadata, false);
+                    }
 
-					return model; 
-				})
-				.ToList();
+                    return model;
+                })
+                .ToList();
 
-			return View(taxProviderModels);
+            return View(taxProviderModels);
         }
 
-        #endregion
+        #endregion Tax Providers
 
         #region Tax categories
 
@@ -116,24 +114,24 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult Categories(GridCommand command)
         {
-			var model = new GridModel<TaxCategoryModel>();
+            var model = new GridModel<TaxCategoryModel>();
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
-			{
-				var categoriesModel = _taxCategoryService.GetAllTaxCategories()
-					.Select(x => x.ToModel())
-					.ForCommand(command)
-					.ToList();
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
+            {
+                var categoriesModel = _taxCategoryService.GetAllTaxCategories()
+                    .Select(x => x.ToModel())
+                    .ForCommand(command)
+                    .ToList();
 
-				model.Data = categoriesModel;
-				model.Total = categoriesModel.Count;
-			}
-			else
-			{
-				model.Data = Enumerable.Empty<TaxCategoryModel>();
+                model.Data = categoriesModel;
+                model.Total = categoriesModel.Count;
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<TaxCategoryModel>();
 
-				NotifyAccessDenied();
-			}
+                NotifyAccessDenied();
+            }
 
             return new JsonResult
             {
@@ -142,41 +140,21 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult CategoryUpdate(TaxCategoryModel model, GridCommand command)
-        {
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
-			{
-				if (!ModelState.IsValid)
-				{
-					var modelStateErrors = this.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
-					return Content(modelStateErrors.FirstOrDefault());
-				}
-
-				var taxCategory = _taxCategoryService.GetTaxCategoryById(model.Id);
-				taxCategory = model.ToEntity(taxCategory);
-
-				_taxCategoryService.UpdateTaxCategory(taxCategory);
-			}
-
-            return Categories(command);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
         public ActionResult CategoryAdd([Bind(Exclude = "Id")] TaxCategoryModel model, GridCommand command)
         {
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
-			{
-				if (!ModelState.IsValid)
-				{
-					var modelStateErrors = this.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
-					return Content(modelStateErrors.FirstOrDefault());
-				}
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
+            {
+                if (!ModelState.IsValid)
+                {
+                    var modelStateErrors = this.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+                    return Content(modelStateErrors.FirstOrDefault());
+                }
 
-				var taxCategory = new TaxCategory();
-				taxCategory = model.ToEntity(taxCategory);
+                var taxCategory = new TaxCategory();
+                taxCategory = model.ToEntity(taxCategory);
 
-				_taxCategoryService.InsertTaxCategory(taxCategory);
-			}
+                _taxCategoryService.InsertTaxCategory(taxCategory);
+            }
 
             return Categories(command);
         }
@@ -184,16 +162,36 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult CategoryDelete(int id, GridCommand command)
         {
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
-			{
-				var taxCategory = _taxCategoryService.GetTaxCategoryById(id);
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
+            {
+                var taxCategory = _taxCategoryService.GetTaxCategoryById(id);
 
-				_taxCategoryService.DeleteTaxCategory(taxCategory);
-			}
+                _taxCategoryService.DeleteTaxCategory(taxCategory);
+            }
 
             return Categories(command);
         }
 
-        #endregion
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult CategoryUpdate(TaxCategoryModel model, GridCommand command)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageTaxSettings))
+            {
+                if (!ModelState.IsValid)
+                {
+                    var modelStateErrors = this.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+                    return Content(modelStateErrors.FirstOrDefault());
+                }
+
+                var taxCategory = _taxCategoryService.GetTaxCategoryById(model.Id);
+                taxCategory = model.ToEntity(taxCategory);
+
+                _taxCategoryService.UpdateTaxCategory(taxCategory);
+            }
+
+            return Categories(command);
+        }
+
+        #endregion Tax categories
     }
 }

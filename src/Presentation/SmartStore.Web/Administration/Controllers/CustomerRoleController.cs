@@ -1,49 +1,47 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Customers;
-using SmartStore.Core;
+﻿using SmartStore.Admin.Models.Customers;
 using SmartStore.Core.Domain.Tax;
+using SmartStore.Core.Logging;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Localization;
-using SmartStore.Core.Logging;
 using SmartStore.Services.Security;
 using SmartStore.Web.Framework.Controllers;
-using SmartStore.Web.Framework;
-using Telerik.Web.Mvc;
-using System.Collections.Generic;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
+    [AdminAuthorize]
     public class CustomerRoleController : AdminControllerBase
-	{
-		#region Fields
+    {
+        #region Fields
 
-		private readonly ICustomerService _customerService;
-        private readonly ILocalizationService _localizationService;
         private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerService _customerService;
+        private readonly ILocalizationService _localizationService;
         private readonly IPermissionService _permissionService;
         private readonly TaxSettings _taxSettings;
 
-		#endregion
+        #endregion Fields
 
-		#region Constructors
+        #region Constructors
 
         public CustomerRoleController(ICustomerService customerService,
             ILocalizationService localizationService, ICustomerActivityService customerActivityService,
             IPermissionService permissionService, TaxSettings taxSettings)
-		{
+        {
             this._customerService = customerService;
             this._localizationService = localizationService;
             this._customerActivityService = customerActivityService;
             this._permissionService = permissionService;
             this._taxSettings = taxSettings;
-		}
+        }
 
-		#endregion 
+        #endregion Constructors
 
         #region Utilities
 
@@ -76,59 +74,15 @@ namespace SmartStore.Admin.Controllers
             return list;
         }
 
-        #endregion
+        #endregion Utilities
 
         #region Customer roles
-
-        public ActionResult Index()
-        {
-            return RedirectToAction("List");
-        }
-
-		public ActionResult List()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
-                return AccessDeniedView();
-            
-			var customerRoles = _customerService.GetAllCustomerRoles(true);
-			var gridModel = new GridModel<CustomerRoleModel>
-			{
-                Data = customerRoles.Select(x => x.ToModel()),
-                Total = customerRoles.Count()
-			};
-			return View(gridModel);
-		}
-
-		[HttpPost, GridAction(EnableCustomBinding = true)]
-		public ActionResult List(GridCommand command)
-        {
-			var model = new GridModel<CustomerRoleModel>();
-
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
-			{
-				var customerRoles = _customerService.GetAllCustomerRoles(true);
-
-				model.Data = customerRoles.Select(x => x.ToModel());
-				model.Total = customerRoles.Count();
-			}
-			else
-			{
-				model.Data = Enumerable.Empty<CustomerRoleModel>();
-
-				NotifyAccessDenied();
-			}
-
-			return new JsonResult
-			{
-				Data = model
-			};
-		}
 
         public ActionResult Create()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
                 return AccessDeniedView();
-            
+
             var model = new CustomerRoleModel();
             model.TaxDisplayTypes = GetTaxDisplayTypesList(model);
             //default values
@@ -141,7 +95,7 @@ namespace SmartStore.Admin.Controllers
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
                 return AccessDeniedView();
-            
+
             if (ModelState.IsValid)
             {
                 var customerRole = model.ToEntity();
@@ -158,11 +112,39 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
 
-		public ActionResult Edit(int id)
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
                 return AccessDeniedView();
-            
+
+            var customerRole = _customerService.GetCustomerRoleById(id);
+            if (customerRole == null)
+                //No customer role found with the specified id
+                return RedirectToAction("List");
+
+            try
+            {
+                _customerService.DeleteCustomerRole(customerRole);
+
+                //activity log
+                _customerActivityService.InsertActivity("DeleteCustomerRole", _localizationService.GetResource("ActivityLog.DeleteCustomerRole"), customerRole.Name);
+
+                NotifySuccess(_localizationService.GetResource("Admin.Customers.CustomerRoles.Deleted"));
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                NotifyError(exc.Message);
+                return RedirectToAction("Edit", new { id = customerRole.Id });
+            }
+        }
+
+        public ActionResult Edit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
+                return AccessDeniedView();
+
             var customerRole = _customerService.GetCustomerRoleById(id);
             if (customerRole == null)
                 //No customer role found with the specified id
@@ -172,14 +154,14 @@ namespace SmartStore.Admin.Controllers
             model.TaxDisplayTypes = GetTaxDisplayTypesList(model);
 
             return View(model);
-		}
+        }
 
         [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
         public ActionResult Edit(CustomerRoleModel model, bool continueEditing)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
                 return AccessDeniedView();
-            
+
             var customerRole = _customerService.GetCustomerRoleById(model.Id);
             if (customerRole == null)
                 // No customer role found with the specified id
@@ -214,35 +196,50 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
+
+        public ActionResult List()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
                 return AccessDeniedView();
-            
-            var customerRole = _customerService.GetCustomerRoleById(id);
-            if (customerRole == null)
-                //No customer role found with the specified id
-                return RedirectToAction("List");
 
-            try
+            var customerRoles = _customerService.GetAllCustomerRoles(true);
+            var gridModel = new GridModel<CustomerRoleModel>
             {
-                _customerService.DeleteCustomerRole(customerRole);
+                Data = customerRoles.Select(x => x.ToModel()),
+                Total = customerRoles.Count()
+            };
+            return View(gridModel);
+        }
 
-                //activity log
-                _customerActivityService.InsertActivity("DeleteCustomerRole", _localizationService.GetResource("ActivityLog.DeleteCustomerRole"), customerRole.Name);
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command)
+        {
+            var model = new GridModel<CustomerRoleModel>();
 
-                NotifySuccess(_localizationService.GetResource("Admin.Customers.CustomerRoles.Deleted"));
-                return RedirectToAction("List");
-            }
-            catch (Exception exc)
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCustomerRoles))
             {
-				NotifyError(exc.Message);
-                return RedirectToAction("Edit", new { id = customerRole.Id });
+                var customerRoles = _customerService.GetAllCustomerRoles(true);
+
+                model.Data = customerRoles.Select(x => x.ToModel());
+                model.Total = customerRoles.Count();
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<CustomerRoleModel>();
+
+                NotifyAccessDenied();
             }
 
-		}
+            return new JsonResult
+            {
+                Data = model
+            };
+        }
 
-		#endregion
+        #endregion Customer roles
     }
 }

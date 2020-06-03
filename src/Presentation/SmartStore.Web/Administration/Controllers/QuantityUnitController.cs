@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Directory;
+﻿using SmartStore.Admin.Models.Directory;
 using SmartStore.Core.Domain.Directory;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Localization;
@@ -9,28 +6,59 @@ using SmartStore.Services.Security;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
     [AdminAuthorize]
-    public class QuantityUnitController :  AdminControllerBase
+    public class QuantityUnitController : AdminControllerBase
     {
-        private readonly IQuantityUnitService _quantityUnitService;
-        private readonly ILocalizedEntityService _localizedEntityService;
+        #region Private Fields
+
         private readonly ILanguageService _languageService;
+        private readonly ILocalizedEntityService _localizedEntityService;
+        private readonly IQuantityUnitService _quantityUnitService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public QuantityUnitController(
-			IQuantityUnitService quantityUnitService,
-            ILocalizedEntityService localizedEntityService, 
+            IQuantityUnitService quantityUnitService,
+            ILocalizedEntityService localizedEntityService,
             ILanguageService languageService)
         {
             _quantityUnitService = quantityUnitService;
             _localizedEntityService = localizedEntityService;
             _languageService = languageService;
         }
-        
+
+        #endregion Public Constructors
+
         #region Methods
+
+        // Ajax.
+        public ActionResult AllQuantityUnits(string label, int selectedId)
+        {
+            var quantityUnits = _quantityUnitService.GetAllQuantityUnits();
+            if (label.HasValue())
+            {
+                quantityUnits.Insert(0, new QuantityUnit { Name = label, Id = 0 });
+            }
+
+            var list = from m in quantityUnits
+                       select new
+                       {
+                           id = m.Id.ToString(),
+                           text = m.Name,
+                           selected = m.Id == selectedId
+                       };
+
+            return new JsonResult { Data = list.ToList(), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
 
         public ActionResult Index()
         {
@@ -57,27 +85,7 @@ namespace SmartStore.Admin.Controllers
             return View(gridModel);
         }
 
-        // Ajax.
-        public ActionResult AllQuantityUnits(string label, int selectedId)
-        {
-            var quantityUnits = _quantityUnitService.GetAllQuantityUnits();
-            if (label.HasValue())
-            {
-                quantityUnits.Insert(0, new QuantityUnit { Name = label, Id = 0 });
-            }
-
-            var list = from m in quantityUnits
-                       select new
-                       {
-                           id = m.Id.ToString(),
-                           text = m.Name,
-                           selected = m.Id == selectedId
-                       };
-
-            return new JsonResult { Data = list.ToList(), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
-
-        #endregion
+        #endregion Methods
 
         #region Create / Edit / Delete / Save
 
@@ -90,7 +98,7 @@ namespace SmartStore.Admin.Controllers
 
             var model = new QuantityUnitModel();
             AddLocales(_languageService, model.Locales);
-            
+
             return View(model);
         }
 
@@ -115,6 +123,34 @@ namespace SmartStore.Admin.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMeasures))
+            {
+                return AccessDeniedView();
+            }
+
+            var quantityUnit = _quantityUnitService.GetQuantityUnitById(id);
+            if (quantityUnit == null)
+            {
+                return RedirectToAction("List");
+            }
+
+            try
+            {
+                _quantityUnitService.DeleteQuantityUnit(quantityUnit);
+
+                NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+                return RedirectToAction("List");
+            }
+            catch (Exception ex)
+            {
+                NotifyError(ex);
+                return RedirectToAction("Edit", new { id = quantityUnit.Id });
+            }
         }
 
         public ActionResult Edit(int id)
@@ -182,35 +218,7 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("List", "QuantityUnit");
         }
 
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageMeasures))
-            {
-                return AccessDeniedView();
-            }
-
-            var quantityUnit = _quantityUnitService.GetQuantityUnitById(id);
-            if (quantityUnit == null)
-            {
-                return RedirectToAction("List");
-            }
-
-            try
-            {
-                _quantityUnitService.DeleteQuantityUnit(quantityUnit);
-
-                NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
-                return RedirectToAction("List");
-            }
-            catch (Exception ex)
-            {
-                NotifyError(ex);
-                return RedirectToAction("Edit", new { id = quantityUnit.Id });
-            }
-        }
-
-        #endregion
+        #endregion Create / Edit / Delete / Save
 
         #region Utilities
 
@@ -224,6 +232,6 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        #endregion
+        #endregion Utilities
     }
 }

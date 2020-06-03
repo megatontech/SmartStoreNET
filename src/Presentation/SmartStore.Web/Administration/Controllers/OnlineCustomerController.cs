@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Customers;
+﻿using SmartStore.Admin.Models.Customers;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Services.Common;
@@ -12,6 +9,9 @@ using SmartStore.Services.Localization;
 using SmartStore.Services.Security;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -21,15 +21,15 @@ namespace SmartStore.Admin.Controllers
     {
         #region Fields
 
-        private readonly ICustomerService _customerService;
-        private readonly IGeoCountryLookup _geoCountryLookup;
-        private readonly IDateTimeHelper _dateTimeHelper;
-        private readonly CustomerSettings _customerSettings;
         private readonly AdminAreaSettings _adminAreaSettings;
-        private readonly IPermissionService _permissionService;
+        private readonly ICustomerService _customerService;
+        private readonly CustomerSettings _customerSettings;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IGeoCountryLookup _geoCountryLookup;
         private readonly ILocalizationService _localizationService;
+        private readonly IPermissionService _permissionService;
 
-        #endregion
+        #endregion Fields
 
         #region Constructors
 
@@ -47,8 +47,8 @@ namespace SmartStore.Admin.Controllers
             this._localizationService = localizationService;
         }
 
-        #endregion
-        
+        #endregion Constructors
+
         #region Online customers
 
         public ActionResult List()
@@ -81,34 +81,34 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult List(GridCommand command)
         {
-			var model = new GridModel<OnlineCustomerModel>();
+            var model = new GridModel<OnlineCustomerModel>();
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-			{
-				var lastActivityFrom = DateTime.UtcNow.AddMinutes(-_customerSettings.OnlineCustomerMinutes);
-				var customers = _customerService.GetOnlineCustomers(lastActivityFrom, null, command.Page - 1, command.PageSize);
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            {
+                var lastActivityFrom = DateTime.UtcNow.AddMinutes(-_customerSettings.OnlineCustomerMinutes);
+                var customers = _customerService.GetOnlineCustomers(lastActivityFrom, null, command.Page - 1, command.PageSize);
 
-				model.Data = customers.Select(x =>
-				{
-					return new OnlineCustomerModel
-					{
-						Id = x.Id,
-						CustomerInfo = x.IsRegistered() ? x.Email : T("Admin.Customers.Guest").Text,
-						LastIpAddress = x.LastIpAddress,
-						Location = _geoCountryLookup.LookupCountry(x.LastIpAddress)?.Name.EmptyNull(),
-						LastActivityDate = _dateTimeHelper.ConvertToUserTime(x.LastActivityDateUtc, DateTimeKind.Utc),
-						LastVisitedPage = x.GetAttribute<string>(SystemCustomerAttributeNames.LastVisitedPage)
-					};
-				});
+                model.Data = customers.Select(x =>
+                {
+                    return new OnlineCustomerModel
+                    {
+                        Id = x.Id,
+                        CustomerInfo = x.IsRegistered() ? x.Email : T("Admin.Customers.Guest").Text,
+                        LastIpAddress = x.LastIpAddress,
+                        Location = _geoCountryLookup.LookupCountry(x.LastIpAddress)?.Name.EmptyNull(),
+                        LastActivityDate = _dateTimeHelper.ConvertToUserTime(x.LastActivityDateUtc, DateTimeKind.Utc),
+                        LastVisitedPage = x.GetAttribute<string>(SystemCustomerAttributeNames.LastVisitedPage)
+                    };
+                });
 
-				model.Total = customers.TotalCount;
-			}
-			else
-			{
-				model.Data = Enumerable.Empty<OnlineCustomerModel>();
+                model.Total = customers.TotalCount;
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<OnlineCustomerModel>();
 
-				NotifyAccessDenied();
-			}
+                NotifyAccessDenied();
+            }
 
             return new JsonResult
             {
@@ -116,6 +116,6 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-        #endregion
+        #endregion Online customers
     }
 }

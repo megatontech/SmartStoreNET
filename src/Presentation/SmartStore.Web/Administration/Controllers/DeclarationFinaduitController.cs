@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
-using SmartStore.Admin.Models.Orders;
+﻿using SmartStore.Admin.Models.Orders;
 using SmartStore.Core;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
@@ -41,7 +36,11 @@ using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Pdf;
 using SmartStore.Web.Framework.Plugins;
-using SmartStore.Web.Framework.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -53,52 +52,51 @@ namespace SmartStore.Admin.Controllers
     {
         #region Fields
 
-        private readonly IOrderService _orderService;
-        private readonly IDeclarationOrderService _DeclarationOrderService;
-        private readonly IOrderReportService _orderReportService;
-        private readonly IOrderProcessingService _orderProcessingService;
-        private readonly IDateTimeHelper _dateTimeHelper;
-        private readonly IPriceFormatter _priceFormatter;
-        private readonly ILocalizationService _localizationService;
-        private readonly IWorkContext _workContext;
-        private readonly ICurrencyService _currencyService;
-        private readonly IEncryptionService _encryptionService;
-        private readonly IPaymentService _paymentService;
-        private readonly IMeasureService _measureService;
         private readonly IAddressService _addressService;
-        private readonly ICountryService _countryService;
-        private readonly IStateProvinceService _stateProvinceService;
-        private readonly IProductService _productService;
-        private readonly IPermissionService _permissionService;
-        private readonly ICategoryService _categoryService;
-        private readonly IManufacturerService _manufacturerService;
-        private readonly IProductAttributeService _productAttributeService;
-        private readonly IProductAttributeParser _productAttributeParser;
-        private readonly IProductAttributeFormatter _productAttributeFormatter;
-        private readonly IShoppingCartService _shoppingCartService;
-        private readonly IGiftCardService _giftCardService;
-        private readonly IDownloadService _downloadService;
-        private readonly IShipmentService _shipmentService;
-        private readonly ITaxService _taxService;
-        private readonly IPriceCalculationService _priceCalculationService;
-        private readonly IEventPublisher _eventPublisher;
-        private readonly ICustomerService _customerService;
-        private readonly PluginMediator _pluginMediator;
-        private readonly IAffiliateService _affiliateService;
-        private readonly ICustomerActivityService _customerActivityService;
-        private readonly ICatalogSearchService _catalogSearchService;
-        private readonly IPdfConverter _pdfConverter;
-
-        private readonly CatalogSettings _catalogSettings;
-        private readonly TaxSettings _taxSettings;
-        private readonly MeasureSettings _measureSettings;
-        private readonly PdfSettings _pdfSettings;
         private readonly AddressSettings _addressSettings;
         private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly IAffiliateService _affiliateService;
+        private readonly ICatalogSearchService _catalogSearchService;
+        private readonly CatalogSettings _catalogSettings;
+        private readonly ICategoryService _categoryService;
+        private readonly ICountryService _countryService;
+        private readonly ICurrencyService _currencyService;
+        private readonly ICustomerActivityService _customerActivityService;
+        private readonly ICustomerService _customerService;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly IDeclarationOrderService _DeclarationOrderService;
+        private readonly IDownloadService _downloadService;
+        private readonly IEncryptionService _encryptionService;
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IGiftCardService _giftCardService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IManufacturerService _manufacturerService;
+        private readonly IMeasureService _measureService;
+        private readonly MeasureSettings _measureSettings;
+        private readonly IOrderProcessingService _orderProcessingService;
+        private readonly IOrderReportService _orderReportService;
+        private readonly IOrderService _orderService;
+        private readonly IPaymentService _paymentService;
+        private readonly IPdfConverter _pdfConverter;
+        private readonly PdfSettings _pdfSettings;
+        private readonly IPermissionService _permissionService;
+        private readonly PluginMediator _pluginMediator;
+        private readonly IPriceCalculationService _priceCalculationService;
+        private readonly IPriceFormatter _priceFormatter;
+        private readonly IProductAttributeFormatter _productAttributeFormatter;
+        private readonly IProductAttributeParser _productAttributeParser;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductService _productService;
         private readonly SearchSettings _searchSettings;
+        private readonly IShipmentService _shipmentService;
+        private readonly IShoppingCartService _shoppingCartService;
         private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly IStateProvinceService _stateProvinceService;
+        private readonly ITaxService _taxService;
+        private readonly TaxSettings _taxSettings;
+        private readonly IWorkContext _workContext;
 
-        #endregion
+        #endregion Fields
 
         #region Ctor
 
@@ -193,9 +191,84 @@ namespace SmartStore.Admin.Controllers
             _DeclarationOrderService = declarationOrderService;
         }
 
-        #endregion
+        #endregion Ctor
 
         #region Utilities
+
+        [NonAction]
+        protected OrderModel.AddOrderProductModel.ProductDetailsModel PrepareAddProductToOrderModel(int orderId, int productId)
+        {
+            var product = _productService.GetProductById(productId);
+            if (product == null)
+                throw new ArgumentException(T("Products.NotFound", productId));
+
+            var customer = _workContext.CurrentCustomer;    // TODO: we need a customer representing entity instance for backend work
+            var order = _orderService.GetOrderById(orderId);
+            var currency = _currencyService.GetCurrencyByCode(order.CustomerCurrencyCode);
+
+            var taxRate = decimal.Zero;
+            var unitPriceTaxRate = decimal.Zero;
+            var unitPrice = _priceCalculationService.GetFinalPrice(product, null, customer, decimal.Zero, false, 1);
+            var unitPriceInclTax = _taxService.GetProductPrice(product, product.TaxCategoryId, unitPrice, true, customer, currency, _taxSettings.PricesIncludeTax, out unitPriceTaxRate);
+            var unitPriceExclTax = _taxService.GetProductPrice(product, product.TaxCategoryId, unitPrice, false, customer, currency, _taxSettings.PricesIncludeTax, out taxRate);
+
+            var model = new OrderModel.AddOrderProductModel.ProductDetailsModel()
+            {
+                ProductId = productId,
+                OrderId = orderId,
+                Name = product.Name,
+                ProductType = product.ProductType,
+                Quantity = 1,
+                UnitPriceInclTax = unitPriceInclTax,
+                UnitPriceExclTax = unitPriceExclTax,
+                TaxRate = unitPriceTaxRate,
+                SubTotalInclTax = unitPriceInclTax,
+                SubTotalExclTax = unitPriceExclTax,
+                ShowUpdateTotals = (order.OrderStatusId <= (int)OrderStatus.Pending),
+                AdjustInventory = true,
+                UpdateTotals = true
+            };
+
+            //attributes
+            var productVariantAttributes = _productAttributeService.GetProductVariantAttributesByProductId(product.Id);
+            foreach (var attribute in productVariantAttributes)
+            {
+                var pvaModel = new OrderModel.AddOrderProductModel.ProductVariantAttributeModel()
+                {
+                    Id = attribute.Id,
+                    ProductAttributeId = attribute.ProductAttributeId,
+                    Name = attribute.ProductAttribute.Name,
+                    TextPrompt = attribute.TextPrompt,
+                    IsRequired = attribute.IsRequired,
+                    AttributeControlType = attribute.AttributeControlType
+                };
+
+                if (attribute.ShouldHaveValues())
+                {
+                    //values
+                    var pvaValues = _productAttributeService.GetProductVariantAttributeValues(attribute.Id);
+                    foreach (var pvaValue in pvaValues)
+                    {
+                        var pvaValueModel = new OrderModel.AddOrderProductModel.ProductVariantAttributeValueModel()
+                        {
+                            Id = pvaValue.Id,
+                            Name = pvaValue.Name,
+                            IsPreSelected = pvaValue.IsPreSelected
+                        };
+                        pvaModel.Values.Add(pvaValueModel);
+                    }
+                }
+
+                model.ProductVariantAttributes.Add(pvaModel);
+            }
+            //gift card
+            model.GiftCard.IsGiftCard = product.IsGiftCard;
+            if (model.GiftCard.IsGiftCard)
+            {
+                model.GiftCard.GiftCardType = product.GiftCardType;
+            }
+            return model;
+        }
 
         [NonAction]
         protected void PrepareOrderDetailsModel(OrderModel model, Order order)
@@ -340,7 +413,7 @@ namespace SmartStore.Admin.Controllers
                 model.RefundedAmount = _priceFormatter.FormatPrice(order.RefundedAmount, true, false);
             }
 
-            #endregion
+            #endregion Order totals
 
             #region Payment info
 
@@ -436,7 +509,7 @@ namespace SmartStore.Admin.Controllers
                 model.RecurringPaymentId = recurringPayment.Id;
             }
 
-            #endregion
+            #endregion Payment info
 
             #region Billing & shipping info
 
@@ -513,7 +586,7 @@ namespace SmartStore.Admin.Controllers
                 model.ShippingAddressGoogleMapsUrl = googleMapsUrl.FormatInvariant(language.UniqueSeoCode.EmptyNull().ToLower(), Server.UrlEncode(googleAddressQuery));
             }
 
-            #endregion
+            #endregion Billing & shipping info
 
             #region Products
 
@@ -629,142 +702,7 @@ namespace SmartStore.Admin.Controllers
 
             model.AutoUpdateOrderItemInfo = TempData[AutoUpdateOrderItemContext.InfoKey] as string;
 
-            #endregion
-        }
-
-        [NonAction]
-        protected OrderModel.AddOrderProductModel.ProductDetailsModel PrepareAddProductToOrderModel(int orderId, int productId)
-        {
-            var product = _productService.GetProductById(productId);
-            if (product == null)
-                throw new ArgumentException(T("Products.NotFound", productId));
-
-            var customer = _workContext.CurrentCustomer;    // TODO: we need a customer representing entity instance for backend work
-            var order = _orderService.GetOrderById(orderId);
-            var currency = _currencyService.GetCurrencyByCode(order.CustomerCurrencyCode);
-
-            var taxRate = decimal.Zero;
-            var unitPriceTaxRate = decimal.Zero;
-            var unitPrice = _priceCalculationService.GetFinalPrice(product, null, customer, decimal.Zero, false, 1);
-            var unitPriceInclTax = _taxService.GetProductPrice(product, product.TaxCategoryId, unitPrice, true, customer, currency, _taxSettings.PricesIncludeTax, out unitPriceTaxRate);
-            var unitPriceExclTax = _taxService.GetProductPrice(product, product.TaxCategoryId, unitPrice, false, customer, currency, _taxSettings.PricesIncludeTax, out taxRate);
-
-            var model = new OrderModel.AddOrderProductModel.ProductDetailsModel()
-            {
-                ProductId = productId,
-                OrderId = orderId,
-                Name = product.Name,
-                ProductType = product.ProductType,
-                Quantity = 1,
-                UnitPriceInclTax = unitPriceInclTax,
-                UnitPriceExclTax = unitPriceExclTax,
-                TaxRate = unitPriceTaxRate,
-                SubTotalInclTax = unitPriceInclTax,
-                SubTotalExclTax = unitPriceExclTax,
-                ShowUpdateTotals = (order.OrderStatusId <= (int)OrderStatus.Pending),
-                AdjustInventory = true,
-                UpdateTotals = true
-            };
-
-            //attributes
-            var productVariantAttributes = _productAttributeService.GetProductVariantAttributesByProductId(product.Id);
-            foreach (var attribute in productVariantAttributes)
-            {
-                var pvaModel = new OrderModel.AddOrderProductModel.ProductVariantAttributeModel()
-                {
-                    Id = attribute.Id,
-                    ProductAttributeId = attribute.ProductAttributeId,
-                    Name = attribute.ProductAttribute.Name,
-                    TextPrompt = attribute.TextPrompt,
-                    IsRequired = attribute.IsRequired,
-                    AttributeControlType = attribute.AttributeControlType
-                };
-
-                if (attribute.ShouldHaveValues())
-                {
-                    //values
-                    var pvaValues = _productAttributeService.GetProductVariantAttributeValues(attribute.Id);
-                    foreach (var pvaValue in pvaValues)
-                    {
-                        var pvaValueModel = new OrderModel.AddOrderProductModel.ProductVariantAttributeValueModel()
-                        {
-                            Id = pvaValue.Id,
-                            Name = pvaValue.Name,
-                            IsPreSelected = pvaValue.IsPreSelected
-                        };
-                        pvaModel.Values.Add(pvaValueModel);
-                    }
-                }
-
-                model.ProductVariantAttributes.Add(pvaModel);
-            }
-            //gift card
-            model.GiftCard.IsGiftCard = product.IsGiftCard;
-            if (model.GiftCard.IsGiftCard)
-            {
-                model.GiftCard.GiftCardType = product.GiftCardType;
-            }
-            return model;
-        }
-
-        private ShipmentModel.ShipmentItemModel PrepareShipmentItemModel(
-            Order order,
-            OrderItem orderItem,
-            ShipmentItem shipmentItem,
-            MeasureDimension baseDimension,
-            MeasureWeight baseWeight)
-        {
-            orderItem.Product.MergeWithCombination(orderItem.AttributesXml);
-
-            var language = Services.WorkContext.WorkingLanguage;
-            var maxQtyToAdd = orderItem.GetItemsCanBeAddedToShipmentCount();
-            var qtyInAllShipments = orderItem.GetShipmentItemsCount();
-
-            var model = new ShipmentModel.ShipmentItemModel
-            {
-                Id = shipmentItem?.Id ?? 0,
-                OrderItemId = orderItem.Id,
-                ProductId = orderItem.ProductId,
-                ProductName = orderItem.Product.Name,
-                ProductType = orderItem.Product.ProductType,
-                ProductTypeName = orderItem.Product.GetProductTypeLabel(_localizationService),
-                ProductTypeLabelHint = orderItem.Product.ProductTypeLabelHint,
-                Sku = orderItem.Product.Sku,
-                Gtin = orderItem.Product.Gtin,
-                AttributeInfo = orderItem.AttributeDescription,
-                ItemWeight = orderItem.ItemWeight.HasValue ? string.Format("{0:F2} [{1}]", orderItem.ItemWeight, baseWeight?.Name ?? "") : "",
-                ItemDimensions = string.Format("{0:F2} x {1:F2} x {2:F2} [{3}]", orderItem.Product.Length, orderItem.Product.Width, orderItem.Product.Height, baseDimension?.Name ?? ""),
-                QuantityOrdered = orderItem.Quantity,
-                QuantityInThisShipment = shipmentItem?.Quantity ?? 0,
-                QuantityInAllShipments = qtyInAllShipments,
-                QuantityToAdd = maxQtyToAdd
-            };
-
-            if (orderItem.Product.ProductType == ProductType.BundledProduct && orderItem.BundleData.HasValue())
-            {
-                var bundleData = orderItem.GetBundleData();
-
-                model.BundlePerItemPricing = orderItem.Product.BundlePerItemPricing;
-                model.BundlePerItemShoppingCart = bundleData.Any(x => x.PerItemShoppingCart);
-
-                foreach (var bundleItem in bundleData)
-                {
-                    var bundleItemModel = new ShipmentModel.BundleItemModel
-                    {
-                        Sku = bundleItem.Sku,
-                        ProductName = bundleItem.ProductName,
-                        ProductSeName = bundleItem.ProductSeName,
-                        VisibleIndividually = bundleItem.VisibleIndividually,
-                        Quantity = bundleItem.Quantity,
-                        DisplayOrder = bundleItem.DisplayOrder,
-                        AttributeInfo = bundleItem.AttributesInfo
-                    };
-
-                    model.BundleItems.Add(bundleItemModel);
-                }
-            }
-
-            return model;
+            #endregion Products
         }
 
         [NonAction]
@@ -874,9 +812,83 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        #endregion
+        private ShipmentModel.ShipmentItemModel PrepareShipmentItemModel(
+                            Order order,
+            OrderItem orderItem,
+            ShipmentItem shipmentItem,
+            MeasureDimension baseDimension,
+            MeasureWeight baseWeight)
+        {
+            orderItem.Product.MergeWithCombination(orderItem.AttributesXml);
+
+            var language = Services.WorkContext.WorkingLanguage;
+            var maxQtyToAdd = orderItem.GetItemsCanBeAddedToShipmentCount();
+            var qtyInAllShipments = orderItem.GetShipmentItemsCount();
+
+            var model = new ShipmentModel.ShipmentItemModel
+            {
+                Id = shipmentItem?.Id ?? 0,
+                OrderItemId = orderItem.Id,
+                ProductId = orderItem.ProductId,
+                ProductName = orderItem.Product.Name,
+                ProductType = orderItem.Product.ProductType,
+                ProductTypeName = orderItem.Product.GetProductTypeLabel(_localizationService),
+                ProductTypeLabelHint = orderItem.Product.ProductTypeLabelHint,
+                Sku = orderItem.Product.Sku,
+                Gtin = orderItem.Product.Gtin,
+                AttributeInfo = orderItem.AttributeDescription,
+                ItemWeight = orderItem.ItemWeight.HasValue ? string.Format("{0:F2} [{1}]", orderItem.ItemWeight, baseWeight?.Name ?? "") : "",
+                ItemDimensions = string.Format("{0:F2} x {1:F2} x {2:F2} [{3}]", orderItem.Product.Length, orderItem.Product.Width, orderItem.Product.Height, baseDimension?.Name ?? ""),
+                QuantityOrdered = orderItem.Quantity,
+                QuantityInThisShipment = shipmentItem?.Quantity ?? 0,
+                QuantityInAllShipments = qtyInAllShipments,
+                QuantityToAdd = maxQtyToAdd
+            };
+
+            if (orderItem.Product.ProductType == ProductType.BundledProduct && orderItem.BundleData.HasValue())
+            {
+                var bundleData = orderItem.GetBundleData();
+
+                model.BundlePerItemPricing = orderItem.Product.BundlePerItemPricing;
+                model.BundlePerItemShoppingCart = bundleData.Any(x => x.PerItemShoppingCart);
+
+                foreach (var bundleItem in bundleData)
+                {
+                    var bundleItemModel = new ShipmentModel.BundleItemModel
+                    {
+                        Sku = bundleItem.Sku,
+                        ProductName = bundleItem.ProductName,
+                        ProductSeName = bundleItem.ProductSeName,
+                        VisibleIndividually = bundleItem.VisibleIndividually,
+                        Quantity = bundleItem.Quantity,
+                        DisplayOrder = bundleItem.DisplayOrder,
+                        AttributeInfo = bundleItem.AttributesInfo
+                    };
+
+                    model.BundleItems.Add(bundleItemModel);
+                }
+            }
+
+            return model;
+        }
+
+        #endregion Utilities
 
         #region Order list
+
+        [HttpPost, ActionName("List")]
+        [FormValueRequired("go-to-order-by-number")]
+        public ActionResult GoToOrderId(OrderListModel model)
+        {
+            var order = _orderService.GetOrderByNumber(model.GoDirectlyToNumber);
+
+            if (order != null)
+                return RedirectToAction("Edit", "Order", new { id = order.Id });
+
+            NotifyWarning(_localizationService.GetResource("Admin.Order.NotFound"));
+
+            return RedirectToAction("List", "Order");
+        }
 
         public ActionResult Index()
         {
@@ -1053,21 +1065,7 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-        [HttpPost, ActionName("List")]
-        [FormValueRequired("go-to-order-by-number")]
-        public ActionResult GoToOrderId(OrderListModel model)
-        {
-            var order = _orderService.GetOrderByNumber(model.GoDirectlyToNumber);
-
-            if (order != null)
-                return RedirectToAction("Edit", "Order", new { id = order.Id });
-
-            NotifyWarning(_localizationService.GetResource("Admin.Order.NotFound"));
-
-            return RedirectToAction("List", "Order");
-        }
-
-        #endregion
+        #endregion Order list
 
         #region Export / Import
 
@@ -1087,7 +1085,7 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("PrintMany", "Order", new { ids = selectedIds, pdf = true, area = "" });
         }
 
-        #endregion
+        #endregion Export / Import
 
         #region Order details
 
@@ -1107,29 +1105,6 @@ namespace SmartStore.Admin.Controllers
             try
             {
                 _orderProcessingService.CancelOrder(order, true);
-            }
-            catch (Exception exc)
-            {
-                NotifyError(exc);
-            }
-
-            return RedirectToAction("Edit", new { id });
-        }
-
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired("completeorder")]
-        public ActionResult CompleteOrder(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            try
-            {
-                _orderProcessingService.CompleteOrder(order);
             }
             catch (Exception exc)
             {
@@ -1167,6 +1142,29 @@ namespace SmartStore.Admin.Controllers
         }
 
         [HttpPost, ActionName("Edit")]
+        [FormValueRequired("completeorder")]
+        public ActionResult CompleteOrder(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            try
+            {
+                _orderProcessingService.CompleteOrder(order);
+            }
+            catch (Exception exc)
+            {
+                NotifyError(exc);
+            }
+
+            return RedirectToAction("Edit", new { id });
+        }
+
+        [HttpPost, ActionName("Edit")]
         [FormValueRequired("markorderaspaid")]
         public ActionResult MarkOrderAsPaid(int id)
         {
@@ -1187,6 +1185,76 @@ namespace SmartStore.Admin.Controllers
             }
 
             return RedirectToAction("Edit", new { id });
+        }
+
+        public ActionResult PartiallyRefundOrderPopup(int id, bool online)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            var model = new OrderModel();
+            PrepareOrderDetailsModel(model, order);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [FormValueRequired("partialrefundorder")]
+        public ActionResult PartiallyRefundOrderPopup(string btnId, string formId, int id, bool online, OrderModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            try
+            {
+                decimal amountToRefund = model.AmountToRefund;
+                if (amountToRefund <= decimal.Zero)
+                    throw new SmartException("Enter amount to refund");
+
+                decimal maxAmountToRefund = order.OrderTotal - order.RefundedAmount;
+                if (amountToRefund > maxAmountToRefund)
+                    amountToRefund = maxAmountToRefund;
+
+                var errors = new List<string>();
+                if (online)
+                    errors = _orderProcessingService.PartiallyRefund(order, amountToRefund).ToList();
+                else
+                    _orderProcessingService.PartiallyRefundOffline(order, amountToRefund);
+
+                if (errors.Count == 0)
+                {
+                    //success
+                    ViewBag.RefreshPage = true;
+                    ViewBag.btnId = btnId;
+                    ViewBag.formId = formId;
+
+                    PrepareOrderDetailsModel(model, order);
+                    return View(model);
+                }
+                else
+                {
+                    //error
+                    PrepareOrderDetailsModel(model, order);
+                    foreach (var error in errors)
+                        NotifyError(error, false);
+                    return View(model);
+                }
+            }
+            catch (Exception exc)
+            {
+                //error
+                PrepareOrderDetailsModel(model, order);
+                NotifyError(exc, false);
+                return View(model);
+            }
         }
 
         [HttpPost, ActionName("Edit")]
@@ -1287,385 +1355,9 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("Edit", new { id });
         }
 
-        public ActionResult PartiallyRefundOrderPopup(int id, bool online)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            var model = new OrderModel();
-            PrepareOrderDetailsModel(model, order);
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [FormValueRequired("partialrefundorder")]
-        public ActionResult PartiallyRefundOrderPopup(string btnId, string formId, int id, bool online, OrderModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            try
-            {
-                decimal amountToRefund = model.AmountToRefund;
-                if (amountToRefund <= decimal.Zero)
-                    throw new SmartException("Enter amount to refund");
-
-                decimal maxAmountToRefund = order.OrderTotal - order.RefundedAmount;
-                if (amountToRefund > maxAmountToRefund)
-                    amountToRefund = maxAmountToRefund;
-
-                var errors = new List<string>();
-                if (online)
-                    errors = _orderProcessingService.PartiallyRefund(order, amountToRefund).ToList();
-                else
-                    _orderProcessingService.PartiallyRefundOffline(order, amountToRefund);
-
-                if (errors.Count == 0)
-                {
-                    //success
-                    ViewBag.RefreshPage = true;
-                    ViewBag.btnId = btnId;
-                    ViewBag.formId = formId;
-
-                    PrepareOrderDetailsModel(model, order);
-                    return View(model);
-                }
-                else
-                {
-                    //error
-                    PrepareOrderDetailsModel(model, order);
-                    foreach (var error in errors)
-                        NotifyError(error, false);
-                    return View(model);
-                }
-            }
-            catch (Exception exc)
-            {
-                //error
-                PrepareOrderDetailsModel(model, order);
-                NotifyError(exc, false);
-                return View(model);
-            }
-        }
-
-        #endregion
+        #endregion Payments and other order workflow
 
         #region Edit, delete
-
-        public ActionResult Edit(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null || order.Deleted)
-                return RedirectToAction("List");
-
-            var model = new OrderModel();
-            PrepareOrderDetailsModel(model, order);
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public ActionResult Delete(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            _orderProcessingService.DeleteOrder(order);
-
-            var msg = T("ActivityLog.DeleteOrder", order.GetOrderNumber());
-
-            _customerActivityService.InsertActivity("DeleteOrder", msg);
-
-            NotifySuccess(msg);
-
-            return RedirectToAction("List");
-        }
-
-        public ActionResult Print(int orderId, bool pdf = false)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            return RedirectToAction("Print", "Order", new { id = orderId, pdf, area = "" });
-        }
-
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired("btnSaveCC")]
-        public ActionResult EditCreditCardInfo(int id, OrderModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            if (order.AllowStoringCreditCardNumber)
-            {
-                string cardType = model.CardType;
-                string cardName = model.CardName;
-                string cardNumber = model.CardNumber;
-                string cardCvv2 = model.CardCvv2;
-                string cardExpirationMonth = model.CardExpirationMonth;
-                string cardExpirationYear = model.CardExpirationYear;
-
-                order.CardType = _encryptionService.EncryptText(cardType);
-                order.CardName = _encryptionService.EncryptText(cardName);
-                order.CardNumber = _encryptionService.EncryptText(cardNumber);
-                order.MaskedCreditCardNumber = _encryptionService.EncryptText(_paymentService.GetMaskedCreditCardNumber(cardNumber));
-                order.CardCvv2 = _encryptionService.EncryptText(cardCvv2);
-                order.CardExpirationMonth = _encryptionService.EncryptText(cardExpirationMonth);
-                order.CardExpirationYear = _encryptionService.EncryptText(cardExpirationYear);
-                _orderService.UpdateOrder(order);
-            }
-
-            PrepareOrderDetailsModel(model, order);
-            return View(model);
-        }
-
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired("btnSaveDD")]
-        public ActionResult EditDirectDebitInfo(int id, OrderModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            if (order.AllowStoringDirectDebit)
-            {
-
-                string accountHolder = model.DirectDebitAccountHolder;
-                string accountNumber = model.DirectDebitAccountNumber;
-                string bankCode = model.DirectDebitBankCode;
-                string bankName = model.DirectDebitBankName;
-                string bic = model.DirectDebitBIC;
-                string country = model.DirectDebitCountry;
-                string iban = model.DirectDebitIban;
-
-                order.DirectDebitAccountHolder = _encryptionService.EncryptText(accountHolder);
-                order.DirectDebitAccountNumber = _encryptionService.EncryptText(accountNumber);
-                order.DirectDebitBankCode = _encryptionService.EncryptText(bankCode);
-                order.DirectDebitBankName = _encryptionService.EncryptText(bankName);
-                order.DirectDebitBIC = _encryptionService.EncryptText(bic);
-                order.DirectDebitCountry = _encryptionService.EncryptText(country);
-                order.DirectDebitIban = _encryptionService.EncryptText(iban);
-
-                _orderService.UpdateOrder(order);
-            }
-
-            PrepareOrderDetailsModel(model, order);
-            return View(model);
-        }
-
-
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired("btnSaveOrderTotals")]
-        public ActionResult EditOrderTotals(int id, OrderModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            order.OrderSubtotalInclTax = model.OrderSubtotalInclTaxValue;
-            order.OrderSubtotalExclTax = model.OrderSubtotalExclTaxValue;
-            order.OrderSubTotalDiscountInclTax = model.OrderSubTotalDiscountInclTaxValue;
-            order.OrderSubTotalDiscountExclTax = model.OrderSubTotalDiscountExclTaxValue;
-            order.OrderShippingInclTax = model.OrderShippingInclTaxValue;
-            order.OrderShippingExclTax = model.OrderShippingExclTaxValue;
-            order.PaymentMethodAdditionalFeeInclTax = model.PaymentMethodAdditionalFeeInclTaxValue;
-            order.PaymentMethodAdditionalFeeExclTax = model.PaymentMethodAdditionalFeeExclTaxValue;
-            order.TaxRates = model.TaxRatesValue;
-            order.OrderTax = model.TaxValue;
-            order.OrderDiscount = model.OrderTotalDiscountValue;
-            order.CreditBalance = model.CreditBalanceValue;
-            order.OrderTotalRounding = model.OrderTotalRoundingValue;
-            order.OrderTotal = model.OrderTotalValue;
-            _orderService.UpdateOrder(order);
-
-            PrepareOrderDetailsModel(model, order);
-            return View(model);
-        }
-
-        [HttpPost]
-        public ActionResult EditOrderItem(AutoUpdateOrderItemModel model, FormCollection form)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var oi = _orderService.GetOrderItemById(model.Id);
-
-            if (oi == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            int orderId = oi.Order.Id;
-
-            if (model.NewQuantity.HasValue)
-            {
-                var context = new AutoUpdateOrderItemContext()
-                {
-                    OrderItem = oi,
-                    QuantityOld = oi.Quantity,
-                    QuantityNew = model.NewQuantity.Value,
-                    AdjustInventory = model.AdjustInventory,
-                    UpdateRewardPoints = model.UpdateRewardPoints,
-                    UpdateTotals = model.UpdateTotals
-                };
-
-                oi.Quantity = model.NewQuantity.Value;
-                oi.UnitPriceInclTax = model.NewUnitPriceInclTax ?? oi.UnitPriceInclTax;
-                oi.UnitPriceExclTax = model.NewUnitPriceExclTax ?? oi.UnitPriceExclTax;
-                oi.TaxRate = model.NewTaxRate ?? oi.TaxRate;
-                oi.DiscountAmountInclTax = model.NewDiscountInclTax ?? oi.DiscountAmountInclTax;
-                oi.DiscountAmountExclTax = model.NewDiscountExclTax ?? oi.DiscountAmountExclTax;
-                oi.PriceInclTax = model.NewPriceInclTax ?? oi.PriceInclTax;
-                oi.PriceExclTax = model.NewPriceExclTax ?? oi.PriceExclTax;
-
-                _orderService.UpdateOrder(oi.Order);
-
-                _orderProcessingService.AutoUpdateOrderDetails(context);
-
-                // we do not delete order item automatically anymore.
-                //if (oi.Quantity <= 0)
-                //{
-                //	_orderService.DeleteOrderItem(oi);
-                //}
-
-                TempData[AutoUpdateOrderItemContext.InfoKey] = context.ToString(_localizationService);
-            }
-
-            return RedirectToAction("Edit", new { id = orderId });
-        }
-
-        [HttpPost]
-        public ActionResult DeleteOrderItem(AutoUpdateOrderItemModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var oi = _orderService.GetOrderItemById(model.Id);
-
-            if (oi == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            int orderId = oi.Order.Id;
-            var context = new AutoUpdateOrderItemContext()
-            {
-                OrderItem = oi,
-                QuantityOld = oi.Quantity,
-                QuantityNew = 0,
-                AdjustInventory = model.AdjustInventory,
-                UpdateRewardPoints = model.UpdateRewardPoints,
-                UpdateTotals = model.UpdateTotals
-            };
-
-            _orderProcessingService.AutoUpdateOrderDetails(context);
-
-            _orderService.DeleteOrderItem(oi);
-
-            TempData[AutoUpdateOrderItemContext.InfoKey] = context.ToString(_localizationService);
-
-            return RedirectToAction("Edit", new { id = orderId });
-        }
-
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired(FormValueRequirement.StartsWith, "btnAddReturnRequest")]
-        [ValidateInput(false)]
-        public ActionResult AddReturnRequest(int id, FormCollection form)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageReturnRequests))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                return RedirectToAction("List");
-
-            //get order item identifier
-            int orderItemId = 0;
-            foreach (var formValue in form.AllKeys)
-                if (formValue.StartsWith("btnAddReturnRequest", StringComparison.InvariantCultureIgnoreCase))
-                    orderItemId = Convert.ToInt32(formValue.Substring("btnAddReturnRequest".Length));
-
-            var orderItem = order.OrderItems.Where(x => x.Id == orderItemId).FirstOrDefault();
-            if (orderItem == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            if (orderItem.Quantity > 0)
-            {
-                var returnRequest = new ReturnRequest
-                {
-                    StoreId = order.StoreId,
-                    OrderItemId = orderItem.Id,
-                    Quantity = orderItem.Quantity,
-                    CustomerId = order.CustomerId,
-                    ReasonForReturn = "",
-                    RequestedAction = "",
-                    StaffNotes = "",
-                    ReturnRequestStatus = ReturnRequestStatus.Pending
-                };
-
-                order.Customer.ReturnRequests.Add(returnRequest);
-                _customerService.UpdateCustomer(order.Customer);
-
-                return RedirectToAction("Edit", "ReturnRequest", new { id = returnRequest.Id });
-            }
-
-            var model = new OrderModel();
-            PrepareOrderDetailsModel(model, order);
-            return View(model);
-        }
-
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired(FormValueRequirement.StartsWith, "btnResetDownloadCount")]
-        [ValidateInput(false)]
-        public ActionResult ResetDownloadCount(int id, FormCollection form)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                //No order found with the specified id
-                return RedirectToAction("List");
-
-            //get order item identifier
-            int orderItemId = 0;
-            foreach (var formValue in form.AllKeys)
-                if (formValue.StartsWith("btnResetDownloadCount", StringComparison.InvariantCultureIgnoreCase))
-                    orderItemId = Convert.ToInt32(formValue.Substring("btnResetDownloadCount".Length));
-
-            var orderItem = order.OrderItems.Where(x => x.Id == orderItemId).FirstOrDefault();
-            if (orderItem == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            orderItem.DownloadCount = 0;
-            _orderService.UpdateOrder(order);
-
-            var model = new OrderModel();
-            PrepareOrderDetailsModel(model, order);
-            return View(model);
-        }
 
         [HttpPost, ActionName("Edit")]
         [FormValueRequired(FormValueRequirement.StartsWith, "btnPvActivateDownload")]
@@ -1695,96 +1387,6 @@ namespace SmartStore.Admin.Controllers
 
             var model = new OrderModel();
             PrepareOrderDetailsModel(model, order);
-            return View(model);
-        }
-
-        public ActionResult UploadLicenseFilePopup(int id, int orderItemId)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(id);
-            if (order == null)
-                //No order found with the specified id
-                return RedirectToAction("List");
-
-            var orderItem = order.OrderItems.Where(x => x.Id == orderItemId).FirstOrDefault();
-            if (orderItem == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            if (!orderItem.Product.IsDownload)
-                throw new ArgumentException("Product is not downloadable");
-
-            var model = new OrderModel.UploadLicenseModel
-            {
-                LicenseDownloadId = orderItem.LicenseDownloadId ?? 0,
-                OrderId = order.Id,
-                OrderItemId = orderItem.Id
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [FormValueRequired("uploadlicense")]
-        public ActionResult UploadLicenseFilePopup(string btnId, string formId, OrderModel.UploadLicenseModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(model.OrderId);
-            if (order == null)
-                //No order found with the specified id
-                return RedirectToAction("List");
-
-            var orderItem = order.OrderItems.Where(x => x.Id == model.OrderItemId).FirstOrDefault();
-            if (orderItem == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            //attach license
-            if (model.LicenseDownloadId > 0)
-                orderItem.LicenseDownloadId = model.LicenseDownloadId;
-            else
-                orderItem.LicenseDownloadId = null;
-
-            MediaHelper.UpdateDownloadTransientStateFor(orderItem, x => x.LicenseDownloadId);
-
-            _orderService.UpdateOrder(order);
-
-            //success
-            ViewBag.RefreshPage = true;
-            ViewBag.btnId = btnId;
-            ViewBag.formId = formId;
-
-            return View(model);
-        }
-
-        [HttpPost, ActionName("UploadLicenseFilePopup")]
-        [FormValueRequired("deletelicense")]
-        public ActionResult DeleteLicenseFilePopup(string btnId, string formId, OrderModel.UploadLicenseModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(model.OrderId);
-            if (order == null)
-                //No order found with the specified id
-                return RedirectToAction("List");
-
-            var orderItem = order.OrderItems.Where(x => x.Id == model.OrderItemId).FirstOrDefault();
-            if (orderItem == null)
-                throw new ArgumentException("No order item found with the specified id");
-
-            //attach license
-            orderItem.LicenseDownloadId = null;
-            MediaHelper.UpdateDownloadTransientStateFor(orderItem, x => x.LicenseDownloadId);
-            _orderService.UpdateOrder(order);
-
-            //success
-            ViewBag.RefreshPage = true;
-            ViewBag.btnId = btnId;
-            ViewBag.formId = formId;
-
             return View(model);
         }
 
@@ -1930,7 +1532,7 @@ namespace SmartStore.Admin.Controllers
                 attributes = _productAttributeParser.AddGiftCardAttribute(attributes, recipientName, recipientEmail, senderName, senderEmail, giftCardMessage);
             }
 
-            #endregion
+            #endregion Gift cards
 
             //warnings
             warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(order.Customer, ShoppingCartType.ShoppingCart, product, attributes, quantity));
@@ -2040,9 +1642,403 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        #endregion
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired(FormValueRequirement.StartsWith, "btnAddReturnRequest")]
+        [ValidateInput(false)]
+        public ActionResult AddReturnRequest(int id, FormCollection form)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageReturnRequests))
+                return AccessDeniedView();
 
-        #endregion
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            //get order item identifier
+            int orderItemId = 0;
+            foreach (var formValue in form.AllKeys)
+                if (formValue.StartsWith("btnAddReturnRequest", StringComparison.InvariantCultureIgnoreCase))
+                    orderItemId = Convert.ToInt32(formValue.Substring("btnAddReturnRequest".Length));
+
+            var orderItem = order.OrderItems.Where(x => x.Id == orderItemId).FirstOrDefault();
+            if (orderItem == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            if (orderItem.Quantity > 0)
+            {
+                var returnRequest = new ReturnRequest
+                {
+                    StoreId = order.StoreId,
+                    OrderItemId = orderItem.Id,
+                    Quantity = orderItem.Quantity,
+                    CustomerId = order.CustomerId,
+                    ReasonForReturn = "",
+                    RequestedAction = "",
+                    StaffNotes = "",
+                    ReturnRequestStatus = ReturnRequestStatus.Pending
+                };
+
+                order.Customer.ReturnRequests.Add(returnRequest);
+                _customerService.UpdateCustomer(order.Customer);
+
+                return RedirectToAction("Edit", "ReturnRequest", new { id = returnRequest.Id });
+            }
+
+            var model = new OrderModel();
+            PrepareOrderDetailsModel(model, order);
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            _orderProcessingService.DeleteOrder(order);
+
+            var msg = T("ActivityLog.DeleteOrder", order.GetOrderNumber());
+
+            _customerActivityService.InsertActivity("DeleteOrder", msg);
+
+            NotifySuccess(msg);
+
+            return RedirectToAction("List");
+        }
+
+        [HttpPost, ActionName("UploadLicenseFilePopup")]
+        [FormValueRequired("deletelicense")]
+        public ActionResult DeleteLicenseFilePopup(string btnId, string formId, OrderModel.UploadLicenseModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(model.OrderId);
+            if (order == null)
+                //No order found with the specified id
+                return RedirectToAction("List");
+
+            var orderItem = order.OrderItems.Where(x => x.Id == model.OrderItemId).FirstOrDefault();
+            if (orderItem == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            //attach license
+            orderItem.LicenseDownloadId = null;
+            MediaHelper.UpdateDownloadTransientStateFor(orderItem, x => x.LicenseDownloadId);
+            _orderService.UpdateOrder(order);
+
+            //success
+            ViewBag.RefreshPage = true;
+            ViewBag.btnId = btnId;
+            ViewBag.formId = formId;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteOrderItem(AutoUpdateOrderItemModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var oi = _orderService.GetOrderItemById(model.Id);
+
+            if (oi == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            int orderId = oi.Order.Id;
+            var context = new AutoUpdateOrderItemContext()
+            {
+                OrderItem = oi,
+                QuantityOld = oi.Quantity,
+                QuantityNew = 0,
+                AdjustInventory = model.AdjustInventory,
+                UpdateRewardPoints = model.UpdateRewardPoints,
+                UpdateTotals = model.UpdateTotals
+            };
+
+            _orderProcessingService.AutoUpdateOrderDetails(context);
+
+            _orderService.DeleteOrderItem(oi);
+
+            TempData[AutoUpdateOrderItemContext.InfoKey] = context.ToString(_localizationService);
+
+            return RedirectToAction("Edit", new { id = orderId });
+        }
+
+        public ActionResult Edit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null || order.Deleted)
+                return RedirectToAction("List");
+
+            var model = new OrderModel();
+            PrepareOrderDetailsModel(model, order);
+
+            return View(model);
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("btnSaveCC")]
+        public ActionResult EditCreditCardInfo(int id, OrderModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            if (order.AllowStoringCreditCardNumber)
+            {
+                string cardType = model.CardType;
+                string cardName = model.CardName;
+                string cardNumber = model.CardNumber;
+                string cardCvv2 = model.CardCvv2;
+                string cardExpirationMonth = model.CardExpirationMonth;
+                string cardExpirationYear = model.CardExpirationYear;
+
+                order.CardType = _encryptionService.EncryptText(cardType);
+                order.CardName = _encryptionService.EncryptText(cardName);
+                order.CardNumber = _encryptionService.EncryptText(cardNumber);
+                order.MaskedCreditCardNumber = _encryptionService.EncryptText(_paymentService.GetMaskedCreditCardNumber(cardNumber));
+                order.CardCvv2 = _encryptionService.EncryptText(cardCvv2);
+                order.CardExpirationMonth = _encryptionService.EncryptText(cardExpirationMonth);
+                order.CardExpirationYear = _encryptionService.EncryptText(cardExpirationYear);
+                _orderService.UpdateOrder(order);
+            }
+
+            PrepareOrderDetailsModel(model, order);
+            return View(model);
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("btnSaveDD")]
+        public ActionResult EditDirectDebitInfo(int id, OrderModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            if (order.AllowStoringDirectDebit)
+            {
+                string accountHolder = model.DirectDebitAccountHolder;
+                string accountNumber = model.DirectDebitAccountNumber;
+                string bankCode = model.DirectDebitBankCode;
+                string bankName = model.DirectDebitBankName;
+                string bic = model.DirectDebitBIC;
+                string country = model.DirectDebitCountry;
+                string iban = model.DirectDebitIban;
+
+                order.DirectDebitAccountHolder = _encryptionService.EncryptText(accountHolder);
+                order.DirectDebitAccountNumber = _encryptionService.EncryptText(accountNumber);
+                order.DirectDebitBankCode = _encryptionService.EncryptText(bankCode);
+                order.DirectDebitBankName = _encryptionService.EncryptText(bankName);
+                order.DirectDebitBIC = _encryptionService.EncryptText(bic);
+                order.DirectDebitCountry = _encryptionService.EncryptText(country);
+                order.DirectDebitIban = _encryptionService.EncryptText(iban);
+
+                _orderService.UpdateOrder(order);
+            }
+
+            PrepareOrderDetailsModel(model, order);
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult EditOrderItem(AutoUpdateOrderItemModel model, FormCollection form)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var oi = _orderService.GetOrderItemById(model.Id);
+
+            if (oi == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            int orderId = oi.Order.Id;
+
+            if (model.NewQuantity.HasValue)
+            {
+                var context = new AutoUpdateOrderItemContext()
+                {
+                    OrderItem = oi,
+                    QuantityOld = oi.Quantity,
+                    QuantityNew = model.NewQuantity.Value,
+                    AdjustInventory = model.AdjustInventory,
+                    UpdateRewardPoints = model.UpdateRewardPoints,
+                    UpdateTotals = model.UpdateTotals
+                };
+
+                oi.Quantity = model.NewQuantity.Value;
+                oi.UnitPriceInclTax = model.NewUnitPriceInclTax ?? oi.UnitPriceInclTax;
+                oi.UnitPriceExclTax = model.NewUnitPriceExclTax ?? oi.UnitPriceExclTax;
+                oi.TaxRate = model.NewTaxRate ?? oi.TaxRate;
+                oi.DiscountAmountInclTax = model.NewDiscountInclTax ?? oi.DiscountAmountInclTax;
+                oi.DiscountAmountExclTax = model.NewDiscountExclTax ?? oi.DiscountAmountExclTax;
+                oi.PriceInclTax = model.NewPriceInclTax ?? oi.PriceInclTax;
+                oi.PriceExclTax = model.NewPriceExclTax ?? oi.PriceExclTax;
+
+                _orderService.UpdateOrder(oi.Order);
+
+                _orderProcessingService.AutoUpdateOrderDetails(context);
+
+                // we do not delete order item automatically anymore.
+                //if (oi.Quantity <= 0)
+                //{
+                //	_orderService.DeleteOrderItem(oi);
+                //}
+
+                TempData[AutoUpdateOrderItemContext.InfoKey] = context.ToString(_localizationService);
+            }
+
+            return RedirectToAction("Edit", new { id = orderId });
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("btnSaveOrderTotals")]
+        public ActionResult EditOrderTotals(int id, OrderModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                return RedirectToAction("List");
+
+            order.OrderSubtotalInclTax = model.OrderSubtotalInclTaxValue;
+            order.OrderSubtotalExclTax = model.OrderSubtotalExclTaxValue;
+            order.OrderSubTotalDiscountInclTax = model.OrderSubTotalDiscountInclTaxValue;
+            order.OrderSubTotalDiscountExclTax = model.OrderSubTotalDiscountExclTaxValue;
+            order.OrderShippingInclTax = model.OrderShippingInclTaxValue;
+            order.OrderShippingExclTax = model.OrderShippingExclTaxValue;
+            order.PaymentMethodAdditionalFeeInclTax = model.PaymentMethodAdditionalFeeInclTaxValue;
+            order.PaymentMethodAdditionalFeeExclTax = model.PaymentMethodAdditionalFeeExclTaxValue;
+            order.TaxRates = model.TaxRatesValue;
+            order.OrderTax = model.TaxValue;
+            order.OrderDiscount = model.OrderTotalDiscountValue;
+            order.CreditBalance = model.CreditBalanceValue;
+            order.OrderTotalRounding = model.OrderTotalRoundingValue;
+            order.OrderTotal = model.OrderTotalValue;
+            _orderService.UpdateOrder(order);
+
+            PrepareOrderDetailsModel(model, order);
+            return View(model);
+        }
+
+        public ActionResult Print(int orderId, bool pdf = false)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            return RedirectToAction("Print", "Order", new { id = orderId, pdf, area = "" });
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired(FormValueRequirement.StartsWith, "btnResetDownloadCount")]
+        [ValidateInput(false)]
+        public ActionResult ResetDownloadCount(int id, FormCollection form)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                //No order found with the specified id
+                return RedirectToAction("List");
+
+            //get order item identifier
+            int orderItemId = 0;
+            foreach (var formValue in form.AllKeys)
+                if (formValue.StartsWith("btnResetDownloadCount", StringComparison.InvariantCultureIgnoreCase))
+                    orderItemId = Convert.ToInt32(formValue.Substring("btnResetDownloadCount".Length));
+
+            var orderItem = order.OrderItems.Where(x => x.Id == orderItemId).FirstOrDefault();
+            if (orderItem == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            orderItem.DownloadCount = 0;
+            _orderService.UpdateOrder(order);
+
+            var model = new OrderModel();
+            PrepareOrderDetailsModel(model, order);
+            return View(model);
+        }
+
+        public ActionResult UploadLicenseFilePopup(int id, int orderItemId)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(id);
+            if (order == null)
+                //No order found with the specified id
+                return RedirectToAction("List");
+
+            var orderItem = order.OrderItems.Where(x => x.Id == orderItemId).FirstOrDefault();
+            if (orderItem == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            if (!orderItem.Product.IsDownload)
+                throw new ArgumentException("Product is not downloadable");
+
+            var model = new OrderModel.UploadLicenseModel
+            {
+                LicenseDownloadId = orderItem.LicenseDownloadId ?? 0,
+                OrderId = order.Id,
+                OrderItemId = orderItem.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [FormValueRequired("uploadlicense")]
+        public ActionResult UploadLicenseFilePopup(string btnId, string formId, OrderModel.UploadLicenseModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(model.OrderId);
+            if (order == null)
+                //No order found with the specified id
+                return RedirectToAction("List");
+
+            var orderItem = order.OrderItems.Where(x => x.Id == model.OrderItemId).FirstOrDefault();
+            if (orderItem == null)
+                throw new ArgumentException("No order item found with the specified id");
+
+            //attach license
+            if (model.LicenseDownloadId > 0)
+                orderItem.LicenseDownloadId = model.LicenseDownloadId;
+            else
+                orderItem.LicenseDownloadId = null;
+
+            MediaHelper.UpdateDownloadTransientStateFor(orderItem, x => x.LicenseDownloadId);
+
+            _orderService.UpdateOrder(order);
+
+            //success
+            ViewBag.RefreshPage = true;
+            ViewBag.btnId = btnId;
+            ViewBag.formId = formId;
+
+            return View(model);
+        }
+
+        #endregion Edit, delete
+
+        #endregion Order details
 
         #region Addresses
 
@@ -2100,88 +2096,9 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
 
-        #endregion
+        #endregion Addresses
 
         #region Shipments
-
-
-        public ActionResult ShipmentList()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var model = new ShipmentListModel
-            {
-                DisplayPdfPackagingSlip = _pdfSettings.Enabled
-            };
-
-            return View(model);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult ShipmentListSelect(GridCommand command, ShipmentListModel model)
-        {
-            var gridModel = new GridModel<ShipmentModel>();
-
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-            {
-                DateTime? startDateValue = (model.StartDate == null) ? null
-                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.StartDate.Value, _dateTimeHelper.CurrentTimeZone);
-
-                DateTime? endDateValue = (model.EndDate == null) ? null
-                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
-
-                //load shipments
-                var shipments = _shipmentService.GetAllShipments(model.TrackingNumber, startDateValue, endDateValue, command.Page - 1, command.PageSize);
-
-                gridModel.Data = shipments.Select(shipment => PrepareShipmentModel(shipment, false, false));
-                gridModel.Total = shipments.TotalCount;
-            }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<ShipmentModel>();
-
-                NotifyAccessDenied();
-            }
-
-            return new JsonResult
-            {
-                Data = gridModel
-            };
-        }
-
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult ShipmentsSelect(int orderId, GridCommand command)
-        {
-            var model = new GridModel<ShipmentModel>();
-
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-            {
-                var order = _orderService.GetOrderById(orderId);
-
-                var shipmentModels = new List<ShipmentModel>();
-                var shipments = order.Shipments.OrderBy(s => s.CreatedOnUtc).ToList();
-
-                foreach (var shipment in shipments)
-                {
-                    shipmentModels.Add(PrepareShipmentModel(shipment, false, false));
-                }
-
-                model.Data = shipmentModels;
-                model.Total = shipmentModels.Count;
-            }
-            else
-            {
-                model.Data = Enumerable.Empty<ShipmentModel>();
-
-                NotifyAccessDenied();
-            }
-
-            return new JsonResult
-            {
-                Data = model
-            };
-        }
 
         public ActionResult AddShipment(int orderId)
         {
@@ -2265,21 +2182,6 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        public ActionResult ShipmentDetails(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var shipment = _shipmentService.GetShipmentById(id);
-            if (shipment == null)
-                //No shipment found with the specified id
-                return RedirectToAction("List");
-
-            var model = PrepareShipmentModel(shipment, true, true);
-
-            return View(model);
-        }
-
         [HttpPost]
         public ActionResult DeleteShipment(int id)
         {
@@ -2296,74 +2198,6 @@ namespace SmartStore.Admin.Controllers
             NotifySuccess(_localizationService.GetResource("Admin.Orders.Shipments.Deleted"));
             _shipmentService.DeleteShipment(shipment);
             return RedirectToAction("Edit", new { id = orderId });
-        }
-
-        [HttpPost, ActionName("ShipmentDetails")]
-        [FormValueRequired("settrackingnumber")]
-        public ActionResult SetTrackingNumber(ShipmentModel model)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var shipment = _shipmentService.GetShipmentById(model.Id);
-            if (shipment == null)
-                //No shipment found with the specified id
-                return RedirectToAction("List");
-
-            shipment.TrackingNumber = model.TrackingNumber;
-            _shipmentService.UpdateShipment(shipment);
-
-            return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
-        }
-
-        [HttpPost, ActionName("ShipmentDetails")]
-        [FormValueRequired("setasshipped")]
-        public ActionResult SetAsShipped(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var shipment = _shipmentService.GetShipmentById(id);
-            if (shipment == null)
-                //No shipment found with the specified id
-                return RedirectToAction("List");
-
-            try
-            {
-                _orderProcessingService.Ship(shipment, true);
-                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
-            }
-            catch (Exception exc)
-            {
-                //error
-                NotifyError(exc, true);
-                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
-            }
-        }
-
-        [HttpPost, ActionName("ShipmentDetails")]
-        [FormValueRequired("setasdelivered")]
-        public ActionResult SetAsDelivered(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var shipment = _shipmentService.GetShipmentById(id);
-            if (shipment == null)
-                //No shipment found with the specified id
-                return RedirectToAction("List");
-
-            try
-            {
-                _orderProcessingService.Deliver(shipment, true);
-                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
-            }
-            catch (Exception exc)
-            {
-                //error
-                NotifyError(exc, true);
-                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
-            }
         }
 
         public ActionResult PdfPackagingSlips(bool all, string selectedIds = null)
@@ -2429,9 +2263,213 @@ namespace SmartStore.Admin.Controllers
             return new PdfResult(_pdfConverter, settings) { FileName = pdfFileName };
         }
 
-        #endregion
+        [HttpPost, ActionName("ShipmentDetails")]
+        [FormValueRequired("setasdelivered")]
+        public ActionResult SetAsDelivered(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var shipment = _shipmentService.GetShipmentById(id);
+            if (shipment == null)
+                //No shipment found with the specified id
+                return RedirectToAction("List");
+
+            try
+            {
+                _orderProcessingService.Deliver(shipment, true);
+                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
+            }
+            catch (Exception exc)
+            {
+                //error
+                NotifyError(exc, true);
+                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
+            }
+        }
+
+        [HttpPost, ActionName("ShipmentDetails")]
+        [FormValueRequired("setasshipped")]
+        public ActionResult SetAsShipped(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var shipment = _shipmentService.GetShipmentById(id);
+            if (shipment == null)
+                //No shipment found with the specified id
+                return RedirectToAction("List");
+
+            try
+            {
+                _orderProcessingService.Ship(shipment, true);
+                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
+            }
+            catch (Exception exc)
+            {
+                //error
+                NotifyError(exc, true);
+                return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
+            }
+        }
+
+        [HttpPost, ActionName("ShipmentDetails")]
+        [FormValueRequired("settrackingnumber")]
+        public ActionResult SetTrackingNumber(ShipmentModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var shipment = _shipmentService.GetShipmentById(model.Id);
+            if (shipment == null)
+                //No shipment found with the specified id
+                return RedirectToAction("List");
+
+            shipment.TrackingNumber = model.TrackingNumber;
+            _shipmentService.UpdateShipment(shipment);
+
+            return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
+        }
+
+        public ActionResult ShipmentDetails(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var shipment = _shipmentService.GetShipmentById(id);
+            if (shipment == null)
+                //No shipment found with the specified id
+                return RedirectToAction("List");
+
+            var model = PrepareShipmentModel(shipment, true, true);
+
+            return View(model);
+        }
+
+        public ActionResult ShipmentList()
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var model = new ShipmentListModel
+            {
+                DisplayPdfPackagingSlip = _pdfSettings.Enabled
+            };
+
+            return View(model);
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult ShipmentListSelect(GridCommand command, ShipmentListModel model)
+        {
+            var gridModel = new GridModel<ShipmentModel>();
+
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            {
+                DateTime? startDateValue = (model.StartDate == null) ? null
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.StartDate.Value, _dateTimeHelper.CurrentTimeZone);
+
+                DateTime? endDateValue = (model.EndDate == null) ? null
+                    : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
+
+                //load shipments
+                var shipments = _shipmentService.GetAllShipments(model.TrackingNumber, startDateValue, endDateValue, command.Page - 1, command.PageSize);
+
+                gridModel.Data = shipments.Select(shipment => PrepareShipmentModel(shipment, false, false));
+                gridModel.Total = shipments.TotalCount;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<ShipmentModel>();
+
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult ShipmentsSelect(int orderId, GridCommand command)
+        {
+            var model = new GridModel<ShipmentModel>();
+
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            {
+                var order = _orderService.GetOrderById(orderId);
+
+                var shipmentModels = new List<ShipmentModel>();
+                var shipments = order.Shipments.OrderBy(s => s.CreatedOnUtc).ToList();
+
+                foreach (var shipment in shipments)
+                {
+                    shipmentModels.Add(PrepareShipmentModel(shipment, false, false));
+                }
+
+                model.Data = shipmentModels;
+                model.Total = shipmentModels.Count;
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<ShipmentModel>();
+
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                Data = model
+            };
+        }
+
+        #endregion Shipments
 
         #region Order notes
+
+        [ValidateInput(false)]
+        public ActionResult OrderNoteAdd(int orderId, bool displayToCustomer, string message)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
+
+            var order = _orderService.GetOrderById(orderId);
+            if (order == null)
+                return Json(new { Result = false }, JsonRequestBehavior.AllowGet);
+
+            var orderNote = new OrderNote()
+            {
+                DisplayToCustomer = displayToCustomer,
+                Note = message,
+                CreatedOnUtc = DateTime.UtcNow,
+            };
+            order.OrderNotes.Add(orderNote);
+            _orderService.UpdateOrder(order);
+
+            //new order notification
+            if (displayToCustomer)
+            {
+                // Email
+                Services.MessageFactory.SendNewOrderNoteAddedCustomerNotification(orderNote, _workContext.WorkingLanguage.Id);
+            }
+
+            return Json(new { Result = true }, JsonRequestBehavior.AllowGet);
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult OrderNoteDelete(int orderId, int orderNoteId, GridCommand command)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            {
+                var order = _orderService.GetOrderById(orderId);
+                var orderNote = order.OrderNotes.Where(on => on.Id == orderNoteId).FirstOrDefault();
+
+                _orderService.DeleteOrderNote(orderNote);
+            }
+
+            return OrderNotesSelect(orderId, command);
+        }
 
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult OrderNotesSelect(int orderId, GridCommand command)
@@ -2479,81 +2517,29 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-        [ValidateInput(false)]
-        public ActionResult OrderNoteAdd(int orderId, bool displayToCustomer, string message)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
-
-            var order = _orderService.GetOrderById(orderId);
-            if (order == null)
-                return Json(new { Result = false }, JsonRequestBehavior.AllowGet);
-
-            var orderNote = new OrderNote()
-            {
-                DisplayToCustomer = displayToCustomer,
-                Note = message,
-                CreatedOnUtc = DateTime.UtcNow,
-            };
-            order.OrderNotes.Add(orderNote);
-            _orderService.UpdateOrder(order);
-
-            //new order notification
-            if (displayToCustomer)
-            {
-                // Email
-                Services.MessageFactory.SendNewOrderNoteAddedCustomerNotification(orderNote, _workContext.WorkingLanguage.Id);
-            }
-
-            return Json(new { Result = true }, JsonRequestBehavior.AllowGet);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult OrderNoteDelete(int orderId, int orderNoteId, GridCommand command)
-        {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-            {
-                var order = _orderService.GetOrderById(orderId);
-                var orderNote = order.OrderNotes.Where(on => on.Id == orderNoteId).FirstOrDefault();
-
-                _orderService.DeleteOrderNote(orderNote);
-            }
-
-            return OrderNotesSelect(orderId, command);
-        }
-
-
-        #endregion
+        #endregion Order notes
 
         #region Reports
 
-        [NonAction]
-        protected IList<BestsellersReportLineModel> GetBestsellersBriefReportModel(int recordsToReturn, int orderBy)
+        public ActionResult BestsellersBriefReportByAmount()
         {
-            var report = _orderReportService.BestSellersReport(0, null, null,
-                null, null, null, 0, recordsToReturn, orderBy, true);
+            var model = GetBestsellersBriefReportModel(5, 2);
+            return PartialView(model);
+        }
 
-            var model = report.Select(x =>
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult BestsellersBriefReportByAmountList(GridCommand command)
+        {
+            var model = GetBestsellersBriefReportModel(5, 2);
+            var gridModel = new GridModel<BestsellersReportLineModel>
             {
-                var product = _productService.GetProductById(x.ProductId);
-
-                var m = new BestsellersReportLineModel()
-                {
-                    ProductId = x.ProductId,
-                    TotalAmount = _priceFormatter.FormatPrice(x.TotalAmount, true, false),
-                    TotalQuantity = x.TotalQuantity,
-                };
-
-                if (product != null)
-                {
-                    m.ProductName = product.Name;
-                    m.ProductTypeName = product.GetProductTypeLabel(_localizationService);
-                    m.ProductTypeLabelHint = product.ProductTypeLabelHint;
-                }
-                return m;
-            }).ToList();
-
-            return model;
+                Data = model,
+                Total = model.Count
+            };
+            return new JsonResult
+            {
+                Data = gridModel
+            };
         }
 
         public ActionResult BestsellersBriefReportByQuantity()
@@ -2566,27 +2552,6 @@ namespace SmartStore.Admin.Controllers
         public ActionResult BestsellersBriefReportByQuantityList(GridCommand command)
         {
             var model = GetBestsellersBriefReportModel(5, 1);
-            var gridModel = new GridModel<BestsellersReportLineModel>
-            {
-                Data = model,
-                Total = model.Count
-            };
-            return new JsonResult
-            {
-                Data = gridModel
-            };
-        }
-
-        public ActionResult BestsellersBriefReportByAmount()
-        {
-            var model = GetBestsellersBriefReportModel(5, 2);
-            return PartialView(model);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult BestsellersBriefReportByAmountList(GridCommand command)
-        {
-            var model = GetBestsellersBriefReportModel(5, 2);
             var gridModel = new GridModel<BestsellersReportLineModel>
             {
                 Data = model,
@@ -2661,8 +2626,6 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-
-
         public ActionResult NeverSoldReport()
         {
             var model = new NeverSoldReportModel();
@@ -2702,6 +2665,50 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
+        [ChildActionOnly]
+        public ActionResult OrderAverageReport()
+        {
+            var model = GetOrderAverageReportModel();
+            return PartialView(model);
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult OrderAverageReportList(GridCommand command)
+        {
+            var model = GetOrderAverageReportModel();
+            var gridModel = new GridModel<OrderAverageReportLineSummaryModel>
+            {
+                Data = model,
+                Total = model.Count
+            };
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
+        [ChildActionOnly]
+        public ActionResult OrderIncompleteReport()
+        {
+            var model = GetOrderIncompleteReportModel();
+            return PartialView(model);
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult OrderIncompleteReportList(GridCommand command)
+        {
+            var model = GetOrderIncompleteReportModel();
+            var gridModel = new GridModel<OrderIncompleteReportLineModel>
+            {
+                Data = model,
+                Total = model.Count
+            };
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
         [HttpPost]
         public ActionResult PendingTodayReport()
         {
@@ -2713,6 +2720,35 @@ namespace SmartStore.Admin.Controllers
             };
 
             return Json(data/*, JsonRequestBehavior.AllowGet*/);
+        }
+
+        [NonAction]
+        protected IList<BestsellersReportLineModel> GetBestsellersBriefReportModel(int recordsToReturn, int orderBy)
+        {
+            var report = _orderReportService.BestSellersReport(0, null, null,
+                null, null, null, 0, recordsToReturn, orderBy, true);
+
+            var model = report.Select(x =>
+            {
+                var product = _productService.GetProductById(x.ProductId);
+
+                var m = new BestsellersReportLineModel()
+                {
+                    ProductId = x.ProductId,
+                    TotalAmount = _priceFormatter.FormatPrice(x.TotalAmount, true, false),
+                    TotalQuantity = x.TotalQuantity,
+                };
+
+                if (product != null)
+                {
+                    m.ProductName = product.Name;
+                    m.ProductTypeName = product.GetProductTypeLabel(_localizationService);
+                    m.ProductTypeLabelHint = product.ProductTypeLabelHint;
+                }
+                return m;
+            }).ToList();
+
+            return model;
         }
 
         [NonAction]
@@ -2748,28 +2784,6 @@ namespace SmartStore.Admin.Controllers
             }).ToList();
 
             return model;
-        }
-
-        [ChildActionOnly]
-        public ActionResult OrderAverageReport()
-        {
-            var model = GetOrderAverageReportModel();
-            return PartialView(model);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult OrderAverageReportList(GridCommand command)
-        {
-            var model = GetOrderAverageReportModel();
-            var gridModel = new GridModel<OrderAverageReportLineSummaryModel>
-            {
-                Data = model,
-                Total = model.Count
-            };
-            return new JsonResult
-            {
-                Data = gridModel
-            };
         }
 
         [NonAction]
@@ -2811,28 +2825,6 @@ namespace SmartStore.Admin.Controllers
             return model;
         }
 
-        [ChildActionOnly]
-        public ActionResult OrderIncompleteReport()
-        {
-            var model = GetOrderIncompleteReportModel();
-            return PartialView(model);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult OrderIncompleteReportList(GridCommand command)
-        {
-            var model = GetOrderIncompleteReportModel();
-            var gridModel = new GridModel<OrderIncompleteReportLineModel>
-            {
-                Data = model,
-                Total = model.Count
-            };
-            return new JsonResult
-            {
-                Data = gridModel
-            };
-        }
-
-        #endregion
+        #endregion Reports
     }
 }

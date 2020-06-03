@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Topics;
+﻿using SmartStore.Admin.Models.Topics;
 using SmartStore.Core.Domain.Topics;
 using SmartStore.Core.Logging;
 using SmartStore.Services.Customers;
@@ -15,6 +12,9 @@ using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Modelling;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -22,188 +22,93 @@ namespace SmartStore.Admin.Controllers
     [AdminAuthorize]
     public class TopicController : AdminControllerBase
     {
-        private readonly ITopicService _topicService;
+        #region Private Fields
+
+        private readonly IAclService _aclService;
+        private readonly ICustomerService _customerService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizedEntityService _localizedEntityService;
-		private readonly IStoreMappingService _storeMappingService;
-		private readonly IUrlRecordService _urlRecordService;
-		private readonly IAclService _aclService;
-		private readonly ICustomerService _customerService;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly ITopicService _topicService;
+        private readonly IUrlRecordService _urlRecordService;
 
-		public TopicController(
-			ITopicService topicService, 
-			ILanguageService languageService,
-            ILocalizedEntityService localizedEntityService, 
-            IStoreMappingService storeMappingService, 
-			IUrlRecordService urlRecordService,
-			IAclService aclService,
-			ICustomerService customerService)
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public TopicController(
+            ITopicService topicService,
+            ILanguageService languageService,
+            ILocalizedEntityService localizedEntityService,
+            IStoreMappingService storeMappingService,
+            IUrlRecordService urlRecordService,
+            IAclService aclService,
+            ICustomerService customerService)
         {
             _topicService = topicService;
             _languageService = languageService;
             _localizedEntityService = localizedEntityService;
-			_storeMappingService = storeMappingService;
-			_urlRecordService = urlRecordService;
-			_aclService = aclService;
-			_customerService = customerService;
-		}
+            _storeMappingService = storeMappingService;
+            _urlRecordService = urlRecordService;
+            _aclService = aclService;
+            _customerService = customerService;
+        }
 
-        [NonAction]
-        public void UpdateLocales(Topic topic, TopicModel model)
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        // AJAX
+        public ActionResult AllTopics(string label, int selectedId, bool useTitles = false, bool includeWidgets = false, bool includeHomePage = false)
         {
-            foreach (var localized in model.Locales)
+            var query = from x in _topicService.GetAllTopics(showHidden: true).SourceQuery
+                        where (includeWidgets || !x.RenderAsWidget)
+                        select x;
+
+            if (useTitles)
             {
-				_localizedEntityService.SaveLocalizedValue(topic, x => x.ShortTitle, localized.ShortTitle, localized.LanguageId);
-				_localizedEntityService.SaveLocalizedValue(topic, x => x.Title, localized.Title, localized.LanguageId);
-				_localizedEntityService.SaveLocalizedValue(topic, x => x.Intro, localized.Intro, localized.LanguageId);
-				_localizedEntityService.SaveLocalizedValue(topic, x => x.Body, localized.Body, localized.LanguageId);
-                _localizedEntityService.SaveLocalizedValue(topic, x => x.MetaKeywords, localized.MetaKeywords, localized.LanguageId);
-                _localizedEntityService.SaveLocalizedValue(topic, x => x.MetaDescription, localized.MetaDescription, localized.LanguageId);
-                _localizedEntityService.SaveLocalizedValue(topic, x => x.MetaTitle, localized.MetaTitle, localized.LanguageId);
+                query = query.Where(x => !string.IsNullOrEmpty(x.Title));
+                query = query.OrderBy(x => x.Title);
+            }
+            else
+            {
+                query = query.OrderBy(x => x.SystemName);
+            }
 
-				var seName = topic.ValidateSeName(localized.SeName, localized.Title.NullEmpty() ?? localized.ShortTitle, false, localized.LanguageId);
-				_urlRecordService.SaveSlug(topic, seName, localized.LanguageId);
-			}
-        }
+            var topics = query.ToList();
 
-		[NonAction]
-		private void PrepareStoresMappingModel(TopicModel model, Topic topic, bool excludeProperties)
-		{
-			Guard.NotNull(model, nameof(model));
+            if (label.HasValue())
+            {
+                var labelTopic = new Topic();
+                if (useTitles)
+                    labelTopic.Title = label;
+                else
+                    labelTopic.SystemName = label;
 
-			if (!excludeProperties)
-			{
-				model.SelectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(topic);
-			}
+                topics.Insert(0, labelTopic);
+            }
 
-			model.AvailableStores = Services.StoreService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
-		}
+            if (includeHomePage)
+            {
+                topics.Insert(0, new Topic
+                {
+                    Id = -10,
+                    Title = T("Admin.ContentManagement.Homepage"),
+                    SystemName = T("Admin.ContentManagement.Homepage"),
+                });
+            }
 
-		[NonAction]
-		private void PrepareAclModel(TopicModel model, Topic topic, bool excludeProperties)
-		{
-			Guard.NotNull(model, nameof(model));
+            var list = from x in topics
+                       select new
+                       {
+                           id = x.Id.ToString(),
+                           text = useTitles ? x.Title : x.SystemName,
+                           selected = x.Id == selectedId
+                       };
 
-			if (!excludeProperties)
-			{
-				if (topic != null)
-				{
-					model.SelectedCustomerRoleIds = _aclService.GetCustomerRoleIdsWithAccessTo(topic);
-				}
-				else
-				{
-					model.SelectedCustomerRoleIds = new int[0];
-				}
-			}
-
-			model.AvailableCustomerRoles = _customerService.GetAllCustomerRoles(true).ToSelectListItems(model.SelectedCustomerRoleIds);
-		}
-
-		private string GetTopicUrl(Topic topic)
-		{
-			string url = null;
-
-			try
-			{
-				if (topic.LimitedToStores)
-				{
-					var storeMappings = _storeMappingService.GetStoreMappings(topic);
-					if (storeMappings.FirstOrDefault(x => x.StoreId == Services.StoreContext.CurrentStore.Id) == null)
-					{
-						var storeMapping = storeMappings.FirstOrDefault();
-						if (storeMapping != null)
-						{
-							var store = Services.StoreService.GetStoreById(storeMapping.StoreId);
-							if (store != null)
-							{
-								var baseUri = new Uri(Services.StoreService.GetHost(store));
-								url = baseUri.GetLeftPart(UriPartial.Authority) + Url.RouteUrl("Topic", new { SeName = topic.GetSeName() });
-							}
-						}
-					}
-				}
-
-				if (url.IsEmpty())
-				{
-					url = Url.RouteUrl("Topic", new { SeName = topic.GetSeName() }, Request.Url.Scheme);
-				}
-			}
-			catch (Exception exception)
-			{
-				Logger.Error(exception);
-			}
-
-			return url;
-		}
-
-		public ActionResult Index()
-        {
-            return RedirectToAction("List");
-        }
-
-        public ActionResult List()
-        {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageTopics))
-                return AccessDeniedView();
-
-			var model = new TopicListModel();
-
-			foreach (var s in Services.StoreService.GetAllStores())
-			{
-				model.AvailableStores.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
-			}
-
-			return View(model);
-        }
-
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-		public ActionResult List(GridCommand command, TopicListModel model)
-        {
-			var gridModel = new GridModel<TopicModel>();
-
-			if (Services.Permissions.Authorize(StandardPermissionProvider.ManageTopics))
-			{
-				var topics = _topicService.GetAllTopics(model.SearchStoreId, command.Page - 1, command.PageSize, true).AlterQuery(q =>
-				{
-					var q2 = q;
-
-					if (model.SystemName.HasValue())
-						q2 = q2.Where(x => x.SystemName.Contains(model.SystemName));
-
-					if (model.Title.HasValue())
-						q2 = q2.Where(x => x.Title.Contains(model.Title) || x.ShortTitle.Contains(model.Title));
-
-					if (model.RenderAsWidget.HasValue)
-						q2 = q2.Where(x => x.RenderAsWidget == model.RenderAsWidget.Value);
-
-					if (model.WidgetZone.HasValue())
-						q2 = q2.Where(x => x.WidgetZone.Contains(model.WidgetZone));
-
-					return q2.OrderBy(x => x.SystemName);
-				});
-				
-				gridModel.Data = topics.Select(x =>
-				{
-					var item = x.ToModel();
-					item.WidgetZone = x.WidgetZone.SplitSafe(",");
-					// otherwise maxJsonLength could be exceeded
-					item.Body = "";
-					return item;
-				});
-
-				gridModel.Total = topics.TotalCount;
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<TopicModel>();
-				NotifyAccessDenied();
-			}
-
-            return new JsonResult
-			{
-				MaxJsonLength = int.MaxValue,
-				Data = gridModel
-			};
+            return new JsonResult { Data = list.ToList(), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         public ActionResult Create()
@@ -212,10 +117,10 @@ namespace SmartStore.Admin.Controllers
                 return AccessDeniedView();
 
             var model = new TopicModel();
-		
-			PrepareStoresMappingModel(model, null, false);
-			PrepareAclModel(model, null, false);
-			AddLocales(_languageService, model.Locales);
+
+            PrepareStoresMappingModel(model, null, false);
+            PrepareAclModel(model, null, false);
+            AddLocales(_languageService, model.Locales);
 
             model.TitleTag = "h1";
 
@@ -245,12 +150,12 @@ namespace SmartStore.Admin.Controllers
 
                 _topicService.InsertTopic(topic);
 
-				model.SeName = topic.ValidateSeName(model.SeName, topic.Title.NullEmpty() ?? topic.SystemName, true);
-				_urlRecordService.SaveSlug(topic, model.SeName, 0);
+                model.SeName = topic.ValidateSeName(model.SeName, topic.Title.NullEmpty() ?? topic.SystemName, true);
+                _urlRecordService.SaveSlug(topic, model.SeName, 0);
 
-				SaveStoreMappings(topic, model);
-				SaveAclMappings(topic, model);
-				UpdateLocales(topic, model);
+                SaveStoreMappings(topic, model);
+                SaveAclMappings(topic, model);
+                UpdateLocales(topic, model);
 
                 Services.EventPublisher.Publish(new ModelBoundEvent(model, topic, form));
 
@@ -259,10 +164,36 @@ namespace SmartStore.Admin.Controllers
             }
 
             // If we got this far, something failed, redisplay form.
-			PrepareStoresMappingModel(model, null, true);
-			PrepareAclModel(model, null, true);
+            PrepareStoresMappingModel(model, null, true);
+            PrepareAclModel(model, null, true);
 
-			return View(model);
+            return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageTopics))
+            {
+                return AccessDeniedView();
+            }
+
+            var topic = _topicService.GetTopicById(id);
+            if (topic == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (topic.IsSystemTopic)
+            {
+                NotifyError(T("Admin.ContentManagement.Topics.CannotBeDeleted"));
+                return RedirectToAction("Edit", new { id = topic.Id });
+            }
+
+            _topicService.DeleteTopic(topic);
+
+            NotifySuccess(T("Admin.ContentManagement.Topics.Deleted"));
+            return RedirectToAction("List");
         }
 
         public ActionResult Edit(int id)
@@ -275,26 +206,26 @@ namespace SmartStore.Admin.Controllers
                 return RedirectToAction("List");
 
             var model = topic.ToModel();
-			model.Url = GetTopicUrl(topic);
-			
-			PrepareStoresMappingModel(model, topic, false);
-			PrepareAclModel(model, topic, false);
+            model.Url = GetTopicUrl(topic);
 
-			AddLocales(_languageService, model.Locales, (locale, languageId) =>
+            PrepareStoresMappingModel(model, topic, false);
+            PrepareAclModel(model, topic, false);
+
+            AddLocales(_languageService, model.Locales, (locale, languageId) =>
             {
-				locale.ShortTitle = topic.GetLocalized(x => x.ShortTitle, languageId, false, false);
-				locale.Title = topic.GetLocalized(x => x.Title, languageId, false, false);
-				locale.Intro = topic.GetLocalized(x => x.Intro, languageId, false, false);
-				locale.Body = topic.GetLocalized(x => x.Body, languageId, false, false);
+                locale.ShortTitle = topic.GetLocalized(x => x.ShortTitle, languageId, false, false);
+                locale.Title = topic.GetLocalized(x => x.Title, languageId, false, false);
+                locale.Intro = topic.GetLocalized(x => x.Intro, languageId, false, false);
+                locale.Body = topic.GetLocalized(x => x.Body, languageId, false, false);
                 locale.MetaKeywords = topic.GetLocalized(x => x.MetaKeywords, languageId, false, false);
                 locale.MetaDescription = topic.GetLocalized(x => x.MetaDescription, languageId, false, false);
                 locale.MetaTitle = topic.GetLocalized(x => x.MetaTitle, languageId, false, false);
-				locale.SeName = topic.GetSeName(languageId, false, false);
+                locale.SeName = topic.GetSeName(languageId, false, false);
             });
 
-			model.WidgetZone = topic.WidgetZone.SplitSafe(",");
+            model.WidgetZone = topic.WidgetZone.SplitSafe(",");
 
-			return View(model);
+            return View(model);
         }
 
         [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
@@ -317,19 +248,19 @@ namespace SmartStore.Admin.Controllers
             {
                 topic = model.ToEntity(topic);
 
-				if (model.WidgetZone != null)
-				{
-					topic.WidgetZone = string.Join(",", model.WidgetZone);
-				}
-				
-				_topicService.UpdateTopic(topic);
+                if (model.WidgetZone != null)
+                {
+                    topic.WidgetZone = string.Join(",", model.WidgetZone);
+                }
 
-				model.SeName = topic.ValidateSeName(model.SeName, topic.Title.NullEmpty() ?? topic.SystemName, true);
-				_urlRecordService.SaveSlug(topic, model.SeName, 0);
+                _topicService.UpdateTopic(topic);
 
-				SaveStoreMappings(topic, model);
-				SaveAclMappings(topic, model);
-				UpdateLocales(topic, model);
+                model.SeName = topic.ValidateSeName(model.SeName, topic.Title.NullEmpty() ?? topic.SystemName, true);
+                _urlRecordService.SaveSlug(topic, model.SeName, 0);
+
+                SaveStoreMappings(topic, model);
+                SaveAclMappings(topic, model);
+                UpdateLocales(topic, model);
 
                 Services.EventPublisher.Publish(new ModelBoundEvent(model, topic, form));
 
@@ -342,89 +273,178 @@ namespace SmartStore.Admin.Controllers
                 HttpContext.Response.AddHeader("X-XSS-Protection", "0");
             }
 
-			// If we got this far, something failed, redisplay form.
-			model.Url = GetTopicUrl(topic);
-			PrepareStoresMappingModel(model, topic, true);
-			PrepareAclModel(model, topic, true);
+            // If we got this far, something failed, redisplay form.
+            model.Url = GetTopicUrl(topic);
+            PrepareStoresMappingModel(model, topic, true);
+            PrepareAclModel(model, topic, true);
 
-			return View(model);
+            return View(model);
         }
 
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Index()
         {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageTopics))
-            {
-                return AccessDeniedView();
-            }
-
-            var topic = _topicService.GetTopicById(id);
-            if (topic == null)
-            {
-                return HttpNotFound();
-            }
-
-            if (topic.IsSystemTopic)
-            {
-                NotifyError(T("Admin.ContentManagement.Topics.CannotBeDeleted"));
-                return RedirectToAction("Edit", new { id = topic.Id });
-            }
-            
-            _topicService.DeleteTopic(topic);
-
-            NotifySuccess(T("Admin.ContentManagement.Topics.Deleted"));
             return RedirectToAction("List");
         }
 
-		// AJAX
-		public ActionResult AllTopics(string label, int selectedId, bool useTitles = false, bool includeWidgets = false, bool includeHomePage = false)
-		{
-			var query = from x in _topicService.GetAllTopics(showHidden: true).SourceQuery
-						where (includeWidgets || !x.RenderAsWidget)
-						select x;
+        public ActionResult List()
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageTopics))
+                return AccessDeniedView();
 
-			if (useTitles)
-			{
-				query = query.Where(x => !string.IsNullOrEmpty(x.Title));
-				query = query.OrderBy(x => x.Title);
-			}
-			else
-			{
-				query = query.OrderBy(x => x.SystemName);
-			}
+            var model = new TopicListModel();
 
-			var topics = query.ToList();
+            foreach (var s in Services.StoreService.GetAllStores())
+            {
+                model.AvailableStores.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
+            }
 
-			if (label.HasValue())
-			{
-				var labelTopic = new Topic();
-				if (useTitles)
-					labelTopic.Title = label;
-				else
-					labelTopic.SystemName = label;
+            return View(model);
+        }
 
-				topics.Insert(0, labelTopic);
-			}
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command, TopicListModel model)
+        {
+            var gridModel = new GridModel<TopicModel>();
 
-			if (includeHomePage)
-			{
-				topics.Insert(0, new Topic
-				{
-					Id = -10,
-					Title = T("Admin.ContentManagement.Homepage"),
-					SystemName = T("Admin.ContentManagement.Homepage"),
-				});
-			}
+            if (Services.Permissions.Authorize(StandardPermissionProvider.ManageTopics))
+            {
+                var topics = _topicService.GetAllTopics(model.SearchStoreId, command.Page - 1, command.PageSize, true).AlterQuery(q =>
+                {
+                    var q2 = q;
 
-			var list = from x in topics
-					   select new
-					   {
-						   id = x.Id.ToString(),
-						   text = useTitles ? x.Title : x.SystemName,
-						   selected = x.Id == selectedId
-					   };
+                    if (model.SystemName.HasValue())
+                        q2 = q2.Where(x => x.SystemName.Contains(model.SystemName));
 
-			return new JsonResult { Data = list.ToList(), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-		}
+                    if (model.Title.HasValue())
+                        q2 = q2.Where(x => x.Title.Contains(model.Title) || x.ShortTitle.Contains(model.Title));
+
+                    if (model.RenderAsWidget.HasValue)
+                        q2 = q2.Where(x => x.RenderAsWidget == model.RenderAsWidget.Value);
+
+                    if (model.WidgetZone.HasValue())
+                        q2 = q2.Where(x => x.WidgetZone.Contains(model.WidgetZone));
+
+                    return q2.OrderBy(x => x.SystemName);
+                });
+
+                gridModel.Data = topics.Select(x =>
+                {
+                    var item = x.ToModel();
+                    item.WidgetZone = x.WidgetZone.SplitSafe(",");
+                    // otherwise maxJsonLength could be exceeded
+                    item.Body = "";
+                    return item;
+                });
+
+                gridModel.Total = topics.TotalCount;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<TopicModel>();
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                MaxJsonLength = int.MaxValue,
+                Data = gridModel
+            };
+        }
+
+        [NonAction]
+        public void UpdateLocales(Topic topic, TopicModel model)
+        {
+            foreach (var localized in model.Locales)
+            {
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.ShortTitle, localized.ShortTitle, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.Title, localized.Title, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.Intro, localized.Intro, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.Body, localized.Body, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.MetaKeywords, localized.MetaKeywords, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.MetaDescription, localized.MetaDescription, localized.LanguageId);
+                _localizedEntityService.SaveLocalizedValue(topic, x => x.MetaTitle, localized.MetaTitle, localized.LanguageId);
+
+                var seName = topic.ValidateSeName(localized.SeName, localized.Title.NullEmpty() ?? localized.ShortTitle, false, localized.LanguageId);
+                _urlRecordService.SaveSlug(topic, seName, localized.LanguageId);
+            }
+        }
+
+        #endregion Public Methods
+
+
+
+        #region Private Methods
+
+        private string GetTopicUrl(Topic topic)
+        {
+            string url = null;
+
+            try
+            {
+                if (topic.LimitedToStores)
+                {
+                    var storeMappings = _storeMappingService.GetStoreMappings(topic);
+                    if (storeMappings.FirstOrDefault(x => x.StoreId == Services.StoreContext.CurrentStore.Id) == null)
+                    {
+                        var storeMapping = storeMappings.FirstOrDefault();
+                        if (storeMapping != null)
+                        {
+                            var store = Services.StoreService.GetStoreById(storeMapping.StoreId);
+                            if (store != null)
+                            {
+                                var baseUri = new Uri(Services.StoreService.GetHost(store));
+                                url = baseUri.GetLeftPart(UriPartial.Authority) + Url.RouteUrl("Topic", new { SeName = topic.GetSeName() });
+                            }
+                        }
+                    }
+                }
+
+                if (url.IsEmpty())
+                {
+                    url = Url.RouteUrl("Topic", new { SeName = topic.GetSeName() }, Request.Url.Scheme);
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception);
+            }
+
+            return url;
+        }
+
+        [NonAction]
+        private void PrepareAclModel(TopicModel model, Topic topic, bool excludeProperties)
+        {
+            Guard.NotNull(model, nameof(model));
+
+            if (!excludeProperties)
+            {
+                if (topic != null)
+                {
+                    model.SelectedCustomerRoleIds = _aclService.GetCustomerRoleIdsWithAccessTo(topic);
+                }
+                else
+                {
+                    model.SelectedCustomerRoleIds = new int[0];
+                }
+            }
+
+            model.AvailableCustomerRoles = _customerService.GetAllCustomerRoles(true).ToSelectListItems(model.SelectedCustomerRoleIds);
+        }
+
+        [NonAction]
+        private void PrepareStoresMappingModel(TopicModel model, Topic topic, bool excludeProperties)
+        {
+            Guard.NotNull(model, nameof(model));
+
+            if (!excludeProperties)
+            {
+                model.SelectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(topic);
+            }
+
+            model.AvailableStores = Services.StoreService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
+        }
+
+        #endregion Private Methods
     }
 }

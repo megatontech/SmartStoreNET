@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.UrlRecord;
+﻿using SmartStore.Admin.Models.UrlRecord;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Seo;
 using SmartStore.Services;
@@ -12,260 +8,284 @@ using SmartStore.Services.Seo;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
-	public class UrlRecordController : AdminControllerBase
-	{
-		private readonly IUrlRecordService _urlRecordService;
-		private readonly AdminAreaSettings _adminAreaSettings;
-		private readonly ICommonServices _services;
-		private readonly ILanguageService _languageService;
+    [AdminAuthorize]
+    public class UrlRecordController : AdminControllerBase
+    {
+        #region Private Fields
 
-		public UrlRecordController(
-			IUrlRecordService urlRecordService,
-			AdminAreaSettings adminAreaSettings,
-			ICommonServices services,
-			ILanguageService languageService)
-		{
-			_urlRecordService = urlRecordService;
-			_adminAreaSettings = adminAreaSettings;
-			_services = services;
-			_languageService = languageService;
-		}
+        private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly ILanguageService _languageService;
+        private readonly ICommonServices _services;
+        private readonly IUrlRecordService _urlRecordService;
 
-		private void PrepareUrlRecordModel(UrlRecordModel model, UrlRecord urlRecord, bool forList = false)
-		{
-			if (!forList)
-			{
-				var allLanguages = _languageService.GetAllLanguages(true);
+        #endregion Private Fields
 
-				model.AvailableLanguages = allLanguages
-					.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() })
-					.ToList();
+        #region Public Constructors
 
-				model.AvailableLanguages.Insert(0, new SelectListItem { Text = T("Admin.System.SeNames.Language.Standard"), Value = "0" });
-			}
+        public UrlRecordController(
+            IUrlRecordService urlRecordService,
+            AdminAreaSettings adminAreaSettings,
+            ICommonServices services,
+            ILanguageService languageService)
+        {
+            _urlRecordService = urlRecordService;
+            _adminAreaSettings = adminAreaSettings;
+            _services = services;
+            _languageService = languageService;
+        }
 
-			if (urlRecord != null)
-			{
-				model.Id = urlRecord.Id;
-				model.Slug = urlRecord.Slug;
-				model.EntityName = urlRecord.EntityName;
-				model.EntityId = urlRecord.EntityId;
-				model.IsActive = urlRecord.IsActive;
-				model.LanguageId = urlRecord.LanguageId;
+        #endregion Public Constructors
 
-				if (urlRecord.EntityName.IsCaseInsensitiveEqual("BlogPost"))
-				{
-					model.EntityUrl = Url.Action("Edit", "Blog", new { id = urlRecord.EntityId });
-				}
-				else if (urlRecord.EntityName.IsCaseInsensitiveEqual("Forum"))
-				{
-					model.EntityUrl = Url.Action("EditForum", "Forum", new { id = urlRecord.EntityId });
-				}
-				else if (urlRecord.EntityName.IsCaseInsensitiveEqual("ForumGroup"))
-				{
-					model.EntityUrl = Url.Action("EditForumGroup", "Forum", new { id = urlRecord.EntityId });
-				}
-				else if (urlRecord.EntityName.IsCaseInsensitiveEqual("NewsItem"))
-				{
-					model.EntityUrl = Url.Action("Edit", "News", new { id = urlRecord.EntityId });
-				}
-				else
-				{
-					model.EntityUrl = Url.Action("Edit", urlRecord.EntityName, new { id = urlRecord.EntityId });
-				}
-			}
-		}
 
-		public ActionResult List(string entityName, int? entityId)
-		{
-			if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
-				return AccessDeniedView();
 
-			var model = new UrlRecordListModel
-			{
-				GridPageSize = _adminAreaSettings.GridPageSize,
-				EntityName = entityName,
-				EntityId = entityId
-			};
+        #region Public Methods
 
-			var allLanguages = _languageService.GetAllLanguages(true);
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
+                return AccessDeniedView();
 
-			model.AvailableLanguages = allLanguages
-				.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() })
-				.ToList();
+            var urlRecord = _urlRecordService.GetUrlRecordById(id);
+            if (urlRecord == null)
+                return RedirectToAction("List");
 
-			model.AvailableLanguages.Insert(0, new SelectListItem { Text = T("Admin.System.SeNames.Language.Standard"), Value = "0" });
+            try
+            {
+                _urlRecordService.DeleteUrlRecord(urlRecord);
 
-			return View(model);
-		}
+                NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
 
-		[HttpPost, GridAction(EnableCustomBinding = true)]
-		public ActionResult List(GridCommand command, UrlRecordListModel model)
-		{
-			var gridModel = new GridModel<UrlRecordModel>();
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                NotifyError(exc);
+                return RedirectToAction("Edit", new { id = urlRecord.Id });
+            }
+        }
 
-			if (_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
-			{
-				var allLanguages = _languageService.GetAllLanguages(true);
-				var defaultLanguageName = T("Admin.System.SeNames.Language.Standard");
+        [HttpPost]
+        public ActionResult DeleteSelected(ICollection<int> selectedIds)
+        {
+            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
+                return AccessDeniedView();
 
-				var urlRecords = _urlRecordService.GetAllUrlRecords(command.Page - 1, command.PageSize,
-					model.SeName, model.EntityName, model.EntityId, model.LanguageId, model.IsActive);
+            if (selectedIds != null)
+            {
+                var urlRecords = _urlRecordService.GetUrlRecordsByIds(selectedIds.ToArray());
 
-				var slugsPerEntity = _urlRecordService.CountSlugsPerEntity(urlRecords.Select(x => x.Id).Distinct().ToArray());
+                foreach (var urlRecord in urlRecords)
+                {
+                    _urlRecordService.DeleteUrlRecord(urlRecord);
+                }
+            }
 
-				gridModel.Data = urlRecords.Select(x =>
-				{
-					string languageName;
+            return Json(new { Result = true });
+        }
 
-					if (x.LanguageId == 0)
-					{
-						languageName = defaultLanguageName;
-					}
-					else
-					{
-						var language = allLanguages.FirstOrDefault(y => y.Id == x.LanguageId);
-						languageName = (language != null ? language.Name : "".NaIfEmpty());
-					}
+        public ActionResult Edit(int id)
+        {
+            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
+                return AccessDeniedView();
 
-					var urlRecordModel = new UrlRecordModel();
-					PrepareUrlRecordModel(urlRecordModel, x, true);
+            var urlRecord = _urlRecordService.GetUrlRecordById(id);
+            if (urlRecord == null)
+                return RedirectToAction("List");
 
-					urlRecordModel.Language = languageName;
-					urlRecordModel.SlugsPerEntity = (slugsPerEntity.ContainsKey(x.Id) ? slugsPerEntity[x.Id] : 0);
+            var model = new UrlRecordModel();
+            PrepareUrlRecordModel(model, urlRecord);
 
-					return urlRecordModel;
-				});
+            return View(model);
+        }
 
-				gridModel.Total = urlRecords.TotalCount;
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<UrlRecordModel>();
+        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
+        public ActionResult Edit(UrlRecordModel model, bool continueEditing)
+        {
+            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
+                return AccessDeniedView();
 
-				NotifyAccessDenied();
-			}
+            var urlRecord = _urlRecordService.GetUrlRecordById(model.Id);
+            if (urlRecord == null)
+                return RedirectToAction("List");
 
-			return new JsonResult
-			{
-				Data = gridModel
-			};
-		}
+            if (!urlRecord.IsActive && model.IsActive)
+            {
+                var urlRecords = _urlRecordService.GetAllUrlRecords(0, int.MaxValue, null, model.EntityName, model.EntityId, model.LanguageId, true);
+                if (urlRecords.Count > 0)
+                {
+                    ModelState.AddModelError("IsActive", T("Admin.System.SeNames.ActiveSlugAlreadyExist"));
+                }
+            }
 
-		public ActionResult Edit(int id)
-		{
-			if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
-				return AccessDeniedView();
+            if (ModelState.IsValid)
+            {
+                urlRecord.Slug = model.Slug;
+                urlRecord.EntityName = model.EntityName;
+                urlRecord.IsActive = model.IsActive;
+                urlRecord.LanguageId = model.LanguageId;
 
-			var urlRecord = _urlRecordService.GetUrlRecordById(id);
-			if (urlRecord == null)
-				return RedirectToAction("List");
+                _urlRecordService.UpdateUrlRecord(urlRecord);
 
-			var model = new UrlRecordModel();
-			PrepareUrlRecordModel(model, urlRecord);
+                NotifySuccess(T("Admin.Common.DataEditSuccess"));
 
-			return View(model);
-		}
+                return continueEditing ? RedirectToAction("Edit", new { id = urlRecord.Id }) : RedirectToAction("List");
+            }
 
-		[HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
-		public ActionResult Edit(UrlRecordModel model, bool continueEditing)
-		{
-			if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
-				return AccessDeniedView();
+            PrepareUrlRecordModel(model, null);
 
-			var urlRecord = _urlRecordService.GetUrlRecordById(model.Id);
-			if (urlRecord == null)
-				return RedirectToAction("List");
+            return View(model);
+        }
 
-			if (!urlRecord.IsActive && model.IsActive)
-			{
-				var urlRecords = _urlRecordService.GetAllUrlRecords(0, int.MaxValue, null, model.EntityName, model.EntityId, model.LanguageId, true);
-				if (urlRecords.Count > 0)
-				{
-					ModelState.AddModelError("IsActive", T("Admin.System.SeNames.ActiveSlugAlreadyExist"));
-				}
-			}
+        public ActionResult List(string entityName, int? entityId)
+        {
+            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
+                return AccessDeniedView();
 
-			if (ModelState.IsValid)
-			{
-				urlRecord.Slug = model.Slug;
-				urlRecord.EntityName = model.EntityName;
-				urlRecord.IsActive = model.IsActive;
-				urlRecord.LanguageId = model.LanguageId;
+            var model = new UrlRecordListModel
+            {
+                GridPageSize = _adminAreaSettings.GridPageSize,
+                EntityName = entityName,
+                EntityId = entityId
+            };
 
-				_urlRecordService.UpdateUrlRecord(urlRecord);
+            var allLanguages = _languageService.GetAllLanguages(true);
 
-				NotifySuccess(T("Admin.Common.DataEditSuccess"));
+            model.AvailableLanguages = allLanguages
+                .Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() })
+                .ToList();
 
-				return continueEditing ? RedirectToAction("Edit", new { id = urlRecord.Id }) : RedirectToAction("List");
-			}
+            model.AvailableLanguages.Insert(0, new SelectListItem { Text = T("Admin.System.SeNames.Language.Standard"), Value = "0" });
 
-			PrepareUrlRecordModel(model, null);
+            return View(model);
+        }
 
-			return View(model);
-		}
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command, UrlRecordListModel model)
+        {
+            var gridModel = new GridModel<UrlRecordModel>();
 
-		[HttpPost, ActionName("Delete")]
-		public ActionResult DeleteConfirmed(int id)
-		{
-			if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
-				return AccessDeniedView();
+            if (_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
+            {
+                var allLanguages = _languageService.GetAllLanguages(true);
+                var defaultLanguageName = T("Admin.System.SeNames.Language.Standard");
 
-			var urlRecord = _urlRecordService.GetUrlRecordById(id);
-			if (urlRecord == null)
-				return RedirectToAction("List");
+                var urlRecords = _urlRecordService.GetAllUrlRecords(command.Page - 1, command.PageSize,
+                    model.SeName, model.EntityName, model.EntityId, model.LanguageId, model.IsActive);
 
-			try
-			{
-				_urlRecordService.DeleteUrlRecord(urlRecord);
+                var slugsPerEntity = _urlRecordService.CountSlugsPerEntity(urlRecords.Select(x => x.Id).Distinct().ToArray());
 
-				NotifySuccess(T("Admin.Common.TaskSuccessfullyProcessed"));
+                gridModel.Data = urlRecords.Select(x =>
+                {
+                    string languageName;
 
-				return RedirectToAction("List");
-			}
-			catch (Exception exc)
-			{
-				NotifyError(exc);
-				return RedirectToAction("Edit", new { id = urlRecord.Id });
-			}
-		}
+                    if (x.LanguageId == 0)
+                    {
+                        languageName = defaultLanguageName;
+                    }
+                    else
+                    {
+                        var language = allLanguages.FirstOrDefault(y => y.Id == x.LanguageId);
+                        languageName = (language != null ? language.Name : "".NaIfEmpty());
+                    }
 
-		[HttpPost]
-		public ActionResult DeleteSelected(ICollection<int> selectedIds)
-		{
-			if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageUrlRecords))
-				return AccessDeniedView();
+                    var urlRecordModel = new UrlRecordModel();
+                    PrepareUrlRecordModel(urlRecordModel, x, true);
 
-			if (selectedIds != null)
-			{
-				var urlRecords = _urlRecordService.GetUrlRecordsByIds(selectedIds.ToArray());
+                    urlRecordModel.Language = languageName;
+                    urlRecordModel.SlugsPerEntity = (slugsPerEntity.ContainsKey(x.Id) ? slugsPerEntity[x.Id] : 0);
 
-				foreach (var urlRecord in urlRecords)
-				{
-					_urlRecordService.DeleteUrlRecord(urlRecord);
-				}
-			}
+                    return urlRecordModel;
+                });
 
-			return Json(new { Result = true });
-		}
+                gridModel.Total = urlRecords.TotalCount;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<UrlRecordModel>();
 
-		[ChildActionOnly]
-		public ActionResult NamesPerEntity(string entityName, int entityId)
-		{
-			if (entityName.IsEmpty() || entityId == 0)
-				return new EmptyResult();
+                NotifyAccessDenied();
+            }
 
-			var count = _urlRecordService.CountSlugsPerEntity(entityName, entityId);
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
-			ViewBag.CountSlugsPerEntity = count;
-			ViewBag.UrlRecordListUrl = Url.Action("List", "UrlRecord", new { entityName = entityName, entityId = entityId });
+        [ChildActionOnly]
+        public ActionResult NamesPerEntity(string entityName, int entityId)
+        {
+            if (entityName.IsEmpty() || entityId == 0)
+                return new EmptyResult();
 
-			return View();
-		}
-	}
+            var count = _urlRecordService.CountSlugsPerEntity(entityName, entityId);
+
+            ViewBag.CountSlugsPerEntity = count;
+            ViewBag.UrlRecordListUrl = Url.Action("List", "UrlRecord", new { entityName = entityName, entityId = entityId });
+
+            return View();
+        }
+
+        #endregion Public Methods
+
+
+
+        #region Private Methods
+
+        private void PrepareUrlRecordModel(UrlRecordModel model, UrlRecord urlRecord, bool forList = false)
+        {
+            if (!forList)
+            {
+                var allLanguages = _languageService.GetAllLanguages(true);
+
+                model.AvailableLanguages = allLanguages
+                    .Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() })
+                    .ToList();
+
+                model.AvailableLanguages.Insert(0, new SelectListItem { Text = T("Admin.System.SeNames.Language.Standard"), Value = "0" });
+            }
+
+            if (urlRecord != null)
+            {
+                model.Id = urlRecord.Id;
+                model.Slug = urlRecord.Slug;
+                model.EntityName = urlRecord.EntityName;
+                model.EntityId = urlRecord.EntityId;
+                model.IsActive = urlRecord.IsActive;
+                model.LanguageId = urlRecord.LanguageId;
+
+                if (urlRecord.EntityName.IsCaseInsensitiveEqual("BlogPost"))
+                {
+                    model.EntityUrl = Url.Action("Edit", "Blog", new { id = urlRecord.EntityId });
+                }
+                else if (urlRecord.EntityName.IsCaseInsensitiveEqual("Forum"))
+                {
+                    model.EntityUrl = Url.Action("EditForum", "Forum", new { id = urlRecord.EntityId });
+                }
+                else if (urlRecord.EntityName.IsCaseInsensitiveEqual("ForumGroup"))
+                {
+                    model.EntityUrl = Url.Action("EditForumGroup", "Forum", new { id = urlRecord.EntityId });
+                }
+                else if (urlRecord.EntityName.IsCaseInsensitiveEqual("NewsItem"))
+                {
+                    model.EntityUrl = Url.Action("Edit", "News", new { id = urlRecord.EntityId });
+                }
+                else
+                {
+                    model.EntityUrl = Url.Action("Edit", urlRecord.EntityName, new { id = urlRecord.EntityId });
+                }
+            }
+        }
+
+        #endregion Private Methods
+    }
 }

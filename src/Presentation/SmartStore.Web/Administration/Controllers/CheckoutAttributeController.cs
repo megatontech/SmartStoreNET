@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Orders;
+﻿using SmartStore.Admin.Models.Orders;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Directory;
@@ -18,57 +15,59 @@ using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
+    [AdminAuthorize]
     public class CheckoutAttributeController : AdminControllerBase
     {
-		#region Fields
+        #region Fields
 
-		private readonly ICommonServices _services;
-		private readonly ICheckoutAttributeService _checkoutAttributeService;
+        private readonly AdminAreaSettings _adminAreaSettings;
+        private readonly ICheckoutAttributeService _checkoutAttributeService;
+        private readonly ICustomerActivityService _customerActivityService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizedEntityService _localizedEntityService;
-        private readonly ITaxCategoryService _taxCategoryService;
         private readonly IMeasureService _measureService;
         private readonly MeasureSettings _measureSettings;
-        private readonly ICustomerActivityService _customerActivityService;
-		private readonly IStoreMappingService _storeMappingService;
+        private readonly ICommonServices _services;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly ITaxCategoryService _taxCategoryService;
 
-		private readonly AdminAreaSettings _adminAreaSettings;
+        #endregion Fields
 
-		#endregion
+        #region Constructors
 
-		#region Constructors
-
-		public CheckoutAttributeController(
-			ICommonServices services,
-			ICheckoutAttributeService checkoutAttributeService,
-            ILanguageService languageService, 
-			ILocalizedEntityService localizedEntityService,
+        public CheckoutAttributeController(
+            ICommonServices services,
+            ICheckoutAttributeService checkoutAttributeService,
+            ILanguageService languageService,
+            ILocalizedEntityService localizedEntityService,
             ITaxCategoryService taxCategoryService,
             ICustomerActivityService customerActivityService,
-            IMeasureService measureService, 
-			MeasureSettings measureSettings,
-			IStoreMappingService storeMappingService,
-			AdminAreaSettings adminAreaSettings)
+            IMeasureService measureService,
+            MeasureSettings measureSettings,
+            IStoreMappingService storeMappingService,
+            AdminAreaSettings adminAreaSettings)
         {
-			_services = services;
-			_checkoutAttributeService = checkoutAttributeService;
+            _services = services;
+            _checkoutAttributeService = checkoutAttributeService;
             _languageService = languageService;
             _localizedEntityService = localizedEntityService;
             _taxCategoryService = taxCategoryService;
             _customerActivityService = customerActivityService;
             _measureService = measureService;
             _measureSettings = measureSettings;
-			_storeMappingService = storeMappingService;
-			_adminAreaSettings = adminAreaSettings;
+            _storeMappingService = storeMappingService;
+            _adminAreaSettings = adminAreaSettings;
         }
 
-        #endregion
-        
+        #endregion Constructors
+
         #region Utilities
 
         [NonAction]
@@ -108,80 +107,28 @@ namespace SmartStore.Admin.Controllers
 
             var taxCategories = _taxCategoryService.GetAllTaxCategories();
 
-			foreach (var tc in taxCategories)
-			{
-				model.AvailableTaxCategories.Add(new SelectListItem
-				{
-					Text = tc.Name,
-					Value = tc.Id.ToString(),
-					Selected = (checkoutAttribute != null && !excludeProperties && tc.Id == checkoutAttribute.TaxCategoryId)
-				});
-			}
+            foreach (var tc in taxCategories)
+            {
+                model.AvailableTaxCategories.Add(new SelectListItem
+                {
+                    Text = tc.Name,
+                    Value = tc.Id.ToString(),
+                    Selected = (checkoutAttribute != null && !excludeProperties && tc.Id == checkoutAttribute.TaxCategoryId)
+                });
+            }
 
-			if (!excludeProperties)
-			{
-				model.SelectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(checkoutAttribute);
-			}
+            if (!excludeProperties)
+            {
+                model.SelectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(checkoutAttribute);
+            }
 
-			model.AvailableStores = _services.StoreService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
-		}
+            model.AvailableStores = _services.StoreService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
+        }
 
-        #endregion
-        
+        #endregion Utilities
+
         #region Checkout attributes
 
-        public ActionResult Index()
-        {
-            return RedirectToAction("List");
-        }
-
-        public ActionResult List()
-        {
-            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
-
-			var model = new CheckoutAttributeListModel
-			{
-				GridPageSize = _adminAreaSettings.GridPageSize
-			};
-
-			model.AvailableStores = _services.StoreService.GetAllStores().ToSelectListItems();
-
-			return View(model);
-        }
-
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult List(GridCommand command)
-        {
-			var model = new GridModel<CheckoutAttributeModel>();
-
-			if (_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var query = _checkoutAttributeService.GetCheckoutAttributes(0, true);
-				var pagedList = new PagedList<CheckoutAttribute>(query, command.Page - 1, command.PageSize);
-
-				model.Data = pagedList.Select(x =>
-				{
-					var caModel = x.ToModel();
-					caModel.AttributeControlTypeName = x.AttributeControlType.GetLocalizedEnum(_services.Localization, _services.WorkContext);
-					return caModel;
-				});
-
-				model.Total = pagedList.TotalCount;
-			}
-			else
-			{
-				model.Data = Enumerable.Empty<CheckoutAttributeModel>();
-
-				NotifyAccessDenied();
-			}
-
-			return new JsonResult
-            {
-                Data = model
-            };
-        }
-        
         //create
         public ActionResult Create()
         {
@@ -189,7 +136,7 @@ namespace SmartStore.Admin.Controllers
                 return AccessDeniedView();
 
             var model = new CheckoutAttributeModel();
-			model.IsActive = true;
+            model.IsActive = true;
 
             //locales
             AddLocales(_languageService, model.Locales);
@@ -210,10 +157,10 @@ namespace SmartStore.Admin.Controllers
 
                 UpdateAttributeLocales(checkoutAttribute, model);
 
-				SaveStoreMappings(checkoutAttribute, model);
+                SaveStoreMappings(checkoutAttribute, model);
 
-				//activity log
-				_customerActivityService.InsertActivity("AddNewCheckoutAttribute", _services.Localization.GetResource("ActivityLog.AddNewCheckoutAttribute"), checkoutAttribute.Name);
+                //activity log
+                _customerActivityService.InsertActivity("AddNewCheckoutAttribute", _services.Localization.GetResource("ActivityLog.AddNewCheckoutAttribute"), checkoutAttribute.Name);
 
                 NotifySuccess(_services.Localization.GetResource("Admin.Catalog.Attributes.CheckoutAttributes.Added"));
                 return continueEditing ? RedirectToAction("Edit", new { id = checkoutAttribute.Id }) : RedirectToAction("List");
@@ -222,6 +169,23 @@ namespace SmartStore.Admin.Controllers
             //If we got this far, something failed, redisplay form
             PrepareCheckoutAttributeModel(model, null, true);
             return View(model);
+        }
+
+        //delete
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
+                return AccessDeniedView();
+
+            var checkoutAttribute = _checkoutAttributeService.GetCheckoutAttributeById(id);
+            _checkoutAttributeService.DeleteCheckoutAttribute(checkoutAttribute);
+
+            //activity log
+            _customerActivityService.InsertActivity("DeleteCheckoutAttribute", _services.Localization.GetResource("ActivityLog.DeleteCheckoutAttribute"), checkoutAttribute.Name);
+
+            NotifySuccess(_services.Localization.GetResource("Admin.Catalog.Attributes.CheckoutAttributes.Deleted"));
+            return RedirectToAction("List");
         }
 
         //edit
@@ -263,10 +227,10 @@ namespace SmartStore.Admin.Controllers
 
                 UpdateAttributeLocales(checkoutAttribute, model);
 
-				SaveStoreMappings(checkoutAttribute, model);
+                SaveStoreMappings(checkoutAttribute, model);
 
-				//activity log
-				_customerActivityService.InsertActivity("EditCheckoutAttribute", _services.Localization.GetResource("ActivityLog.EditCheckoutAttribute"), checkoutAttribute.Name);
+                //activity log
+                _customerActivityService.InsertActivity("EditCheckoutAttribute", _services.Localization.GetResource("ActivityLog.EditCheckoutAttribute"), checkoutAttribute.Name);
 
                 NotifySuccess(_services.Localization.GetResource("Admin.Catalog.Attributes.CheckoutAttributes.Updated"));
                 return continueEditing ? RedirectToAction("Edit", checkoutAttribute.Id) : RedirectToAction("List");
@@ -277,52 +241,61 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
 
-        //delete
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
+
+        public ActionResult List()
         {
             if (!_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
 
-            var checkoutAttribute = _checkoutAttributeService.GetCheckoutAttributeById(id);
-            _checkoutAttributeService.DeleteCheckoutAttribute(checkoutAttribute);
+            var model = new CheckoutAttributeListModel
+            {
+                GridPageSize = _adminAreaSettings.GridPageSize
+            };
 
-            //activity log
-            _customerActivityService.InsertActivity("DeleteCheckoutAttribute", _services.Localization.GetResource("ActivityLog.DeleteCheckoutAttribute"), checkoutAttribute.Name);
+            model.AvailableStores = _services.StoreService.GetAllStores().ToSelectListItems();
 
-            NotifySuccess(_services.Localization.GetResource("Admin.Catalog.Attributes.CheckoutAttributes.Deleted"));
-            return RedirectToAction("List");
+            return View(model);
         }
 
-        #endregion
-
-        #region Checkout attribute values
-
         [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult ValueList(int checkoutAttributeId, GridCommand command)
+        public ActionResult List(GridCommand command)
         {
-			var model = new GridModel<CheckoutAttributeValueModel>();
+            var model = new GridModel<CheckoutAttributeModel>();
 
-			if (_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var values = _checkoutAttributeService.GetCheckoutAttributeValues(checkoutAttributeId);
+            if (_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var query = _checkoutAttributeService.GetCheckoutAttributes(0, true);
+                var pagedList = new PagedList<CheckoutAttribute>(query, command.Page - 1, command.PageSize);
 
-				model.Data = values.Select(x => x.ToModel());
+                model.Data = pagedList.Select(x =>
+                {
+                    var caModel = x.ToModel();
+                    caModel.AttributeControlTypeName = x.AttributeControlType.GetLocalizedEnum(_services.Localization, _services.WorkContext);
+                    return caModel;
+                });
 
-				model.Total = values.Count();
-			}
-			else
-			{
-				model.Data = Enumerable.Empty<CheckoutAttributeValueModel>();
+                model.Total = pagedList.TotalCount;
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<CheckoutAttributeModel>();
 
-				NotifyAccessDenied();
-			}
+                NotifyAccessDenied();
+            }
 
-			return new JsonResult
+            return new JsonResult
             {
                 Data = model
             };
         }
+
+        #endregion Checkout attributes
+
+        #region Checkout attribute values
 
         //create
         public ActionResult ValueCreatePopup(int checkoutAttributeId)
@@ -332,7 +305,7 @@ namespace SmartStore.Admin.Controllers
 
             var model = new CheckoutAttributeValueModel();
             model.CheckoutAttributeId = checkoutAttributeId;
-			model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
+            model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
             model.BaseWeightIn = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name;
 
             //locales
@@ -350,7 +323,7 @@ namespace SmartStore.Admin.Controllers
             if (checkoutAttribute == null)
                 return RedirectToAction("List");
 
-			model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
+            model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
             model.BaseWeightIn = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name;
 
             if (ModelState.IsValid)
@@ -370,6 +343,19 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
 
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult ValueDelete(int valueId, int checkoutAttributeId, GridCommand command)
+        {
+            if (_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var cav = _checkoutAttributeService.GetCheckoutAttributeValueById(valueId);
+
+                _checkoutAttributeService.DeleteCheckoutAttributeValue(cav);
+            }
+
+            return ValueList(checkoutAttributeId, command);
+        }
+
         //edit
         public ActionResult ValueEditPopup(int id)
         {
@@ -381,7 +367,7 @@ namespace SmartStore.Admin.Controllers
                 return RedirectToAction("List");
 
             var model = cav.ToModel();
-			model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
+            model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
             model.BaseWeightIn = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name;
 
             //locales
@@ -403,7 +389,7 @@ namespace SmartStore.Admin.Controllers
             if (cav == null)
                 return RedirectToAction("List");
 
-			model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
+            model.PrimaryStoreCurrencyCode = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
             model.BaseWeightIn = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name;
 
             if (ModelState.IsValid)
@@ -423,19 +409,32 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
 
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult ValueDelete(int valueId, int checkoutAttributeId, GridCommand command)
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult ValueList(int checkoutAttributeId, GridCommand command)
         {
-			if (_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
-			{
-				var cav = _checkoutAttributeService.GetCheckoutAttributeValueById(valueId);
+            var model = new GridModel<CheckoutAttributeValueModel>();
 
-				_checkoutAttributeService.DeleteCheckoutAttributeValue(cav);
-			}
+            if (_services.Permissions.Authorize(StandardPermissionProvider.ManageCatalog))
+            {
+                var values = _checkoutAttributeService.GetCheckoutAttributeValues(checkoutAttributeId);
 
-            return ValueList(checkoutAttributeId, command);
+                model.Data = values.Select(x => x.ToModel());
+
+                model.Total = values.Count();
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<CheckoutAttributeValueModel>();
+
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                Data = model
+            };
         }
 
-        #endregion
+        #endregion Checkout attribute values
     }
 }

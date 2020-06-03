@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Polls;
+﻿using SmartStore.Admin.Models.Polls;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Polls;
@@ -15,21 +12,30 @@ using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
     [AdminAuthorize]
     public class PollController : AdminControllerBase
-	{
-        private readonly IPollService _pollService;
-        private readonly ILanguageService _languageService;
-        private readonly IDateTimeHelper _dateTimeHelper;
-        private readonly IPermissionService _permissionService;
+    {
+        #region Private Fields
+
         private readonly AdminAreaSettings _adminAreaSettings;
-		private readonly IStoreService _storeService;
-		private readonly IStoreMappingService _storeMappingService;
         private readonly CustomerSettings _customerSettings;
+        private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly ILanguageService _languageService;
+        private readonly IPermissionService _permissionService;
+        private readonly IPollService _pollService;
+        private readonly IStoreMappingService _storeMappingService;
+        private readonly IStoreService _storeService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public PollController(
             IPollService pollService,
@@ -37,8 +43,8 @@ namespace SmartStore.Admin.Controllers
             IDateTimeHelper dateTimeHelper,
             IPermissionService permissionService,
             AdminAreaSettings adminAreaSettings,
-			IStoreService storeService,
-			IStoreMappingService storeMappingService,
+            IStoreService storeService,
+            IStoreMappingService storeMappingService,
             CustomerSettings customerSettings)
         {
             _pollService = pollService;
@@ -46,23 +52,25 @@ namespace SmartStore.Admin.Controllers
             _dateTimeHelper = dateTimeHelper;
             _permissionService = permissionService;
             _adminAreaSettings = adminAreaSettings;
-			_storeService = storeService;
-			_storeMappingService = storeMappingService;
+            _storeService = storeService;
+            _storeMappingService = storeMappingService;
             _customerSettings = customerSettings;
-		}
+        }
 
-		#region Utilities
+        #endregion Public Constructors
 
-		private void PreparePollModel(PollModel model, Poll poll, bool excludeProperties)
-		{
-			Guard.NotNull(model, nameof(model));
+        #region Utilities
 
-			if (!excludeProperties)
-			{
-				model.SelectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(poll);
-			}
+        private void PreparePollModel(PollModel model, Poll poll, bool excludeProperties)
+        {
+            Guard.NotNull(model, nameof(model));
 
-			model.AvailableStores = _storeService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
+            if (!excludeProperties)
+            {
+                model.SelectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(poll);
+            }
+
+            model.AvailableStores = _storeService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
             model.UsernamesEnabled = _customerSettings.CustomerLoginType != CustomerLoginType.Email;
             model.GridPageSize = _adminAreaSettings.GridPageSize;
 
@@ -71,9 +79,113 @@ namespace SmartStore.Admin.Controllers
                 .ToList();
         }
 
-		#endregion Utilities
+        #endregion Utilities
 
-		#region Polls
+        #region Polls
+
+        public ActionResult Create()
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+                return AccessDeniedView();
+
+            var model = new PollModel
+            {
+                Published = true,
+                ShowOnHomePage = true
+            };
+
+            PreparePollModel(model, null, false);
+
+            return View(model);
+        }
+
+        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
+        public ActionResult Create(PollModel model, bool continueEditing)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+                return AccessDeniedView();
+
+            if (ModelState.IsValid)
+            {
+                var poll = model.ToEntity();
+                poll.StartDateUtc = model.StartDate;
+                poll.EndDateUtc = model.EndDate;
+
+                _pollService.InsertPoll(poll);
+
+                SaveStoreMappings(poll, model);
+
+                NotifySuccess(T("Admin.ContentManagement.Polls.Added"));
+                return continueEditing ? RedirectToAction("Edit", new { id = poll.Id }) : RedirectToAction("List");
+            }
+
+            // If we got this far, something failed, redisplay form.
+            PreparePollModel(model, null, true);
+            return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+                return AccessDeniedView();
+
+            var poll = _pollService.GetPollById(id);
+            if (poll == null)
+                return RedirectToAction("List");
+
+            _pollService.DeletePoll(poll);
+
+            NotifySuccess(T("Admin.ContentManagement.Polls.Deleted"));
+            return RedirectToAction("List");
+        }
+
+        public ActionResult Edit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+                return AccessDeniedView();
+
+            var poll = _pollService.GetPollById(id);
+            if (poll == null)
+                return RedirectToAction("List");
+
+            var model = poll.ToModel();
+            model.StartDate = poll.StartDateUtc;
+            model.EndDate = poll.EndDateUtc;
+
+            PreparePollModel(model, poll, false);
+
+            return View(model);
+        }
+
+        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
+        public ActionResult Edit(PollModel model, bool continueEditing)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+                return AccessDeniedView();
+
+            var poll = _pollService.GetPollById(model.Id);
+            if (poll == null)
+                return RedirectToAction("List");
+
+            if (ModelState.IsValid)
+            {
+                poll = model.ToEntity(poll);
+                poll.StartDateUtc = model.StartDate;
+                poll.EndDateUtc = model.EndDate;
+
+                _pollService.UpdatePoll(poll);
+
+                SaveStoreMappings(poll, model);
+
+                NotifySuccess(T("Admin.ContentManagement.Polls.Updated"));
+                return continueEditing ? RedirectToAction("Edit", new { id = poll.Id }) : RedirectToAction("List");
+            }
+
+            // If we got this far, something failed, redisplay form.
+            PreparePollModel(model, poll, true);
+            return View(model);
+        }
 
         public ActionResult Index()
         {
@@ -106,35 +218,35 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult List(GridCommand command)
         {
-			var gridModel = new GridModel<PollModel>();
+            var gridModel = new GridModel<PollModel>();
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-			{
-				var polls = _pollService.GetPolls(0, false, command.Page - 1, command.PageSize, true);
+            if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+            {
+                var polls = _pollService.GetPolls(0, false, command.Page - 1, command.PageSize, true);
 
-				gridModel.Data = polls.Select(x =>
-				{
-					var m = x.ToModel();
+                gridModel.Data = polls.Select(x =>
+                {
+                    var m = x.ToModel();
 
-					if (x.StartDateUtc.HasValue)
-						m.StartDate = _dateTimeHelper.ConvertToUserTime(x.StartDateUtc.Value, DateTimeKind.Utc);
+                    if (x.StartDateUtc.HasValue)
+                        m.StartDate = _dateTimeHelper.ConvertToUserTime(x.StartDateUtc.Value, DateTimeKind.Utc);
 
-					if (x.EndDateUtc.HasValue)
-						m.EndDate = _dateTimeHelper.ConvertToUserTime(x.EndDateUtc.Value, DateTimeKind.Utc);
+                    if (x.EndDateUtc.HasValue)
+                        m.EndDate = _dateTimeHelper.ConvertToUserTime(x.EndDateUtc.Value, DateTimeKind.Utc);
 
-					m.LanguageName = x.Language.Name;
+                    m.LanguageName = x.Language.Name;
 
-					return m;
-				});
+                    return m;
+                });
 
-				gridModel.Total = polls.TotalCount;
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<PollModel>();
+                gridModel.Total = polls.TotalCount;
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<PollModel>();
 
-				NotifyAccessDenied();
-			}
+                NotifyAccessDenied();
+            }
 
             return new JsonResult
             {
@@ -142,145 +254,80 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-        public ActionResult Create()
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-                return AccessDeniedView();
-
-            var model = new PollModel
-            {
-                Published = true,
-                ShowOnHomePage = true
-            };
-
-			PreparePollModel(model, null, false);
-
-            return View(model);
-        }
-
-        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
-        public ActionResult Create(PollModel model, bool continueEditing)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-                return AccessDeniedView();
-
-            if (ModelState.IsValid)
-            {
-                var poll = model.ToEntity();
-                poll.StartDateUtc = model.StartDate;
-                poll.EndDateUtc = model.EndDate;
-
-                _pollService.InsertPoll(poll);
-
-				SaveStoreMappings(poll, model);
-
-                NotifySuccess(T("Admin.ContentManagement.Polls.Added"));
-                return continueEditing ? RedirectToAction("Edit", new { id = poll.Id }) : RedirectToAction("List");
-            }
-
-            // If we got this far, something failed, redisplay form.		
-			PreparePollModel(model, null, true);
-            return View(model);
-        }
-
-        public ActionResult Edit(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-                return AccessDeniedView();
-
-            var poll = _pollService.GetPollById(id);
-            if (poll == null)
-                return RedirectToAction("List");
-
-            var model = poll.ToModel();
-            model.StartDate = poll.StartDateUtc;
-            model.EndDate = poll.EndDateUtc;
-
-			PreparePollModel(model, poll, false);
-
-            return View(model);
-        }
-
-        [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
-        public ActionResult Edit(PollModel model, bool continueEditing)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-                return AccessDeniedView();
-
-            var poll = _pollService.GetPollById(model.Id);
-            if (poll == null)
-                return RedirectToAction("List");
-
-            if (ModelState.IsValid)
-            {
-                poll = model.ToEntity(poll);
-                poll.StartDateUtc = model.StartDate;
-                poll.EndDateUtc = model.EndDate;
-
-                _pollService.UpdatePoll(poll);
-
-				SaveStoreMappings(poll, model);
-
-                NotifySuccess(T("Admin.ContentManagement.Polls.Updated"));
-                return continueEditing ? RedirectToAction("Edit", new { id = poll.Id }) : RedirectToAction("List");
-            }
-
-            // If we got this far, something failed, redisplay form.
-			PreparePollModel(model, poll, true);
-            return View(model);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-                return AccessDeniedView();
-
-            var poll = _pollService.GetPollById(id);
-            if (poll == null)
-                return RedirectToAction("List");
-            
-            _pollService.DeletePoll(poll);
-
-            NotifySuccess(T("Admin.ContentManagement.Polls.Deleted"));
-            return RedirectToAction("List");
-        }
-
-        #endregion
+        #endregion Polls
 
         #region Poll answer
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult PollAnswerAdd(int pollId, PollAnswerModel model, GridCommand command)
+        {
+            if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+            {
+                if (!ModelState.IsValid)
+                {
+                    var modelStateErrors = this.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+                    return Content(modelStateErrors.FirstOrDefault());
+                }
+
+                var poll = _pollService.GetPollById(pollId);
+
+                poll.PollAnswers.Add(new PollAnswer
+                {
+                    Name = model.Name,
+                    DisplayOrder = model.DisplayOrder1
+                });
+
+                _pollService.UpdatePoll(poll);
+            }
+
+            return PollAnswers(pollId, command);
+        }
+
+        [GridAction(EnableCustomBinding = true)]
+        public ActionResult PollAnswerDelete(int id, GridCommand command)
+        {
+            var pollAnswer = _pollService.GetPollAnswerById(id);
+            var pollId = pollAnswer.PollId;
+
+            if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+            {
+                _pollService.DeletePollAnswer(pollAnswer);
+            }
+
+            return PollAnswers(pollId, command);
+        }
 
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult PollAnswers(int pollId, GridCommand command)
         {
-			var model = new GridModel<PollAnswerModel>();
+            var model = new GridModel<PollAnswerModel>();
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-			{
-				var poll = _pollService.GetPollById(pollId);
+            if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+            {
+                var poll = _pollService.GetPollById(pollId);
 
-				var answers = poll.PollAnswers.OrderBy(x => x.DisplayOrder).ToList();
+                var answers = poll.PollAnswers.OrderBy(x => x.DisplayOrder).ToList();
 
-				model.Data = answers.Select(x =>
-				{
-					return new PollAnswerModel
-					{
-						Id = x.Id,
-						PollId = x.PollId,
-						Name = x.Name,
-						NumberOfVotes = x.NumberOfVotes,
-						DisplayOrder1 = x.DisplayOrder
-					};
-				});
+                model.Data = answers.Select(x =>
+                {
+                    return new PollAnswerModel
+                    {
+                        Id = x.Id,
+                        PollId = x.PollId,
+                        Name = x.Name,
+                        NumberOfVotes = x.NumberOfVotes,
+                        DisplayOrder1 = x.DisplayOrder
+                    };
+                });
 
-				model.Total = answers.Count;
-			}
-			else
-			{
-				model.Data = Enumerable.Empty<PollAnswerModel>();
+                model.Total = answers.Count;
+            }
+            else
+            {
+                model.Data = Enumerable.Empty<PollAnswerModel>();
 
-				NotifyAccessDenied();
-			}
+                NotifyAccessDenied();
+            }
 
             return new JsonResult
             {
@@ -291,65 +338,26 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult PollAnswerUpdate(PollAnswerModel model, GridCommand command)
         {
-			var pollAnswer = _pollService.GetPollAnswerById(model.Id);
+            var pollAnswer = _pollService.GetPollAnswerById(model.Id);
 
-			if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-			{
-				if (!ModelState.IsValid)
-				{
-					var modelStateErrors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
-					return Content(modelStateErrors.FirstOrDefault());
-				}
+            if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
+            {
+                if (!ModelState.IsValid)
+                {
+                    var modelStateErrors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+                    return Content(modelStateErrors.FirstOrDefault());
+                }
 
-				pollAnswer.Name = model.Name;
-				pollAnswer.DisplayOrder = model.DisplayOrder1;
+                pollAnswer.Name = model.Name;
+                pollAnswer.DisplayOrder = model.DisplayOrder1;
 
-				_pollService.UpdatePoll(pollAnswer.Poll);
-			}
+                _pollService.UpdatePoll(pollAnswer.Poll);
+            }
 
             return PollAnswers(pollAnswer.PollId, command);
         }
 
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult PollAnswerAdd(int pollId, PollAnswerModel model, GridCommand command)
-        {
-			if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-			{
-				if (!ModelState.IsValid)
-				{
-					var modelStateErrors = this.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
-					return Content(modelStateErrors.FirstOrDefault());
-				}
-
-				var poll = _pollService.GetPollById(pollId);
-
-				poll.PollAnswers.Add(new PollAnswer
-				{
-					Name = model.Name,
-					DisplayOrder = model.DisplayOrder1
-				});
-
-				_pollService.UpdatePoll(poll);
-			}
-
-            return PollAnswers(pollId, command);
-        }
-
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult PollAnswerDelete(int id, GridCommand command)
-        {
-			var pollAnswer = _pollService.GetPollAnswerById(id);
-			var pollId = pollAnswer.PollId;
-
-			if (_permissionService.Authorize(StandardPermissionProvider.ManagePolls))
-			{
-				_pollService.DeletePollAnswer(pollAnswer);
-			}
-
-            return PollAnswers(pollId, command);
-        }
-
-        #endregion
+        #endregion Poll answer
 
         #region Voting records
 
@@ -393,6 +401,6 @@ namespace SmartStore.Admin.Controllers
             return new JsonResult { Data = model };
         }
 
-        #endregion
+        #endregion Voting records
     }
 }

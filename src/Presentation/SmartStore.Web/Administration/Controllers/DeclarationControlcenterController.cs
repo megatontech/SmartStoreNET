@@ -1,34 +1,29 @@
 ﻿using SmartStore.Services.Calc;
 using SmartStore.Web.Framework.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
     public class DeclarationControlcenterController : AdminControllerBase
     {
+        #region Private Fields
+
         private readonly ICalcRewardService _CalcRewardService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public DeclarationControlcenterController(ICalcRewardService calcRewardService)
         {
             _CalcRewardService = calcRewardService;
         }
 
-        // GET: DeclarationControlcenter
-        public ActionResult Index()
-        {
-            _CalcRewardService.CalcRewardTwo(1400M);
-            return View();
-        }
+        #endregion Public Constructors
 
-        // GET: DeclarationControlcenter/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+
+
+        #region Public Methods
 
         // GET: DeclarationControlcenter/Create
         public ActionResult Create()
@@ -43,28 +38,6 @@ namespace SmartStore.Admin.Controllers
             try
             {
                 // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: DeclarationControlcenter/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: DeclarationControlcenter/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
 
                 return RedirectToAction("Index");
             }
@@ -95,5 +68,42 @@ namespace SmartStore.Admin.Controllers
                 return View();
             }
         }
+
+        // GET: DeclarationControlcenter/Details/5
+        public ActionResult Details(int id)
+        {
+            return View();
+        }
+
+        // GET: DeclarationControlcenter/Edit/5
+        public ActionResult Edit(int id)
+        {
+            return View();
+        }
+
+        // POST: DeclarationControlcenter/Edit/5
+        [HttpPost]
+        public ActionResult Edit(int id, FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add update logic here
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: DeclarationControlcenter
+        public ActionResult Index()
+        {
+            _CalcRewardService.CalcRewardTwo(1400M);
+            return View();
+        }
+
+        #endregion Public Methods
     }
 }

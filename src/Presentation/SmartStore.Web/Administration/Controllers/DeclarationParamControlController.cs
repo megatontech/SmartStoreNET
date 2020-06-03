@@ -1,8 +1,4 @@
 ﻿using SmartStore.Web.Framework.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -12,17 +8,7 @@ namespace SmartStore.Admin.Controllers
     /// </summary>
     public class DeclarationParamControlController : AdminControllerBase
     {
-        // GET: DeclarationParamControl
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        // GET: DeclarationParamControl/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        #region Public Methods
 
         // GET: DeclarationParamControl/Create
         public ActionResult Create()
@@ -37,28 +23,6 @@ namespace SmartStore.Admin.Controllers
             try
             {
                 // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: DeclarationParamControl/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: DeclarationParamControl/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
 
                 return RedirectToAction("Index");
             }
@@ -89,5 +53,41 @@ namespace SmartStore.Admin.Controllers
                 return View();
             }
         }
+
+        // GET: DeclarationParamControl/Details/5
+        public ActionResult Details(int id)
+        {
+            return View();
+        }
+
+        // GET: DeclarationParamControl/Edit/5
+        public ActionResult Edit(int id)
+        {
+            return View();
+        }
+
+        // POST: DeclarationParamControl/Edit/5
+        [HttpPost]
+        public ActionResult Edit(int id, FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add update logic here
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: DeclarationParamControl
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        #endregion Public Methods
     }
 }

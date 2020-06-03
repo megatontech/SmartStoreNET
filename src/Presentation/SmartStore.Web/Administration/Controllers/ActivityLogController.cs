@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Logging;
+﻿using SmartStore.Admin.Models.Logging;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Logging;
 using SmartStore.Services.Customers;
@@ -11,40 +7,44 @@ using SmartStore.Services.Security;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
+    [AdminAuthorize]
     public partial class ActivityLogController : AdminControllerBase
     {
         #region Fields
 
+        private readonly AdminAreaSettings _adminAreaSettings;
         private readonly ICustomerActivityService _customerActivityService;
-		private readonly ICustomerService _customerService;
-		private readonly IDateTimeHelper _dateTimeHelper;
+        private readonly ICustomerService _customerService;
+        private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IPermissionService _permissionService;
-		private readonly AdminAreaSettings _adminAreaSettings;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Constructors
+        #region Constructors
 
-		public ActivityLogController(
-			ICustomerActivityService customerActivityService,
-			ICustomerService customerService,
-			IDateTimeHelper dateTimeHelper,
+        public ActivityLogController(
+            ICustomerActivityService customerActivityService,
+            ICustomerService customerService,
+            IDateTimeHelper dateTimeHelper,
             IPermissionService permissionService,
-			AdminAreaSettings adminAreaSettings)
-		{
+            AdminAreaSettings adminAreaSettings)
+        {
             this._customerActivityService = customerActivityService;
-			this._customerService = customerService;
+            this._customerService = customerService;
             this._dateTimeHelper = dateTimeHelper;
             this._permissionService = permissionService;
-			this._adminAreaSettings = adminAreaSettings;
-		}
+            this._adminAreaSettings = adminAreaSettings;
+        }
 
-		#endregion 
+        #endregion Constructors
 
         #region Activity log types
 
@@ -87,13 +87,12 @@ namespace SmartStore.Admin.Controllers
             foreach (var key in keys)
             {
                 int id;
-                if (Int32.TryParse(key,out id))
+                if (Int32.TryParse(key, out id))
                 {
                     var activityType = _customerActivityService.GetActivityTypeById(id);
                     activityType.Enabled = !formCollection["checkBox_" + key].Equals("false");
                     _customerActivityService.UpdateActivityType(activityType);
                 }
-
             }
 
             NotifySuccess(T("Admin.Configuration.ActivityLog.ActivityLogType.Updated"));
@@ -101,30 +100,37 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("ListTypes");
         }
 
-        #endregion
-        
+        #endregion Activity log types
+
         #region Activity log
-        
-        public ActionResult ListLogs()
+
+        [HttpPost, ActionName("ListLogs")]
+        [FormValueRequired("clearall")]
+        public ActionResult ClearAll()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageActivityLog))
                 return AccessDeniedView();
 
-			var model = new ActivityLogSearchModel
-			{
-				GridPageSize = _adminAreaSettings.GridPageSize
-			};
+            _customerActivityService.ClearAllActivities();
 
-			model.ActivityLogType = _customerActivityService.GetAllActivityTypes()
-				.OrderBy(x => x.Name)
-				.Select(x => new SelectListItem
-				{
-					Value = x.Id.ToString(),
-					Text = x.Name
-				})
-				.ToList();
+            return RedirectToAction("ListLogs");
+        }
 
-            return View(model);
+        [HttpPost]
+        public ActionResult DeleteSelected(ICollection<int> selectedIds)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageActivityLog))
+                return AccessDeniedView();
+
+            if (selectedIds != null)
+            {
+                var activityLogs = _customerActivityService.GetActivityByIds(selectedIds.ToArray());
+
+                foreach (var activityLog in activityLogs)
+                    _customerActivityService.DeleteActivity(activityLog);
+            }
+
+            return Json(new { Result = true });
         }
 
         [HttpPost, GridAction(EnableCustomBinding = true)]
@@ -134,71 +140,64 @@ namespace SmartStore.Admin.Controllers
                 : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnFrom.Value, _dateTimeHelper.CurrentTimeZone);
 
             DateTime? endDateValue = (model.CreatedOnTo == null) ? null
-				: (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnTo.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
+                : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.CreatedOnTo.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
 
             var activityLog = _customerActivityService.GetAllActivities(startDateValue, endDateValue, null, model.ActivityLogTypeId,
-				command.Page - 1, command.PageSize, model.CustomerEmail, model.CustomerSystemAccount);
+                command.Page - 1, command.PageSize, model.CustomerEmail, model.CustomerSystemAccount);
 
-			var systemAccountCustomers = _customerService.GetSystemAccountCustomers();
+            var systemAccountCustomers = _customerService.GetSystemAccountCustomers();
 
-			var gridModel = new GridModel<ActivityLogModel>
+            var gridModel = new GridModel<ActivityLogModel>
             {
                 Data = activityLog.Select(x =>
                 {
                     var m = x.ToModel();
-					var systemCustomer = systemAccountCustomers.FirstOrDefault(y => y.Id == x.CustomerId);
+                    var systemCustomer = systemAccountCustomers.FirstOrDefault(y => y.Id == x.CustomerId);
 
                     m.CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc);
-					m.IsSystemAccount = (systemCustomer != null);
+                    m.IsSystemAccount = (systemCustomer != null);
 
-					if (systemCustomer != null)
-					{
-						if (systemCustomer.IsSearchEngineAccount())
-							m.SystemAccountName = T("Admin.System.SystemCustomerNames.SearchEngine");
-						else if (systemCustomer.IsBackgroundTaskAccount())
-							m.SystemAccountName = T("Admin.System.SystemCustomerNames.BackgroundTask");
-						else if (systemCustomer.IsPdfConverter())
-							m.SystemAccountName = T("Admin.System.SystemCustomerNames.PdfConverter");
-						else
-							m.SystemAccountName = "";
-					}
+                    if (systemCustomer != null)
+                    {
+                        if (systemCustomer.IsSearchEngineAccount())
+                            m.SystemAccountName = T("Admin.System.SystemCustomerNames.SearchEngine");
+                        else if (systemCustomer.IsBackgroundTaskAccount())
+                            m.SystemAccountName = T("Admin.System.SystemCustomerNames.BackgroundTask");
+                        else if (systemCustomer.IsPdfConverter())
+                            m.SystemAccountName = T("Admin.System.SystemCustomerNames.PdfConverter");
+                        else
+                            m.SystemAccountName = "";
+                    }
 
-					return m;
+                    return m;
                 }),
                 Total = activityLog.TotalCount
             };
-            return new JsonResult { Data = gridModel};
+            return new JsonResult { Data = gridModel };
         }
 
-		[HttpPost, ActionName("ListLogs")]
-		[FormValueRequired("clearall")]
-		public ActionResult ClearAll()
+        public ActionResult ListLogs()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageActivityLog))
                 return AccessDeniedView();
 
-            _customerActivityService.ClearAllActivities();
+            var model = new ActivityLogSearchModel
+            {
+                GridPageSize = _adminAreaSettings.GridPageSize
+            };
 
-			return RedirectToAction("ListLogs");
+            model.ActivityLogType = _customerActivityService.GetAllActivityTypes()
+                .OrderBy(x => x.Name)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Name
+                })
+                .ToList();
+
+            return View(model);
         }
 
-		[HttpPost]
-		public ActionResult DeleteSelected(ICollection<int> selectedIds)
-		{
-			if (!_permissionService.Authorize(StandardPermissionProvider.ManageActivityLog))
-				return AccessDeniedView();
-
-			if (selectedIds != null)
-			{
-				var activityLogs = _customerActivityService.GetActivityByIds(selectedIds.ToArray());
-
-				foreach (var activityLog in activityLogs)
-					_customerActivityService.DeleteActivity(activityLog);
-			}
-
-			return Json(new { Result = true });
-		}
-
-		#endregion
-	}
+        #endregion Activity log
+    }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Web.Mvc;
-using SmartStore.Admin.Models.Directory;
+﻿using SmartStore.Admin.Models.Directory;
 using SmartStore.Core.Domain.Directory;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Localization;
@@ -9,34 +6,37 @@ using SmartStore.Services.Security;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
-	[AdminAuthorize]
-    public class DeliveryTimeController :  AdminControllerBase
+    [AdminAuthorize]
+    public class DeliveryTimeController : AdminControllerBase
     {
         #region Fields
 
         private readonly IDeliveryTimeService _deliveryTimeService;
-        private readonly ILocalizedEntityService _localizedEntityService;
         private readonly ILanguageService _languageService;
+        private readonly ILocalizedEntityService _localizedEntityService;
 
-        #endregion
+        #endregion Fields
 
         #region Constructors
 
         public DeliveryTimeController(
-			IDeliveryTimeService deliveryTimeService,
-            ILocalizedEntityService localizedEntityService, 
+            IDeliveryTimeService deliveryTimeService,
+            ILocalizedEntityService localizedEntityService,
             ILanguageService languageService)
         {
             _deliveryTimeService = deliveryTimeService;
             _localizedEntityService = localizedEntityService;
             _languageService = languageService;
         }
-        
-        #endregion
+
+        #endregion Constructors
 
         #region Utilities
 
@@ -49,52 +49,12 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        #endregion
+        #endregion Utilities
 
         #region Methods
 
-        public ActionResult Index()
-        {
-            return RedirectToAction("List");
-        }
-
-        public ActionResult List()
-        {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageDeliveryTimes))
-                return AccessDeniedView();
-
-            return View();
-        }
-
-		[HttpPost, GridAction(EnableCustomBinding = true)]
-		public ActionResult List(GridCommand command)
-		{
-			var gridModel = new GridModel<DeliveryTimeModel>();
-
-			if (Services.Permissions.Authorize(StandardPermissionProvider.ManageDeliveryTimes))
-			{
-				var deliveryTimeModels = _deliveryTimeService.GetAllDeliveryTimes()
-					.Select(x => x.ToModel())
-					.ToList();
-
-				gridModel.Data = deliveryTimeModels;
-				gridModel.Total = deliveryTimeModels.Count();
-			}
-			else
-			{
-				gridModel.Data = Enumerable.Empty<DeliveryTimeModel>();
-
-				NotifyAccessDenied();
-			}
-
-			return new JsonResult
-			{
-				Data = gridModel
-			};
-		}
-
-		//ajax
-		public ActionResult AllDeliveryTimes(string label, int selectedId)
+        //ajax
+        public ActionResult AllDeliveryTimes(string label, int selectedId)
         {
             var deliveryTimes = _deliveryTimeService.GetAllDeliveryTimes();
             if (label.HasValue())
@@ -111,13 +71,53 @@ namespace SmartStore.Admin.Controllers
                        };
 
             return new JsonResult
-			{
-				Data = list.ToList(),
-				JsonRequestBehavior = JsonRequestBehavior.AllowGet
-			};
+            {
+                Data = list.ToList(),
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
         }
 
-        #endregion
+        public ActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
+
+        public ActionResult List()
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageDeliveryTimes))
+                return AccessDeniedView();
+
+            return View();
+        }
+
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command)
+        {
+            var gridModel = new GridModel<DeliveryTimeModel>();
+
+            if (Services.Permissions.Authorize(StandardPermissionProvider.ManageDeliveryTimes))
+            {
+                var deliveryTimeModels = _deliveryTimeService.GetAllDeliveryTimes()
+                    .Select(x => x.ToModel())
+                    .ToList();
+
+                gridModel.Data = deliveryTimeModels;
+                gridModel.Total = deliveryTimeModels.Count();
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<DeliveryTimeModel>();
+
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
+        #endregion Methods
 
         #region Create / Edit / Delete / Save
 
@@ -129,7 +129,7 @@ namespace SmartStore.Admin.Controllers
             var model = new DeliveryTimeModel();
 
             AddLocales(_languageService, model.Locales);
-            
+
             return View(model);
         }
 
@@ -142,7 +142,7 @@ namespace SmartStore.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var deliveryTime = model.ToEntity();
-                
+
                 _deliveryTimeService.InsertDeliveryTime(deliveryTime);
 
                 UpdateLocales(deliveryTime, model);
@@ -153,6 +153,30 @@ namespace SmartStore.Admin.Controllers
 
             //If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageDeliveryTimes))
+                return AccessDeniedView();
+
+            var deliveryTime = _deliveryTimeService.GetDeliveryTimeById(id);
+            if (deliveryTime == null)
+                return RedirectToAction("List");
+
+            try
+            {
+                _deliveryTimeService.DeleteDeliveryTime(deliveryTime);
+
+                NotifySuccess(T("Admin.Configuration.DeliveryTimes.Deleted"));
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                NotifyError(exc);
+                return RedirectToAction("Edit", new { id = deliveryTime.Id });
+            }
         }
 
         public ActionResult Edit(int id)
@@ -195,37 +219,13 @@ namespace SmartStore.Admin.Controllers
                 }
 
                 UpdateLocales(deliveryTime, model);
-				_deliveryTimeService.UpdateDeliveryTime(deliveryTime);
-                
+                _deliveryTimeService.UpdateDeliveryTime(deliveryTime);
+
                 NotifySuccess(T("Admin.Configuration.DeliveryTimes.Updated"));
                 return continueEditing ? RedirectToAction("Edit", new { id = deliveryTime.Id }) : RedirectToAction("List");
             }
 
             return View(model);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageDeliveryTimes))
-                return AccessDeniedView();
-
-            var deliveryTime = _deliveryTimeService.GetDeliveryTimeById(id);
-            if (deliveryTime == null)
-                return RedirectToAction("List");
-
-            try
-            {
-                _deliveryTimeService.DeleteDeliveryTime(deliveryTime);
-
-                NotifySuccess(T("Admin.Configuration.DeliveryTimes.Deleted"));
-                return RedirectToAction("List");
-            }
-            catch (Exception exc)
-            {
-                NotifyError(exc);
-                return RedirectToAction("Edit", new { id = deliveryTime.Id });
-            }
         }
 
         [HttpPost]
@@ -237,6 +237,6 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("List", "DeliveryTime");
         }
 
-        #endregion
+        #endregion Create / Edit / Delete / Save
     }
 }

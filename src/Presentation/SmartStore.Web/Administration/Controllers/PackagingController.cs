@@ -1,120 +1,125 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using SmartStore.Utilities;
+﻿using SmartStore.Core.Logging;
 using SmartStore.Core.Packaging;
-using SmartStore.Web.Framework.Controllers;
-using SmartStore.Core.Localization;
-using System.IO;
+using SmartStore.Core.Themes;
 using SmartStore.Services;
 using SmartStore.Services.Security;
-using System.Dynamic;
-using SmartStore.Core.Logging;
-using SmartStore.Core.Themes;
+using SmartStore.Utilities;
+using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
+using System;
+using System.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
+    [AdminAuthorize]
+    public class PackagingController : AdminControllerBase
+    {
+        #region Private Fields
 
-	[AdminAuthorize]
-	public class PackagingController : AdminControllerBase
-	{
-		private readonly ICommonServices _services;
-		private readonly IPackageManager _packageManager;
-		private readonly Lazy<IThemeRegistry> _themeRegistry;
+        private readonly IPackageManager _packageManager;
+        private readonly ICommonServices _services;
+        private readonly Lazy<IThemeRegistry> _themeRegistry;
 
-		public PackagingController(ICommonServices services, IPackageManager packageManager, Lazy<IThemeRegistry> themeRegistry)
-		{
-			this._services = services;
-			this._packageManager = packageManager;
-			this._themeRegistry = themeRegistry;
-		}
+        #endregion Private Fields
 
-		[ChildActionOnly]
-		public ActionResult UploadPackage(bool isTheme)
-		{
-			var title = isTheme ? T("Admin.Packaging.UploadTheme").Text : T("Admin.Packaging.UploadPlugin").Text;
-			var info = isTheme ? T("Admin.Packaging.Dialog.ThemeInfo").Text : T("Admin.Packaging.Dialog.PluginInfo").Text;
+        #region Public Constructors
 
-			var model = new { Title = title, Info = info };
-			return PartialView(CommonHelper.ToExpando(model));
-		}
+        public PackagingController(ICommonServices services, IPackageManager packageManager, Lazy<IThemeRegistry> themeRegistry)
+        {
+            this._services = services;
+            this._packageManager = packageManager;
+            this._themeRegistry = themeRegistry;
+        }
 
-		[HttpPost]
-		public ActionResult UploadPackage(FormCollection form, string returnUrl = "")
-		{
-			bool isTheme = false;
+        #endregion Public Constructors
 
-			try
-			{
-				var file = Request.Files["packagefile"].ToPostedFileResult();
-				if (file != null)
-				{
-					var requiredPermission = (isTheme = PackagingUtils.IsTheme(file.FileName))
-						? StandardPermissionProvider.ManageThemes
-						: StandardPermissionProvider.ManagePlugins;
 
-					if (!_services.Permissions.Authorize(requiredPermission))
-					{
-						return AccessDeniedView();
-					}
 
-					if (!file.FileExtension.IsCaseInsensitiveEqual(".nupkg"))
-					{
-						NotifyError(T("Admin.Packaging.NotAPackage"));
-						return RedirectToReferrer(returnUrl);
-					}
+        #region Public Methods
 
-					var location = CommonHelper.MapPath("~/App_Data");
-					var appPath = CommonHelper.MapPath("~/");
+        [ChildActionOnly]
+        public ActionResult UploadPackage(bool isTheme)
+        {
+            var title = isTheme ? T("Admin.Packaging.UploadTheme").Text : T("Admin.Packaging.UploadPlugin").Text;
+            var info = isTheme ? T("Admin.Packaging.Dialog.ThemeInfo").Text : T("Admin.Packaging.Dialog.PluginInfo").Text;
 
-					if (isTheme)
-					{
-						// avoid getting terrorized by IO events
-						_themeRegistry.Value.StopMonitoring();
-					}
+            var model = new { Title = title, Info = info };
+            return PartialView(CommonHelper.ToExpando(model));
+        }
 
-					var packageInfo = _packageManager.Install(file.Stream, location, appPath);
+        [HttpPost]
+        public ActionResult UploadPackage(FormCollection form, string returnUrl = "")
+        {
+            bool isTheme = false;
 
-					if (isTheme)
-					{
-						// create manifest
-						if (packageInfo != null)
-						{
-							var manifest = ThemeManifest.Create(packageInfo.ExtensionDescriptor.Path);
-							if (manifest != null)
-							{
-								_themeRegistry.Value.AddThemeManifest(manifest);
-							}
-						}
+            try
+            {
+                var file = Request.Files["packagefile"].ToPostedFileResult();
+                if (file != null)
+                {
+                    var requiredPermission = (isTheme = PackagingUtils.IsTheme(file.FileName))
+                        ? StandardPermissionProvider.ManageThemes
+                        : StandardPermissionProvider.ManagePlugins;
 
-						// SOFT start IO events again
-						_themeRegistry.Value.StartMonitoring(false);
-					}
-				}
-				else
-				{
-					NotifyError(T("Admin.Common.UploadFile"));
-					return RedirectToReferrer(returnUrl);
-				}
+                    if (!_services.Permissions.Authorize(requiredPermission))
+                    {
+                        return AccessDeniedView();
+                    }
 
-				if (!isTheme)
-				{
-					_services.WebHelper.RestartAppDomain();
-				}
-				NotifySuccess(T("Admin.Packaging.InstallSuccess"));
-				return RedirectToReferrer(returnUrl);
-			}
-			catch (Exception exc)
-			{
-				NotifyError(exc);
-				Logger.Error(exc);
-				return RedirectToReferrer(returnUrl);
-			}
-		}
+                    if (!file.FileExtension.IsCaseInsensitiveEqual(".nupkg"))
+                    {
+                        NotifyError(T("Admin.Packaging.NotAPackage"));
+                        return RedirectToReferrer(returnUrl);
+                    }
 
-	}
+                    var location = CommonHelper.MapPath("~/App_Data");
+                    var appPath = CommonHelper.MapPath("~/");
 
+                    if (isTheme)
+                    {
+                        // avoid getting terrorized by IO events
+                        _themeRegistry.Value.StopMonitoring();
+                    }
+
+                    var packageInfo = _packageManager.Install(file.Stream, location, appPath);
+
+                    if (isTheme)
+                    {
+                        // create manifest
+                        if (packageInfo != null)
+                        {
+                            var manifest = ThemeManifest.Create(packageInfo.ExtensionDescriptor.Path);
+                            if (manifest != null)
+                            {
+                                _themeRegistry.Value.AddThemeManifest(manifest);
+                            }
+                        }
+
+                        // SOFT start IO events again
+                        _themeRegistry.Value.StartMonitoring(false);
+                    }
+                }
+                else
+                {
+                    NotifyError(T("Admin.Common.UploadFile"));
+                    return RedirectToReferrer(returnUrl);
+                }
+
+                if (!isTheme)
+                {
+                    _services.WebHelper.RestartAppDomain();
+                }
+                NotifySuccess(T("Admin.Packaging.InstallSuccess"));
+                return RedirectToReferrer(returnUrl);
+            }
+            catch (Exception exc)
+            {
+                NotifyError(exc);
+                Logger.Error(exc);
+                return RedirectToReferrer(returnUrl);
+            }
+        }
+
+        #endregion Public Methods
+    }
 }
