@@ -499,6 +499,7 @@ namespace SmartStore.Core.Domain.Orders
         /// <summary>
         /// Gets or sets the reward points history record
         /// </summary>
+        [NotMapped]
         public virtual RewardPointsHistory RedeemedRewardPointsEntry { get; set; }
 
 		///// <summary>
