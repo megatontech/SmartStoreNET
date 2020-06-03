@@ -1,0 +1,2 @@
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\.vs\SmartStoreNET\v16\lut\0\i\SmartStore.Admin\SmartStore.Admin.csprojAssemblyReference.cache
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\.vs\SmartStoreNET\v16\lut\0\i\SmartStore.Admin\SmartStore.Admin.csproj.CoreCompileInputs.cache

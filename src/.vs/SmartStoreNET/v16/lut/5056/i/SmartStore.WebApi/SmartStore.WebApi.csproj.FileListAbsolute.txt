@@ -1,0 +1,2 @@
+C:\Users\ZJ\Downloads\SmartStoreNET\src\.vs\SmartStoreNET\v16\lut\0\i\SmartStore.WebApi\SmartStore.WebApi.csprojAssemblyReference.cache
+C:\Users\ZJ\Downloads\SmartStoreNET\src\.vs\SmartStoreNET\v16\lut\0\i\SmartStore.WebApi\SmartStore.WebApi.csproj.CoreCompileInputs.cache

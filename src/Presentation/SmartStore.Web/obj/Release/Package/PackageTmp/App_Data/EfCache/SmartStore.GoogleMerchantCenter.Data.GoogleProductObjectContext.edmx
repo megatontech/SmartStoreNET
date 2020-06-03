@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Edmx Version="3.0" xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <Runtime>
+    <ConceptualModels>
+      <Schema Namespace="SmartStore.GoogleMerchantCenter.Data" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="GoogleProductRecord" customannotation:ClrType="SmartStore.GoogleMerchantCenter.Domain.GoogleProductRecord, SmartStore.GoogleMerchantCenter, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="Taxonomy" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Gender" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="AgeGroup" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Color" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Size" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Material" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Pattern" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ItemGroupId" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsTouched" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedOnUtc" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedOnUtc" Type="DateTime" Nullable="false" />
+          <Property Name="Export" Type="Boolean" Nullable="false" />
+          <Property Name="Multipack" Type="Int32" Nullable="false" />
+          <Property Name="IsBundle" Type="Boolean" />
+          <Property Name="IsAdult" Type="Boolean" />
+          <Property Name="EnergyEfficiencyClass" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CustomLabel0" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CustomLabel1" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CustomLabel2" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CustomLabel3" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CustomLabel4" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityContainer Name="GoogleProductObjectContext" customannotation:UseClrTypes="true">
+          <EntitySet Name="GoogleProductRecords" EntityType="Self.GoogleProductRecord" />
+        </EntityContainer>
+      </Schema>
+    </ConceptualModels>
+    <Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CodeFirstDatabase" CdmEntityContainer="GoogleProductObjectContext">
+          <EntitySetMapping Name="GoogleProductRecords">
+            <EntityTypeMapping TypeName="SmartStore.GoogleMerchantCenter.Data.GoogleProductRecord">
+              <MappingFragment StoreEntitySet="GoogleProductRecord">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="Taxonomy" ColumnName="Taxonomy" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="AgeGroup" ColumnName="AgeGroup" />
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="Size" ColumnName="Size" />
+                <ScalarProperty Name="Material" ColumnName="Material" />
+                <ScalarProperty Name="Pattern" ColumnName="Pattern" />
+                <ScalarProperty Name="ItemGroupId" ColumnName="ItemGroupId" />
+                <ScalarProperty Name="IsTouched" ColumnName="IsTouched" />
+                <ScalarProperty Name="CreatedOnUtc" ColumnName="CreatedOnUtc" />
+                <ScalarProperty Name="UpdatedOnUtc" ColumnName="UpdatedOnUtc" />
+                <ScalarProperty Name="Export" ColumnName="Export" />
+                <ScalarProperty Name="Multipack" ColumnName="Multipack" />
+                <ScalarProperty Name="IsBundle" ColumnName="IsBundle" />
+                <ScalarProperty Name="IsAdult" ColumnName="IsAdult" />
+                <ScalarProperty Name="EnergyEfficiencyClass" ColumnName="EnergyEfficiencyClass" />
+                <ScalarProperty Name="CustomLabel0" ColumnName="CustomLabel0" />
+                <ScalarProperty Name="CustomLabel1" ColumnName="CustomLabel1" />
+                <ScalarProperty Name="CustomLabel2" ColumnName="CustomLabel2" />
+                <ScalarProperty Name="CustomLabel3" ColumnName="CustomLabel3" />
+                <ScalarProperty Name="CustomLabel4" ColumnName="CustomLabel4" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </Mappings>
+    <StorageModels>
+      <Schema Namespace="CodeFirstDatabaseSchema" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="GoogleProductRecord" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductId" Type="int" customannotation:Index="{ }" Nullable="false" />
+          <Property Name="Taxonomy" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Gender" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="AgeGroup" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Color" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Size" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Material" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Pattern" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="ItemGroupId" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="IsTouched" Type="bit" customannotation:Index="{ }" Nullable="false" />
+          <Property Name="CreatedOnUtc" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedOnUtc" Type="datetime" Nullable="false" />
+          <Property Name="Export" Type="bit" customannotation:Index="{ }" Nullable="false" />
+          <Property Name="Multipack" Type="int" Nullable="false" />
+          <Property Name="IsBundle" Type="bit" Nullable="true" />
+          <Property Name="IsAdult" Type="bit" Nullable="true" />
+          <Property Name="EnergyEfficiencyClass" Type="nvarchar" MaxLength="50" Nullable="true" />
+          <Property Name="CustomLabel0" Type="nvarchar" MaxLength="100" Nullable="true" />
+          <Property Name="CustomLabel1" Type="nvarchar" MaxLength="100" Nullable="true" />
+          <Property Name="CustomLabel2" Type="nvarchar" MaxLength="100" Nullable="true" />
+          <Property Name="CustomLabel3" Type="nvarchar" MaxLength="100" Nullable="true" />
+          <Property Name="CustomLabel4" Type="nvarchar" MaxLength="100" Nullable="true" />
+        </EntityType>
+        <EntityContainer Name="CodeFirstDatabase">
+          <EntitySet Name="GoogleProductRecord" EntityType="Self.GoogleProductRecord" Schema="dbo" Table="GoogleProduct" />
+        </EntityContainer>
+      </Schema>
+    </StorageModels>
+  </Runtime>
+  <Designer>
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="ProcessDependentTemplatesOnSave" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <Diagrams />
+  </Designer>
+</Edmx>

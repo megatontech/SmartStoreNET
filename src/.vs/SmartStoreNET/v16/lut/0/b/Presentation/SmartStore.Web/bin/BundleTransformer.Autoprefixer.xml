@@ -1,0 +1,511 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BundleTransformer.Autoprefixer</name>
+    </assembly>
+    <members>
+        <member name="T:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings">
+            <summary>
+            Configuration settings of Andrey Sitnik's Autoprefix CSS postprocessor
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Browsers">
+            <summary>
+            Gets a list of browser conditional expressions
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Cascade">
+            <summary>
+            Gets or sets a flag for whether to create nice visual cascade of prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Add">
+            <summary>
+            Gets or sets a flag for whether to add new prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Remove">
+            <summary>
+            Gets or sets a flag for whether to remove outdated prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Supports">
+            <summary>
+            Gets or sets a flag for whether to add prefixes for <code>@supports</code> parameters
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Flexbox">
+            <summary>
+            Gets or sets a flag for whether to add prefixes for flexbox properties.
+            With "no-2009" value Autoprefixer will add prefixes only for final and IE versions of specification.
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Grid">
+            <summary>
+            Gets or sets a flag for whether to add IE prefixes for Grid Layout properties
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.Stats">
+            <summary>
+            Gets or sets a virtual path to file, that contains custom usage statistics for
+            <code>&gt; 10% in my stats</code> browsers query
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings.JsEngine">
+            <summary>
+            Gets a configuration settings of JS engine
+            </summary>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Configuration.BrowserConditionalExpression">
+            <summary>
+            Browser conditional expression
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.BrowserConditionalExpression.ConditionalExpression">
+            <summary>
+            Gets or sets conditional expression
+            </summary>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Configuration.BrowserConditionalExpressionCollection">
+            <summary>
+            Collection of browser conditional expressions
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Configuration.BrowserConditionalExpressionCollection.CreateNewElement">
+            <summary>
+            Creates a new browser conditional expression
+            </summary>
+            <returns>Browser conditional expression</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Configuration.BrowserConditionalExpressionCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+            <summary>
+            Gets a key of the specified browser conditional expression
+            </summary>
+            <param name="element">Browser conditional expression</param>
+            <returns>Key</returns>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Configuration.BrowserConditionalExpressionCollection.Item(System.String)">
+            <summary>
+            Gets a browser conditional expression by conditional expression
+            </summary>
+            <param name="conditionalExpression">Conditional expression</param>
+            <returns>Browser conditional expression</returns>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Configuration.ConfigurationContextExtensions">
+            <summary>
+            Configuration context extensions
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Configuration.ConfigurationContextExtensions._autoprefixerConfig">
+            <summary>
+            Configuration settings of Andrey Sitnik's Autoprefix CSS postprocessor
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Configuration.ConfigurationContextExtensions.GetAutoprefixerSettings(BundleTransformer.Core.Configuration.IConfigurationContext)">
+            <summary>
+            Gets a Andrey Sitnik's Autoprefix CSS postprocessor configuration settings
+            </summary>
+            <param name="context">Configuration context</param>
+            <returns>Configuration settings of Andrey Sitnik's Autoprefix CSS postprocessor</returns>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions">
+            <summary>
+            CSS autoprefixing options
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Browsers">
+            <summary>
+            Gets or sets a list of browser conditional expressions
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Cascade">
+            <summary>
+            Gets or sets a flag for whether to create nice visual cascade of prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Add">
+            <summary>
+            Gets or sets a flag for whether to add new prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Remove">
+            <summary>
+            Gets or sets a flag for whether to remove outdated prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Supports">
+            <summary>
+            Gets or sets a flag for whether to add prefixes for <code>@supports</code> parameters
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Flexbox">
+            <summary>
+            Gets or sets a flag for whether to add prefixes for flexbox properties.
+            With "no-2009" value Autoprefixer will add prefixes only for final and IE versions of specification.
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Grid">
+            <summary>
+            Gets or sets a flag for whether to add IE prefixes for Grid Layout properties
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.Stats">
+            <summary>
+            Gets or sets a virtual path to file, that contains custom usage statistics for
+            <code>&gt; 10% in my stats</code> browsers query
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions.#ctor">
+            <summary>
+            Constructs a instance of the CSS autoprefixing options
+            </summary>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Internal.AutoprefixingResult">
+            <summary>
+            Autoprefixing result
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingResult.ProcessedContent">
+            <summary>
+            Gets or sets a processed CSS code
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.AutoprefixingResult.IncludedFilePaths">
+            <summary>
+            Gets or sets a list of included files
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.AutoprefixingResult.#ctor">
+            <summary>
+            Constructs a instance of the autoprefixing result
+            </summary>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService">
+            <summary>
+            Country statistics service
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService.AUTOPREFIXER_COUNTRY_STATISTICS_DIRECTORY_NAME">
+            <summary>
+            Name of directory, which contains a Autoprefixer country statistics
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService._countryCodes">
+            <summary>
+            Set of country codes for which there are statistics
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService._instance">
+            <summary>
+            Instance of country statistics service
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService.Instance">
+            <summary>
+            Gets a instance of country statistics service
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService.#ctor">
+            <summary>
+            Constructs a instance of country statistics service
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService.ContainsCountry(System.String)">
+            <summary>
+            Determines whether the statistics database contains the specified country
+            </summary>
+            <param name="countryCode">Two-letter country code</param>
+            <returns>true if the statistics database contains an country with the specified code;
+            otherwise, false</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CountryStatisticsService.GetStatisticsForCountry(System.String)">
+            <summary>
+            Gets a statistics for country
+            </summary>
+            <param name="countryCode">Two-letter country code</param>
+            <returns>Statistics for country</returns>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer">
+            <summary>
+            CSS autoprefixer
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.AUTOPREFIXER_LIBRARY_FILE_NAME">
+            <summary>
+            Name of file, which contains a Autoprefixer library
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.AUTOPREFIXER_HELPER_FILE_NAME">
+            <summary>
+            Name of file, which contains a Autoprefixer helper
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.AUTOPREFIXING_FUNCTION_CALL_TEMPLATE">
+            <summary>
+            Template of function call, which is responsible for autoprefixing
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.COUNTRY_STATISTICS_SERVICE_VARIABLE_NAME">
+            <summary>
+            Name of variable, which contains a country statistics service
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer._jsEngine">
+            <summary>
+            JS engine
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer._virtualFileSystemWrapper">
+            <summary>
+            Virtual file system wrapper
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer._options">
+            <summary>
+            Autoprefixing options
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer._optionsString">
+            <summary>
+            String representation of the autoprefixing options
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer._initializedFlag">
+            <summary>
+            Flag that CSS autoprefixer is initialized
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer._disposedFlag">
+            <summary>
+            Flag that object is destroyed
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.#ctor(System.Func{JavaScriptEngineSwitcher.Core.IJsEngine},BundleTransformer.Core.FileSystem.IVirtualFileSystemWrapper,BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions)">
+            <summary>
+            Constructs a instance of CSS autoprefixer
+            </summary>
+            <param name="createJsEngineInstance">Delegate that creates an instance of JS engine</param>
+            <param name="virtualFileSystemWrapper">Virtual file system wrapper</param>
+            <param name="options">Autoprefixing options</param>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.Initialize">
+            <summary>
+            Initializes CSS autoprefixer
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.Process(System.String,System.String)">
+            <summary>
+            Actualizes a vendor prefixes in CSS code by using Andrey Sitnik's Autoprefixer
+            </summary>
+            <param name="content">Text content of CSS asset</param>
+            <param name="path">Path to CSS asset</param>
+            <returns>Autoprefixing result</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.ConvertAutoprefixingOptionsToJson(BundleTransformer.Autoprefixer.Internal.AutoprefixingOptions)">
+            <summary>
+            Converts a autoprefixing options to JSON
+            </summary>
+            <param name="options">Autoprefixing options</param>
+            <returns>Autoprefixing options in JSON format</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.GetCustomStatisticsFromFile(System.String)">
+            <summary>
+            Gets a custom statistics from specified file
+            </summary>
+            <param name="path">Virtual path to file, that contains custom statistics</param>
+            <returns>Custom statistics in JSON format</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.GetIncludedFilePaths(System.String)">
+            <summary>
+            Gets a list of included files
+            </summary>
+            <param name="path">Virtual path to file, that contains custom statistics</param>
+            <returns>List of included files</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.FormatErrorDetails(Newtonsoft.Json.Linq.JToken,System.String,System.String)">
+            <summary>
+            Generates a detailed error message
+            </summary>
+            <param name="errorDetails">Error details</param>
+            <param name="sourceCode">Source code</param>
+            <param name="currentFilePath">Path to current CSS file</param>
+            <returns>Detailed error message</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixer.Dispose">
+            <summary>
+            Destroys object
+            </summary>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Internal.CssAutoprefixingException">
+            <summary>
+            The exception that is thrown when a autoprefixing of asset code by CSS autoprefixer is failed
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixingException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:BundleTransformer.Autoprefixer.Internal.CssAutoprefixingException"/> class
+            class with a specified error message
+            </summary>
+            <param name="message">The message that describes the error</param>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.CssAutoprefixingException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:BundleTransformer.Autoprefixer.Internal.CssAutoprefixingException"/> class
+            class with a specified error message and a reference to the inner exception that is the cause of this exception
+            </summary>
+            <param name="message">The error message that explains the reason for the exception</param>
+            <param name="innerException">The exception that is the cause of the current exception</param>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Internal.ResourceHelpers">
+            <summary>
+            Resource helpers
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.Internal.ResourceHelpers.RESOURCES_NAMESPACE">
+            <summary>
+            Namespace for resources
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Internal.ResourceHelpers.ResourcesNamespace">
+            <summary>
+            Gets a namespace for resources
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.Internal.ResourceHelpers.GetResourceName(System.String)">
+            <summary>
+            Gets a resource name
+            </summary>
+            <param name="fileName">File name</param>
+            <returns>Resource name</returns>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor">
+            <summary>
+            Postprocessor that actualizes a vendor prefixes in CSS code
+            by using Andrey Sitnik's Autoprefixer
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.POSTPROCESSOR_NAME">
+            <summary>
+            Name of postprocessor
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.CODE_TYPE">
+            <summary>
+            Name of code type
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor._createJsEngineInstance">
+            <summary>
+            Delegate that creates an instance of JS engine
+            </summary>
+        </member>
+        <member name="F:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor._virtualFileSystemWrapper">
+            <summary>
+            Virtual file system wrapper
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Browsers">
+            <summary>
+            Gets or sets a list of browser conditional expressions
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Cascade">
+            <summary>
+            Gets or sets a flag for whether to create nice visual cascade of prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Add">
+            <summary>
+            Gets or sets a flag for whether to add new prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Remove">
+            <summary>
+            Gets or sets a flag for whether to remove outdated prefixes
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Supports">
+            <summary>
+            Gets or sets a flag for whether to add prefixes for <code>@supports</code> parameters
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Flexbox">
+            <summary>
+            Gets or sets a flag for whether to add prefixes for flexbox properties.
+            With "no-2009" value Autoprefixer will add prefixes only for final and IE versions of specification.
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Grid">
+            <summary>
+            Gets or sets a flag for whether to add IE prefixes for Grid Layout properties
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.Stats">
+            <summary>
+            Gets or sets a virtual path to file, that contains custom usage statistics for
+            <code>&gt; 10% in my stats</code> browsers query
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.#ctor">
+            <summary>
+            Constructs a instance of Andrey Sitnik's Autoprefix CSS postprocessor
+            </summary>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.#ctor(System.Func{JavaScriptEngineSwitcher.Core.IJsEngine},BundleTransformer.Core.FileSystem.IVirtualFileSystemWrapper,BundleTransformer.Autoprefixer.Configuration.AutoprefixerSettings)">
+            <summary>
+            Constructs a instance of Andrey Sitnik's Autoprefix CSS postprocessor
+            </summary>
+            <param name="createJsEngineInstance">Delegate that creates an instance of JS engine</param>
+            <param name="virtualFileSystemWrapper">Virtual file system wrapper</param>
+            <param name="autoprefixerConfig">Configuration settings of Andrey Sitnik's Autoprefix CSS postprocessor</param>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.ParseFlexboxProperty(System.String)">
+            <summary>
+            Parses a string representation of the <code>Flexbox</code> property
+            </summary>
+            <param name="flexboxString">String representation of the <code>Flexbox</code> property</param>
+            <returns>Parsed value of the <code>Flexbox</code> property</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.PostProcess(BundleTransformer.Core.Assets.IAsset)">
+            <summary>
+            Actualizes a vendor prefixes in CSS asset by using Andrey Sitnik's Autoprefixer
+            </summary>
+            <param name="asset">CSS asset</param>
+            <returns>Processed CSS asset</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.PostProcess(System.Collections.Generic.IList{BundleTransformer.Core.Assets.IAsset})">
+            <summary>
+            Actualizes a vendor prefixes in CSS assets by using Andrey Sitnik's Autoprefixer
+            </summary>
+            <param name="assets">Set of CSS assets</param>
+            <returns>Set of processed CSS assets</returns>
+        </member>
+        <member name="M:BundleTransformer.Autoprefixer.PostProcessors.AutoprefixCssPostProcessor.CreateAutoprefixingOptions">
+            <summary>
+            Creates a autoprefixing options
+            </summary>
+            <returns>Autoprefixing options</returns>
+        </member>
+        <member name="T:BundleTransformer.Autoprefixer.Resources.Strings">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Resources.Strings.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Resources.Strings.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:BundleTransformer.Autoprefixer.Resources.Strings.PostProcessors_CountryStatisticsNotFound">
+            <summary>
+              Looks up a localized string similar to Could not find the statistics for country code &apos;{0}&apos;..
+            </summary>
+        </member>
+    </members>
+</doc>

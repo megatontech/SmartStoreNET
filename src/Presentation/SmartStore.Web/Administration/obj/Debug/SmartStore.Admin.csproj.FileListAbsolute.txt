@@ -1,0 +1,16 @@
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\bin\SmartStore.Admin.dll.config
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\bin\SmartStore.Admin.dll
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\bin\SmartStore.Admin.pdb
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.csprojAssemblyReference.cache
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.csproj.CoreCompileInputs.cache
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.csproj.CopyComplete
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.dll
+C:\Users\ZJ\Downloads\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.pdb
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\SmartStore.Admin.dll.config
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\SmartStore.Admin.dll
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\SmartStore.Admin.pdb
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.csprojAssemblyReference.cache
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.csproj.CoreCompileInputs.cache
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.csproj.CopyComplete
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.dll
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\Administration\obj\Debug\SmartStore.Admin.pdb

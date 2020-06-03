@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Edmx Version="3.0" xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <Runtime>
+    <ConceptualModels>
+      <Schema Namespace="SmartStore.ShippingByWeight.Data" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ShippingByWeightRecord" customannotation:ClrType="SmartStore.ShippingByWeight.Domain.ShippingByWeightRecord, SmartStore.ShippingByWeight, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StoreId" Type="Int32" Nullable="false" />
+          <Property Name="CountryId" Type="Int32" Nullable="false" />
+          <Property Name="Zip" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ShippingMethodId" Type="Int32" Nullable="false" />
+          <Property Name="From" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="To" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UsePercentage" Type="Boolean" Nullable="false" />
+          <Property Name="ShippingChargePercentage" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ShippingChargeAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="SmallQuantitySurcharge" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="SmallQuantityThreshold" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="ShippingByWeightObjectContext" customannotation:UseClrTypes="true">
+          <EntitySet Name="ShippingByWeightRecords" EntityType="Self.ShippingByWeightRecord" />
+        </EntityContainer>
+      </Schema>
+    </ConceptualModels>
+    <Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CodeFirstDatabase" CdmEntityContainer="ShippingByWeightObjectContext">
+          <EntitySetMapping Name="ShippingByWeightRecords">
+            <EntityTypeMapping TypeName="SmartStore.ShippingByWeight.Data.ShippingByWeightRecord">
+              <MappingFragment StoreEntitySet="ShippingByWeightRecord">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="StoreId" ColumnName="StoreId" />
+                <ScalarProperty Name="CountryId" ColumnName="CountryId" />
+                <ScalarProperty Name="Zip" ColumnName="Zip" />
+                <ScalarProperty Name="ShippingMethodId" ColumnName="ShippingMethodId" />
+                <ScalarProperty Name="From" ColumnName="From" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="UsePercentage" ColumnName="UsePercentage" />
+                <ScalarProperty Name="ShippingChargePercentage" ColumnName="ShippingChargePercentage" />
+                <ScalarProperty Name="ShippingChargeAmount" ColumnName="ShippingChargeAmount" />
+                <ScalarProperty Name="SmallQuantitySurcharge" ColumnName="SmallQuantitySurcharge" />
+                <ScalarProperty Name="SmallQuantityThreshold" ColumnName="SmallQuantityThreshold" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </Mappings>
+    <StorageModels>
+      <Schema Namespace="CodeFirstDatabaseSchema" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ShippingByWeightRecord" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StoreId" Type="int" Nullable="false" />
+          <Property Name="CountryId" Type="int" Nullable="false" />
+          <Property Name="Zip" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="ShippingMethodId" Type="int" Nullable="false" />
+          <Property Name="From" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="To" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UsePercentage" Type="bit" Nullable="false" />
+          <Property Name="ShippingChargePercentage" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ShippingChargeAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="SmallQuantitySurcharge" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="SmallQuantityThreshold" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="CodeFirstDatabase">
+          <EntitySet Name="ShippingByWeightRecord" EntityType="Self.ShippingByWeightRecord" Schema="dbo" Table="ShippingByWeight" />
+        </EntityContainer>
+      </Schema>
+    </StorageModels>
+  </Runtime>
+  <Designer>
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="ProcessDependentTemplatesOnSave" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <Diagrams />
+  </Designer>
+</Edmx>
