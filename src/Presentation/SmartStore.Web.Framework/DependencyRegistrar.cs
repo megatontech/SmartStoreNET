@@ -37,6 +37,7 @@ using SmartStore.Services.Affiliates;
 using SmartStore.Services.Authentication;
 using SmartStore.Services.Authentication.External;
 using SmartStore.Services.Blogs;
+using SmartStore.Services.Calc;
 using SmartStore.Services.Catalog;
 using SmartStore.Services.Catalog.Extensions;
 using SmartStore.Services.Catalog.Importer;
@@ -49,6 +50,7 @@ using SmartStore.Services.Customers.Importer;
 using SmartStore.Services.DataExchange;
 using SmartStore.Services.DataExchange.Export;
 using SmartStore.Services.DataExchange.Import;
+using SmartStore.Services.Declaration;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Discounts;
 using SmartStore.Services.Events;
@@ -77,6 +79,7 @@ using SmartStore.Services.Tasks;
 using SmartStore.Services.Tax;
 using SmartStore.Services.Themes;
 using SmartStore.Services.Topics;
+using SmartStore.Services.Wallet;
 using SmartStore.Templating;
 using SmartStore.Templating.Liquid;
 using SmartStore.Utilities;
@@ -230,6 +233,7 @@ namespace SmartStore.Web.Framework
 			builder.RegisterType<CheckoutAttributeService>().As<ICheckoutAttributeService>().InstancePerRequest();
 			builder.RegisterType<GiftCardService>().As<IGiftCardService>().InstancePerRequest();
 			builder.RegisterType<OrderService>().As<IOrderService>().InstancePerRequest();
+			builder.RegisterType<DeclarationOrderService>().As<IDeclarationOrderService>().InstancePerRequest();
 			builder.RegisterType<OrderReportService>().As<IOrderReportService>().InstancePerRequest();
 			builder.RegisterType<OrderProcessingService>().As<IOrderProcessingService>().InstancePerRequest();
 			builder.RegisterType<OrderTotalCalculationService>().As<IOrderTotalCalculationService>().InstancePerRequest();
@@ -273,6 +277,9 @@ namespace SmartStore.Web.Framework
 			builder.RegisterType<ExternalAuthorizer>().As<IExternalAuthorizer>().InstancePerRequest();
 			builder.RegisterType<OpenAuthenticationService>().As<IOpenAuthenticationService>().InstancePerRequest();
 
+			builder.RegisterType<WalletService>().As<IWalletService>().InstancePerRequest();
+			builder.RegisterType<CalcRewardService>().As<ICalcRewardService>().InstancePerRequest();
+			builder.RegisterType<DeclarationCapRuleService>().As<IDeclarationCapRuleService>().InstancePerRequest();
 			builder.RegisterType<CommonServices>().As<ICommonServices>().InstancePerRequest();
 		}
 

@@ -43,9 +43,9 @@ namespace SmartStore.Core.Domain.Catalog
 
         #endregion static
 
-        private ICollection<ProductCategory> _productCategories;
+        //private ICollection<ProductCategory> _productCategories;
         private ICollection<ProductPicture> _productPictures;
-        private ICollection<ProductReview> _productReviews;
+      //  private ICollection<ProductReview> _productReviews;
         //private ICollection<ProductSpecificationAttribute> _productSpecificationAttributes;
         //private ICollection<ProductVariantAttribute> _productVariantAttributes;
         //private ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
@@ -1027,15 +1027,15 @@ namespace SmartStore.Core.Domain.Catalog
             }
         }
 
-        /// <summary>
-        /// Gets or sets the collection of ProductCategory
-        /// </summary>
-        [DataMember]
-        public virtual ICollection<ProductCategory> ProductCategories
-        {
-            get { return _productCategories ?? (_productCategories = new HashSet<ProductCategory>()); }
-            protected set { _productCategories = value; }
-        }
+        ///// <summary>
+        ///// Gets or sets the collection of ProductCategory
+        ///// </summary>
+        //[DataMember]
+        //public virtual ICollection<ProductCategory> ProductCategories
+        //{
+        //    get { return _productCategories ?? (_productCategories = new HashSet<ProductCategory>()); }
+        //    protected set { _productCategories = value; }
+        //}
 
        
         /// <summary>
@@ -1048,45 +1048,45 @@ namespace SmartStore.Core.Domain.Catalog
             protected set { _productPictures = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the collection of product reviews
-        /// </summary>
-        public virtual ICollection<ProductReview> ProductReviews
-        {
-            get { return _productReviews ?? (_productReviews = new HashSet<ProductReview>()); }
-            protected set { _productReviews = value; }
-        }
+        ///// <summary>
+        ///// Gets or sets the collection of product reviews
+        ///// </summary>
+        //public virtual ICollection<ProductReview> ProductReviews
+        //{
+        //    get { return _productReviews ?? (_productReviews = new HashSet<ProductReview>()); }
+        //    protected set { _productReviews = value; }
+        //}
 
-  //      /// <summary>
-  //      /// Gets or sets the product specification attribute
-  //      /// </summary>
-		//[DataMember]
-  //      public virtual ICollection<ProductSpecificationAttribute> ProductSpecificationAttributes
-  //      {
-  //          get { return _productSpecificationAttributes ?? (_productSpecificationAttributes = new HashSet<ProductSpecificationAttribute>()); }
-  //          protected set { _productSpecificationAttributes = value; }
-  //      }
+        //      /// <summary>
+        //      /// Gets or sets the product specification attribute
+        //      /// </summary>
+        //[DataMember]
+        //      public virtual ICollection<ProductSpecificationAttribute> ProductSpecificationAttributes
+        //      {
+        //          get { return _productSpecificationAttributes ?? (_productSpecificationAttributes = new HashSet<ProductSpecificationAttribute>()); }
+        //          protected set { _productSpecificationAttributes = value; }
+        //      }
 
 
-  //      /// <summary>
-  //      /// Gets or sets the product attributes
-  //      /// </summary>
-  //      [DataMember]
-  //      public virtual ICollection<ProductVariantAttribute> ProductVariantAttributes
-  //      {
-  //          get { return _productVariantAttributes ?? (_productVariantAttributes = new HashSet<ProductVariantAttribute>()); }
-  //          protected set { _productVariantAttributes = value; }
-  //      }
+        //      /// <summary>
+        //      /// Gets or sets the product attributes
+        //      /// </summary>
+        //      [DataMember]
+        //      public virtual ICollection<ProductVariantAttribute> ProductVariantAttributes
+        //      {
+        //          get { return _productVariantAttributes ?? (_productVariantAttributes = new HashSet<ProductVariantAttribute>()); }
+        //          protected set { _productVariantAttributes = value; }
+        //      }
 
-  //      /// <summary>
-  //      /// Gets or sets the product attribute combinations
-  //      /// </summary>
-  //      [DataMember]
-  //      public virtual ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations
-  //      {
-  //          get { return _productVariantAttributeCombinations ?? (_productVariantAttributeCombinations = new List<ProductVariantAttributeCombination>()); }
-  //          protected set { _productVariantAttributeCombinations = value; }
-  //      }
+        //      /// <summary>
+        //      /// Gets or sets the product attribute combinations
+        //      /// </summary>
+        //      [DataMember]
+        //      public virtual ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations
+        //      {
+        //          get { return _productVariantAttributeCombinations ?? (_productVariantAttributeCombinations = new List<ProductVariantAttributeCombination>()); }
+        //          protected set { _productVariantAttributeCombinations = value; }
+        //      }
 
         /// <summary>
         /// Gets or sets the tier prices
@@ -1098,6 +1098,6 @@ namespace SmartStore.Core.Domain.Catalog
             protected set { _tierPrices = value; }
         }
 
-       
+
     }
 }

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using SmartStore.Admin.Models.Common;
 using SmartStore.Admin.Models.Customers;
 using SmartStore.Admin.Models.ShoppingCart;
+using SmartStore.Collections;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
@@ -23,6 +24,7 @@ using SmartStore.Core.Html;
 using SmartStore.Core.Logging;
 using SmartStore.Services.Affiliates;
 using SmartStore.Services.Authentication.External;
+using SmartStore.Services.Calc;
 using SmartStore.Services.Catalog;
 using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
@@ -85,12 +87,14 @@ namespace SmartStore.Admin.Controllers
 		private readonly IAffiliateService _affiliateService;
 		private readonly IMessageModelProvider _messageModelProvider;
 		private readonly Lazy<IGdprTool> _gdprTool;
+        
+        //private readonly CalcRewardService _CalcRewardService;
 
-		#endregion
+        #endregion
 
-		#region Constructors
+        #region Constructors
 
-		public CustomerController(
+        public CustomerController(
 			ICustomerService customerService,
 			INewsLetterSubscriptionService newsLetterSubscriptionService,
             IGenericAttributeService genericAttributeService,
@@ -152,7 +156,8 @@ namespace SmartStore.Admin.Controllers
 			_affiliateService = affiliateService;
 			_messageModelProvider = messageModelProvider;
 			_gdprTool = gdprTool;
-		}
+
+        }
 
         #endregion
 
@@ -451,7 +456,7 @@ namespace SmartStore.Admin.Controllers
         {
             return RedirectToAction("List");
         }
-
+        
         public ActionResult List()
         {
 			if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
@@ -484,7 +489,7 @@ namespace SmartStore.Admin.Controllers
 			};
 
 			var customers = _customerService.SearchCustomers(q);
-
+            
             // Customer list.
             listModel.Customers = new GridModel<CustomerModel>
             {

@@ -1,73 +1,125 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.Serialization;
+using SmartStore.Collections;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Forums;
 using SmartStore.Core.Domain.Orders;
 
 namespace SmartStore.Core.Domain.Customers
 {
-    /// <summary>
-    /// Represents a customer
-    /// </summary>
-    [DataContract]
+	/// <summary>
+	/// Represents a customer
+	/// </summary>
+	[DataContract]
 	public partial class Customer : BaseEntity, ISoftDeletable
-    {
-        private ICollection<ExternalAuthenticationRecord> _externalAuthenticationRecords;
-        private ICollection<CustomerContent> _customerContent;
-        private ICollection<CustomerRole> _customerRoles;
-        private ICollection<ShoppingCartItem> _shoppingCartItems;
-        private ICollection<Order> _orders;
-        private ICollection<RewardPointsHistory> _rewardPointsHistory;
+	{
+		private ICollection<ExternalAuthenticationRecord> _externalAuthenticationRecords;
+		private ICollection<CustomerContent> _customerContent;
+		private ICollection<CustomerRole> _customerRoles;
+		private ICollection<ShoppingCartItem> _shoppingCartItems;
+		private ICollection<Order> _orders;
+		private ICollection<RewardPointsHistory> _rewardPointsHistory;
 		private ICollection<WalletHistory> _walletHistory;
 		private ICollection<ReturnRequest> _returnRequests;
-        private ICollection<Address> _addresses;
-        private ICollection<ForumTopic> _forumTopics;
-        private ICollection<ForumPost> _forumPosts;
+		private ICollection<Address> _addresses;
+		private ICollection<ForumTopic> _forumTopics;
+		private ICollection<ForumPost> _forumPosts;
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
-        public Customer()
-        {
-            this.CustomerGuid = Guid.NewGuid();
-            this.PasswordFormat = PasswordFormat.Clear;
-        }
+		public Customer()
+		{
+			this.CustomerGuid = Guid.NewGuid();
+			this.PasswordFormat = PasswordFormat.Clear;
+		}
 
-        /// <summary>
-        /// Gets or sets the customer Guid
-        /// </summary>
-        [DataMember]
-        public Guid CustomerGuid { get; set; }
+		/// <summary>
+		/// Gets or sets the customer Guid
+		/// </summary>
+		[DataMember]
+		public Guid CustomerGuid { get; set; }
 
 		/// <summary>
 		/// Gets or sets the username
 		/// </summary>
-        [DataMember]
-        public string Username { get; set; }
+		[DataMember]
+		public string Username { get; set; }
 
 		/// <summary>
 		/// Gets or sets the email
 		/// </summary>
-        [DataMember]
-        public string Email { get; set; }
+		[DataMember]
+		public string Email { get; set; }
 
 		/// <summary>
 		/// Gets or sets the password
 		/// </summary>
-        public string Password { get; set; }
+		public string Password { get; set; }
 
 		/// <summary>
 		/// Gets or sets the password format
 		/// </summary>
-        public int PasswordFormatId { get; set; }
+		public int PasswordFormatId { get; set; }
+		#region 分红
+		public decimal SelfTotal { get; set; }
+		/// <summary>
+		/// 下面所有的线数
+		/// </summary>
+		public int SubLines{get;set;}
+		/// <summary>
+		/// 活跃线数
+		/// </summary>
+		public int ActiveLines { get;set;}
+		/// <summary>
+		/// 封顶线数
+		/// </summary>
+		public int CapLines { get;set; }
+		/// <summary>
+		/// 封顶钱数
+		/// </summary>
+		public decimal CapLinesTotal { get; set; }
+		
+		/// <summary>
+		/// 每日贡献值点数
+		/// </summary>
+		public float TotalPoints { get; set; }
+		/// <summary>
+		/// 每日贡献值价值商城利润分红
+		/// </summary>
+		public decimal TotalPointsValue2 { get; set; }
+		/// <summary>
+		/// 每日贡献值价值商城利润分红
+		/// </summary>
+		public decimal TotalPointsValue3 { get; set; }
+		/// <summary>
+		/// 是否有下级
+		/// </summary>
+		public bool HasChild { get; set; }
+		/// <summary>
+		/// 下属节点
+		/// </summary>
+		public TreeNode<Customer> ChildNode { get; set; }
+		/// <summary>
+		/// 每日下线所有业绩
+		/// </summary>
+		public Dictionary<Guid, decimal> LineTotalpairs { get; set; }
+		/// <summary>
+		/// 每日下线直接业绩（不计算）
+		/// </summary>
+		public Dictionary<Guid, decimal> LineDirectpairs { get; set; }
+		#endregion
+
+
 
 		/// <summary>
 		/// Gets or sets the password format
 		/// </summary>
-        public PasswordFormat PasswordFormat
+		public PasswordFormat PasswordFormat
         {
             get { return (PasswordFormat)PasswordFormatId; }
             set { this.PasswordFormatId = (int)value; }
