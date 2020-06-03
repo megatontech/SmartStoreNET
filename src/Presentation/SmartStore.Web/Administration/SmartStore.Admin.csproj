@@ -655,6 +655,30 @@
     <Content Include="Views\DeclarationProduct\ProductAttributeValueCreatePopup.cshtml" />
     <Content Include="Views\DeclarationProduct\ProductAttributeValueEditPopup.cshtml" />
     <Content Include="Views\DeclarationProduct\ProductTags.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_AutoUpdateOrderItem.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_Edit.BillingAndShipment.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_Edit.Info.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_Edit.OrderNotes.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_Edit.Products.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_ProductAddAttributes.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_ProductAddGiftCardInfo.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\AddProductToOrder.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\AddProductToOrderDetails.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\AddressEdit.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\AddShipment.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\BestsellersBriefReportByAmount.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\BestsellersBriefReportByQuantity.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\BestsellersReport.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\Edit.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\List.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\NeverSoldReport.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\OrderAverageReport.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\OrderIncompleteReport.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\PartiallyRefundOrderPopup.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\ShipmentDetails.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\ShipmentDetails.Print.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\ShipmentList.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\UploadLicenseFilePopup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />
@@ -1238,7 +1262,6 @@
     <Folder Include="Views\DeclarationBalanceOverview\" />
     <Folder Include="Views\DeclarationControlcenter\" />
     <Folder Include="Views\DeclarationCustomOverview\" />
-    <Folder Include="Views\DeclarationFinaduit\" />
     <Folder Include="Views\DeclarationFinwithdraladuit\" />
     <Folder Include="Views\DeclarationParamControl\" />
     <Folder Include="Views\DeclarationProductOverview\" />

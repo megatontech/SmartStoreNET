@@ -148,11 +148,13 @@
     <Compile Include="Mapping\DataExchange\ImportProfileMap.cs" />
     <Compile Include="Mapping\DataExchange\SyncMappingMap.cs" />
     <Compile Include="Mapping\DataExchange\ExportDeploymentMap.cs" />
+    <Compile Include="Mapping\Declaration\DeclarationCapRuleMap.cs" />
     <Compile Include="Mapping\Directory\QuantityUnitMap.cs" />
     <Compile Include="Mapping\DataExchange\ExportProfileMap.cs" />
     <Compile Include="Mapping\Forums\ForumPostVoteMap.cs" />
     <Compile Include="Mapping\Media\MediaStorageMap.cs" />
     <Compile Include="Mapping\Messages\QueuedEmailAttachmentMap.cs" />
+    <Compile Include="Mapping\Orders\DeclarationOrderMap.cs" />
     <Compile Include="Mapping\Payments\PaymentMethodMap.cs" />
     <Compile Include="Mapping\Tasks\ScheduleTaskHistoryMap.cs" />
     <Compile Include="Migrations\201403112331027_Initial.cs" />

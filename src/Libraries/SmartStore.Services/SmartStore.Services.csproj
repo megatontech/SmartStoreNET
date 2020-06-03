@@ -188,6 +188,8 @@
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
     <Compile Include="Blogs\BlogMessageFactoryExtensions.cs" />
+    <Compile Include="Calc\CalcRewardService.cs" />
+    <Compile Include="Calc\ICalcRewardService.cs" />
     <Compile Include="Catalog\CategoryTreeChangeHandler.cs" />
     <Compile Include="Catalog\CatalogMessageFactoryExtensions.cs" />
     <Compile Include="Catalog\Extensions\ProductUrlHelper.cs" />
@@ -288,6 +290,8 @@
     <Compile Include="DataExchange\Export\ExportFeaturesAttribute.cs" />
     <Compile Include="DataExchange\Export\ExportDataSegmenter.cs" />
     <Compile Include="DataExchange\Export\DataExportTask.cs" />
+    <Compile Include="Declaration\DeclarationCapRuleService.cs" />
+    <Compile Include="Declaration\IDeclarationCapRuleService.cs" />
     <Compile Include="Directory\GeoCountryLookup.cs" />
     <Compile Include="Directory\QuantityUnitService.cs" />
     <Compile Include="Directory\IQuantityUnitService.cs" />
@@ -348,7 +352,9 @@
     <Compile Include="Messages\CreateAttachmentsConsumer.cs" />
     <Compile Include="News\NewsMessageFactoryExtensions.cs" />
     <Compile Include="Orders\AddToCartContext.cs" />
+    <Compile Include="Orders\IDeclarationOrderService.cs" />
     <Compile Include="Orders\OrderMessageFactoryExtensions.cs" />
+    <Compile Include="Orders\DeclarationOrderService.cs" />
     <Compile Include="Orders\ShoppingCartTotal.cs" />
     <Compile Include="Payments\CapturePaymentHook.cs" />
     <Compile Include="Payments\IPaymentMethodFilter.cs" />
@@ -667,6 +673,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration\SettingService.cs" />
     <Compile Include="Catalog\SpecificationAttributeService.cs" />
+    <Compile Include="Wallet\IWalletService.cs" />
+    <Compile Include="Wallet\WalletService.cs" />
     <Compile Include="Web References\EuropaCheckVatService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
