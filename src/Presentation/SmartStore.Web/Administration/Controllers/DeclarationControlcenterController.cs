@@ -1,5 +1,6 @@
 ﻿using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Core.Domain.Wallet;
 using SmartStore.Services.Calc;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Orders;
@@ -110,12 +111,12 @@ namespace SmartStore.Admin.Controllers
         {
             Customer customer = _CustomerService.GetCustomerById(33);
             DeclarationOrder order = _DeclarationOrder.GetOrderById(13);
-            _CalcRewardService.UpdateRealtimeData();
-            _CalcRewardService.CalcRewardOne(customer, order);
-            _CalcRewardService.CalcRewardTwo(1400M);
-            _CalcRewardService.CalcRewardThree(500M);
-            _CalcRewardService.CalcRewardFour(100M);
-            return View();
+            DailyTotalContribution model = _CalcRewardService.UpdateRealtimeData();
+            //_CalcRewardService.CalcRewardOne(customer, order);
+            //_CalcRewardService.CalcRewardTwo(1400M);
+            //_CalcRewardService.CalcRewardThree(500M);
+            //_CalcRewardService.CalcRewardFour(100M);
+            return View(model);
         }
 
         #endregion Public Methods

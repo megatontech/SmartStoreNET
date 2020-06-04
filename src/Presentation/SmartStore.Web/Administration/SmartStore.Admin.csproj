@@ -403,6 +403,8 @@
     <Compile Include="Models\Catalog\ProductModel.cs" />
     <Compile Include="Models\Messages\QueuedEmailModel.cs" />
     <Compile Include="Models\Settings\TaxSettingsModel.cs" />
+    <Compile Include="Models\Wallet\DailyTotalContributionModel.cs" />
+    <Compile Include="Models\Wallet\DeclarationCalcRuleModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

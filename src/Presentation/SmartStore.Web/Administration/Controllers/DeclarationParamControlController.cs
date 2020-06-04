@@ -1,4 +1,6 @@
-﻿using SmartStore.Web.Framework.Controllers;
+﻿using SmartStore.Core.Domain.Wallet;
+using SmartStore.Services.Wallet;
+using SmartStore.Web.Framework.Controllers;
 using System.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -8,6 +10,14 @@ namespace SmartStore.Admin.Controllers
     /// </summary>
     public class DeclarationParamControlController : AdminControllerBase
     {
+        private readonly IDeclarationCalcRuleService _calcruleService;
+        private readonly DeclarationCalcRule _calcrule;
+
+        public DeclarationParamControlController(IDeclarationCalcRuleService calcruleService)
+        {
+            _calcruleService = calcruleService;
+            _calcrule = _calcruleService.GetDeclarationCalcRule();
+        }
         #region Public Methods
 
         // GET: DeclarationParamControl/Create
@@ -61,9 +71,9 @@ namespace SmartStore.Admin.Controllers
         }
 
         // GET: DeclarationParamControl/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit()
         {
-            return View();
+            return View(_calcrule);
         }
 
         // POST: DeclarationParamControl/Edit/5
@@ -85,7 +95,7 @@ namespace SmartStore.Admin.Controllers
         // GET: DeclarationParamControl
         public ActionResult Index()
         {
-            return View();
+            return View("edit",_calcrule);
         }
 
         #endregion Public Methods

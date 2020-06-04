@@ -92,12 +92,12 @@ namespace SmartStore.Core.Domain.Wallet
         [DataMember]
         public string Comment { get; set; }
         /// <summary>
-        /// 发放时间
+        /// 
         /// </summary>
         [DataMember]
         public DateTime CreateTime { get; set; }
         /// <summary>
-        /// 发放开始时间
+        /// 
         /// </summary>
         [DataMember]
         public DateTime UpdateTime { get; set; }

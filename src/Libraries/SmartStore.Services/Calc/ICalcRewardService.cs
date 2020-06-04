@@ -1,6 +1,7 @@
 ﻿using SmartStore.Collections;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Core.Domain.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace SmartStore.Services.Calc
         /// <summary>
         /// 实时更新
         /// </summary>
-        public void UpdateRealtimeData();
+        public DailyTotalContribution UpdateRealtimeData();
         /// <summary>
         /// 直推奖
         /// </summary>

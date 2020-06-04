@@ -1,4 +1,7 @@
-﻿@{
+﻿@model DailyTotalContribution
+@using SmartStore.Core.Domain.Wallet;
+@using Telerik.Web.Mvc.UI;
+@{
     ViewBag.Title = T("Admin.Dashboard").Text;
 }
 
@@ -10,34 +13,55 @@
 </div>
 
 <div class="dashboard">
-	@{ Html.RenderWidget("admin_dashboard_top"); }
+    @{ Html.RenderWidget("admin_dashboard_top"); }
 
-	<div class="row">
-		<div class="col-lg-9 col-xl-10">
-			@{ Html.RenderAction("OrderAverageReport", "Order"); }
-			<div class="row">
-				<div class="col-xl-6">
-					@{ Html.RenderAction("BestsellersBriefReportByQuantity", "Order"); }
-				</div>
-				<div class="col-xl-6">
-					@{ Html.RenderAction("BestsellersBriefReportByAmount", "Order"); }
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-xl-6">
-					@*@{ Html.RenderAction("ReportRegisteredCustomers", "Customer"); }*@
-				</div>
-				<div class="col-xl-6">
-					@{ Html.RenderAction("OrderIncompleteReport", "Order"); }
-				</div>
-			</div>
-		</div>
+    <div class="row">
+        <div class="col-lg-9 col-xl-10">
 
-		<div class="col-lg-3 col-xl-2">
-			@*@{ Html.RenderAction("MarketplaceFeed"); }*@
-		</div>
-	</div>
+            <div class="stats-today row mb-4">
+                <div class="col">
+                    <h1 class="stats-today-title display-4 m-0">@T("Admin.SalesReport.Average.SumTodayOrders")</h1>
+                </div>
 
-	@{ Html.RenderWidget("admin_dashboard_bottom"); }
+                <div class='col-auto stats-today-item ml-auto" )'>
+                    <div class="stats-today-item-label">总业绩</div>
+                    <div class="stats-today-item-value active" )">
+                        @Model.TotalValue.ToString("F2")
+                    </div>
+                </div>
+                <div class='col-auto stats-today-item")'>
+                    <div class="stats-today-item-label">贡献值个数</div>
+                    <div class="stats-today-item-value active" )">@Model.ContributionValue.ToString("F2")</div>
+                </div>
+                <div class='col-auto stats-today-item")'>
+                    <div class="stats-today-item-label">分红金额</div>
+                    <div class="stats-today-item-value active" )">@Model.DecValue.ToString("F2")</div>
+                </div>
+            </div>
+            @*@{ Html.RenderAction("OrderAverageReport", "Order"); }*@
+            <div class="row">
+                <div class="col-xl-6">
+                    @*@{ Html.RenderAction("BestsellersBriefReportByQuantity", "Order"); }*@
+                </div>
+                <div class="col-xl-6">
+                    @*@{ Html.RenderAction("BestsellersBriefReportByAmount", "Order"); }*@
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-6">
+                    @*@{ Html.RenderAction("ReportRegisteredCustomers", "Customer"); }*@
+                </div>
+                <div class="col-xl-6">
+                    @*@{ Html.RenderAction("OrderIncompleteReport", "Order"); }*@
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-xl-2">
+            @*@{ Html.RenderAction("MarketplaceFeed"); }*@
+        </div>
+    </div>
+
+    @{ Html.RenderWidget("admin_dashboard_bottom"); }
 </div>
 

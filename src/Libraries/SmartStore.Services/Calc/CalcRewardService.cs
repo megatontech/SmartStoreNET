@@ -46,7 +46,7 @@ namespace SmartStore.Services.Calc
 
         #endregion Public Constructors
         #region 实时更新数据
-        public void UpdateRealtimeData() 
+        public DailyTotalContribution UpdateRealtimeData() 
         {
             List<Customer> allCustomer = _CustomerService.BuildCurrentTree();
             foreach (var item in allCustomer)
@@ -95,6 +95,7 @@ namespace SmartStore.Services.Calc
                 customerContribution.CountTotalValue = pair.Sum(x => x.Value);
                 _customerContributeService.Update(customerContribution);
             }
+            return totalContribution;
         }
         #endregion
         #region 发钱算法
