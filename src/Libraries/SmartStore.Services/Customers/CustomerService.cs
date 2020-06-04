@@ -764,7 +764,27 @@ namespace SmartStore.Services.Customers
 
 			return map;
 		}
-
+		public List<Customer> BuildAllTreeWithoutOrder()
+		{
+			List<Customer> tree = new List<Customer>();
+			var query = from c in IncludeShoppingCart(_customerRepository.Table)
+						join d in _declarationOrderRepository.Table on c.Id equals d.CustomerId into custom
+						orderby c.Id
+						where c.IsCustomer == true
+						select c;
+			var yestoday = DateTime.Now.Date.AddDays(-1);
+			var today = DateTime.Now.Date;
+			var dorder = from d in _declarationOrderRepository.Table
+						 where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
+						 select d;
+			tree = query.ToList();
+			foreach (var item in tree)
+			{
+				item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
+			}
+			//tree.AddRange(query);
+			return tree;
+		}
 		public List<Customer> BuildTree()
 		{
 			List<Customer> tree = new List<Customer>();

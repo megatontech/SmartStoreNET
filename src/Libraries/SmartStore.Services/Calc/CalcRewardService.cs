@@ -74,8 +74,9 @@ namespace SmartStore.Services.Calc
         /// <param name="treeNode">下单人所属的树</param>
         /// <param name="customer">下单人</param>
         /// <param name="order">订单</param>
-        public void CalcRewardOne(List<Customer> treeNode, Customer customer, DeclarationOrder order)
+        public void CalcRewardOne(Customer customer, DeclarationOrder order)
         {
+            List<Customer> treeNode = _CustomerService.BuildAllTreeWithoutOrder();
             //直接上级orderAmount*15%
             var customer1 = treeNode.Where(x => x.CustomerGuid == customer.ParentCustomerGuid).FirstOrDefault();
             var reward01 = Math.Round(order.OrderTotal * (decimal)0.15, 2);

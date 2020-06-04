@@ -1,4 +1,8 @@
-﻿using SmartStore.Services.Calc;
+﻿using SmartStore.Core.Domain.Customers;
+using SmartStore.Core.Domain.Orders;
+using SmartStore.Services.Calc;
+using SmartStore.Services.Customers;
+using SmartStore.Services.Orders;
 using SmartStore.Web.Framework.Controllers;
 using System.Web.Mvc;
 
@@ -9,14 +13,18 @@ namespace SmartStore.Admin.Controllers
         #region Private Fields
 
         private readonly ICalcRewardService _CalcRewardService;
-
+        private readonly ICustomerService _CustomerService;
+        private readonly IDeclarationOrderService _DeclarationOrder;
+        
         #endregion Private Fields
 
         #region Public Constructors
 
-        public DeclarationControlcenterController(ICalcRewardService calcRewardService)
+        public DeclarationControlcenterController(ICalcRewardService calcRewardService, ICustomerService customerService, IDeclarationOrderService declarationOrder)
         {
             _CalcRewardService = calcRewardService;
+            _CustomerService = customerService;
+            _DeclarationOrder = declarationOrder;
         }
 
         #endregion Public Constructors
@@ -100,7 +108,12 @@ namespace SmartStore.Admin.Controllers
         // GET: DeclarationControlcenter
         public ActionResult Index()
         {
+            Customer customer = _CustomerService.GetCustomerById(33);
+            DeclarationOrder order = _DeclarationOrder.GetOrderById(1);
+            _CalcRewardService.CalcRewardOne(customer, order);
             _CalcRewardService.CalcRewardTwo(1400M);
+            _CalcRewardService.CalcRewardThree(500M);
+            _CalcRewardService.CalcRewardFour(100M);
             return View();
         }
 
