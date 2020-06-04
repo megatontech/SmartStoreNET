@@ -123,4 +123,3 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Tools\SmartStore.Web
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Tools\SmartStore.WebApi.Client\obj\Debug\SmartStore.WebApi.Client.csproj.CopyComplete
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Tools\SmartStore.WebApi.Client\obj\Debug\SmartStoreNetWebApiClient.exe
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Tools\SmartStore.WebApi.Client\obj\Debug\SmartStoreNetWebApiClient.pdb
-C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Tools\SmartStore.WebApi.Client\obj\Debug\SmartStore.WebApi.Client.csprojAssemblyReference.cache
