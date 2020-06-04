@@ -157,6 +157,15 @@
     <Compile Include="Mapping\Orders\DeclarationOrderMap.cs" />
     <Compile Include="Mapping\Payments\PaymentMethodMap.cs" />
     <Compile Include="Mapping\Tasks\ScheduleTaskHistoryMap.cs" />
+    <Compile Include="Mapping\Wallet\CustomerPointsTotal.cs" />
+    <Compile Include="Mapping\Wallet\DailyCustomerContributionDetail.cs" />
+    <Compile Include="Mapping\Wallet\DailyTotalContribution.cs" />
+    <Compile Include="Mapping\Wallet\DailyTotalContributionDetail.cs" />
+    <Compile Include="Mapping\Wallet\LuckMoney.cs" />
+    <Compile Include="Mapping\Wallet\WithdrawalApply.cs" />
+    <Compile Include="Mapping\Wallet\WithdrawalDetail.cs" />
+    <Compile Include="Mapping\Wallet\WithdrawalTotal.cs" />
+    <Compile Include="Mapping\Wallet\CustomerPointsDetail.cs" />
     <Compile Include="Migrations\201403112331027_Initial.cs" />
     <Compile Include="Migrations\201403112331027_Initial.Designer.cs">
       <DependentUpon>201403112331027_Initial.cs</DependentUpon>
@@ -1242,9 +1251,7 @@
   <ItemGroup>
     <Content Include="Caching\Credits.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mapping\Wallet\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

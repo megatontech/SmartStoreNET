@@ -283,6 +283,15 @@ namespace SmartStore.Web.Framework
 			//∑‚∂•πÊ‘Ú
 			builder.RegisterType<DeclarationCapRuleService>().As<IDeclarationCapRuleService>().InstancePerRequest();
 			//
+			builder.RegisterType<WithdrawalTotalService>().As<IWithdrawalTotalService>().InstancePerRequest();
+			builder.RegisterType<WithdrawalDetailService>().As<IWithdrawalDetailService>().InstancePerRequest();
+			builder.RegisterType<WithdrawalApplyService>().As<IWithdrawalApplyService>().InstancePerRequest();
+			builder.RegisterType<LuckMoneyService>().As<ILuckMoneyService>().InstancePerRequest();
+			builder.RegisterType<DailyTotalContributionService>().As<IDailyTotalContributionService>().InstancePerRequest();
+			builder.RegisterType<DailyTotalContributionDetailService>().As<IDailyTotalContributionDetailService>().InstancePerRequest();
+			builder.RegisterType<DailyCustomerContributionDetailService>().As<IDailyCustomerContributionDetailService>().InstancePerRequest();
+			builder.RegisterType<CustomerPointsTotalService>().As<ICustomerPointsTotalService>().InstancePerRequest();
+			builder.RegisterType<CustomerPointsDetailService>().As<ICustomerPointsDetailService>().InstancePerRequest();
 
 			builder.RegisterType<CommonServices>().As<ICommonServices>().InstancePerRequest();
 		}

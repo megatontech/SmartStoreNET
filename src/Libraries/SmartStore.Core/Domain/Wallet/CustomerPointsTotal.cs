@@ -23,6 +23,26 @@ namespace SmartStore.Core.Domain.Wallet
     public partial class CustomerPointsTotal : BaseEntity, ILocalizedEntity, ISlugSupported
     {
         /// <summary>
+        /// 客户
+        /// </summary>
+        [DataMember]
+        public int Customer { get; set; }
+        /// <summary>
+        /// 客户id
+        /// </summary>
+        [DataMember]
+        public Guid CustomerID { get; set; }
+        /// <summary>
+        /// 积分数
+        /// </summary>
+        [DataMember]
+        public decimal Amount { get; set; }
+        /// <summary>
+        /// 最后更新时间
+        /// </summary>
+        [DataMember]
+        public DateTime UpdateTime { get; set; }
+        /// <summary>
         /// 是否参与统计
         /// </summary>
         [DataMember]

@@ -21,6 +21,36 @@ namespace SmartStore.Core.Domain.Wallet
     public partial class DailyTotalContribution : BaseEntity, ILocalizedEntity, ISlugSupported
     {
         /// <summary>
+        /// 总业绩
+        /// </summary>
+        [DataMember]
+        public decimal TotalValue { get; set; }
+        /// <summary>
+        /// 贡献值
+        /// </summary>
+        [DataMember]
+        public decimal ContributionValue { get; set; }
+        /// <summary>
+        /// 分红金额
+        /// </summary>
+        [DataMember]
+        public decimal DecValue { get; set; }
+        /// <summary>
+        /// 日期（每天00：00）
+        /// </summary>
+        [DataMember]
+        public DateTime ContributionTime { get; set; }
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        [DataMember]
+        public DateTime CreateTime { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        [DataMember]
+        public DateTime UpdateTime { get; set; }
+        /// <summary>
         /// 是否参与统计
         /// </summary>
         [DataMember]
