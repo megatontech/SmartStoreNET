@@ -109,7 +109,8 @@ namespace SmartStore.Admin.Controllers
         public ActionResult Index()
         {
             Customer customer = _CustomerService.GetCustomerById(33);
-            DeclarationOrder order = _DeclarationOrder.GetOrderById(1);
+            DeclarationOrder order = _DeclarationOrder.GetOrderById(13);
+            _CalcRewardService.UpdateRealtimeData();
             _CalcRewardService.CalcRewardOne(customer, order);
             _CalcRewardService.CalcRewardTwo(1400M);
             _CalcRewardService.CalcRewardThree(500M);

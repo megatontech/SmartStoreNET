@@ -157,6 +157,7 @@
     <Compile Include="Mapping\Orders\DeclarationOrderMap.cs" />
     <Compile Include="Mapping\Payments\PaymentMethodMap.cs" />
     <Compile Include="Mapping\Tasks\ScheduleTaskHistoryMap.cs" />
+    <Compile Include="Mapping\Wallet\DeclarationCalcRule.cs" />
     <Compile Include="Mapping\Wallet\CustomerPointsTotal.cs" />
     <Compile Include="Mapping\Wallet\DailyCustomerContributionDetail.cs" />
     <Compile Include="Mapping\Wallet\DailyTotalContribution.cs" />

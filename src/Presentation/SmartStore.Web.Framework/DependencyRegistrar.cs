@@ -292,6 +292,8 @@ namespace SmartStore.Web.Framework
 			builder.RegisterType<DailyCustomerContributionDetailService>().As<IDailyCustomerContributionDetailService>().InstancePerRequest();
 			builder.RegisterType<CustomerPointsTotalService>().As<ICustomerPointsTotalService>().InstancePerRequest();
 			builder.RegisterType<CustomerPointsDetailService>().As<ICustomerPointsDetailService>().InstancePerRequest();
+			//º∆À„πÊ‘Ú
+			builder.RegisterType<DeclarationCalcRuleService>().As<IDeclarationCalcRuleService>().InstancePerRequest();
 
 			builder.RegisterType<CommonServices>().As<ICommonServices>().InstancePerRequest();
 		}

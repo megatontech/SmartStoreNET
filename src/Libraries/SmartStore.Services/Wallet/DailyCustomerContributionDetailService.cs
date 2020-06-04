@@ -1,5 +1,7 @@
 ﻿using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Wallet;
+using System;
+using System.Linq;
 
 namespace SmartStore.Services.Wallet
 {
@@ -27,6 +29,39 @@ namespace SmartStore.Services.Wallet
         public void Add(DailyCustomerContributionDetail entity)
         {
             _DailyCustomerContributionDetailRepository.Insert(entity);
+        }
+
+        public DailyCustomerContributionDetail Get(int id,Guid guid)
+        {
+            var today = DateTime.Now.Date;
+            if (!_DailyCustomerContributionDetailRepository.Table.Any(x => x.CreateTime >= today&&x.Customer==id))
+            {
+                DailyCustomerContributionDetail dailyTotalContribution = new DailyCustomerContributionDetail()
+                {
+                    CreateTime = today,
+                    ContributionTime = today,
+                     ActiveLine = 0,
+                    CountTotalValue = 0M, 
+                    Customer = id,
+                    TotalLine = 0,
+                    TotalPoint=0, 
+                    TotalPointValue=0M,
+                    CustomerID= guid,
+                    TotalValue = 0M,
+                    UpdateTime = DateTime.Now
+                };
+                _DailyCustomerContributionDetailRepository.Insert(dailyTotalContribution);
+                return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime >= today && x.Customer == id);
+            }
+            else
+            {
+                return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime >= today && x.Customer == id);
+            }
+        }
+
+        public void Update(DailyCustomerContributionDetail entity)
+        {
+            _DailyCustomerContributionDetailRepository.Update(entity);
         }
 
         #endregion Public Methods

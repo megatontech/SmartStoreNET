@@ -23,6 +23,7 @@ namespace SmartStore.Services.Customers
 		/// <returns>Customer collection</returns>
 		IPagedList<Customer> SearchCustomers(CustomerSearchQuery q);
 		List<Customer> BuildTree();
+		List<Customer> BuildCurrentTree();
 		List<Customer> BuildAllTreeWithoutOrder();
 		/// <summary>
 		/// Gets all customers by customer format (including deleted ones)

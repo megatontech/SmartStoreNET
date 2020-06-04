@@ -122,6 +122,11 @@ namespace SmartStore.Core.Domain.Customers
         /// </summary>
         [NotMapped]
         public decimal TotalPointsValue4 { get; set; }
+            /// <summary>
+            ///当日业绩
+            /// </summary>
+            [NotMapped]
+            public decimal CurrentOrderSum { get; set; }
         /// <summary>
         /// 是否有下级
         /// </summary>

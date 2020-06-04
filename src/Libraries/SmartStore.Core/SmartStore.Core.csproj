@@ -260,6 +260,7 @@
     <Compile Include="Domain\Wallet\DailyCustomerContributionDetail.cs" />
     <Compile Include="Domain\Wallet\DailyTotalContribution.cs" />
     <Compile Include="Domain\Wallet\DailyTotalContributionDetail.cs" />
+    <Compile Include="Domain\Wallet\DeclarationCalcRule.cs" />
     <Compile Include="Domain\Wallet\LuckMoney.cs" />
     <Compile Include="Domain\Wallet\WithdrawalApply.cs" />
     <Compile Include="Domain\Wallet\WithdrawalDetail.cs" />

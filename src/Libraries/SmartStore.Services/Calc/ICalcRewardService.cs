@@ -12,6 +12,10 @@ namespace SmartStore.Services.Calc
     public partial  interface ICalcRewardService
     {
         /// <summary>
+        /// 实时更新
+        /// </summary>
+        public void UpdateRealtimeData();
+        /// <summary>
         /// 直推奖
         /// </summary>
         /// <param name="customer"></param>
@@ -32,7 +36,7 @@ namespace SmartStore.Services.Calc
         /// </summary>
         /// <param name="StoreTotal"></param>
         /// <param name="isEqual"></param>
-        void CalcRewardFour(decimal StoreTotal, bool isEqual = false);
+        void CalcRewardFour(decimal StoreTotal);
         /// <summary>
         /// 查节点
         /// </summary>

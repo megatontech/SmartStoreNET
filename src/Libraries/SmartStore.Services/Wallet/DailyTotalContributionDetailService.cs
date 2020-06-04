@@ -1,5 +1,7 @@
 ﻿using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Wallet;
+using System.Linq;
+using System.Linq.Dynamic;
 
 namespace SmartStore.Services.Wallet
 {
@@ -24,10 +26,7 @@ namespace SmartStore.Services.Wallet
 
         #region Public Methods
 
-        public void Add(DailyTotalContributionDetail entity)
-        {
-            _DailyTotalContributionDetailRepository.Insert(entity);
-        }
+       
 
         #endregion Public Methods
     }

@@ -678,8 +678,10 @@
     <Compile Include="Wallet\IDailyCustomerContributionDetailService.cs" />
     <Compile Include="Wallet\IDailyTotalContributionService.cs" />
     <Compile Include="Wallet\IDailyTotalContributionDetailService.cs" />
+    <Compile Include="Wallet\IDeclarationCalcRuleService.cs" />
     <Compile Include="Wallet\IWalletService.cs" />
     <Compile Include="Wallet\ILuckMoneyService.cs" />
+    <Compile Include="Wallet\DeclarationCalcRuleService.cs" />
     <Compile Include="Wallet\WalletService.cs" />
     <Compile Include="Wallet\IWithdrawalTotalService.cs" />
     <Compile Include="Wallet\CustomerPointsDetailService.cs" />

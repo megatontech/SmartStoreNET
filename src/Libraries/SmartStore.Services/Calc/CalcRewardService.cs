@@ -1,6 +1,7 @@
 ﻿using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Declaration;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Core.Domain.Wallet;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Declaration;
 using SmartStore.Services.Wallet;
@@ -17,22 +18,85 @@ namespace SmartStore.Services.Calc
         private readonly ICustomerService _CustomerService;
         private readonly IDeclarationCapRuleService _DeclarationCapRuleService;
         private readonly List<DeclarationCapRule> _rule;
+        private readonly DeclarationCalcRule _calcrule;
+        private readonly IDeclarationCalcRuleService _calcruleService;
         private readonly IWalletService _walletService;
-
+        private readonly IDailyTotalContributionService _totalContributeService;
+        private readonly IDailyCustomerContributionDetailService _customerContributeService;
+        //private 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public CalcRewardService(IWalletService walletService, ICustomerService customerService, IDeclarationCapRuleService declarationCapRuleService)
+       public CalcRewardService(IWalletService walletService, ICustomerService customerService, IDeclarationCapRuleService declarationCapRuleService, 
+           IDeclarationCalcRuleService calcruleService,
+           IDailyTotalContributionService totalContributeService,
+           IDailyCustomerContributionDetailService customerContributeService
+           )
         {
             _walletService = walletService;
             _CustomerService = customerService;
             _DeclarationCapRuleService = declarationCapRuleService;
+            _calcruleService = calcruleService;
+            _totalContributeService = totalContributeService;
+            _customerContributeService = customerContributeService;
+            _calcrule = _calcruleService.GetDeclarationCalcRule();
             _rule = _DeclarationCapRuleService.GetAllRule().ToList();
         }
 
         #endregion Public Constructors
-
+        #region 实时更新数据
+        public void UpdateRealtimeData() 
+        {
+            List<Customer> allCustomer = _CustomerService.BuildCurrentTree();
+            foreach (var item in allCustomer)
+            {
+                item.SubLines = allCustomer.Count(x => x.ParentCustomerGuid == item.CustomerGuid);
+                item.HasChild = allCustomer.Any(x => x.ParentCustomerGuid == item.CustomerGuid);
+                Dictionary<Guid, decimal> keyValuePairsTotal = new Dictionary<Guid, decimal>();
+                Dictionary<Guid, decimal> keyValuePairsDirect = new Dictionary<Guid, decimal>();
+                //每条线业绩累加到最下级
+                foreach (var subcustomer in allCustomer.Where(x => x.ParentCustomerGuid == item.CustomerGuid))
+                {
+                    keyValuePairsTotal.Add(subcustomer.CustomerGuid, CalcLineTotal(allCustomer, subcustomer));
+                }
+                item.LineTotalpairs = keyValuePairsTotal;
+                item.CurrentOrderSum = item.OrderList.Sum(x=>x.OrderTotal);
+            }
+            //总数
+            var reward = Math.Round(allCustomer.Sum(x=>x.CurrentOrderSum) * ((decimal)_calcrule.CalcRewardTwoPercent / 100), 2);
+            //贡献值总数
+            var totalPoint = (decimal)0;
+            //计算并填充贡献点数计算业绩计算活跃线数
+            //计算每个人点数
+            List<Customer> list = CalcCustomersPoints(allCustomer);
+            totalPoint = (decimal)list.Sum(x => x.TotalPoints);
+            //每个贡献值的价值
+            var pointValue = (decimal)0;
+            if (totalPoint != 0) { pointValue = Math.Round(reward / totalPoint); }
+            //存储当天实时数据到数据库
+            var totalContribution = _totalContributeService.Get();
+            totalContribution.TotalValue = allCustomer.Sum(x => x.CurrentOrderSum);
+            totalContribution.ContributionValue = totalPoint;
+            var StoreTotal = list.Sum(x => x.SelfTotal);
+            totalContribution.DecValue = reward;
+            _totalContributeService.Update(totalContribution);
+            //每个人的贡献值
+            foreach (var item in list)
+            {
+                item.TotalPointsValue2 = pointValue * (decimal)item.TotalPoints;
+                var customerContribution = _customerContributeService.Get(item.Id,item.CustomerGuid);
+                customerContribution.TotalLine = item.SubLines;
+                customerContribution.ActiveLine = item.ActiveLines;
+                customerContribution.TotalPoint = (int)item.TotalPoints;
+                customerContribution.TotalPointValue = item.TotalPointsValue2;
+                customerContribution.TotalValue = item.SelfTotal;
+                var pair = item.LineTotalpairs;
+                customerContribution.CountTotalValue = pair.Sum(x => x.Value);
+                _customerContributeService.Update(customerContribution);
+            }
+        }
+        #endregion
         #region 发钱算法
 
         /// <summary>
@@ -43,17 +107,17 @@ namespace SmartStore.Services.Calc
         /// </summary>
         /// <param name="treeNode"></param>
         /// <param name="StoreTotal"></param>
-        public void CalcRewardFour(decimal StoreTotal, bool isEqual = false)
+        public void CalcRewardFour(decimal StoreTotal)
         {
             //商城利润红包
-            var storeReward = Math.Round(StoreTotal * (decimal)0.1, 2);
+            var storeReward = Math.Round(StoreTotal * (decimal)((decimal)_calcrule.CalcRewardFourPercent/100), 2);
             List<Customer> customers = _CustomerService.BuildTree();
             LeftMoneyPackage package = new LeftMoneyPackage();
             package.remainMoney = (double)storeReward;
             package.remainSize = customers.Count();
             foreach (var item in customers)
             {
-                if (isEqual)
+                if (_calcrule.CalcRewardFourEqual)
                 {
                     item.TotalPointsValue4 = Math.Round(storeReward / customers.Count(), 2);
                 }
@@ -79,21 +143,21 @@ namespace SmartStore.Services.Calc
             List<Customer> treeNode = _CustomerService.BuildAllTreeWithoutOrder();
             //直接上级orderAmount*15%
             var customer1 = treeNode.Where(x => x.CustomerGuid == customer.ParentCustomerGuid).FirstOrDefault();
-            var reward01 = Math.Round(order.OrderTotal * (decimal)0.15, 2);
+            var reward01 = Math.Round(order.OrderTotal * (decimal)((decimal)_calcrule.CalcRewardOneL1Percent/100), 2);
             //向上5层orderAmount*15%*10%
             List<Customer> customers2 = new List<Customer>();
-            var reward02 = Math.Round(order.OrderTotal * (decimal)0.15 * (decimal)0.10, 2);
-            recursiveFindNode(customers2, treeNode, customer, 2, 6, 0);
+            var reward02 = Math.Round(order.OrderTotal * (decimal)((decimal)_calcrule.CalcRewardOneL1Percent / 100) * (decimal)((decimal)_calcrule.CalcRewardOneL2Percent / 100), 2);
+            recursiveFindNode(customers2, treeNode, customer, 2, 1+ _calcrule.CalcRewardOneL2Count, 0);
             customers2 = customers2.Distinct().ToList();
             //再向上5层orderAmount*15%*5%
             List<Customer> customers3 = new List<Customer>();
-            var reward03 = Math.Round(order.OrderTotal * (decimal)0.15 * (decimal)0.05, 2);
-            recursiveFindNode(customers3, treeNode, customer, 7, 11, 0);
+            var reward03 = Math.Round(order.OrderTotal * (decimal)((decimal)_calcrule.CalcRewardOneL1Percent / 100) * (decimal)((decimal)_calcrule.CalcRewardOneL3Percent / 100), 2);
+            recursiveFindNode(customers3, treeNode, customer, 2+ _calcrule.CalcRewardOneL2Count, 2 + _calcrule.CalcRewardOneL2Count+ _calcrule.CalcRewardOneL3Count, 0);
             customers3 = customers3.Distinct().ToList();
             //保存佣金计算结果，分配钱到每个人的钱包
             _walletService.SendRewardToWalletOne(new List<Customer> { customer1 }, reward01, order);
-            _walletService.SendRewardToWalletOne(customers2, reward01, order);
-            _walletService.SendRewardToWalletOne(customers3, reward01, order);
+            _walletService.SendRewardToWalletOne(customers2, reward02, order);
+            _walletService.SendRewardToWalletOne(customers3, reward03, order);
         }
 
         /// <summary>
@@ -104,7 +168,7 @@ namespace SmartStore.Services.Calc
         public void CalcRewardThree(decimal StoreTotal)
         {
             //商城利润分红
-            var storeReward = Math.Round(StoreTotal * (decimal)0.5, 2);
+            var storeReward = Math.Round(StoreTotal * (decimal)((decimal)_calcrule.CalcRewardThreePercent/100), 2);
             //贡献值总数
             var totalPoint = (decimal)0;
             //计算并填充贡献点数计算业绩计算活跃线数
@@ -114,7 +178,10 @@ namespace SmartStore.Services.Calc
             totalPoint = (decimal)list.Sum(x => x.TotalPoints);
             //每个贡献值的价值
             var pointValue = (decimal)0;
-            pointValue = Math.Round(storeReward / totalPoint);
+            if (totalPoint != 0)
+            {
+                pointValue = Math.Round(storeReward / totalPoint);
+            }
             //每个人的贡献值
             foreach (var item in list)
             {
@@ -137,7 +204,7 @@ namespace SmartStore.Services.Calc
         public void CalcRewardTwo(decimal CompanyTotal)
         {
             //分红总数
-            var reward = Math.Round(CompanyTotal * (decimal)0.25, 2);
+            var reward = Math.Round(CompanyTotal * (decimal)((decimal)_calcrule.CalcRewardTwoPercent / 100), 2);
             //贡献值总数
             var totalPoint = (decimal)0;
             //计算并填充贡献点数计算业绩计算活跃线数
@@ -147,7 +214,7 @@ namespace SmartStore.Services.Calc
             totalPoint = (decimal)list.Sum(x => x.TotalPoints);
             //每个贡献值的价值
             var pointValue = (decimal)0;
-            pointValue = Math.Round(reward / totalPoint);
+            if (totalPoint != 0) { pointValue = Math.Round(reward / totalPoint); }
             //每个人的贡献值
             foreach (var item in list)
             {
@@ -211,7 +278,7 @@ namespace SmartStore.Services.Calc
                     pair.Remove(item.LineTotalpairs.FirstOrDefault(x => x.Value == item.LineTotalpairs.Values.Max()).Key);
                 }
 
-                item.TotalPoints = (float)(pair.Sum(x => x.Value) / 100);
+                item.TotalPoints = (float)(pair.Sum(x => x.Value) / _calcrule.CalcRewardTwoPointPercent);
             }
             return customers;
         }
@@ -287,6 +354,7 @@ namespace SmartStore.Services.Calc
         /// <returns></returns>
         public Customer recursiveFindNode(List<Customer> result, List<Customer> treeNode, Customer customer, int start, int end, int current)
         {
+            if (customer == null) { return null; }
             var customer1 = treeNode.Where(x => x.CustomerGuid == customer.ParentCustomerGuid).FirstOrDefault();
             ++current;
             if (current >= start && current <= end && customer1 != null)

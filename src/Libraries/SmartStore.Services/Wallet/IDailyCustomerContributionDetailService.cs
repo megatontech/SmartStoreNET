@@ -1,6 +1,12 @@
-﻿namespace SmartStore.Services.Wallet
+﻿using SmartStore.Core.Domain.Wallet;
+using System;
+
+namespace SmartStore.Services.Wallet
 {
     public interface IDailyCustomerContributionDetailService
     {
+        public DailyCustomerContributionDetail Get(int id, Guid guid);
+        public void Update(DailyCustomerContributionDetail entity);
+        public void Add(DailyCustomerContributionDetail entity);
     }
 }

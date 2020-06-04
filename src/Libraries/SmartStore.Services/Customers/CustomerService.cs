@@ -801,12 +801,35 @@ namespace SmartStore.Services.Customers
 			tree = query.ToList();
 			foreach (var item in tree)
 			{
+				item.OrderList.Clear();
 				item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
 			}
 			//tree.AddRange(query);
 			return tree;
 		}
-
+		public List<Customer> BuildCurrentTree()
+		{
+			List<Customer> tree = new List<Customer>();
+			var query = from c in IncludeShoppingCart(_customerRepository.Table)
+						join d in _declarationOrderRepository.Table on c.Id equals d.CustomerId into custom
+						orderby c.Id
+						where c.IsCustomer == true
+						select c;
+			var yestoday = DateTime.Now.Date.AddDays(-1);
+			var today = DateTime.Now.Date;
+			var tomorrow = DateTime.Now.Date.AddDays(1);
+			var dorder = from d in _declarationOrderRepository.Table
+						 where d.PaidDateUtc.Value <= tomorrow && d.PaidDateUtc.Value >= today
+						 select d;
+			tree = query.ToList();
+			foreach (var item in tree)
+			{
+				item.OrderList.Clear();
+				item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
+			}
+			//tree.AddRange(query);
+			return tree;
+		}
 		#endregion Reward points
 	}
 }

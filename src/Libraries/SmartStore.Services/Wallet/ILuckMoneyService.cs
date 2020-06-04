@@ -6,7 +6,7 @@ namespace SmartStore.Services.Wallet
     {
         #region Public Methods
 
-        void AddLuckMoney(LuckMoney luck)
+        void AddLuckMoney(LuckMoney luck);
 
 
 #endregion Public Methods

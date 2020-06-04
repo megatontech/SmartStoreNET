@@ -61,7 +61,7 @@ namespace SmartStore.Services.Wallet
             _IWithdrawalDetailService.Add(new WithdrawalDetail
             {
                 Amount = luck.Amount,
-                Comment = DateTime.Now.ToString() + "领红包" + luck.Amount + "￥",
+                Comment = "领取红包入账" + luck.Amount.ToString("F2"),
                 Customer = customer.Id,
                 isOut = false,
                 WithdrawTime = DateTime.Now,
@@ -119,7 +119,7 @@ namespace SmartStore.Services.Wallet
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
                     Amount = amount,
-                    Comment = "",
+                    Comment = "直推佣金入账" + amount.ToString("F2"),
                     Customer = customer.Id,
                     isOut = false,
                     WithdrawTime = DateTime.Now,
@@ -149,7 +149,7 @@ namespace SmartStore.Services.Wallet
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
                     Amount = customer.TotalPointsValue3,
-                    Comment = "",
+                    Comment = "商城利润分红入账"+ customer.TotalPointsValue3.ToString("F2"),
                     Customer = customer.Id,
                     isOut = false,
                     WithdrawTime = DateTime.Now,
@@ -173,14 +173,15 @@ namespace SmartStore.Services.Wallet
             {
                 //log
                 var total = _IWithdrawalTotalService.Get(customer);
-                total.TotalAmount += customer.TotalPointsValue2;
+                var finalAmount = customer.TotalPointsValue2 > customer.CapLinesTotal ? customer.CapLinesTotal : customer.TotalPointsValue2;
+                total.TotalAmount += finalAmount;
                 total.TotalPushAmount += customer.TotalPointsValue2;
                 total.UpdateTime = DateTime.Now;
                 _IWithdrawalTotalService.Update(total);
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
-                    Amount = customer.TotalPointsValue2,
-                    Comment = "",
+                    Amount = finalAmount,
+                    Comment = "营业额度分红入账" + finalAmount+"封顶值"+customer.CapLinesTotal + "贡献值分红"+ customer.TotalPointsValue2,
                     Customer = customer.Id,
                     isOut = false,
                     WithdrawTime = DateTime.Now,
