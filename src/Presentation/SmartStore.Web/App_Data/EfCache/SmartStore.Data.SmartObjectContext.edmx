@@ -1379,6 +1379,26 @@
           <Property Name="EntityName" Type="String" MaxLength="400" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="StoreId" Type="Int32" Nullable="false" />
         </EntityType>
+        <EntityType Name="DeclarationCalcRule" customannotation:ClrType="SmartStore.Core.Domain.Wallet.DeclarationCalcRule, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CalcRewardOneL1Percent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardOneL2Percent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardOneL3Percent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardOneL2Count" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardOneL3Count" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardThreePercent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardTwoPointPercent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardTwoPercent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardFourEqual" Type="Boolean" Nullable="false" />
+          <Property Name="CalcRewardFourPercent" Type="Int32" Nullable="false" />
+          <Property Name="isUse" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+        </EntityType>
         <EntityType Name="CustomerPointsTotal" customannotation:ClrType="SmartStore.Core.Domain.Wallet.CustomerPointsTotal, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -3710,6 +3730,7 @@
           <EntitySet Name="Stores" EntityType="Self.Store" />
           <EntitySet Name="Currencies" EntityType="Self.Currency" />
           <EntitySet Name="StoreMappings" EntityType="Self.StoreMapping" />
+          <EntitySet Name="DeclarationCalcRules" EntityType="Self.DeclarationCalcRule" />
           <EntitySet Name="CustomerPointsTotals" EntityType="Self.CustomerPointsTotal" />
           <EntitySet Name="DailyCustomerContributionDetails" EntityType="Self.DailyCustomerContributionDetail" />
           <EntitySet Name="DailyTotalContributions" EntityType="Self.DailyTotalContribution" />
@@ -5552,6 +5573,27 @@
                 <ScalarProperty Name="EntityId" ColumnName="EntityId" />
                 <ScalarProperty Name="EntityName" ColumnName="EntityName" />
                 <ScalarProperty Name="StoreId" ColumnName="StoreId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DeclarationCalcRules">
+            <EntityTypeMapping TypeName="SmartStore.Data.DeclarationCalcRule">
+              <MappingFragment StoreEntitySet="DeclarationCalcRule">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CalcRewardOneL1Percent" ColumnName="CalcRewardOneL1Percent" />
+                <ScalarProperty Name="CalcRewardOneL2Percent" ColumnName="CalcRewardOneL2Percent" />
+                <ScalarProperty Name="CalcRewardOneL3Percent" ColumnName="CalcRewardOneL3Percent" />
+                <ScalarProperty Name="CalcRewardOneL2Count" ColumnName="CalcRewardOneL2Count" />
+                <ScalarProperty Name="CalcRewardOneL3Count" ColumnName="CalcRewardOneL3Count" />
+                <ScalarProperty Name="CalcRewardThreePercent" ColumnName="CalcRewardThreePercent" />
+                <ScalarProperty Name="CalcRewardTwoPointPercent" ColumnName="CalcRewardTwoPointPercent" />
+                <ScalarProperty Name="CalcRewardTwoPercent" ColumnName="CalcRewardTwoPercent" />
+                <ScalarProperty Name="CalcRewardFourEqual" ColumnName="CalcRewardFourEqual" />
+                <ScalarProperty Name="CalcRewardFourPercent" ColumnName="CalcRewardFourPercent" />
+                <ScalarProperty Name="isUse" ColumnName="isUse" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -7673,6 +7715,26 @@
           <Property Name="EntityId" Type="int" Nullable="false" />
           <Property Name="EntityName" Type="nvarchar" MaxLength="400" Nullable="false" />
           <Property Name="StoreId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DeclarationCalcRule" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CalcRewardOneL1Percent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardOneL2Percent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardOneL3Percent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardOneL2Count" Type="int" Nullable="false" />
+          <Property Name="CalcRewardOneL3Count" Type="int" Nullable="false" />
+          <Property Name="CalcRewardThreePercent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardTwoPointPercent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardTwoPercent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardFourEqual" Type="bit" Nullable="false" />
+          <Property Name="CalcRewardFourPercent" Type="int" Nullable="false" />
+          <Property Name="isUse" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="CustomerPointsTotal" customannotation:Index="{ }">
           <Key>
@@ -10330,6 +10392,7 @@
           <EntitySet Name="Store" EntityType="Self.Store" Schema="dbo" Table="Store" />
           <EntitySet Name="Currency" EntityType="Self.Currency" Schema="dbo" Table="Currency" />
           <EntitySet Name="StoreMapping" EntityType="Self.StoreMapping" Schema="dbo" Table="StoreMapping" />
+          <EntitySet Name="DeclarationCalcRule" EntityType="Self.DeclarationCalcRule" Schema="dbo" Table="DeclarationCalcRule" />
           <EntitySet Name="CustomerPointsTotal" EntityType="Self.CustomerPointsTotal" Schema="dbo" Table="DeclarationCustomerPointsTotal" />
           <EntitySet Name="DailyCustomerContributionDetail" EntityType="Self.DailyCustomerContributionDetail" Schema="dbo" Table="DeclarationDailyCustomerContributionDetail" />
           <EntitySet Name="DailyTotalContribution" EntityType="Self.DailyTotalContribution" Schema="dbo" Table="DeclarationDailyTotalContribution" />
