@@ -9,12 +9,23 @@ namespace SmartStore.Services.Wallet
 {
     public class WalletService : IWalletService
     {
-        private readonly ILuckMoneyService _ILuckMoneyService;
-        private readonly IWithdrawalTotalService _IWithdrawalTotalService;
-        private readonly IWithdrawalDetailService _IWithdrawalDetailService;
-        
-        public readonly DateTime sdateTime;
+        #region Public Fields
+
         public readonly DateTime edateTime;
+        public readonly DateTime sdateTime;
+
+        #endregion Public Fields
+
+
+
+        #region Private Fields
+
+        private readonly ILuckMoneyService _ILuckMoneyService;
+        private readonly IWithdrawalDetailService _IWithdrawalDetailService;
+        private readonly IWithdrawalTotalService _IWithdrawalTotalService;
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         public WalletService(ILuckMoneyService iLuckMoneyService,
@@ -36,33 +47,6 @@ namespace SmartStore.Services.Wallet
         #region Public Methods
 
         /// <summary>
-        /// 发红包
-        /// </summary>
-        /// <param name="customers"></param>
-        /// <returns></returns>
-        public bool SendRewardToWalletFour(List<Customer> customers)
-        {
-            foreach (var customer in customers)
-            {
-                //log
-                LuckMoney luck = new LuckMoney();
-                luck.Amount = customer.TotalPointsValue4;
-                luck.StartTime = sdateTime;
-                luck.SendTime = sdateTime;
-                luck.EndTime = edateTime;
-                luck.Comment = sdateTime.ToString()+"2小时内有效";
-                luck.Customer = customer.Id;
-                luck.CustomerAmount = customers.Count;
-                luck.CustomerID = customer.CustomerGuid;
-                luck.IsCount = false;
-                luck.isOut = false;
-                luck.TotalAmount = customers.Sum(x => x.TotalPointsValue4);
-                //send reward
-                _ILuckMoneyService.AddLuckMoney(luck);
-            }
-            return true;
-        }
-        /// <summary>
         /// 领红包
         /// </summary>
         /// <param name="customers"></param>
@@ -77,7 +61,7 @@ namespace SmartStore.Services.Wallet
             _IWithdrawalDetailService.Add(new WithdrawalDetail
             {
                 Amount = luck.Amount,
-                Comment = DateTime.Now.ToString()+"领红包"+ luck.Amount+"￥",
+                Comment = DateTime.Now.ToString() + "领红包" + luck.Amount + "￥",
                 Customer = customer.Id,
                 isOut = false,
                 WithdrawTime = DateTime.Now,
@@ -86,6 +70,35 @@ namespace SmartStore.Services.Wallet
             });
             return true;
         }
+
+        /// <summary>
+        /// 发红包
+        /// </summary>
+        /// <param name="customers"></param>
+        /// <returns></returns>
+        public bool SendRewardToWalletFour(List<Customer> customers)
+        {
+            foreach (var customer in customers)
+            {
+                //log
+                LuckMoney luck = new LuckMoney();
+                luck.Amount = customer.TotalPointsValue4;
+                luck.StartTime = sdateTime;
+                luck.SendTime = sdateTime;
+                luck.EndTime = edateTime;
+                luck.Comment = sdateTime.ToString() + "2小时内有效";
+                luck.Customer = customer.Id;
+                luck.CustomerAmount = customers.Count;
+                luck.CustomerID = customer.CustomerGuid;
+                luck.IsCount = false;
+                luck.isOut = false;
+                luck.TotalAmount = customers.Sum(x => x.TotalPointsValue4);
+                //send reward
+                _ILuckMoneyService.AddLuckMoney(luck);
+            }
+            return true;
+        }
+
         /// <summary>
         /// 向列表中每个客户打钱，并且记录此次交易细节
         /// </summary>
@@ -100,7 +113,7 @@ namespace SmartStore.Services.Wallet
                 //log
                 var total = _IWithdrawalTotalService.Get(customer);
                 total.TotalAmount += amount;
-                total.TotalPushAmount+= amount;
+                total.TotalPushAmount += amount;
                 total.UpdateTime = DateTime.Now;
                 _IWithdrawalTotalService.Update(total);
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
@@ -112,7 +125,7 @@ namespace SmartStore.Services.Wallet
                     WithdrawTime = DateTime.Now,
                     WithdrawType = 1,
                     CustomerID = customer.CustomerGuid
-                }) ;
+                });
                 //send reward
             }
             return true;

@@ -1,26 +1,34 @@
 ﻿using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Wallet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartStore.Services.Wallet
 {
-    public class WithdrawalApplyService: IWithdrawalApplyService
+    public class WithdrawalApplyService : IWithdrawalApplyService
     {
+        #region Private Fields
+
         private readonly IRepository<WithdrawalApply> _WithdrawalApplyRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public WithdrawalApplyService(IRepository<WithdrawalApply> withdrawalApplyRepository)
         {
             _WithdrawalApplyRepository = withdrawalApplyRepository;
         }
-        public void Add(WithdrawalApply entity) 
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        public void Add(WithdrawalApply entity)
         {
             _WithdrawalApplyRepository.Insert(entity);
-
-
         }
+
+        #endregion Public Methods
     }
 }
