@@ -1379,6 +1379,142 @@
           <Property Name="EntityName" Type="String" MaxLength="400" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="StoreId" Type="Int32" Nullable="false" />
         </EntityType>
+        <EntityType Name="CustomerPointsTotal" customannotation:ClrType="SmartStore.Core.Domain.Wallet.CustomerPointsTotal, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="CustomerID" Type="Guid" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DailyCustomerContributionDetail" customannotation:ClrType="SmartStore.Core.Domain.Wallet.DailyCustomerContributionDetail, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="CustomerID" Type="Guid" Nullable="false" />
+          <Property Name="ContributionTime" Type="DateTime" Nullable="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+          <Property Name="ActiveLine" Type="Int32" Nullable="false" />
+          <Property Name="TotalLine" Type="Int32" Nullable="false" />
+          <Property Name="TotalPointValue" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalPoint" Type="Int32" Nullable="false" />
+          <Property Name="TotalValue" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CountTotalValue" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DailyTotalContribution" customannotation:ClrType="SmartStore.Core.Domain.Wallet.DailyTotalContribution, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TotalValue" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ContributionValue" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="DecValue" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ContributionTime" Type="DateTime" Nullable="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DailyTotalContributionDetail" customannotation:ClrType="SmartStore.Core.Domain.Wallet.DailyTotalContributionDetail, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LuckMoney" customannotation:ClrType="SmartStore.Core.Domain.Wallet.LuckMoney, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="Operater" Type="Int32" Nullable="false" />
+          <Property Name="CustomerID" Type="Guid" Nullable="false" />
+          <Property Name="OperaterID" Type="Guid" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CustomerAmount" Type="Int32" Nullable="false" />
+          <Property Name="isOut" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SendTime" Type="DateTime" Nullable="false" />
+          <Property Name="StartTime" Type="DateTime" Nullable="false" />
+          <Property Name="EndTime" Type="DateTime" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WithdrawalApply" customannotation:ClrType="SmartStore.Core.Domain.Wallet.WithdrawalApply, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="Operater" Type="Int32" Nullable="false" />
+          <Property Name="CustomerID" Type="Guid" Nullable="false" />
+          <Property Name="OperaterID" Type="Guid" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="isOut" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="WithdrawTime" Type="DateTime" Nullable="false" />
+          <Property Name="WithdrawAuditTime" Type="DateTime" Nullable="false" />
+          <Property Name="WithdrawAuditCustomer" Type="Int32" Nullable="false" />
+          <Property Name="WithdrawAuditComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="WithdrawType" Type="Int32" Nullable="false" />
+          <Property Name="WithdrawStatus" Type="Int32" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WithdrawalDetail" customannotation:ClrType="SmartStore.Core.Domain.Wallet.WithdrawalDetail, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="Operater" Type="Int32" Nullable="false" />
+          <Property Name="CustomerID" Type="Guid" Nullable="false" />
+          <Property Name="OperaterID" Type="Guid" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="isOut" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="WithdrawType" Type="Int32" Nullable="false" />
+          <Property Name="WithdrawTime" Type="DateTime" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WithdrawalTotal" customannotation:ClrType="SmartStore.Core.Domain.Wallet.WithdrawalTotal, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerGuid" Type="Guid" Nullable="false" />
+          <Property Name="CustomerId" Type="Int32" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+          <Property Name="TotalAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalDecShareAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalFreezeAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalLuckyAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalPushAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalStoreShareAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CustomerPointsDetail" customannotation:ClrType="SmartStore.Core.Domain.Wallet.CustomerPointsDetail, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="Comment" Type="Boolean" Nullable="false" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="CustomerID" Type="Guid" Nullable="false" />
+          <Property Name="IsCount" Type="Boolean" Nullable="false" />
+          <Property Name="isOut" Type="Boolean" Nullable="false" />
+          <Property Name="PointGetType" Type="Int32" Nullable="false" />
+          <Property Name="PointUseType" Type="Int32" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
+        </EntityType>
         <EntityType Name="ScheduleTaskHistory" customannotation:ClrType="SmartStore.Core.Domain.Tasks.ScheduleTaskHistory, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -3574,6 +3710,15 @@
           <EntitySet Name="Stores" EntityType="Self.Store" />
           <EntitySet Name="Currencies" EntityType="Self.Currency" />
           <EntitySet Name="StoreMappings" EntityType="Self.StoreMapping" />
+          <EntitySet Name="CustomerPointsTotals" EntityType="Self.CustomerPointsTotal" />
+          <EntitySet Name="DailyCustomerContributionDetails" EntityType="Self.DailyCustomerContributionDetail" />
+          <EntitySet Name="DailyTotalContributions" EntityType="Self.DailyTotalContribution" />
+          <EntitySet Name="DailyTotalContributionDetails" EntityType="Self.DailyTotalContributionDetail" />
+          <EntitySet Name="LuckMoneys" EntityType="Self.LuckMoney" />
+          <EntitySet Name="WithdrawalApplies" EntityType="Self.WithdrawalApply" />
+          <EntitySet Name="WithdrawalDetails" EntityType="Self.WithdrawalDetail" />
+          <EntitySet Name="WithdrawalTotals" EntityType="Self.WithdrawalTotal" />
+          <EntitySet Name="CustomerPointsDetails" EntityType="Self.CustomerPointsDetail" />
           <EntitySet Name="ScheduleTaskHistories" EntityType="Self.ScheduleTaskHistory" />
           <EntitySet Name="ScheduleTasks" EntityType="Self.ScheduleTask" />
           <EntitySet Name="PaymentMethods" EntityType="Self.PaymentMethod" />
@@ -5407,6 +5552,151 @@
                 <ScalarProperty Name="EntityId" ColumnName="EntityId" />
                 <ScalarProperty Name="EntityName" ColumnName="EntityName" />
                 <ScalarProperty Name="StoreId" ColumnName="StoreId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CustomerPointsTotals">
+            <EntityTypeMapping TypeName="SmartStore.Data.CustomerPointsTotal">
+              <MappingFragment StoreEntitySet="CustomerPointsTotal">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DailyCustomerContributionDetails">
+            <EntityTypeMapping TypeName="SmartStore.Data.DailyCustomerContributionDetail">
+              <MappingFragment StoreEntitySet="DailyCustomerContributionDetail">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="ContributionTime" ColumnName="ContributionTime" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="ActiveLine" ColumnName="ActiveLine" />
+                <ScalarProperty Name="TotalLine" ColumnName="TotalLine" />
+                <ScalarProperty Name="TotalPointValue" ColumnName="TotalPointValue" />
+                <ScalarProperty Name="TotalPoint" ColumnName="TotalPoint" />
+                <ScalarProperty Name="TotalValue" ColumnName="TotalValue" />
+                <ScalarProperty Name="CountTotalValue" ColumnName="CountTotalValue" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DailyTotalContributions">
+            <EntityTypeMapping TypeName="SmartStore.Data.DailyTotalContribution">
+              <MappingFragment StoreEntitySet="DailyTotalContribution">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TotalValue" ColumnName="TotalValue" />
+                <ScalarProperty Name="ContributionValue" ColumnName="ContributionValue" />
+                <ScalarProperty Name="DecValue" ColumnName="DecValue" />
+                <ScalarProperty Name="ContributionTime" ColumnName="ContributionTime" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DailyTotalContributionDetails">
+            <EntityTypeMapping TypeName="SmartStore.Data.DailyTotalContributionDetail">
+              <MappingFragment StoreEntitySet="DailyTotalContributionDetail">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LuckMoneys">
+            <EntityTypeMapping TypeName="SmartStore.Data.LuckMoney">
+              <MappingFragment StoreEntitySet="LuckMoney">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="Operater" ColumnName="Operater" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="OperaterID" ColumnName="OperaterID" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
+                <ScalarProperty Name="CustomerAmount" ColumnName="CustomerAmount" />
+                <ScalarProperty Name="isOut" ColumnName="isOut" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="SendTime" ColumnName="SendTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WithdrawalApplies">
+            <EntityTypeMapping TypeName="SmartStore.Data.WithdrawalApply">
+              <MappingFragment StoreEntitySet="WithdrawalApply">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="Operater" ColumnName="Operater" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="OperaterID" ColumnName="OperaterID" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="isOut" ColumnName="isOut" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="WithdrawTime" ColumnName="WithdrawTime" />
+                <ScalarProperty Name="WithdrawAuditTime" ColumnName="WithdrawAuditTime" />
+                <ScalarProperty Name="WithdrawAuditCustomer" ColumnName="WithdrawAuditCustomer" />
+                <ScalarProperty Name="WithdrawAuditComment" ColumnName="WithdrawAuditComment" />
+                <ScalarProperty Name="WithdrawType" ColumnName="WithdrawType" />
+                <ScalarProperty Name="WithdrawStatus" ColumnName="WithdrawStatus" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WithdrawalDetails">
+            <EntityTypeMapping TypeName="SmartStore.Data.WithdrawalDetail">
+              <MappingFragment StoreEntitySet="WithdrawalDetail">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="Operater" ColumnName="Operater" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="OperaterID" ColumnName="OperaterID" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="isOut" ColumnName="isOut" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="WithdrawType" ColumnName="WithdrawType" />
+                <ScalarProperty Name="WithdrawTime" ColumnName="WithdrawTime" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WithdrawalTotals">
+            <EntityTypeMapping TypeName="SmartStore.Data.WithdrawalTotal">
+              <MappingFragment StoreEntitySet="WithdrawalTotal">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CustomerGuid" ColumnName="CustomerGuid" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
+                <ScalarProperty Name="TotalDecShareAmount" ColumnName="TotalDecShareAmount" />
+                <ScalarProperty Name="TotalFreezeAmount" ColumnName="TotalFreezeAmount" />
+                <ScalarProperty Name="TotalLuckyAmount" ColumnName="TotalLuckyAmount" />
+                <ScalarProperty Name="TotalPushAmount" ColumnName="TotalPushAmount" />
+                <ScalarProperty Name="TotalStoreShareAmount" ColumnName="TotalStoreShareAmount" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CustomerPointsDetails">
+            <EntityTypeMapping TypeName="SmartStore.Data.CustomerPointsDetail">
+              <MappingFragment StoreEntitySet="CustomerPointsDetail">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="IsCount" ColumnName="IsCount" />
+                <ScalarProperty Name="isOut" ColumnName="isOut" />
+                <ScalarProperty Name="PointGetType" ColumnName="PointGetType" />
+                <ScalarProperty Name="PointUseType" ColumnName="PointUseType" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -7383,6 +7673,142 @@
           <Property Name="EntityId" Type="int" Nullable="false" />
           <Property Name="EntityName" Type="nvarchar" MaxLength="400" Nullable="false" />
           <Property Name="StoreId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CustomerPointsTotal" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DailyCustomerContributionDetail" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ContributionTime" Type="datetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="ActiveLine" Type="int" Nullable="false" />
+          <Property Name="TotalLine" Type="int" Nullable="false" />
+          <Property Name="TotalPointValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalPoint" Type="int" Nullable="false" />
+          <Property Name="TotalValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CountTotalValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DailyTotalContribution" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TotalValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ContributionValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="DecValue" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ContributionTime" Type="datetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DailyTotalContributionDetail" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LuckMoney" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="Operater" Type="int" Nullable="false" />
+          <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OperaterID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CustomerAmount" Type="int" Nullable="false" />
+          <Property Name="isOut" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="SendTime" Type="datetime" Nullable="false" />
+          <Property Name="StartTime" Type="datetime" Nullable="false" />
+          <Property Name="EndTime" Type="datetime" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WithdrawalApply" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="Operater" Type="int" Nullable="false" />
+          <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OperaterID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="isOut" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="WithdrawTime" Type="datetime" Nullable="false" />
+          <Property Name="WithdrawAuditTime" Type="datetime" Nullable="false" />
+          <Property Name="WithdrawAuditCustomer" Type="int" Nullable="false" />
+          <Property Name="WithdrawAuditComment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="WithdrawType" Type="int" Nullable="false" />
+          <Property Name="WithdrawStatus" Type="int" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WithdrawalDetail" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="Operater" Type="int" Nullable="false" />
+          <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OperaterID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="isOut" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="WithdrawType" Type="int" Nullable="false" />
+          <Property Name="WithdrawTime" Type="datetime" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WithdrawalTotal" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerGuid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CustomerId" Type="int" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+          <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalDecShareAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalFreezeAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalLuckyAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalPushAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="TotalStoreShareAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CustomerPointsDetail" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="Comment" Type="bit" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="IsCount" Type="bit" Nullable="false" />
+          <Property Name="isOut" Type="bit" Nullable="false" />
+          <Property Name="PointGetType" Type="int" Nullable="false" />
+          <Property Name="PointUseType" Type="int" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="ScheduleTaskHistory" customannotation:Index="{ }">
           <Key>
@@ -9904,6 +10330,15 @@
           <EntitySet Name="Store" EntityType="Self.Store" Schema="dbo" Table="Store" />
           <EntitySet Name="Currency" EntityType="Self.Currency" Schema="dbo" Table="Currency" />
           <EntitySet Name="StoreMapping" EntityType="Self.StoreMapping" Schema="dbo" Table="StoreMapping" />
+          <EntitySet Name="CustomerPointsTotal" EntityType="Self.CustomerPointsTotal" Schema="dbo" Table="DeclarationCustomerPointsTotal" />
+          <EntitySet Name="DailyCustomerContributionDetail" EntityType="Self.DailyCustomerContributionDetail" Schema="dbo" Table="DeclarationDailyCustomerContributionDetail" />
+          <EntitySet Name="DailyTotalContribution" EntityType="Self.DailyTotalContribution" Schema="dbo" Table="DeclarationDailyTotalContribution" />
+          <EntitySet Name="DailyTotalContributionDetail" EntityType="Self.DailyTotalContributionDetail" Schema="dbo" Table="DeclarationDailyTotalContributionDetail" />
+          <EntitySet Name="LuckMoney" EntityType="Self.LuckMoney" Schema="dbo" Table="DeclarationLuckMoney" />
+          <EntitySet Name="WithdrawalApply" EntityType="Self.WithdrawalApply" Schema="dbo" Table="DeclarationWithdrawalApply" />
+          <EntitySet Name="WithdrawalDetail" EntityType="Self.WithdrawalDetail" Schema="dbo" Table="DeclarationWithdrawalDetail" />
+          <EntitySet Name="WithdrawalTotal" EntityType="Self.WithdrawalTotal" Schema="dbo" Table="DeclarationWithdrawalTotal" />
+          <EntitySet Name="CustomerPointsDetail" EntityType="Self.CustomerPointsDetail" Schema="dbo" Table="DeclarationCustomerPointsDetail" />
           <EntitySet Name="ScheduleTaskHistory" EntityType="Self.ScheduleTaskHistory" Schema="dbo" Table="ScheduleTaskHistory" />
           <EntitySet Name="ScheduleTask" EntityType="Self.ScheduleTask" Schema="dbo" Table="ScheduleTask" />
           <EntitySet Name="PaymentMethod" EntityType="Self.PaymentMethod" Schema="dbo" Table="PaymentMethod" />
