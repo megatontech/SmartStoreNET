@@ -30,4 +30,3 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.S
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Shipping\obj\Debug\SmartStore.Shipping.csproj.CopyComplete
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Shipping\obj\Debug\SmartStore.Shipping.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Shipping\obj\Debug\SmartStore.Shipping.pdb
-C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.Shipping\obj\Debug\SmartStore.Shipping.csprojAssemblyReference.cache
