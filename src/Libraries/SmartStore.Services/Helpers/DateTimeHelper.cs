@@ -1,44 +1,112 @@
-using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Services.Common;
 using SmartStore.Services.Configuration;
-using SmartStore.Services.Customers;
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace SmartStore.Services.Helpers
 {
     public partial class DateTimeHelper : IDateTimeHelper
     {
-        private readonly IWorkContext _workContext;
-		private readonly IGenericAttributeService _genericAttributeService;
-        private readonly ISettingService _settingService;
+        #region Private Fields
+
         private readonly DateTimeSettings _dateTimeSettings;
 
-		private TimeZoneInfo _cachedUserTimeZone;
+        private readonly IGenericAttributeService _genericAttributeService;
+
+        private readonly ISettingService _settingService;
+
+        private readonly IWorkContext _workContext;
+
+        private TimeZoneInfo _cachedUserTimeZone;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public DateTimeHelper(
-			IWorkContext workContext,
-			IGenericAttributeService genericAttributeService,
-            ISettingService settingService, 
+            IWorkContext workContext,
+            IGenericAttributeService genericAttributeService,
+            ISettingService settingService,
             DateTimeSettings dateTimeSettings)
         {
             _workContext = workContext;
-			_genericAttributeService = genericAttributeService;
+            _genericAttributeService = genericAttributeService;
             _settingService = settingService;
             _dateTimeSettings = dateTimeSettings;
         }
 
-        public virtual TimeZoneInfo FindTimeZoneById(string id)
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public virtual TimeZoneInfo CurrentTimeZone
         {
-            return TimeZoneInfo.FindSystemTimeZoneById(id);
+            get
+            {
+                return GetCustomerTimeZone(_workContext.CurrentCustomer);
+            }
+
+            set
+            {
+                if (!_dateTimeSettings.AllowCustomersToSetTimeZone)
+                    return;
+
+                string timeZoneId = string.Empty;
+                if (value != null)
+                {
+                    timeZoneId = value.Id;
+                }
+
+                _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, SystemCustomerAttributeNames.TimeZoneId, timeZoneId);
+                _cachedUserTimeZone = null;
+            }
         }
 
-        public virtual ReadOnlyCollection<TimeZoneInfo> GetSystemTimeZones()
+        public virtual TimeZoneInfo DefaultStoreTimeZone
         {
-            return TimeZoneInfo.GetSystemTimeZones();
+            get
+            {
+                TimeZoneInfo timeZoneInfo = null;
+                try
+                {
+                    if (_dateTimeSettings.DefaultStoreTimeZoneId.HasValue())
+                        timeZoneInfo = FindTimeZoneById(_dateTimeSettings.DefaultStoreTimeZoneId);
+                }
+                catch (Exception ex)
+                {
+                    Debug.Write(ex.ToString());
+                }
+
+                if (timeZoneInfo == null)
+                    timeZoneInfo = TimeZoneInfo.Local;
+
+                return timeZoneInfo;
+            }
+
+            set
+            {
+                string defaultTimeZoneId = string.Empty;
+                if (value != null)
+                {
+                    defaultTimeZoneId = value.Id;
+                }
+
+                _dateTimeSettings.DefaultStoreTimeZoneId = defaultTimeZoneId;
+                _settingService.SaveSetting(_dateTimeSettings);
+                _cachedUserTimeZone = null;
+            }
         }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
 
         public virtual DateTime ConvertToUserTime(DateTime dt)
         {
@@ -87,23 +155,28 @@ namespace SmartStore.Services.Helpers
             }
         }
 
+        public virtual TimeZoneInfo FindTimeZoneById(string id)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById(id);
+        }
+
         public virtual TimeZoneInfo GetCustomerTimeZone(Customer customer)
         {
-			if (_cachedUserTimeZone != null)
-				return _cachedUserTimeZone;
+            if (_cachedUserTimeZone != null)
+                return _cachedUserTimeZone;
 
-			// registered user
-			TimeZoneInfo timeZone = null;
+            // registered user
+            TimeZoneInfo timeZone = null;
             if (_dateTimeSettings.AllowCustomersToSetTimeZone)
             {
                 string timeZoneId = string.Empty;
                 if (customer != null)
-					timeZoneId = customer.GetAttribute<string>(SystemCustomerAttributeNames.TimeZoneId, _genericAttributeService);
+                    timeZoneId = customer.GetAttribute<string>(SystemCustomerAttributeNames.TimeZoneId, _genericAttributeService);
 
                 try
                 {
-					if (timeZoneId.HasValue())
-						timeZone = FindTimeZoneById(timeZoneId);
+                    if (timeZoneId.HasValue())
+                        timeZone = FindTimeZoneById(timeZoneId);
                 }
                 catch (Exception ex)
                 {
@@ -115,66 +188,16 @@ namespace SmartStore.Services.Helpers
             if (timeZone == null)
                 timeZone = this.DefaultStoreTimeZone;
 
-			_cachedUserTimeZone = timeZone;
+            _cachedUserTimeZone = timeZone;
 
-			return timeZone;
+            return timeZone;
         }
 
-        public virtual TimeZoneInfo DefaultStoreTimeZone
+        public virtual ReadOnlyCollection<TimeZoneInfo> GetSystemTimeZones()
         {
-            get
-            {
-                TimeZoneInfo timeZoneInfo = null;
-                try
-                {
-                    if (_dateTimeSettings.DefaultStoreTimeZoneId.HasValue())
-						timeZoneInfo = FindTimeZoneById(_dateTimeSettings.DefaultStoreTimeZoneId);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Write(ex.ToString());
-                }
-
-                if (timeZoneInfo == null)
-                    timeZoneInfo = TimeZoneInfo.Local;
-
-                return timeZoneInfo;
-            }
-            set
-            {
-                string defaultTimeZoneId = string.Empty;
-                if (value != null)
-                {
-                    defaultTimeZoneId = value.Id;
-                }
-
-                _dateTimeSettings.DefaultStoreTimeZoneId = defaultTimeZoneId;
-                _settingService.SaveSetting(_dateTimeSettings);
-				_cachedUserTimeZone = null;
-
-			}
+            return TimeZoneInfo.GetSystemTimeZones();
         }
 
-        public virtual TimeZoneInfo CurrentTimeZone
-        {
-            get
-            {
-                return GetCustomerTimeZone(_workContext.CurrentCustomer);
-            }
-            set
-            {
-                if (!_dateTimeSettings.AllowCustomersToSetTimeZone)
-                    return;
-
-                string timeZoneId = string.Empty;
-                if (value != null)
-                {
-                    timeZoneId = value.Id;
-                }
-
-				_genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, SystemCustomerAttributeNames.TimeZoneId, timeZoneId);
-				_cachedUserTimeZone = null;
-			}
-        }
+        #endregion Public Methods
     }
 }
