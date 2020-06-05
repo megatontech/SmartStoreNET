@@ -1,242 +1,258 @@
-﻿using System;
-using System.Collections.Specialized;
+﻿using SmartStore.Core.Domain.Media;
+using SmartStore.Core.IO;
+using SmartStore.Core.Logging;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Hosting;
-using SmartStore.Core;
-using SmartStore.Core.Domain.Media;
-using SmartStore.Core.IO;
-using SmartStore.Core.Logging;
 
 namespace SmartStore.Services.Media
 {
-	public class ImageCache : IImageCache
+    public class ImageCache : IImageCache
     {
-		public const string IdFormatString = "0000000";
-		internal const int MaxDirLength = 4;
+        #region Public Fields
 
-		private readonly MediaSettings _mediaSettings;
-		private readonly string _thumbsRootDir;
-		private readonly IMediaFileSystem _fileSystem;
-		private readonly IImageProcessor _imageProcessor;
+        public const string IdFormatString = "0000000";
 
-		public ImageCache(MediaSettings mediaSettings, IMediaFileSystem fileSystem, IImageProcessor imageProcessor)
+        #endregion Public Fields
+
+        #region Internal Fields
+
+        internal const int MaxDirLength = 4;
+
+        #endregion Internal Fields
+
+
+
+        #region Private Fields
+
+        private readonly IMediaFileSystem _fileSystem;
+
+        private readonly IImageProcessor _imageProcessor;
+
+        private readonly MediaSettings _mediaSettings;
+
+        private readonly string _thumbsRootDir;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public ImageCache(MediaSettings mediaSettings, IMediaFileSystem fileSystem, IImageProcessor imageProcessor)
         {
             _mediaSettings = mediaSettings;
-			_fileSystem = fileSystem;
-			_imageProcessor = imageProcessor;
+            _fileSystem = fileSystem;
+            _imageProcessor = imageProcessor;
 
-			_thumbsRootDir = "Thumbs/";
+            _thumbsRootDir = "Thumbs/";
 
-			Logger = NullLogger.Instance;
-		}
-
-		public ILogger Logger
-		{
-			get;
-			set;
-		}
-
-		public void Put(CachedImageResult cachedImage, byte[] buffer)
-		{
-			if (PreparePut(cachedImage, buffer))
-			{
-				var path = BuildPath(cachedImage.Path);
-
-				_fileSystem.WriteAllBytes(path, buffer);
-
-				cachedImage.Exists = true;
-				cachedImage.File = _fileSystem.GetFile(path);
-			}
-		}
-
-		public async Task PutAsync(CachedImageResult cachedImage, byte[] buffer)
-		{
-			if (PreparePut(cachedImage, buffer))
-			{
-				var path = BuildPath(cachedImage.Path);
-
-				// save file
-				await _fileSystem.WriteAllBytesAsync(path, buffer);
-
-				// Refresh info
-				cachedImage.Exists = true;
-				cachedImage.File = _fileSystem.GetFile(path);
-			}
-		}
-
-		private bool PreparePut(CachedImageResult cachedImage, byte[] buffer)
-		{
-			Guard.NotNull(cachedImage, nameof(cachedImage));
-
-			if (buffer == null || buffer.Length == 0)
-			{
-				return false;
-			}
-
-			if (cachedImage.Exists)
-			{
-				_fileSystem.DeleteFile(BuildPath(cachedImage.Path));
-			}
-
-			// create folder if needed
-			string imageDir = System.IO.Path.GetDirectoryName(cachedImage.Path);
-			if (imageDir.HasValue())
-			{
-				_fileSystem.TryCreateFolder(BuildPath(imageDir));
-			}
-
-			return true;
-		}
-
-        public virtual CachedImageResult Get(int? pictureId, string seoFileName, string extension, ProcessImageQuery query = null)
-        {
-			Guard.NotEmpty(extension, nameof(extension));
-
-			extension = query?.GetResultExtension() ?? extension.TrimStart('.').ToLower();
-			var imagePath = GetCachedImagePath(pictureId, seoFileName, extension, query);
-
-			var file = _fileSystem.GetFile(BuildPath(imagePath));
-
-			var result = new CachedImageResult(file)
-			{
-				Path = imagePath,
-				Extension = extension,
-				IsRemote = _fileSystem.IsCloudStorage
-			};
-
-			if (file.Exists && file.Size <= 0)
-			{
-				result.Exists = false;
-			}
-
-			return result;
+            Logger = NullLogger.Instance;
         }
 
-		public virtual CachedImageResult Get(IFile file, ProcessImageQuery query)
-		{
-			Guard.NotNull(file, nameof(file));
-			Guard.NotNull(query, nameof(query));
+        #endregion Public Constructors
 
-			var imagePath = GetCachedImagePath(file, query);
-			var thumbFile = _fileSystem.GetFile(BuildPath(imagePath));
 
-			var result = new CachedImageResult(thumbFile)
-			{
-				Path = imagePath,
-				Extension = file.Extension.TrimStart('.'),
-				IsRemote = _fileSystem.IsCloudStorage
-			};
 
-			if (file.Exists && file.Size <= 0)
-			{
-				result.Exists = false;
-			}
+        #region Public Properties
 
-			return result;
-		}
-
-		public virtual Stream Open(CachedImageResult cachedImage)
-		{
-			Guard.NotNull(cachedImage, nameof(cachedImage));
-
-			return _fileSystem.GetFile(BuildPath(cachedImage.Path)).OpenRead();
-		}
-
-        public virtual string GetPublicUrl(string imagePath)
+        public ILogger Logger
         {
-			if (imagePath.IsEmpty())
-                return null;
+            get;
+            set;
+        }
 
-			return _fileSystem.GetPublicUrl(BuildPath(imagePath), true).EmptyNull();
-		}
+        #endregion Public Properties
 
-		public virtual void RefreshInfo(CachedImageResult cachedImage)
-		{
-			Guard.NotNull(cachedImage, nameof(cachedImage));
-			
-			var file = _fileSystem.GetFile(cachedImage.File.Path);
-			cachedImage.File = file;
-			cachedImage.Exists = file.Exists && file.Size > 0;
-		}
 
-		public virtual void Delete(Picture picture)
+
+        #region Public Methods
+
+        public void CacheStatistics(out long fileCount, out long totalSize)
         {
-            var filter = string.Format("{0}*.*", picture.Id.ToString(IdFormatString));
+            fileCount = 0;
+            totalSize = 0;
 
-			var files = _fileSystem.SearchFiles(_thumbsRootDir, filter);
-			foreach (var file in files)
-			{
-				_fileSystem.DeleteFile(file);
-			}
-		}
+            if (!_fileSystem.FolderExists(_thumbsRootDir))
+            {
+                return;
+            }
 
-		public virtual void Delete(IFile file)
-		{
-			// TODO: (mc) this could lead to more thumbs getting deleted as desired. But who cares? :-)
-			var filter = string.Format("{0}*.*", file.Title);
+            fileCount = _fileSystem.SearchFiles(_thumbsRootDir, "*.*").Count();
+            totalSize = _fileSystem.ListFolders(_thumbsRootDir).Sum(x => x.Size);
+        }
 
-			var files = _fileSystem.SearchFiles(BuildPath(file.Directory), filter);
-			foreach (var f in files)
-			{
-				_fileSystem.DeleteFile(f);
-			}
-		}
-
-		public virtual void Clear()
+        public virtual void Clear()
         {
-			for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 try
                 {
                     foreach (var file in _fileSystem.ListFiles(_thumbsRootDir))
                     {
-						if (!file.Name.IsCaseInsensitiveEqual("placeholder") && !file.Name.IsCaseInsensitiveEqual("placeholder.txt"))
-						{
-							_fileSystem.DeleteFile(file.Path);
-						}
+                        if (!file.Name.IsCaseInsensitiveEqual("placeholder") && !file.Name.IsCaseInsensitiveEqual("placeholder.txt"))
+                        {
+                            _fileSystem.DeleteFile(file.Path);
+                        }
                     }
                     foreach (var dir in _fileSystem.ListFolders(_thumbsRootDir))
                     {
-						_fileSystem.DeleteFolder(dir.Path);
-					}
+                        _fileSystem.DeleteFolder(dir.Path);
+                    }
 
                     return;
                 }
                 catch (Exception ex)
                 {
-					Logger.Error(ex);
+                    Logger.Error(ex);
                 }
             }
         }
 
-        public void CacheStatistics(out long fileCount, out long totalSize)
+        public virtual void Delete(Picture picture)
         {
-			fileCount = 0;
-			totalSize = 0;
+            var filter = string.Format("{0}*.*", picture.Id.ToString(IdFormatString));
 
-			if (!_fileSystem.FolderExists(_thumbsRootDir))
-			{
-				return;
-			}
-
-			fileCount = _fileSystem.SearchFiles(_thumbsRootDir, "*.*").Count();
-			totalSize = _fileSystem.ListFolders(_thumbsRootDir).Sum(x => x.Size);
+            var files = _fileSystem.SearchFiles(_thumbsRootDir, filter);
+            foreach (var file in files)
+            {
+                _fileSystem.DeleteFile(file);
+            }
         }
 
-		#region Utils
+        public virtual void Delete(IFile file)
+        {
+            // TODO: (mc) this could lead to more thumbs getting deleted as desired. But who cares? :-)
+            var filter = string.Format("{0}*.*", file.Title);
 
-		/// <summary>
-		/// Returns the file name with the subfolder (when multidirs are enabled)
-		/// </summary>
-		/// <param name="pictureId"></param>
-		/// <param name="seoFileName">File name without extension</param>
-		/// <param name="extension">Dot-less file extension</param>
-		/// <param name="query"></param>
-		/// <returns></returns>
-		private string GetCachedImagePath(int? pictureId, string seoFileName, string extension, ProcessImageQuery query = null)
+            var files = _fileSystem.SearchFiles(BuildPath(file.Directory), filter);
+            foreach (var f in files)
+            {
+                _fileSystem.DeleteFile(f);
+            }
+        }
+
+        public virtual CachedImageResult Get(int? pictureId, string seoFileName, string extension, ProcessImageQuery query = null)
+        {
+            Guard.NotEmpty(extension, nameof(extension));
+
+            extension = query?.GetResultExtension() ?? extension.TrimStart('.').ToLower();
+            var imagePath = GetCachedImagePath(pictureId, seoFileName, extension, query);
+
+            var file = _fileSystem.GetFile(BuildPath(imagePath));
+
+            var result = new CachedImageResult(file)
+            {
+                Path = imagePath,
+                Extension = extension,
+                IsRemote = _fileSystem.IsCloudStorage
+            };
+
+            if (file.Exists && file.Size <= 0)
+            {
+                result.Exists = false;
+            }
+
+            return result;
+        }
+
+        public virtual CachedImageResult Get(IFile file, ProcessImageQuery query)
+        {
+            Guard.NotNull(file, nameof(file));
+            Guard.NotNull(query, nameof(query));
+
+            var imagePath = GetCachedImagePath(file, query);
+            var thumbFile = _fileSystem.GetFile(BuildPath(imagePath));
+
+            var result = new CachedImageResult(thumbFile)
+            {
+                Path = imagePath,
+                Extension = file.Extension.TrimStart('.'),
+                IsRemote = _fileSystem.IsCloudStorage
+            };
+
+            if (file.Exists && file.Size <= 0)
+            {
+                result.Exists = false;
+            }
+
+            return result;
+        }
+
+        public virtual string GetPublicUrl(string imagePath)
+        {
+            if (imagePath.IsEmpty())
+                return null;
+
+            return _fileSystem.GetPublicUrl(BuildPath(imagePath), true).EmptyNull();
+        }
+
+        public virtual Stream Open(CachedImageResult cachedImage)
+        {
+            Guard.NotNull(cachedImage, nameof(cachedImage));
+
+            return _fileSystem.GetFile(BuildPath(cachedImage.Path)).OpenRead();
+        }
+
+        public void Put(CachedImageResult cachedImage, byte[] buffer)
+        {
+            if (PreparePut(cachedImage, buffer))
+            {
+                var path = BuildPath(cachedImage.Path);
+
+                _fileSystem.WriteAllBytes(path, buffer);
+
+                cachedImage.Exists = true;
+                cachedImage.File = _fileSystem.GetFile(path);
+            }
+        }
+
+        public async Task PutAsync(CachedImageResult cachedImage, byte[] buffer)
+        {
+            if (PreparePut(cachedImage, buffer))
+            {
+                var path = BuildPath(cachedImage.Path);
+
+                // save file
+                await _fileSystem.WriteAllBytesAsync(path, buffer);
+
+                // Refresh info
+                cachedImage.Exists = true;
+                cachedImage.File = _fileSystem.GetFile(path);
+            }
+        }
+
+        public virtual void RefreshInfo(CachedImageResult cachedImage)
+        {
+            Guard.NotNull(cachedImage, nameof(cachedImage));
+
+            var file = _fileSystem.GetFile(cachedImage.File.Path);
+            cachedImage.File = file;
+            cachedImage.Exists = file.Exists && file.Size > 0;
+        }
+
+        #endregion Public Methods
+
+
+
+        #region Private Methods
+
+        private string BuildPath(string imagePath)
+        {
+            if (imagePath.IsEmpty())
+                return null;
+
+            return String.Concat(_thumbsRootDir, imagePath);
+        }
+
+        /// <summary>
+        /// Returns the file name with the subfolder (when multidirs are enabled)
+        /// </summary>
+        /// <param name="pictureId"></param>
+        /// <param name="seoFileName">File name without extension</param>
+        /// <param name="extension">Dot-less file extension</param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private string GetCachedImagePath(int? pictureId, string seoFileName, string extension, ProcessImageQuery query = null)
         {
             string imageFileName = null;
 
@@ -260,8 +276,8 @@ namespace SmartStore.Services.Media
             }
             else
             {
-				imageFileName = String.Concat(firstPart, seoFileName, query.CreateHash());
-			}
+                imageFileName = String.Concat(firstPart, seoFileName, query.CreateHash());
+            }
 
             if (_mediaSettings.MultipleThumbDirectories && imageFileName != null && imageFileName.Length > MaxDirLength)
             {
@@ -273,38 +289,52 @@ namespace SmartStore.Services.Media
             return String.Concat(imageFileName, ".", extension);
         }
 
-		/// <summary>
-		/// Returns the images thumb path as is plus query (required for uploaded images)
-		/// </summary>
-		/// <param name="file">Image file to get thumbnail for</param>
-		/// <param name="query"></param>
-		/// <returns></returns>
-		private string GetCachedImagePath(IFile file, ProcessImageQuery query)
-		{
-			if (!_imageProcessor.IsSupportedImage(file.Name))
-			{
-				throw new InvalidOperationException("Thumbnails for '{0}' files are not supported".FormatInvariant(file.Extension));
-			}
-			
-			// TODO: (mc) prevent creating thumbs for thumbs AND check equality of source and target
+        /// <summary>
+        /// Returns the images thumb path as is plus query (required for uploaded images)
+        /// </summary>
+        /// <param name="file">Image file to get thumbnail for</param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private string GetCachedImagePath(IFile file, ProcessImageQuery query)
+        {
+            if (!_imageProcessor.IsSupportedImage(file.Name))
+            {
+                throw new InvalidOperationException("Thumbnails for '{0}' files are not supported".FormatInvariant(file.Extension));
+            }
 
-			var imageFileName = String.Concat(file.Title, query.CreateHash());
-			var extension = (query.GetResultExtension() ?? file.Extension).EnsureStartsWith(".").ToLower();
-			var path = _fileSystem.Combine(file.Directory, imageFileName + extension);
+            // TODO: (mc) prevent creating thumbs for thumbs AND check equality of source and target
 
-			return path.TrimStart('/', '\\');
-		}
+            var imageFileName = String.Concat(file.Title, query.CreateHash());
+            var extension = (query.GetResultExtension() ?? file.Extension).EnsureStartsWith(".").ToLower();
+            var path = _fileSystem.Combine(file.Directory, imageFileName + extension);
 
-		private string BuildPath(string imagePath)
-		{
-			if (imagePath.IsEmpty())
-				return null;
+            return path.TrimStart('/', '\\');
+        }
 
-			return String.Concat(_thumbsRootDir, imagePath);
-		}
+        private bool PreparePut(CachedImageResult cachedImage, byte[] buffer)
+        {
+            Guard.NotNull(cachedImage, nameof(cachedImage));
 
-        #endregion
+            if (buffer == null || buffer.Length == 0)
+            {
+                return false;
+            }
 
+            if (cachedImage.Exists)
+            {
+                _fileSystem.DeleteFile(BuildPath(cachedImage.Path));
+            }
+
+            // create folder if needed
+            string imageDir = System.IO.Path.GetDirectoryName(cachedImage.Path);
+            if (imageDir.HasValue())
+            {
+                _fileSystem.TryCreateFolder(BuildPath(imageDir));
+            }
+
+            return true;
+        }
+
+        #endregion Private Methods
     }
-
 }

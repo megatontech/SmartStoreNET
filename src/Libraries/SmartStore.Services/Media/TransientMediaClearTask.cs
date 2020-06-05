@@ -1,10 +1,10 @@
-﻿using System;
+﻿using SmartStore.Core.Data;
+using SmartStore.Core.Domain.Media;
+using SmartStore.Services.Tasks;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using SmartStore.Core.Data;
-using SmartStore.Core.Domain.Media;
-using SmartStore.Services.Tasks;
 
 namespace SmartStore.Services.Media
 {
@@ -14,44 +14,59 @@ namespace SmartStore.Services.Media
     /// </summary>
     public partial class TransientMediaClearTask : AsyncTask
     {
-		private readonly IPictureService _pictureService;
-        private readonly IDownloadService _downloadService;
-		private readonly IRepository<Picture> _pictureRepository;
-		private readonly IRepository<Download> _downloadRepository;
+        #region Private Fields
 
-		public TransientMediaClearTask(
-			IPictureService pictureService,
+        private readonly IRepository<Download> _downloadRepository;
+
+        private readonly IDownloadService _downloadService;
+
+        private readonly IRepository<Picture> _pictureRepository;
+
+        private readonly IPictureService _pictureService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public TransientMediaClearTask(
+            IPictureService pictureService,
             IDownloadService downloadService,
-            IRepository<Picture> pictureRepository, 
-			IRepository<Download> downloadRepository)
+            IRepository<Picture> pictureRepository,
+            IRepository<Download> downloadRepository)
         {
-			_pictureService = pictureService;
+            _pictureService = pictureService;
             _downloadService = downloadService;
-			_pictureRepository = pictureRepository;
-			_downloadRepository = downloadRepository;
+            _pictureRepository = pictureRepository;
+            _downloadRepository = downloadRepository;
         }
 
-		public override async Task ExecuteAsync(TaskExecutionContext ctx)
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        public override async Task ExecuteAsync(TaskExecutionContext ctx)
         {
-			// Delete all media records which are in transient state since at least 3 hours.
-			var olderThan = DateTime.UtcNow.AddHours(-3);
-			var pictureAutoCommit = _pictureRepository.AutoCommitEnabled;
+            // Delete all media records which are in transient state since at least 3 hours.
+            var olderThan = DateTime.UtcNow.AddHours(-3);
+            var pictureAutoCommit = _pictureRepository.AutoCommitEnabled;
             var downloadAutoCommit = _downloadRepository.AutoCommitEnabled;
-			
+
             _pictureRepository.AutoCommitEnabled = false;
             _downloadRepository.AutoCommitEnabled = false;
 
-			try
-			{
-				using (var scope = new DbContextScope(autoDetectChanges: false, validateOnSave: false, hooksEnabled: false))
-				{
-					var pictures = await _pictureRepository.Table.Where(x => x.IsTransient && x.UpdatedOnUtc < olderThan).ToListAsync();
-					foreach (var picture in pictures)
-					{
-						_pictureService.DeletePicture(picture);
-					}
+            try
+            {
+                using (var scope = new DbContextScope(autoDetectChanges: false, validateOnSave: false, hooksEnabled: false))
+                {
+                    var pictures = await _pictureRepository.Table.Where(x => x.IsTransient && x.UpdatedOnUtc < olderThan).ToListAsync();
+                    foreach (var picture in pictures)
+                    {
+                        _pictureService.DeletePicture(picture);
+                    }
 
-					await _pictureRepository.Context.SaveChangesAsync();
+                    await _pictureRepository.Context.SaveChangesAsync();
 
                     var downloads = await _downloadRepository.Table.Where(x => x.IsTransient && x.UpdatedOnUtc < olderThan).ToListAsync();
                     foreach (var download in downloads)
@@ -72,10 +87,12 @@ namespace SmartStore.Services.Media
                 }
             }
             finally
-			{
-				_pictureRepository.AutoCommitEnabled = pictureAutoCommit;
+            {
+                _pictureRepository.AutoCommitEnabled = pictureAutoCommit;
                 _downloadRepository.AutoCommitEnabled = downloadAutoCommit;
-			}
+            }
         }
+
+        #endregion Public Methods
     }
 }

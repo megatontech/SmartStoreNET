@@ -1,42 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using SmartStore.Core.Data;
+﻿using SmartStore.Core.Data;
 using SmartStore.Core.Data.Hooks;
 using SmartStore.Core.Domain.Security;
 using SmartStore.Services.Security;
+using System;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Common
 {
-	public class AclEntityHook : DbSaveHook<IAclSupported>
-	{
-		private readonly Lazy<IAclService> _aclService;
-		private readonly HashSet<AclRecord> _toDelete = new HashSet<AclRecord>();
+    public class AclEntityHook : DbSaveHook<IAclSupported>
+    {
+        #region Private Fields
 
-		public AclEntityHook(Lazy<IAclService> aclService)
-		{
-			_aclService = aclService;
-		}
+        private readonly Lazy<IAclService> _aclService;
 
-		protected override void OnDeleted(IAclSupported entity, IHookedEntity entry)
-		{
-			var entityType = entry.EntityType;
+        private readonly HashSet<AclRecord> _toDelete = new HashSet<AclRecord>();
 
-			var records = _aclService.Value.GetAclRecordsFor(entityType.Name, entry.Entity.Id);
-			_toDelete.AddRange(records);
-		}
+        #endregion Private Fields
 
-		public override void OnAfterSaveCompleted()
-		{
-			if (_toDelete.Count == 0)
-				return;
+        #region Public Constructors
 
-			using (var scope = new DbContextScope(autoCommit: false))
-			{
-				_toDelete.Each(x => _aclService.Value.DeleteAclRecord(x));
-				scope.Commit();
-			}
+        public AclEntityHook(Lazy<IAclService> aclService)
+        {
+            _aclService = aclService;
+        }
 
-			_toDelete.Clear();
-		}
-	}
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        public override void OnAfterSaveCompleted()
+        {
+            if (_toDelete.Count == 0)
+                return;
+
+            using (var scope = new DbContextScope(autoCommit: false))
+            {
+                _toDelete.Each(x => _aclService.Value.DeleteAclRecord(x));
+                scope.Commit();
+            }
+
+            _toDelete.Clear();
+        }
+
+        #endregion Public Methods
+
+
+
+        #region Protected Methods
+
+        protected override void OnDeleted(IAclSupported entity, IHookedEntity entry)
+        {
+            var entityType = entry.EntityType;
+
+            var records = _aclService.Value.GetAclRecordsFor(entityType.Name, entry.Entity.Id);
+            _toDelete.AddRange(records);
+        }
+
+        #endregion Protected Methods
+    }
 }

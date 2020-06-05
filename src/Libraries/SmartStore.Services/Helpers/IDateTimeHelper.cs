@@ -1,6 +1,6 @@
+using SmartStore.Core.Domain.Customers;
 using System;
 using System.Collections.ObjectModel;
-using SmartStore.Core.Domain.Customers;
 
 namespace SmartStore.Services.Helpers
 {
@@ -9,18 +9,23 @@ namespace SmartStore.Services.Helpers
     /// </summary>
     public partial interface IDateTimeHelper
     {
-        /// <summary>
-        /// Retrieves a System.TimeZoneInfo object from the registry based on its identifier.
-        /// </summary>
-        /// <param name="id">The time zone identifier, which corresponds to the System.TimeZoneInfo.Id property.</param>
-        /// <returns>A System.TimeZoneInfo object whose identifier is the value of the id parameter.</returns>
-        TimeZoneInfo FindTimeZoneById(string id);
+        #region Public Properties
 
         /// <summary>
-        /// Returns a sorted collection of all the time zones
+        /// Gets or sets the current user time zone
         /// </summary>
-        /// <returns>A read-only collection of System.TimeZoneInfo objects.</returns>
-        ReadOnlyCollection<TimeZoneInfo> GetSystemTimeZones();
+        TimeZoneInfo CurrentTimeZone { get; set; }
+
+        /// <summary>
+        /// Gets or sets a default store time zone
+        /// </summary>
+        TimeZoneInfo DefaultStoreTimeZone { get; set; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
 
         /// <summary>
         /// Converts the date and time to current user date and time
@@ -78,6 +83,13 @@ namespace SmartStore.Services.Helpers
         DateTime ConvertToUtcTime(DateTime dt, TimeZoneInfo sourceTimeZone);
 
         /// <summary>
+        /// Retrieves a System.TimeZoneInfo object from the registry based on its identifier.
+        /// </summary>
+        /// <param name="id">The time zone identifier, which corresponds to the System.TimeZoneInfo.Id property.</param>
+        /// <returns>A System.TimeZoneInfo object whose identifier is the value of the id parameter.</returns>
+        TimeZoneInfo FindTimeZoneById(string id);
+
+        /// <summary>
         /// Gets a customer time zone
         /// </summary>
         /// <param name="customer">Customer</param>
@@ -85,13 +97,11 @@ namespace SmartStore.Services.Helpers
         TimeZoneInfo GetCustomerTimeZone(Customer customer);
 
         /// <summary>
-        /// Gets or sets a default store time zone
+        /// Returns a sorted collection of all the time zones
         /// </summary>
-        TimeZoneInfo DefaultStoreTimeZone { get; set; }
+        /// <returns>A read-only collection of System.TimeZoneInfo objects.</returns>
+        ReadOnlyCollection<TimeZoneInfo> GetSystemTimeZones();
 
-        /// <summary>
-        /// Gets or sets the current user time zone
-        /// </summary>
-        TimeZoneInfo CurrentTimeZone { get; set; }
+        #endregion Public Methods
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using SmartStore.Core;
+﻿using SmartStore.Core;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Logging;
 using SmartStore.Core.Logging;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Logging
 {
@@ -15,22 +15,27 @@ namespace SmartStore.Services.Logging
     /// </summary>
     public class CustomerActivityService : ICustomerActivityService
     {
-        #region Fields
+        #region Private Fields
 
         private const int _deleteNumberOfEntries = 1000;
 
-        private readonly IRepository<ActivityLog> _activityLogRepository;
-        private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
-        private readonly IRepository<Customer> _customerRepository;
-        private readonly IWorkContext _workContext;
-        private readonly IDbContext _dbContext;
-
         private readonly static object s_lock = new object();
+
         private readonly static ConcurrentDictionary<string, ActivityLogType> s_logTypes = new ConcurrentDictionary<string, ActivityLogType>();
 
-        #endregion Fields
+        private readonly IRepository<ActivityLog> _activityLogRepository;
 
-        #region Ctor
+        private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
+
+        private readonly IRepository<Customer> _customerRepository;
+
+        private readonly IDbContext _dbContext;
+
+        private readonly IWorkContext _workContext;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public CustomerActivityService(
             IRepository<ActivityLog> activityLogRepository,
@@ -46,34 +51,58 @@ namespace SmartStore.Services.Logging
             this._dbContext = dbContext;
         }
 
-        #endregion Ctor
+        #endregion Public Constructors
 
-        #region Methods
+
+
+        #region Public Methods
 
         /// <summary>
-        /// Inserts an activity log type item
+        /// Clears activity log
         /// </summary>
-        /// <param name="activityLogType">Activity log type item</param>
-        public virtual void InsertActivityType(ActivityLogType activityLogType)
+        public virtual void ClearAllActivities()
         {
-            if (activityLogType == null)
-                throw new ArgumentNullException("activityLogType");
+            try
+            {
+                _dbContext.ExecuteSqlCommand("TRUNCATE TABLE [ActivityLog]");
+            }
+            catch
+            {
+                try
+                {
+                    for (int i = 0; i < 100000; ++i)
+                    {
+                        if (_dbContext.ExecuteSqlCommand("Delete Top ({0}) From [ActivityLog]", false, null, _deleteNumberOfEntries) < _deleteNumberOfEntries)
+                            break;
+                    }
+                }
+                catch { }
 
-            s_logTypes.Clear();
-            _activityLogTypeRepository.Insert(activityLogType);
+                try
+                {
+                    _dbContext.ExecuteSqlCommand("DBCC CHECKIDENT('ActivityLog', RESEED, 0)");
+                }
+                catch
+                {
+                    try
+                    {
+                        _dbContext.ExecuteSqlCommand("Alter Table [ActivityLog] Alter Column [Id] Identity(1,1)");
+                    }
+                    catch { }
+                }
+            }
         }
 
         /// <summary>
-        /// Updates an activity log type item
+        /// Deletes an activity log item
         /// </summary>
-        /// <param name="activityLogType">Activity log type item</param>
-        public virtual void UpdateActivityType(ActivityLogType activityLogType)
+        /// <param name="activityLog">Activity log type</param>
+        public virtual void DeleteActivity(ActivityLog activityLog)
         {
-            if (activityLogType == null)
-                throw new ArgumentNullException("activityLogType");
+            if (activityLog == null)
+                throw new ArgumentNullException("activityLog");
 
-            s_logTypes.Clear();
-            _activityLogTypeRepository.Update(activityLogType);
+            _activityLogRepository.Delete(activityLog);
         }
 
         /// <summary>
@@ -90,33 +119,32 @@ namespace SmartStore.Services.Logging
         }
 
         /// <summary>
-        /// Gets all activity log type items
+        /// Gets an activity log item
         /// </summary>
-        /// <returns>Activity log type collection</returns>
-        public virtual IEnumerable<ActivityLogType> GetAllActivityTypes()
+        /// <param name="activityLogId">Activity log identifier</param>
+        /// <returns>Activity log item</returns>
+        public virtual ActivityLog GetActivityById(int activityLogId)
         {
-            EnsureLogTypesAreLoaded();
-            return s_logTypes.Select(x => x.Value);
+            if (activityLogId == 0)
+                return null;
+
+            var query = from al in _activityLogRepository.Table
+                        where al.Id == activityLogId
+                        select al;
+            var activityLog = query.SingleOrDefault();
+            return activityLog;
         }
 
-        private void EnsureLogTypesAreLoaded()
+        public virtual IList<ActivityLog> GetActivityByIds(int[] activityLogIds)
         {
-            if (s_logTypes.Count > 0)
-                return;
+            if (activityLogIds == null || activityLogIds.Length == 0)
+                return new List<ActivityLog>();
 
-            lock (s_lock)
-            {
-                if (s_logTypes.Count == 0)
-                {
-                    var query = from alt in _activityLogTypeRepository.Table
-                                orderby alt.Name
-                                select alt;
-                    query.Each(x =>
-                    {
-                        s_logTypes[x.SystemKeyword] = x;
-                    });
-                }
-            }
+            var query = _activityLogRepository.Table
+                .Where(x => activityLogIds.Contains(x.Id))
+                .OrderByDescending(x => x.CreatedOnUtc);
+
+            return query.ToList();
         }
 
         /// <summary>
@@ -145,72 +173,6 @@ namespace SmartStore.Services.Logging
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Inserts an activity log item
-        /// </summary>
-        /// <param name="systemKeyword">The system keyword</param>
-        /// <param name="comment">The activity comment</param>
-        /// <param name="commentParams">The activity comment parameters for string.Format() function.</param>
-        /// <returns>Activity log item</returns>
-        public virtual ActivityLog InsertActivity(string systemKeyword, string comment, params object[] commentParams)
-        {
-            return InsertActivity(systemKeyword, comment, _workContext.CurrentCustomer, commentParams);
-        }
-
-        /// <summary>
-        /// Inserts an activity log item
-        /// </summary>
-        /// <param name="systemKeyword">The system keyword</param>
-        /// <param name="comment">The activity comment</param>
-        /// <param name="customer">The customer</param>
-        /// <param name="commentParams">The activity comment parameters for string.Format() function.</param>
-        /// <returns>Activity log item</returns>
-        public virtual ActivityLog InsertActivity(string systemKeyword, string comment, Customer customer, params object[] commentParams)
-        {
-            if (customer == null)
-                return null;
-
-            var activityType = this.GetActivityTypeBySystemKeyword(systemKeyword);
-            if (activityType == null || !activityType.Enabled)
-                return null;
-
-            comment = comment.EmptyNull();
-            comment = comment.Replace("（“{ 0 }”）", "{0}");
-            comment = comment.Replace("（“{ 1 }”）", "{1}");
-            comment = comment.Replace("（“{ 2 }”）", "{2}");
-            comment = comment.Replace("（“{ 3 }”）", "{3}");
-            comment = comment.Replace("（“{ 4 }”）", "{4}");
-            comment = comment.Replace("{ 0 }", "{0}");
-            comment = comment.Replace("{ 1 }", "{1}");
-            comment = comment.Replace("{ 2 }", "{2}");
-            comment = comment.Replace("{ 3 }", "{3}");
-            comment = comment.Replace("{ 4 }", "{4}");
-            comment = string.Format(comment, commentParams);
-            comment = comment.Truncate(4000);
-
-            var activity = new ActivityLog();
-            activity.ActivityLogTypeId = activityType.Id;
-            activity.CustomerId = customer.Id;
-            activity.Comment = comment;
-            activity.CreatedOnUtc = DateTime.UtcNow;
-
-            _activityLogRepository.Insert(activity);
-
-            return activity;
-        }
-
-        /// <summary>
-        /// Deletes an activity log item
-        /// </summary>
-        /// <param name="activityLog">Activity log type</param>
-        public virtual void DeleteActivity(ActivityLog activityLog)
-        {
-            if (activityLog == null)
-                throw new ArgumentNullException("activityLog");
-
-            _activityLogRepository.Delete(activityLog);
         }
 
         /// <summary>
@@ -272,70 +234,121 @@ namespace SmartStore.Services.Logging
         }
 
         /// <summary>
-        /// Gets an activity log item
+        /// Gets all activity log type items
         /// </summary>
-        /// <param name="activityLogId">Activity log identifier</param>
-        /// <returns>Activity log item</returns>
-        public virtual ActivityLog GetActivityById(int activityLogId)
+        /// <returns>Activity log type collection</returns>
+        public virtual IEnumerable<ActivityLogType> GetAllActivityTypes()
         {
-            if (activityLogId == 0)
-                return null;
-
-            var query = from al in _activityLogRepository.Table
-                        where al.Id == activityLogId
-                        select al;
-            var activityLog = query.SingleOrDefault();
-            return activityLog;
-        }
-
-        public virtual IList<ActivityLog> GetActivityByIds(int[] activityLogIds)
-        {
-            if (activityLogIds == null || activityLogIds.Length == 0)
-                return new List<ActivityLog>();
-
-            var query = _activityLogRepository.Table
-                .Where(x => activityLogIds.Contains(x.Id))
-                .OrderByDescending(x => x.CreatedOnUtc);
-
-            return query.ToList();
+            EnsureLogTypesAreLoaded();
+            return s_logTypes.Select(x => x.Value);
         }
 
         /// <summary>
-        /// Clears activity log
+        /// Inserts an activity log item
         /// </summary>
-        public virtual void ClearAllActivities()
+        /// <param name="systemKeyword">The system keyword</param>
+        /// <param name="comment">The activity comment</param>
+        /// <param name="commentParams">The activity comment parameters for string.Format() function.</param>
+        /// <returns>Activity log item</returns>
+        public virtual ActivityLog InsertActivity(string systemKeyword, string comment, params object[] commentParams)
         {
-            try
-            {
-                _dbContext.ExecuteSqlCommand("TRUNCATE TABLE [ActivityLog]");
-            }
-            catch
-            {
-                try
-                {
-                    for (int i = 0; i < 100000; ++i)
-                    {
-                        if (_dbContext.ExecuteSqlCommand("Delete Top ({0}) From [ActivityLog]", false, null, _deleteNumberOfEntries) < _deleteNumberOfEntries)
-                            break;
-                    }
-                }
-                catch { }
+            return InsertActivity(systemKeyword, comment, _workContext.CurrentCustomer, commentParams);
+        }
 
-                try
+        /// <summary>
+        /// Inserts an activity log item
+        /// </summary>
+        /// <param name="systemKeyword">The system keyword</param>
+        /// <param name="comment">The activity comment</param>
+        /// <param name="customer">The customer</param>
+        /// <param name="commentParams">The activity comment parameters for string.Format() function.</param>
+        /// <returns>Activity log item</returns>
+        public virtual ActivityLog InsertActivity(string systemKeyword, string comment, Customer customer, params object[] commentParams)
+        {
+            if (customer == null)
+                return null;
+
+            var activityType = this.GetActivityTypeBySystemKeyword(systemKeyword);
+            if (activityType == null || !activityType.Enabled)
+                return null;
+
+            comment = comment.EmptyNull();
+            comment = comment.Replace("（“{ 0 }”）", "{0}");
+            comment = comment.Replace("（“{ 1 }”）", "{1}");
+            comment = comment.Replace("（“{ 2 }”）", "{2}");
+            comment = comment.Replace("（“{ 3 }”）", "{3}");
+            comment = comment.Replace("（“{ 4 }”）", "{4}");
+            comment = comment.Replace("{ 0 }", "{0}");
+            comment = comment.Replace("{ 1 }", "{1}");
+            comment = comment.Replace("{ 2 }", "{2}");
+            comment = comment.Replace("{ 3 }", "{3}");
+            comment = comment.Replace("{ 4 }", "{4}");
+            comment = string.Format(comment, commentParams);
+            comment = comment.Truncate(4000);
+
+            var activity = new ActivityLog();
+            activity.ActivityLogTypeId = activityType.Id;
+            activity.CustomerId = customer.Id;
+            activity.Comment = comment;
+            activity.CreatedOnUtc = DateTime.UtcNow;
+
+            _activityLogRepository.Insert(activity);
+
+            return activity;
+        }
+
+        /// <summary>
+        /// Inserts an activity log type item
+        /// </summary>
+        /// <param name="activityLogType">Activity log type item</param>
+        public virtual void InsertActivityType(ActivityLogType activityLogType)
+        {
+            if (activityLogType == null)
+                throw new ArgumentNullException("activityLogType");
+
+            s_logTypes.Clear();
+            _activityLogTypeRepository.Insert(activityLogType);
+        }
+
+        /// <summary>
+        /// Updates an activity log type item
+        /// </summary>
+        /// <param name="activityLogType">Activity log type item</param>
+        public virtual void UpdateActivityType(ActivityLogType activityLogType)
+        {
+            if (activityLogType == null)
+                throw new ArgumentNullException("activityLogType");
+
+            s_logTypes.Clear();
+            _activityLogTypeRepository.Update(activityLogType);
+        }
+
+        #endregion Public Methods
+
+
+
+        #region Private Methods
+
+        private void EnsureLogTypesAreLoaded()
+        {
+            if (s_logTypes.Count > 0)
+                return;
+
+            lock (s_lock)
+            {
+                if (s_logTypes.Count == 0)
                 {
-                    _dbContext.ExecuteSqlCommand("DBCC CHECKIDENT('ActivityLog', RESEED, 0)");
-                }
-                catch
-                {
-                    try
+                    var query = from alt in _activityLogTypeRepository.Table
+                                orderby alt.Name
+                                select alt;
+                    query.Each(x =>
                     {
-                        _dbContext.ExecuteSqlCommand("Alter Table [ActivityLog] Alter Column [Id] Identity(1,1)");
-                    }
-                    catch { }
+                        s_logTypes[x.SystemKeyword] = x;
+                    });
                 }
             }
         }
 
-        #endregion Methods
+        #endregion Private Methods
     }
 }

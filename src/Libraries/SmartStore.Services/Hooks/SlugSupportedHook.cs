@@ -1,44 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using SmartStore.Core.Data;
+﻿using SmartStore.Core.Data;
 using SmartStore.Core.Data.Hooks;
 using SmartStore.Core.Domain.Seo;
 using SmartStore.Services.Seo;
+using System;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Common
 {
-	public class SlugSupportedHook : DbSaveHook<ISlugSupported>
-	{
-		private readonly Lazy<IUrlRecordService> _urlRecordService;
-		private readonly HashSet<UrlRecord> _toDelete = new HashSet<UrlRecord>();
+    public class SlugSupportedHook : DbSaveHook<ISlugSupported>
+    {
+        #region Private Fields
 
-		public SlugSupportedHook(Lazy<IUrlRecordService> urlRecordService)
-		{
-			_urlRecordService = urlRecordService;
-		}
+        private readonly HashSet<UrlRecord> _toDelete = new HashSet<UrlRecord>();
 
-		protected override void OnDeleted(ISlugSupported entity, IHookedEntity entry)
-		{
-			var entityType = entry.EntityType;
-			var records = _urlRecordService.Value.GetUrlRecordsFor(entityType.Name, entry.Entity.Id);
-			_toDelete.AddRange(records);
-		}
+        private readonly Lazy<IUrlRecordService> _urlRecordService;
 
-		public override void OnAfterSaveCompleted()
-		{
-			if (_toDelete.Count == 0)
-				return;
+        #endregion Private Fields
 
-			using (var scope = new DbContextScope(autoCommit: false))
-			{
-				using (_urlRecordService.Value.BeginScope())
-				{
-					_toDelete.Each(x => _urlRecordService.Value.DeleteUrlRecord(x));
-				}
+        #region Public Constructors
 
-				scope.Commit();
-				_toDelete.Clear();
-			}
-		}
-	}
+        public SlugSupportedHook(Lazy<IUrlRecordService> urlRecordService)
+        {
+            _urlRecordService = urlRecordService;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        public override void OnAfterSaveCompleted()
+        {
+            if (_toDelete.Count == 0)
+                return;
+
+            using (var scope = new DbContextScope(autoCommit: false))
+            {
+                using (_urlRecordService.Value.BeginScope())
+                {
+                    _toDelete.Each(x => _urlRecordService.Value.DeleteUrlRecord(x));
+                }
+
+                scope.Commit();
+                _toDelete.Clear();
+            }
+        }
+
+        #endregion Public Methods
+
+
+
+        #region Protected Methods
+
+        protected override void OnDeleted(ISlugSupported entity, IHookedEntity entry)
+        {
+            var entityType = entry.EntityType;
+            var records = _urlRecordService.Value.GetUrlRecordsFor(entityType.Name, entry.Entity.Id);
+            _toDelete.AddRange(records);
+        }
+
+        #endregion Protected Methods
+    }
 }

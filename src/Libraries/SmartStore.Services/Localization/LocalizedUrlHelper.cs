@@ -1,11 +1,13 @@
-﻿using System.Web;
-using SmartStore.Core.Localization;
+﻿using SmartStore.Core.Localization;
+using System.Web;
 
 namespace SmartStore.Services.Localization
 {
-	public class LocalizedUrlHelper
+    public class LocalizedUrlHelper
     {
-        public LocalizedUrlHelper(HttpRequestBase httpRequest, bool rawUrl = false) 
+        #region Public Constructors
+
+        public LocalizedUrlHelper(HttpRequestBase httpRequest, bool rawUrl = false)
             : this(httpRequest.ApplicationPath, rawUrl ? httpRequest.RawUrl : httpRequest.AppRelativeCurrentExecutionFilePath, rawUrl)
         {
             Guard.NotNull(httpRequest, nameof(httpRequest));
@@ -28,9 +30,34 @@ namespace SmartStore.Services.Localization
             }
         }
 
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
         public string ApplicationPath { get; private set; }
 
         public string RelativePath { get; private set; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
+
+        public string GetAbsolutePath()
+        {
+            string path = this.ApplicationPath.EnsureEndsWith("/");
+            path = path + this.RelativePath;
+
+            if (path.Length > 1 && path[0] != '/')
+            {
+                path = "/" + path;
+            }
+
+            return path;
+        }
 
         public bool IsLocalizedUrl()
         {
@@ -56,27 +83,13 @@ namespace SmartStore.Services.Localization
                 firstPart = firstPart.Substring(0, firstSlash);
             }
 
-            if (LocalizationHelper.IsValidCultureCode(firstPart)) 
+            if (LocalizationHelper.IsValidCultureCode(firstPart))
             {
                 seoCode = firstPart;
                 return true;
             }
 
             return false;
-        }
-
-        public string StripSeoCode()
-        {
-            if (IsLocalizedUrl(out var seoCode))
-            {
-                this.RelativePath = this.RelativePath.Substring(seoCode.Length).TrimStart('/');
-                //if (this.RelativePath.IsEmpty())
-                //{
-                //    this.RelativePath = "/";
-                //}
-            }
-
-            return this.RelativePath;
         }
 
         public string PrependSeoCode(string seoCode, bool safe = false)
@@ -103,18 +116,26 @@ namespace SmartStore.Services.Localization
             return this.RelativePath;
         }
 
-        public string GetAbsolutePath()
+        public string StripSeoCode()
         {
-            string path = this.ApplicationPath.EnsureEndsWith("/");
-            path = path + this.RelativePath;
-
-            if (path.Length > 1 && path[0] != '/')
+            if (IsLocalizedUrl(out var seoCode))
             {
-                path = "/" + path;
+                this.RelativePath = this.RelativePath.Substring(seoCode.Length).TrimStart('/');
+
+                //if (this.RelativePath.IsEmpty())
+                //{
+                //    this.RelativePath = "/";
+                //}
             }
 
-            return path;
+            return this.RelativePath;
         }
+
+        #endregion Public Methods
+
+
+
+        #region Private Methods
 
         private string RemoveApplicationPathFromRawUrl(string rawUrl)
         {
@@ -124,6 +145,7 @@ namespace SmartStore.Services.Localization
             }
 
             var result = rawUrl.Substring(ApplicationPath.Length);
+
             // raw url always starts with '/'
             if (!result.StartsWith("/"))
             {
@@ -132,5 +154,7 @@ namespace SmartStore.Services.Localization
 
             return result;
         }
+
+        #endregion Private Methods
     }
 }
