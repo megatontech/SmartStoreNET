@@ -43,6 +43,8 @@ using SmartStore.Services.Tax;
 using SmartStore.Core.Domain.Themes;
 using SmartStore.Services.Common;
 using SmartStore.Core.Domain.Payments;
+using SmartStore.Admin.Models.Wallet;
+using SmartStore.Core.Domain.Wallet;
 
 namespace SmartStore.Admin
 {
@@ -1027,5 +1029,22 @@ namespace SmartStore.Admin
         }
 
         #endregion Stores
+        #region wallet
+        public static DeclarationFinwithdraladuitModel ToModel(this WithdrawalApply entity)
+        {
+            return Mapper.Map<WithdrawalApply, DeclarationFinwithdraladuitModel>(entity);
+        }
+
+        public static WithdrawalApply ToEntity(this DeclarationFinwithdraladuitModel model)
+        {
+            return Mapper.Map<DeclarationFinwithdraladuitModel, WithdrawalApply>(model);
+        }
+
+        public static WithdrawalApply ToEntity(this DeclarationFinwithdraladuitModel model, WithdrawalApply destination)
+        {
+            return Mapper.Map(model, destination);
+        }
+
+        #endregion
     }
 }

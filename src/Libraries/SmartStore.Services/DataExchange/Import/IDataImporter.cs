@@ -1,46 +1,68 @@
-﻿using System;
+﻿using SmartStore.Core.Domain;
+using SmartStore.Core.Domain.DataExchange;
+using System;
 using System.Collections.Generic;
 using System.Threading;
-using SmartStore.Core.Domain;
-using SmartStore.Core.Domain.DataExchange;
 
 namespace SmartStore.Services.DataExchange.Import
 {
-	public interface IDataImporter
-	{
-		void Import(DataImportRequest request, CancellationToken cancellationToken);
-	}
+    public interface IDataImporter
+    {
+        #region Public Methods
+
+        void Import(DataImportRequest request, CancellationToken cancellationToken);
+
+        #endregion Public Methods
+    }
+
+    public class DataImportRequest
+    {
+        #region Private Fields
+
+        private readonly static ProgressValueSetter _voidProgressValueSetter = DataImportRequest.SetProgress;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public DataImportRequest(ImportProfile profile)
+        {
+            Guard.NotNull(profile, nameof(profile));
+
+            Profile = profile;
+            ProgressValueSetter = _voidProgressValueSetter;
+
+            EntitiesToImport = new List<int>();
+            CustomData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        #endregion Public Constructors
 
 
-	public class DataImportRequest
-	{
-		private readonly static ProgressValueSetter _voidProgressValueSetter = DataImportRequest.SetProgress;
 
-		public DataImportRequest(ImportProfile profile)
-		{
-			Guard.NotNull(profile, nameof(profile));
+        #region Public Properties
 
-			Profile = profile;
-			ProgressValueSetter = _voidProgressValueSetter;
+        public IDictionary<string, object> CustomData { get; private set; }
 
-			EntitiesToImport = new List<int>();
-			CustomData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-		}
+        public IList<int> EntitiesToImport { get; set; }
 
-		public ImportProfile Profile { get; private set; }
+        public bool HasPermission { get; set; }
 
-		public ProgressValueSetter ProgressValueSetter { get; set; }
+        public ImportProfile Profile { get; private set; }
 
-		public bool HasPermission { get; set; }
+        public ProgressValueSetter ProgressValueSetter { get; set; }
 
-		public IList<int> EntitiesToImport { get; set; }
-
-		public IDictionary<string, object> CustomData { get; private set; }
+        #endregion Public Properties
 
 
-		private static void SetProgress(int val, int max, string msg)
-		{
-			// do nothing
-		}
-	}
+
+        #region Private Methods
+
+        private static void SetProgress(int val, int max, string msg)
+        {
+            // do nothing
+        }
+
+        #endregion Private Methods
+    }
 }

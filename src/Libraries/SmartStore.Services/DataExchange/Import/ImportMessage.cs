@@ -2,89 +2,115 @@
 
 namespace SmartStore.Services.DataExchange.Import
 {
-	
-	public class ImportMessage
-	{
-		public ImportMessage(string message, ImportMessageType messageType = ImportMessageType.Info)
-		{
-			Guard.NotEmpty(message, nameof(message));
+    public enum ImportMessageType
+    {
+        Info = 0,
 
-			this.Message = message;
-			this.MessageType = messageType;
-		}
-		
-		public ImportRowInfo AffectedItem
-		{
-			get;
-			set;
-		}
+        Warning = 5,
 
-		public string AffectedField
-		{
-			get;
-			set;
-		}
+        Error = 10
+    }
 
-		public ImportMessageType MessageType
-		{
-			get;
-			set;
-		}
+    public class ImportMessage
+    {
+        #region Public Constructors
 
-		public string Message
-		{
-			get;
-			set;
-		}
+        public ImportMessage(string message, ImportMessageType messageType = ImportMessageType.Info)
+        {
+            Guard.NotEmpty(message, nameof(message));
 
-		public string FullMessage
-		{
-			get;
-			set;
-		}
+            this.Message = message;
+            this.MessageType = messageType;
+        }
 
-		public override string ToString()
-		{
-			var result = Message.NaIfEmpty();
+        #endregion Public Constructors
 
-			string appendix = null;
 
-			if (AffectedItem != null)
-				appendix = appendix.Grow("Pos: " + (AffectedItem.Position + 1).ToString(), ", ");
 
-			if (AffectedField.HasValue())
-				appendix = appendix.Grow("Field: " + AffectedField, ", ");
+        #region Public Properties
 
-			if (appendix.HasValue())
-				result = "{0} [{1}]".FormatInvariant(result, appendix);
+        public string AffectedField
+        {
+            get;
+            set;
+        }
 
-			return result;
-		}
-	}
+        public ImportRowInfo AffectedItem
+        {
+            get;
+            set;
+        }
 
-	public class ImportRowInfo : Tuple<int, string>
-	{
-		public ImportRowInfo(int position, string entityName) 
-			: base(position, entityName)
-		{
-		}
+        public string FullMessage
+        {
+            get;
+            set;
+        }
 
-		public int Position
-		{
-			get { return base.Item1; }
-		}
+        public string Message
+        {
+            get;
+            set;
+        }
 
-		public string EntityName
-		{
-			get { return base.Item2; }
-		}
-	}
+        public ImportMessageType MessageType
+        {
+            get;
+            set;
+        }
 
-	public enum ImportMessageType
-	{
-		Info = 0,
-		Warning = 5,
-		Error = 10
-	}
+        #endregion Public Properties
 
+
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            var result = Message.NaIfEmpty();
+
+            string appendix = null;
+
+            if (AffectedItem != null)
+                appendix = appendix.Grow("Pos: " + (AffectedItem.Position + 1).ToString(), ", ");
+
+            if (AffectedField.HasValue())
+                appendix = appendix.Grow("Field: " + AffectedField, ", ");
+
+            if (appendix.HasValue())
+                result = "{0} [{1}]".FormatInvariant(result, appendix);
+
+            return result;
+        }
+
+        #endregion Public Methods
+    }
+
+    public class ImportRowInfo : Tuple<int, string>
+    {
+        #region Public Constructors
+
+        public ImportRowInfo(int position, string entityName)
+            : base(position, entityName)
+        {
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public string EntityName
+        {
+            get { return base.Item2; }
+        }
+
+        public int Position
+        {
+            get { return base.Item1; }
+        }
+
+        #endregion Public Properties
+    }
 }

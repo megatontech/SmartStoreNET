@@ -405,6 +405,7 @@
     <Compile Include="Models\Settings\TaxSettingsModel.cs" />
     <Compile Include="Models\Wallet\DailyTotalContributionModel.cs" />
     <Compile Include="Models\Wallet\DeclarationCalcRuleModel.cs" />
+    <Compile Include="Models\Wallet\DeclarationFinwithdraladuitModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

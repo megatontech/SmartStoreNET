@@ -1,181 +1,194 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
 
 namespace SmartStore.Services.DataExchange.Import
 {
-	public class ImportResult : ICloneable<SerializableImportResult>
-	{
-		public ImportResult()
-		{
-			this.Messages = new List<ImportMessage>();
-			Clear();
-		}
+    public class ImportResult : ICloneable<SerializableImportResult>
+    {
+        #region Public Constructors
 
-		public DateTime StartDateUtc
-		{
-			get;
-			set;
-		}
+        public ImportResult()
+        {
+            this.Messages = new List<ImportMessage>();
+            Clear();
+        }
 
-		public DateTime EndDateUtc
-		{
-			get;
-			set;
-		}
+        #endregion Public Constructors
 
-		public int TotalRecords
-		{
-			get;
-			set;
-		}
 
-		public int SkippedRecords
-		{
-			get;
-			set;
-		}
 
-		public int NewRecords
-		{
-			get;
-			set;
-		}
+        #region Public Properties
 
-		public int ModifiedRecords
-		{
-			get;
-			set;
-		}
+        public int AffectedRecords
+        {
+            get { return NewRecords + ModifiedRecords; }
+        }
 
-		public int AffectedRecords
-		{
-			get { return NewRecords + ModifiedRecords; }
-		}
+        public bool Cancelled
+        {
+            get;
+            set;
+        }
 
-		public bool Cancelled
-		{
-			get;
-			set;
-		}
+        public DateTime EndDateUtc
+        {
+            get;
+            set;
+        }
 
-		public void Clear()
-		{
-			Messages.Clear();
-			StartDateUtc = EndDateUtc = DateTime.UtcNow;
-			TotalRecords = 0;
-			SkippedRecords = 0;
-			NewRecords = 0;
-			ModifiedRecords = 0;
-			Cancelled = false;
-		}
+        public int Errors
+        {
+            get { return Messages.Count(x => x.MessageType == ImportMessageType.Error); }
+        }
 
-		public ImportMessage AddInfo(string message, ImportRowInfo affectedRow = null, string affectedField = null)
-		{
-			return this.AddMessage(message, ImportMessageType.Info, affectedRow, affectedField);
-		}
+        public bool HasErrors
+        {
+            get { return this.Messages.Any(x => x.MessageType == ImportMessageType.Error); }
+        }
 
-		public ImportMessage AddWarning(string message, ImportRowInfo affectedRow = null, string affectedField = null)
-		{
-			return this.AddMessage(message, ImportMessageType.Warning, affectedRow, affectedField);
-		}
+        public bool HasWarnings
+        {
+            get { return this.Messages.Any(x => x.MessageType == ImportMessageType.Warning); }
+        }
 
-		public ImportMessage AddError(string message, ImportRowInfo affectedRow = null, string affectedField = null)
-		{
-			return this.AddMessage(message, ImportMessageType.Error, affectedRow, affectedField);
-		}
+        public string LastError
+        {
+            get
+            {
+                var lastError = Messages.LastOrDefault(x => x.MessageType == ImportMessageType.Error);
+                if (lastError != null)
+                    return lastError.Message;
 
-		public ImportMessage AddError(Exception exception, int? affectedBatch = null, string stage = null)
-		{
-			var prefix = new List<string>();
-			if (affectedBatch.HasValue)
-			{
-				prefix.Add("Batch: " + affectedBatch.Value);
-			}
-			if (stage.HasValue())
-			{
-				prefix.Add("Stage: " + stage);
-			}
+                return null;
+            }
+        }
 
-			string msg = string.Empty;
-			if (prefix.Any())
-			{
-				msg = "[{0}] ".FormatCurrent(String.Join(", ", prefix));
-			}
+        public IList<ImportMessage> Messages
+        {
+            get;
+            private set;
+        }
 
-			msg += exception.ToAllMessages();
+        public int ModifiedRecords
+        {
+            get;
+            set;
+        }
 
-			return this.AddMessage(msg, ImportMessageType.Error, fullMessage: exception.StackTrace);
-		}
+        public int NewRecords
+        {
+            get;
+            set;
+        }
 
-		public ImportMessage AddError(Exception exception, string message)
-		{
-			return AddMessage(
-				message ?? exception.ToAllMessages(),
-				ImportMessageType.Error,
-				null,
-				null,
-				exception.StackTrace);
-		}
+        public int SkippedRecords
+        {
+            get;
+            set;
+        }
 
-		public ImportMessage AddMessage(string message, ImportMessageType severity, ImportRowInfo affectedRow = null, string affectedField = null, string fullMessage = null)
-		{
-			var msg = new ImportMessage(message, severity);
+        public DateTime StartDateUtc
+        {
+            get;
+            set;
+        }
 
-			msg.AffectedItem = affectedRow;
-			msg.AffectedField = affectedField;
-			msg.FullMessage = fullMessage;
+        public int TotalRecords
+        {
+            get;
+            set;
+        }
 
-			this.Messages.Add(msg);
-			return msg;
-		}
+        public int Warnings
+        {
+            get { return Messages.Count(x => x.MessageType == ImportMessageType.Warning); }
+        }
 
-		public IList<ImportMessage> Messages
-		{
-			get;
-			private set;
-		}
+        #endregion Public Properties
 
-		public bool HasWarnings
-		{
-			get { return this.Messages.Any(x => x.MessageType == ImportMessageType.Warning); }
-		}
 
-		public int Warnings
-		{
-			get { return Messages.Count(x => x.MessageType == ImportMessageType.Warning); }
-		}
 
-		public bool HasErrors
-		{
-			get { return this.Messages.Any(x => x.MessageType == ImportMessageType.Error); }
-		}
+        #region Public Methods
 
-		public int Errors
-		{
-			get { return Messages.Count(x => x.MessageType == ImportMessageType.Error); }
-		}
+        public ImportMessage AddError(string message, ImportRowInfo affectedRow = null, string affectedField = null)
+        {
+            return this.AddMessage(message, ImportMessageType.Error, affectedRow, affectedField);
+        }
 
-		public string LastError
-		{
-			get
-			{
-				var lastError = Messages.LastOrDefault(x => x.MessageType == ImportMessageType.Error);
-				if (lastError != null)
-					return lastError.Message;
+        public ImportMessage AddError(Exception exception, int? affectedBatch = null, string stage = null)
+        {
+            var prefix = new List<string>();
+            if (affectedBatch.HasValue)
+            {
+                prefix.Add("Batch: " + affectedBatch.Value);
+            }
+            if (stage.HasValue())
+            {
+                prefix.Add("Stage: " + stage);
+            }
 
-				return null;
-			}
-		}
+            string msg = string.Empty;
+            if (prefix.Any())
+            {
+                msg = "[{0}] ".FormatCurrent(String.Join(", ", prefix));
+            }
 
-		object ICloneable.Clone()
-		{
-			return this.MemberwiseClone();
-		}
+            msg += exception.ToAllMessages();
 
-		public SerializableImportResult Clone()
-		{
+            return this.AddMessage(msg, ImportMessageType.Error, fullMessage: exception.StackTrace);
+        }
+
+        public ImportMessage AddError(Exception exception, string message)
+        {
+            return AddMessage(
+                message ?? exception.ToAllMessages(),
+                ImportMessageType.Error,
+                null,
+                null,
+                exception.StackTrace);
+        }
+
+        public ImportMessage AddInfo(string message, ImportRowInfo affectedRow = null, string affectedField = null)
+        {
+            return this.AddMessage(message, ImportMessageType.Info, affectedRow, affectedField);
+        }
+
+        public ImportMessage AddMessage(string message, ImportMessageType severity, ImportRowInfo affectedRow = null, string affectedField = null, string fullMessage = null)
+        {
+            var msg = new ImportMessage(message, severity);
+
+            msg.AffectedItem = affectedRow;
+            msg.AffectedField = affectedField;
+            msg.FullMessage = fullMessage;
+
+            this.Messages.Add(msg);
+            return msg;
+        }
+
+        public ImportMessage AddWarning(string message, ImportRowInfo affectedRow = null, string affectedField = null)
+        {
+            return this.AddMessage(message, ImportMessageType.Warning, affectedRow, affectedField);
+        }
+
+        public void Clear()
+        {
+            Messages.Clear();
+            StartDateUtc = EndDateUtc = DateTime.UtcNow;
+            TotalRecords = 0;
+            SkippedRecords = 0;
+            NewRecords = 0;
+            ModifiedRecords = 0;
+            Cancelled = false;
+        }
+
+        object ICloneable.Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public SerializableImportResult Clone()
+        {
             var result = new SerializableImportResult();
             result.StartDateUtc = StartDateUtc;
             result.EndDateUtc = EndDateUtc;
@@ -191,22 +204,37 @@ namespace SmartStore.Services.DataExchange.Import
 
             return result;
         }
-	}
 
+        #endregion Public Methods
+    }
 
-	[Serializable]
-	public partial class SerializableImportResult
-	{
-		public DateTime StartDateUtc { get; set; }
-		public DateTime EndDateUtc { get; set; }
-		public int TotalRecords { get; set; }
-		public int SkippedRecords { get; set; }
-		public int NewRecords { get; set; }
-		public int ModifiedRecords { get; set; }
-		public int AffectedRecords { get; set; }
-		public bool Cancelled { get; set; }
-		public int Warnings { get; set; }
-		public int Errors { get; set; }
-		public string LastError { get; set; }
-	}
+    [Serializable]
+    public partial class SerializableImportResult
+    {
+        #region Public Properties
+
+        public int AffectedRecords { get; set; }
+
+        public bool Cancelled { get; set; }
+
+        public DateTime EndDateUtc { get; set; }
+
+        public int Errors { get; set; }
+
+        public string LastError { get; set; }
+
+        public int ModifiedRecords { get; set; }
+
+        public int NewRecords { get; set; }
+
+        public int SkippedRecords { get; set; }
+
+        public DateTime StartDateUtc { get; set; }
+
+        public int TotalRecords { get; set; }
+
+        public int Warnings { get; set; }
+
+        #endregion Public Properties
+    }
 }

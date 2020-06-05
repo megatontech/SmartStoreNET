@@ -7,6 +7,8 @@ namespace SmartStore.Services.Discounts
     /// </summary>
     public partial interface IDiscountRequirementRule : IProvider
     {
+        #region Public Methods
+
         /// <summary>
         /// Check discount requirement
         /// </summary>
@@ -21,5 +23,7 @@ namespace SmartStore.Services.Discounts
         /// <param name="discountRequirementId">Discount requirement identifier (if editing)</param>
         /// <returns>URL</returns>
         string GetConfigurationUrl(int discountId, int? discountRequirementId);
+
+        #endregion Public Methods
     }
 }

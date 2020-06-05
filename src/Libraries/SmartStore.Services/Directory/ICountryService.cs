@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using SmartStore.Core.Domain.Directory;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Directory
 {
@@ -9,6 +8,8 @@ namespace SmartStore.Services.Directory
     /// </summary>
     public partial interface ICountryService
     {
+        #region Public Methods
+
         /// <summary>
         /// Deletes a country
         /// </summary>
@@ -37,18 +38,18 @@ namespace SmartStore.Services.Directory
         IList<Country> GetAllCountriesForShipping(bool showHidden = false);
 
         /// <summary>
-        /// Gets a country 
+        /// Gets a country
         /// </summary>
         /// <param name="countryId">Country identifier</param>
         /// <returns>Country</returns>
         Country GetCountryById(int countryId);
 
-		/// <summary>
-		/// Gets a country by two or three letter ISO code
-		/// </summary>
-		/// <param name="letterIsoCode">Country two or three letter ISO code</param>
-		/// <returns>Country</returns>
-		Country GetCountryByTwoOrThreeLetterIsoCode(string letterIsoCode);
+        /// <summary>
+        /// Gets a country by three letter ISO code
+        /// </summary>
+        /// <param name="threeLetterIsoCode">Country three letter ISO code</param>
+        /// <returns>Country</returns>
+        Country GetCountryByThreeLetterIsoCode(string threeLetterIsoCode);
 
         /// <summary>
         /// Gets a country by two letter ISO code
@@ -58,11 +59,11 @@ namespace SmartStore.Services.Directory
         Country GetCountryByTwoLetterIsoCode(string twoLetterIsoCode);
 
         /// <summary>
-        /// Gets a country by three letter ISO code
+        /// Gets a country by two or three letter ISO code
         /// </summary>
-        /// <param name="threeLetterIsoCode">Country three letter ISO code</param>
+        /// <param name="letterIsoCode">Country two or three letter ISO code</param>
         /// <returns>Country</returns>
-        Country GetCountryByThreeLetterIsoCode(string threeLetterIsoCode);
+        Country GetCountryByTwoOrThreeLetterIsoCode(string letterIsoCode);
 
         /// <summary>
         /// Inserts a country
@@ -75,5 +76,7 @@ namespace SmartStore.Services.Directory
         /// </summary>
         /// <param name="country">Country</param>
         void UpdateCountry(Country country);
-	}
+
+        #endregion Public Methods
+    }
 }

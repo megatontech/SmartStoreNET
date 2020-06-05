@@ -1,32 +1,32 @@
-﻿using System;
+﻿using SmartStore.Core.Data;
+using SmartStore.Core.Domain.Declaration;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
-using AutoMapper;
-using SmartStore.Collections;
-using SmartStore.Core.Data;
-using SmartStore.Core.Domain.Catalog;
-using SmartStore.Core.Domain.Customers;
-using SmartStore.Core.Domain.Declaration;
-using SmartStore.Core.Domain.Discounts;
-using SmartStore.Core.Domain.Localization;
-using SmartStore.Core.Domain.Orders;
-using SmartStore.Core.Events;
-using SmartStore.Data.Caching;
-using SmartStore.Services.Messages;
-using SmartStore.Services.Orders;
 
 namespace SmartStore.Services.Declaration
 {
-    public class DeclarationCapRuleService:IDeclarationCapRuleService
+    public class DeclarationCapRuleService : IDeclarationCapRuleService
     {
+        #region Private Fields
+
         private readonly IRepository<DeclarationCapRule> _Repository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
         public DeclarationCapRuleService(IRepository<DeclarationCapRule> services)
         {
             _Repository = services;
-
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
         public virtual IList<DeclarationCapRule> GetAllRule()
         {
             var query =
@@ -37,5 +37,7 @@ namespace SmartStore.Services.Declaration
             var rule = query.ToList();
             return rule;
         }
+
+        #endregion Public Methods
     }
 }

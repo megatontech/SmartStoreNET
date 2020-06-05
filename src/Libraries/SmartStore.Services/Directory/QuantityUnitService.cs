@@ -1,35 +1,50 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Directory;
 using SmartStore.Core.Events;
 using SmartStore.Data.Caching;
 using SmartStore.Services.Customers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Directory
 {
     public partial class QuantityUnitService : IQuantityUnitService
     {
-        private readonly IRepository<QuantityUnit> _quantityUnitRepository;
-        private readonly IRepository<Product> _productRepository;
+        #region Private Fields
+
+        private readonly CatalogSettings _catalogSettings;
+
         private readonly IEventPublisher _eventPublisher;
-		private readonly CatalogSettings _catalogSettings;
-        
+
+        private readonly IRepository<Product> _productRepository;
+
+        private readonly IRepository<QuantityUnit> _quantityUnitRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
         public QuantityUnitService(
             IRepository<QuantityUnit> quantityUnitRepository,
             IRepository<Product> productRepository,
             IRepository<ProductVariantAttributeCombination> attributeCombinationRepository,
             ICustomerService customerService,
             IEventPublisher eventPublisher,
-			CatalogSettings catalogSettings)
+            CatalogSettings catalogSettings)
         {
             this._quantityUnitRepository = quantityUnitRepository;
             this._eventPublisher = eventPublisher;
             this._productRepository = productRepository;
-			this._catalogSettings = catalogSettings;
+            this._catalogSettings = catalogSettings;
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
 
         public virtual void DeleteQuantityUnit(QuantityUnit quantityUnit)
         {
@@ -42,24 +57,27 @@ namespace SmartStore.Services.Directory
             _quantityUnitRepository.Delete(quantityUnit);
         }
 
-        public virtual bool IsAssociated(int quantityUnitId)
+        public virtual IList<QuantityUnit> GetAllQuantityUnits()
         {
-            if (quantityUnitId == 0)
-                return false;
+            var query = _quantityUnitRepository.Table.OrderBy(c => c.DisplayOrder);
 
-            var query = 
-				from p in _productRepository.Table
-                where p.QuantityUnitId == quantityUnitId || p.ProductVariantAttributeCombinations.Any(c => c.QuantityUnitId == quantityUnitId)
-				select p.Id;
+            var quantityUnits = query.ToListCached("db.qtyunit.all");
+            return quantityUnits;
+        }
 
-            return query.Count() > 0;
+        public virtual QuantityUnit GetQuantityUnit(Product product)
+        {
+            if (product == null)
+                return null;
+
+            return GetQuantityUnitById(product.QuantityUnitId ?? 0);
         }
 
         public virtual QuantityUnit GetQuantityUnitById(int? quantityUnitId)
         {
-			if (quantityUnitId == null || quantityUnitId == 0)
+            if (quantityUnitId == null || quantityUnitId == 0)
             {
-                if(_catalogSettings.ShowDefaultQuantityUnit)
+                if (_catalogSettings.ShowDefaultQuantityUnit)
                 {
                     return GetAllQuantityUnits().Where(x => x.IsDefault == true).FirstOrDefault();
                 }
@@ -68,25 +86,9 @@ namespace SmartStore.Services.Directory
                     return null;
                 }
             }
-            
+
             return _quantityUnitRepository.GetById(quantityUnitId);
         }
-
-        public virtual QuantityUnit GetQuantityUnit(Product product)
-		{
-			if (product == null)
-				return null;
-
-            return GetQuantityUnitById(product.QuantityUnitId ?? 0);
-		}
-
-        public virtual IList<QuantityUnit> GetAllQuantityUnits()
-        {
-			var query = _quantityUnitRepository.Table.OrderBy(c => c.DisplayOrder);
-
-			var quantityUnits = query.ToListCached("db.qtyunit.all");
-			return quantityUnits;
-		}
 
         public virtual void InsertQuantityUnit(QuantityUnit quantityUnit)
         {
@@ -96,21 +98,34 @@ namespace SmartStore.Services.Directory
             _quantityUnitRepository.Insert(quantityUnit);
         }
 
+        public virtual bool IsAssociated(int quantityUnitId)
+        {
+            if (quantityUnitId == 0)
+                return false;
+
+            var query =
+                from p in _productRepository.Table
+                where p.QuantityUnitId == quantityUnitId || p.ProductVariantAttributeCombinations.Any(c => c.QuantityUnitId == quantityUnitId)
+                select p.Id;
+
+            return query.Count() > 0;
+        }
+
         public virtual void UpdateQuantityUnit(QuantityUnit quantityUnit)
         {
             if (quantityUnit == null)
                 throw new ArgumentNullException("quantityUnit");
 
-            if (quantityUnit.IsDefault == true) {
-
+            if (quantityUnit.IsDefault == true)
+            {
                 var temp = new List<QuantityUnit>();
                 temp.Add(quantityUnit);
 
                 var query = GetAllQuantityUnits()
                     .Where(x => x.IsDefault == true)
                     .Except(temp);
-                
-                foreach(var qu in query) 
+
+                foreach (var qu in query)
                 {
                     qu.IsDefault = false;
                     _quantityUnitRepository.Update(qu);
@@ -119,5 +134,7 @@ namespace SmartStore.Services.Directory
 
             _quantityUnitRepository.Update(quantityUnit);
         }
+
+        #endregion Public Methods
     }
 }

@@ -1,5 +1,18 @@
-﻿using SmartStore.Web.Framework.Controllers;
+﻿using SmartStore.Admin.Models.Wallet;
+using SmartStore.Core.Domain.Wallet;
+using SmartStore.Web.Framework.Controllers;
 using System.Web.Mvc;
+using SmartStore.Admin.Models.Stores;
+using SmartStore.Core.Domain.Stores;
+using SmartStore.Services.Directory;
+using SmartStore.Services.Media;
+using SmartStore.Services.Security;
+using SmartStore.Web.Framework.Filters;
+using SmartStore.Web.Framework.Security;
+using System;
+using System.Linq;
+using Telerik.Web.Mvc;
+using SmartStore.Services.Wallet;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -8,6 +21,12 @@ namespace SmartStore.Admin.Controllers
     /// </summary>
     public class DeclarationFinwithdraladuitController : AdminControllerBase
     {
+        private IWithdrawalApplyService _withdrawalApplyService;
+
+        public DeclarationFinwithdraladuitController(IWithdrawalApplyService withdrawalApplyService)
+        {
+            _withdrawalApplyService = withdrawalApplyService;
+        }
         #region Public Methods
 
         // GET: DeclarationFinwithdraladuit/Create
@@ -46,7 +65,7 @@ namespace SmartStore.Admin.Controllers
             {
                 // TODO: Add delete logic here
 
-                return RedirectToAction("Index");
+                return RedirectToAction("List");
             }
             catch
             {
@@ -57,13 +76,15 @@ namespace SmartStore.Admin.Controllers
         // GET: DeclarationFinwithdraladuit/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var storeModels = _withdrawalApplyService.GetByID(id);
+            return View(storeModels);
         }
 
         // GET: DeclarationFinwithdraladuit/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var storeModels = _withdrawalApplyService.GetByID(id);
+            return View(storeModels);
         }
 
         // POST: DeclarationFinwithdraladuit/Edit/5
@@ -73,7 +94,8 @@ namespace SmartStore.Admin.Controllers
             try
             {
                 // TODO: Add update logic here
-
+                var storeModels = _withdrawalApplyService.GetByID(id);
+                _withdrawalApplyService.Update(storeModels);
                 return RedirectToAction("Index");
             }
             catch
@@ -81,13 +103,46 @@ namespace SmartStore.Admin.Controllers
                 return View();
             }
         }
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command)
+        {
+            var gridModel = new GridModel<DeclarationFinwithdraladuitModel>();
 
+            if (Services.Permissions.Authorize(StandardPermissionProvider.ManageStores))
+            {
+                var storeModels = _withdrawalApplyService.GetList()
+                    .Select(x =>
+                    {
+                        var model = x.ToModel();
+                        //PrepareStoreModel(model, x);
+                        return model;
+                    })
+                    .ToList();
+
+                gridModel.Data = storeModels;
+                gridModel.Total = storeModels.Count();
+            }
+            else
+            {
+                gridModel.Data = Enumerable.Empty<DeclarationFinwithdraladuitModel>();
+                NotifyAccessDenied();
+            }
+
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
         // GET: DeclarationFinwithdraladuit
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("List");
         }
 
         #endregion Public Methods
+        private void PrepareStoreModel(DeclarationFinwithdraladuitModel model, WithdrawalApply apply)
+        {
+            AutoMapper.Mapper.Instance.Map(apply, model);
+        }
     }
 }

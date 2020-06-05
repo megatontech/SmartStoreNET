@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using SmartStore.Core;
+﻿using SmartStore.Core;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Plugins;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Discounts
 {
@@ -12,38 +11,13 @@ namespace SmartStore.Services.Discounts
     /// </summary>
     public partial interface IDiscountService
     {
+        #region Public Methods
+
         /// <summary>
         /// Delete discount
         /// </summary>
         /// <param name="discount">Discount</param>
         void DeleteDiscount(Discount discount);
-
-        /// <summary>
-        /// Gets a discount
-        /// </summary>
-        /// <param name="discountId">Discount identifier</param>
-        /// <returns>Discount</returns>
-        Discount GetDiscountById(int discountId);
-
-		/// <summary>
-		/// Gets all discounts
-		/// </summary>
-		/// <param name="discountType">Discount type; null to load all discount</param>
-		/// <param name="showHidden">A value indicating whether to show hidden records</param>
-		/// <returns>Discount collection</returns>
-		IEnumerable<Discount> GetAllDiscounts(DiscountType? discountType, string couponCode = "", bool showHidden = false);
-
-        /// <summary>
-        /// Inserts a discount
-        /// </summary>
-        /// <param name="discount">Discount</param>
-        void InsertDiscount(Discount discount);
-
-        /// <summary>
-        /// Updates the discount
-        /// </summary>
-        /// <param name="discount">Discount</param>
-        void UpdateDiscount(Discount discount);
 
         /// <summary>
         /// Delete discount requirement
@@ -52,18 +26,29 @@ namespace SmartStore.Services.Discounts
         void DeleteDiscountRequirement(DiscountRequirement discountRequirement);
 
         /// <summary>
-        /// Load discount requirement rule by system name
+        /// Delete discount usage history record
         /// </summary>
-        /// <param name="systemName">System name</param>
-        /// <returns>Found discount requirement rule</returns>
-		Provider<IDiscountRequirementRule> LoadDiscountRequirementRuleBySystemName(string systemName, int storeId = 0);
+        /// <param name="discountUsageHistory">Discount usage history record</param>
+        void DeleteDiscountUsageHistory(DiscountUsageHistory discountUsageHistory);
 
         /// <summary>
-        /// Load all discount requirement rules
+        /// Gets all discounts
         /// </summary>
-        /// <returns>Discount requirement rules</returns>
-		IEnumerable<Provider<IDiscountRequirementRule>> LoadAllDiscountRequirementRules(int storeId = 0);
+        /// <param name="discountType">Discount type; null to load all discount</param>
+        /// <param name="showHidden">A value indicating whether to show hidden records</param>
+        /// <returns>Discount collection</returns>
+        IEnumerable<Discount> GetAllDiscounts(DiscountType? discountType, string couponCode = "", bool showHidden = false);
 
+        /// <summary>
+        /// Gets all discount usage history records
+        /// </summary>
+        /// <param name="discountId">Discount identifier</param>
+        /// <param name="customerId">Customer identifier</param>
+        /// <param name="pageIndex">Page index</param>
+        /// <param name="pageSize">Page size</param>
+        /// <returns>Discount usage history records</returns>
+        IPagedList<DiscountUsageHistory> GetAllDiscountUsageHistory(int? discountId,
+            int? customerId, int pageIndex, int pageSize);
 
         /// <summary>
         /// Get discount by coupon code
@@ -72,6 +57,32 @@ namespace SmartStore.Services.Discounts
         /// <param name="showHidden">A value indicating whether to show hidden records</param>
         /// <returns>Discount</returns>
         Discount GetDiscountByCouponCode(string couponCode, bool showHidden = false);
+
+        /// <summary>
+        /// Gets a discount
+        /// </summary>
+        /// <param name="discountId">Discount identifier</param>
+        /// <returns>Discount</returns>
+        Discount GetDiscountById(int discountId);
+
+        /// <summary>
+        /// Gets a discount usage history record
+        /// </summary>
+        /// <param name="discountUsageHistoryId">Discount usage history record identifier</param>
+        /// <returns>Discount usage history</returns>
+        DiscountUsageHistory GetDiscountUsageHistoryById(int discountUsageHistoryId);
+
+        /// <summary>
+        /// Inserts a discount
+        /// </summary>
+        /// <param name="discount">Discount</param>
+        void InsertDiscount(Discount discount);
+
+        /// <summary>
+        /// Insert discount usage history record
+        /// </summary>
+        /// <param name="discountUsageHistory">Discount usage history record</param>
+        void InsertDiscountUsageHistory(DiscountUsageHistory discountUsageHistory);
 
         /// <summary>
         /// Check discount requirements
@@ -91,40 +102,30 @@ namespace SmartStore.Services.Discounts
         bool IsDiscountValid(Discount discount, Customer customer, string couponCodeToValidate);
 
         /// <summary>
-        /// Gets a discount usage history record
+        /// Load all discount requirement rules
         /// </summary>
-        /// <param name="discountUsageHistoryId">Discount usage history record identifier</param>
-        /// <returns>Discount usage history</returns>
-        DiscountUsageHistory GetDiscountUsageHistoryById(int discountUsageHistoryId);
-        
-        /// <summary>
-        /// Gets all discount usage history records
-        /// </summary>
-        /// <param name="discountId">Discount identifier</param>
-        /// <param name="customerId">Customer identifier</param>
-        /// <param name="pageIndex">Page index</param>
-        /// <param name="pageSize">Page size</param>
-        /// <returns>Discount usage history records</returns>
-        IPagedList<DiscountUsageHistory> GetAllDiscountUsageHistory(int? discountId, 
-            int? customerId, int pageIndex, int pageSize);
+        /// <returns>Discount requirement rules</returns>
+		IEnumerable<Provider<IDiscountRequirementRule>> LoadAllDiscountRequirementRules(int storeId = 0);
 
         /// <summary>
-        /// Insert discount usage history record
+        /// Load discount requirement rule by system name
         /// </summary>
-        /// <param name="discountUsageHistory">Discount usage history record</param>
-        void InsertDiscountUsageHistory(DiscountUsageHistory discountUsageHistory);
-        
+        /// <param name="systemName">System name</param>
+        /// <returns>Found discount requirement rule</returns>
+		Provider<IDiscountRequirementRule> LoadDiscountRequirementRuleBySystemName(string systemName, int storeId = 0);
+
+        /// <summary>
+        /// Updates the discount
+        /// </summary>
+        /// <param name="discount">Discount</param>
+        void UpdateDiscount(Discount discount);
+
         /// <summary>
         /// Update discount usage history record
         /// </summary>
         /// <param name="discountUsageHistory">Discount usage history record</param>
         void UpdateDiscountUsageHistory(DiscountUsageHistory discountUsageHistory);
 
-        /// <summary>
-        /// Delete discount usage history record
-        /// </summary>
-        /// <param name="discountUsageHistory">Discount usage history record</param>
-        void DeleteDiscountUsageHistory(DiscountUsageHistory discountUsageHistory);
-
+        #endregion Public Methods
     }
 }

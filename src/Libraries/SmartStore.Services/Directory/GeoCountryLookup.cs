@@ -1,22 +1,31 @@
-using System;
-using System.Net;
 using MaxMind.GeoIP2;
-using SmartStore.Core;
-using SmartStore.Core.Caching;
 using SmartStore.Utilities;
-using SmDir = SmartStore.Core.Domain.Directory;
+using System.Net;
 
 namespace SmartStore.Services.Directory
 {
     public partial class GeoCountryLookup : DisposableObject, IGeoCountryLookup
     {
-        private readonly DatabaseReader _reader;
+        #region Private Fields
+
         private readonly object _lock = new object();
+
+        private readonly DatabaseReader _reader;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public GeoCountryLookup()
         {
             _reader = new DatabaseReader(CommonHelper.MapPath("~/App_Data/GeoLite2/GeoLite2-Country.mmdb"));
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
 
         public LookupCountryResponse LookupCountry(string addr)
         {
@@ -47,6 +56,12 @@ namespace SmartStore.Services.Directory
             return null;
         }
 
+        #endregion Public Methods
+
+
+
+        #region Protected Methods
+
         protected override void OnDispose(bool disposing)
         {
             if (disposing && _reader != null)
@@ -54,5 +69,7 @@ namespace SmartStore.Services.Directory
                 _reader.Dispose();
             }
         }
+
+        #endregion Protected Methods
     }
 }

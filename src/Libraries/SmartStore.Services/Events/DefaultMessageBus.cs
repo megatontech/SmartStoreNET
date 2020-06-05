@@ -1,35 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SmartStore.Core;
 
 namespace SmartStore.Services.Events
 {
-	public class DefaultMessageBus : IMessageBus
-	{
-		private readonly IMessageBroker _messageBroker;
+    public class DefaultMessageBus : IMessageBus
+    {
+        #region Private Fields
 
-		public DefaultMessageBus(IEnumerable<IMessageBroker> messageBrokers)
-		{
-			_messageBroker = messageBrokers.FirstOrDefault();
-		}
+        private readonly IMessageBroker _messageBroker;
 
-		public void Subscribe(string channel, Action<string, string> handler)
-		{
-			if (_messageBroker == null)
-				return;
+        #endregion Private Fields
 
-			_messageBroker.Subscribe(channel, handler);
-		}
+        #region Public Constructors
 
-		public void Publish(string channel, string message)
-		{
-			if (_messageBroker == null)
-				return;
+        public DefaultMessageBus(IEnumerable<IMessageBroker> messageBrokers)
+        {
+            _messageBroker = messageBrokers.FirstOrDefault();
+        }
 
-			_messageBroker.Publish(channel, message);
-		}
-	}
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        public void Publish(string channel, string message)
+        {
+            if (_messageBroker == null)
+                return;
+
+            _messageBroker.Publish(channel, message);
+        }
+
+        public void Subscribe(string channel, Action<string, string> handler)
+        {
+            if (_messageBroker == null)
+                return;
+
+            _messageBroker.Subscribe(channel, handler);
+        }
+
+        #endregion Public Methods
+    }
 }

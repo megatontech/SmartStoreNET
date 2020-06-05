@@ -1,51 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SmartStore.ComponentModel;
+﻿using SmartStore.ComponentModel;
 using SmartStore.Core.Events;
 using SmartStore.Core.Logging;
+using System.Linq;
 
 namespace SmartStore.Services.Events
 {
-	public class EventPublisher : IEventPublisher
-	{
-		private readonly IConsumerRegistry _registry;
-		private readonly IConsumerResolver _resolver;
-		private readonly IConsumerInvoker _invoker;
+    public class EventPublisher : IEventPublisher
+    {
+        #region Private Fields
 
-		public EventPublisher(IConsumerRegistry registry, IConsumerResolver resolver, IConsumerInvoker invoker)
-		{
-			_registry = registry;
-			_resolver = resolver;
-			_invoker = invoker;
+        private readonly IConsumerInvoker _invoker;
 
-			Logger = NullLogger.Instance;
-		}
+        private readonly IConsumerRegistry _registry;
 
-		public ILogger Logger { get; set; }
+        private readonly IConsumerResolver _resolver;
 
-		public void Publish<T>(T message) where T : class
-		{
-			var descriptors = _registry.GetConsumers(message);
+        #endregion Private Fields
 
-			if (!descriptors.Any())
-			{
-				return;
-			}
+        #region Public Constructors
 
-			var envelopeType = typeof(ConsumeContext<>).MakeGenericType(typeof(T));
-			var envelope = (ConsumeContext<T>)FastActivator.CreateInstance(envelopeType, message);
+        public EventPublisher(IConsumerRegistry registry, IConsumerResolver resolver, IConsumerInvoker invoker)
+        {
+            _registry = registry;
+            _resolver = resolver;
+            _invoker = invoker;
 
-			foreach (var descriptor in descriptors)
-			{
-				var consumer = _resolver.Resolve(descriptor);
-				if (consumer != null)
-				{
-					_invoker.Invoke(descriptor, consumer, envelope);
-				}
-			}
-		}
-	}
+            Logger = NullLogger.Instance;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public ILogger Logger { get; set; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
+
+        public void Publish<T>(T message) where T : class
+        {
+            var descriptors = _registry.GetConsumers(message);
+
+            if (!descriptors.Any())
+            {
+                return;
+            }
+
+            var envelopeType = typeof(ConsumeContext<>).MakeGenericType(typeof(T));
+            var envelope = (ConsumeContext<T>)FastActivator.CreateInstance(envelopeType, message);
+
+            foreach (var descriptor in descriptors)
+            {
+                var consumer = _resolver.Resolve(descriptor);
+                if (consumer != null)
+                {
+                    _invoker.Invoke(descriptor, consumer, envelope);
+                }
+            }
+        }
+
+        #endregion Public Methods
+    }
 }

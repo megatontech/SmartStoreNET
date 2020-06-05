@@ -1,49 +1,39 @@
-﻿@model Telerik.Web.Mvc.GridModel<DiscountModel>
-@using Telerik.Web.Mvc.UI
+﻿@using Telerik.Web.Mvc.UI
+@using SmartStore.Admin.Models.Wallet;
 @{
-    ViewBag.Title = T("Admin.Promotions.Discounts").Text;
+	ViewBag.Title = T("提现申请管理").Text;
 }
 <div class="section-header">
     <div class="title">
-        @T("Admin.Promotions.Discounts")
+		<i class="fa fa-shopping-cart"></i>
+        @T("提现申请审核")
     </div>
     <div class="options">
-		@{ Html.RenderWidget("admin_button_toolbar_before"); }
-
-        <a href="@Url.Action("Create")" class="btn btn-primary">
+		@*<a href="@Url.Action("Create")" class="btn btn-primary">
 			<i class="fa fa-plus"></i>
 			<span>@T("Admin.Common.AddNew")</span>
-		</a>
-
-		@{ Html.RenderWidget("admin_button_toolbar_after"); }
+		</a>*@
     </div>
 </div>
 
 <div>
-	@(Html.Telerik().Grid<DiscountModel>(Model.Data)
-		.Name("discounts-grid")
+	@(Html.Telerik().Grid<DeclarationFinwithdraladuitModel>()
+		.Name("stores-grid")
 		.Columns(columns =>
 		{
-			columns.Bound(x => x.Name)
-				.Width(400)
+			columns.Bound(x => x.CustomerID)
 				.Template(x => Html.ActionLink(x.Name, "Edit", new { id = x.Id }))
 				.ClientTemplate("<a href=\"Edit/<#= Id #>\"><#= Name #></a>");
-			columns.Bound(x => x.StartDateUtc)
-				.Width(120);
-			columns.Bound(x => x.EndDateUtc)
-				.Width(120);
-			columns.Bound(x => x.UsePercentage)
-				.Width(120)
-				.Template(item => @Html.SymbolForBool(item.UsePercentage))
-				.ClientTemplate(@Html.SymbolForBool("UsePercentage"))
+			columns.Bound(x => x.Amount)
+				.ClientTemplate("<a href=\"<#= Url #>\" target=\"_blank\"><#= Url #></a>");
+			columns.Bound(x => x.WithdrawType);
+			columns.Bound(x => x.WithdrawStatus);
+			columns.Bound(x => x.WithdrawTime)
+				.ClientTemplate("<a href=\"<#= ContentDeliveryNetwork #>\" target=\"_blank\"><#= ContentDeliveryNetwork #></a>");
+			columns.Bound(x => x.WithdrawAuditTime)
 				.Centered();
-			columns.Bound(x => x.FormattedDiscountPercentage)
-				.Width(120)
-				.Centered();
-			columns.Bound(x => x.FormattedDiscountAmount)
-				.Width(120)
-				.RightAlign();
 		})
-		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Discount"))
+		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "DeclarationFinwithdraladuit"))
 		.EnableCustomBinding(true))
 </div>
+

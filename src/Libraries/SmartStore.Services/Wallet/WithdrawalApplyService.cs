@@ -1,5 +1,6 @@
 ﻿using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Wallet;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Wallet
 {
@@ -18,16 +19,43 @@ namespace SmartStore.Services.Wallet
             _WithdrawalApplyRepository = withdrawalApplyRepository;
         }
 
+        public void Delete(WithdrawalApply model)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public WithdrawalApply GetByID(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<WithdrawalApply> GetList()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<WithdrawalApply> GetListByID()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Insert(WithdrawalApply model)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Update(WithdrawalApply model)
+        {
+            throw new System.NotImplementedException();
+        }
+
         #endregion Public Constructors
 
 
 
         #region Public Methods
 
-        public void Add(WithdrawalApply entity)
-        {
-            _WithdrawalApplyRepository.Insert(entity);
-        }
+
 
         #endregion Public Methods
     }

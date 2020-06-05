@@ -1,20 +1,28 @@
-﻿using System;
-
-namespace SmartStore.Services.DataExchange.Import.Events
+﻿namespace SmartStore.Services.DataExchange.Import.Events
 {
-	public class ImportExecutedEvent
-	{
-		public ImportExecutedEvent(ImportExecuteContext context)
-		{
-			Guard.NotNull(context, nameof(context));
+    public class ImportExecutedEvent
+    {
+        #region Public Constructors
 
-			Context = context;
-		}
+        public ImportExecutedEvent(ImportExecuteContext context)
+        {
+            Guard.NotNull(context, nameof(context));
 
-		public ImportExecuteContext Context
-		{
-			get;
-			private set;
-		}
-	}
+            Context = context;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public ImportExecuteContext Context
+        {
+            get;
+            private set;
+        }
+
+        #endregion Public Properties
+    }
 }
