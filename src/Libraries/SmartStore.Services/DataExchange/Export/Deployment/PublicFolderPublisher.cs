@@ -1,44 +1,48 @@
-﻿using System.IO;
-using SmartStore.Core.Domain;
+﻿using SmartStore.Core.Domain;
 using SmartStore.Core.Logging;
 using SmartStore.Utilities;
+using System.IO;
 
 namespace SmartStore.Services.DataExchange.Export.Deployment
 {
-	public class PublicFolderPublisher : IFilePublisher
-	{
-		public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
-		{
-			var destinationFolder = deployment.GetDeploymentFolder(true);
+    public class PublicFolderPublisher : IFilePublisher
+    {
+        #region Public Methods
 
-			if (destinationFolder.IsEmpty())
-				return;
+        public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
+        {
+            var destinationFolder = deployment.GetDeploymentFolder(true);
 
-			if (!System.IO.Directory.Exists(destinationFolder))
-			{
-				System.IO.Directory.CreateDirectory(destinationFolder);
-			}
+            if (destinationFolder.IsEmpty())
+                return;
 
-			if (context.CreateZipArchive)
-			{
-				if (File.Exists(context.ZipPath))
-				{
-					var destinationFile = Path.Combine(destinationFolder, Path.GetFileName(context.ZipPath));
+            if (!System.IO.Directory.Exists(destinationFolder))
+            {
+                System.IO.Directory.CreateDirectory(destinationFolder);
+            }
 
-					File.Copy(context.ZipPath, destinationFile, true);
+            if (context.CreateZipArchive)
+            {
+                if (File.Exists(context.ZipPath))
+                {
+                    var destinationFile = Path.Combine(destinationFolder, Path.GetFileName(context.ZipPath));
 
-					context.Log.Info($"Copied zipped export data to {destinationFile}.");
-				}
-			}
-			else
-			{
-				if (!FileSystemHelper.CopyDirectory(new DirectoryInfo(context.FolderContent), new DirectoryInfo(destinationFolder)))
-				{
-					context.Result.LastError = context.T("Admin.DataExchange.Export.Deployment.CopyFileFailed");
-				}
+                    File.Copy(context.ZipPath, destinationFile, true);
 
-				context.Log.Info($"Copied export data files to {destinationFolder}.");
-			}
-		}
-	}
+                    context.Log.Info($"Copied zipped export data to {destinationFile}.");
+                }
+            }
+            else
+            {
+                if (!FileSystemHelper.CopyDirectory(new DirectoryInfo(context.FolderContent), new DirectoryInfo(destinationFolder)))
+                {
+                    context.Result.LastError = context.T("Admin.DataExchange.Export.Deployment.CopyFileFailed");
+                }
+
+                context.Log.Info($"Copied export data files to {destinationFolder}.");
+            }
+        }
+
+        #endregion Public Methods
+    }
 }

@@ -3,71 +3,105 @@ using System.Collections.Generic;
 
 namespace SmartStore.Services.DataExchange.Import
 {
-	public interface IDataColumn
-	{
-		string Name { get; }
-		Type Type { get; }
-	}
+    public interface IDataColumn
+    {
+        #region Public Properties
 
-	public interface IDataRow
-	{
-		object[] Values { get; }
-		object this[int index] { get; set; }
-		object this[string name] { get; set; }
+        string Name { get; }
 
-		IDataTable Table { get; }
-	}
+        Type Type { get; }
 
-	public interface IDataTable
-	{
-		bool HasColumn(string name);
-		int GetColumnIndex(string name);
+        #endregion Public Properties
+    }
+
+    public interface IDataRow
+    {
+        #region Public Properties
+
+        IDataTable Table { get; }
+
+        object[] Values { get; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Indexers
+
+        object this[int index] { get; set; }
+
+        object this[string name] { get; set; }
+
+        #endregion Public Indexers
+    }
+
+    public interface IDataTable
+    {
+        #region Public Properties
+
         IList<IDataColumn> Columns { get; }
-		IList<IDataRow> Rows { get; }
-	}
 
-	public static class IDataRowExtensions
-	{
-		public static object GetValue(this IDataRow row, int index)
-		{
-			return row[index];
-		}
+        IList<IDataRow> Rows { get; }
 
-		public static object GetValue(this IDataRow row, string name)
-		{
-			return row[name];
-		}
+        #endregion Public Properties
 
-		public static void SetValue(this IDataRow row, int index, object value)
-		{
-			row[index] = value;
-		}
 
-		public static void SetValue(this IDataRow row, string name, object value)
-		{
-			row[name] = value;
-		}
 
-		public static bool TryGetValue(this IDataRow row, string name, out object value)
-		{
-			value = null;
+        #region Public Methods
 
-			var index = row.Table.GetColumnIndex(name);
-			if (index < 0)
-				return false;
+        int GetColumnIndex(string name);
 
-			value = row[index];
-			return true;
-		}
+        bool HasColumn(string name);
 
-		public static bool TrySetValue(this IDataRow row, string name, object value)
-		{
-			var index = row.Table.GetColumnIndex(name);
-			if (index < 0)
-				return false;
+        #endregion Public Methods
+    }
 
-			row[index] = value;
-			return true;
-		}
-	}
+    public static class IDataRowExtensions
+    {
+        #region Public Methods
+
+        public static object GetValue(this IDataRow row, int index)
+        {
+            return row[index];
+        }
+
+        public static object GetValue(this IDataRow row, string name)
+        {
+            return row[name];
+        }
+
+        public static void SetValue(this IDataRow row, int index, object value)
+        {
+            row[index] = value;
+        }
+
+        public static void SetValue(this IDataRow row, string name, object value)
+        {
+            row[name] = value;
+        }
+
+        public static bool TryGetValue(this IDataRow row, string name, out object value)
+        {
+            value = null;
+
+            var index = row.Table.GetColumnIndex(name);
+            if (index < 0)
+                return false;
+
+            value = row[index];
+            return true;
+        }
+
+        public static bool TrySetValue(this IDataRow row, string name, object value)
+        {
+            var index = row.Table.GetColumnIndex(name);
+            if (index < 0)
+                return false;
+
+            row[index] = value;
+            return true;
+        }
+
+        #endregion Public Methods
+    }
 }

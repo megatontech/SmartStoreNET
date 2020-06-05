@@ -1,0 +1,252 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DEBDF6EE-2913-4307-A002-CE3E143872B5}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SmartStore.GenlinTheme</RootNamespace>
+    <AssemblyName>SmartStore.GenlinTheme</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\compiled\theme.css" />
+    <Content Include="Content\images\best-product-1.png" />
+    <Content Include="Content\images\best-product.png" />
+    <Content Include="Content\images\delivery-truck.jpg" />
+    <Content Include="Content\images\grippy.png" />
+    <Content Include="Content\images\loading.gif" />
+    <Content Include="Content\images\slider\1.jpg" />
+    <Content Include="Content\images\slider\2.jpg" />
+    <Content Include="Content\images\slider\3.jpg" />
+    <Content Include="Content\images\star-off-12.png" />
+    <Content Include="Content\images\star-off.png" />
+    <Content Include="Content\images\star-on-12.png" />
+    <Content Include="Content\images\star-on.png" />
+    <Content Include="Content\js\swiper\swiper.esm.browser.bundle.js" />
+    <Content Include="Content\js\swiper\swiper.esm.browser.bundle.min.js" />
+    <Content Include="Content\js\swiper\swiper.esm.bundle.js" />
+    <Content Include="Content\js\swiper\swiper.esm.js" />
+    <Content Include="Content\js\swiper\swiper.js" />
+    <Content Include="Content\js\swiper\swiper.min.js" />
+    <Content Include="Content\js\theme.js" />
+    <Content Include="preview.png" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\images\calendar.svg" />
+    <Content Include="Content\images\calendar1.svg" />
+    <Content Include="Content\images\clock.svg" />
+    <Content Include="Content\images\delivery.svg" />
+    <Content Include="Content\images\supermarket.svg" />
+    <Content Include="Content\images\wallet.svg" />
+    <Content Include="Content\js\swiper\swiper.esm.browser.bundle.js.map" />
+    <Content Include="Content\js\swiper\swiper.esm.browser.bundle.min.js.map" />
+    <Content Include="Content\js\swiper\swiper.esm.bundle.js.map" />
+    <Content Include="Content\js\swiper\swiper.esm.js.map" />
+    <Content Include="Content\js\swiper\swiper.js.map" />
+    <Content Include="Content\js\swiper\swiper.min.js.map" />
+    <Content Include="Content\swiper.scss" />
+    <Content Include="Content\theme-rtl.scss" />
+    <Content Include="Content\theme.scss" />
+    <Content Include="Content\_accordion.scss" />
+    <Content Include="Content\_artlist.scss" />
+    <Content Include="Content\_block.scss" />
+    <Content Include="Content\_blog.scss" />
+    <Content Include="Content\_buttons.scss" />
+    <Content Include="Content\_cart.scss" />
+    <Content Include="Content\_checkout.scss" />
+    <Content Include="Content\_custom.scss" />
+    <Content Include="Content\_fonts.scss" />
+    <Content Include="Content\_footer.scss" />
+    <Content Include="Content\_forum.scss" />
+    <Content Include="Content\_gallery.scss" />
+    <Content Include="Content\_layout.scss" />
+    <Content Include="Content\_login.scss" />
+    <Content Include="Content\_megamenu.scss" />
+    <Content Include="Content\_menu.scss" />
+    <Content Include="Content\_misc.scss" />
+    <Content Include="Content\_news.scss" />
+    <Content Include="Content\_print.scss" />
+    <Content Include="Content\_product.scss" />
+    <Content Include="Content\_rating.scss" />
+    <Content Include="Content\_rtl.scss" />
+    <Content Include="Content\_search.scss" />
+    <Content Include="Content\_shopbar.scss" />
+    <Content Include="Content\_text-expander.scss" />
+    <Content Include="Content\_user.scss" />
+    <Content Include="Content\_variables-custom.scss" />
+    <Content Include="Content\_variables.scss" />
+    <Content Include="fonts\Shabnam-Bold-FD.eot" />
+    <Content Include="fonts\Shabnam-Bold-FD.ttf" />
+    <Content Include="fonts\Shabnam-Bold-FD.woff" />
+    <Content Include="fonts\Shabnam-Bold-FD.woff2" />
+    <Content Include="fonts\Shabnam-FD.eot" />
+    <Content Include="fonts\Shabnam-FD.ttf" />
+    <Content Include="fonts\Shabnam-FD.woff" />
+    <Content Include="fonts\Shabnam-FD.woff2" />
+    <Content Include="fonts\Shabnam-Light-FD.eot" />
+    <Content Include="fonts\Shabnam-Light-FD.ttf" />
+    <Content Include="fonts\Shabnam-Light-FD.woff" />
+    <Content Include="fonts\Shabnam-Light-FD.woff2" />
+    <Content Include="fonts\Shabnam-Medium-FD.eot" />
+    <Content Include="fonts\Shabnam-Medium-FD.ttf" />
+    <Content Include="fonts\Shabnam-Medium-FD.woff" />
+    <Content Include="fonts\Shabnam-Medium-FD.woff2" />
+    <Content Include="fonts\Shabnam-Thin-FD.eot" />
+    <Content Include="fonts\Shabnam-Thin-FD.ttf" />
+    <Content Include="fonts\Shabnam-Thin-FD.woff" />
+    <Content Include="fonts\Shabnam-Thin-FD.woff2" />
+    <Content Include="LICENSE" />
+    <None Include="packages.config" />
+    <Content Include="theme.config" />
+    <Content Include="Views\Catalog\CategoryTemplate.ProductsInGridOrLines.cshtml" />
+    <Content Include="Views\Catalog\CompareProducts.cshtml" />
+    <Content Include="Views\Catalog\ManufacturerAll.cshtml" />
+    <Content Include="Views\Catalog\ManufacturerTemplate.ProductsInGridOrLines.cshtml" />
+    <Content Include="Views\Catalog\Menus\Categories.cshtml" />
+    <Content Include="Views\Catalog\Partials\HomepageBestSellers.cshtml" />
+    <Content Include="Views\Catalog\Partials\HomepageCategories.cshtml" />
+    <Content Include="Views\Catalog\Partials\HomepageManufacturers.cshtml" />
+    <Content Include="Views\Catalog\Partials\HomepageProducts.cshtml" />
+    <Content Include="Views\Catalog\Partials\OffCanvasCompare.cshtml" />
+    <Content Include="Views\Catalog\Partials\OffCanvasMenu.cshtml" />
+    <Content Include="Views\Catalog\Partials\OffCanvasMenuCategories.cshtml" />
+    <Content Include="Views\Catalog\Partials\OffCanvasMenuManufacturers.cshtml" />
+    <Content Include="Views\Catalog\Partials\PopularProductTags.cshtml" />
+    <Content Include="Views\Catalog\Partials\RecentlyViewedProductsBlock.cshtml" />
+    <Content Include="Views\Catalog\ProductsByTag.cshtml" />
+    <Content Include="Views\Catalog\ProductTagsAll.cshtml" />
+    <Content Include="Views\Catalog\RecentlyAddedProducts.cshtml" />
+    <Content Include="Views\Catalog\RecentlyViewedProducts.cshtml" />
+    <Content Include="Views\Common\Partials\Footer.cshtml" />
+    <Content Include="Views\Common\Partials\ShopBar.cshtml" />
+    <Content Include="Views\Common\Partials\ShopBar.Tools.cshtml" />
+    <Content Include="Views\Home\ContactUs.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\StoreClosed.cshtml" />
+    <Content Include="Views\Product\Partials\Product.RelatedProducts.cshtml" />
+    <Content Include="Views\Product\Partials\Product.Tabs.cshtml" />
+    <Content Include="Views\Product\Product.cshtml" />
+    <Content Include="Views\Product\Reviews.cshtml" />
+    <Content Include="Views\Search\Partials\SearchBox.cshtml" />
+    <Content Include="Views\Shared\ConfigureTheme.cshtml" />
+    <Content Include="Views\Shared\EmailTemplates\address.liquid" />
+    <Content Include="Views\Shared\EmailTemplates\footer.liquid" />
+    <Content Include="Views\Shared\EmailTemplates\header.liquid" />
+    <Content Include="Views\Shared\EmailTemplates\master.liquid" />
+    <Content Include="Views\Shared\EmailTemplates\order.liquid" />
+    <Content Include="Views\Shared\EmailTemplates\shipment.liquid" />
+    <Content Include="Views\Shared\Head.cshtml" />
+    <Content Include="Views\Shared\Layouts\_Document.cshtml" />
+    <Content Include="Views\Shared\Layouts\_Layout.cshtml" />
+    <Content Include="Views\Shared\ProductListHomepage.cshtml" />
+    <Content Include="Views\Shared\ServicesHomePage.cshtml" />
+    <Content Include="Views\Shared\SliderHomePage.cshtml" />
+    <Content Include="Views\Web.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>39530</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:39530/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

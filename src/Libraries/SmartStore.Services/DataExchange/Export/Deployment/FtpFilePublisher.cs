@@ -1,175 +1,194 @@
-﻿using System;
+﻿using SmartStore.Core.Domain;
+using SmartStore.Core.Logging;
+using System;
 using System.IO;
 using System.Net;
-using SmartStore.Core.Domain;
-using SmartStore.Core.Logging;
 
 namespace SmartStore.Services.DataExchange.Export.Deployment
 {
-	public class FtpFilePublisher : IFilePublisher
-	{
-		private ExportDeploymentContext _context;
-		private ExportDeployment _deployment;
-		private int _succeededFiles;
-		private string _ftpRootUrl;
+    public class FtpFilePublisher : IFilePublisher
+    {
+        #region Private Fields
 
-		private string GetRelativePath(string path)
-		{
-			var relativePath = path.Substring(_context.FolderContent.Length).Replace("\\", "/");
-			if (relativePath.StartsWith("/"))
-			{
-				return relativePath.Substring(1);
-			}
+        private ExportDeploymentContext _context;
 
-			return relativePath;
-		}
+        private ExportDeployment _deployment;
 
-		private FtpWebRequest CreateRequest(string url, bool keepAlive = true, long? contentLength = null)
-		{
-			var request = (FtpWebRequest)WebRequest.Create(url);
-			request.Method = WebRequestMethods.Ftp.UploadFile;
-			request.KeepAlive = keepAlive;
-			request.UseBinary = true;
-			request.Proxy = null;
-			request.UsePassive = _deployment.PassiveMode;
-			request.EnableSsl = _deployment.UseSsl;
+        private string _ftpRootUrl;
 
-			if (_deployment.Username.HasValue())
-			{
-				request.Credentials = new NetworkCredential(_deployment.Username, _deployment.Password);
-			}
+        private int _succeededFiles;
 
-			if (contentLength.HasValue)
-			{
-				request.ContentLength = contentLength.Value;
-			}
+        #endregion Private Fields
 
-			return request;
-		}
 
-		private bool UploadFile(string path, string fileUrl, bool keepAlive = true)
-		{
-			var succeeded = false;
-			var bytesRead = 0;
-			var buffLength = 32768;
-			byte[] buff = new byte[buffLength];
 
-			var request = CreateRequest(fileUrl, keepAlive, (new FileInfo(path)).Length);
-			request.Method = WebRequestMethods.Ftp.UploadFile;
+        #region Public Methods
 
-			var requestStream = request.GetRequestStream();
-			using (var stream = new FileStream(path, FileMode.Open))
-			{
-				while ((bytesRead = stream.Read(buff, 0, buffLength)) != 0)
-				{
-					requestStream.Write(buff, 0, bytesRead);
-				}
-			}
+        public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
+        {
+            _context = context;
+            _deployment = deployment;
+            _succeededFiles = 0;
+            _ftpRootUrl = deployment.Url;
 
-			requestStream.Close();
+            if (!_ftpRootUrl.StartsWith("ftp://", StringComparison.InvariantCultureIgnoreCase))
+            {
+                _ftpRootUrl = "ftp://" + _ftpRootUrl;
+            }
 
-			using (var response = (FtpWebResponse)request.GetResponse())
-			{
-				var statusCode = (int)response.StatusCode;
-				succeeded = statusCode >= 200 && statusCode <= 299;
+            _ftpRootUrl = _ftpRootUrl.EnsureEndsWith("/");
 
-				if (succeeded)
-				{
-					++_succeededFiles;
-				}
-				else
-				{
-					_context.Result.LastError = _context.T("Admin.Common.FtpStatus", statusCode, response.StatusCode.ToString());
-					_context.Log.Error("The FTP transfer failed. FTP status {0} ({1}). File {3}".FormatInvariant(statusCode, response.StatusCode.ToString(), path));
-				}
-			}
+            if (context.CreateZipArchive)
+            {
+                if (File.Exists(context.ZipPath))
+                {
+                    var fileUrl = _ftpRootUrl + Path.GetFileName(context.ZipPath);
+                    UploadFile(context.ZipPath, fileUrl, false);
+                }
+            }
+            else
+            {
+                FtpCopyDirectory(new DirectoryInfo(context.FolderContent));
+            }
 
-			return succeeded;
-		}
+            context.Log.Info("{0} file(s) successfully uploaded via FTP.".FormatInvariant(_succeededFiles));
+        }
 
-		private bool DirectoryExists(string directoryUrl)
-		{
-			var result = false;
+        #endregion Public Methods
 
-			try
-			{
-				var request = CreateRequest(directoryUrl.EnsureEndsWith("/"));
-				request.Method = WebRequestMethods.Ftp.ListDirectory;
 
-				using (request.GetResponse())
-				{
-					result = true;
-				}
-			}
-			catch (WebException)
-			{
-				result = false;
-			}
 
-			return result;
-		}
+        #region Private Methods
 
-		private bool FtpCopyDirectory(DirectoryInfo source)
-		{
-			var files = source.GetFiles();
-			var len = files.Length;
+        private FtpWebRequest CreateRequest(string url, bool keepAlive = true, long? contentLength = null)
+        {
+            var request = (FtpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Ftp.UploadFile;
+            request.KeepAlive = keepAlive;
+            request.UseBinary = true;
+            request.Proxy = null;
+            request.UsePassive = _deployment.PassiveMode;
+            request.EnableSsl = _deployment.UseSsl;
 
-			for (var i = 0; i < len; ++i)
-			{
-				var path = files[i].FullName;
-				var relativePath = GetRelativePath(path);
+            if (_deployment.Username.HasValue())
+            {
+                request.Credentials = new NetworkCredential(_deployment.Username, _deployment.Password);
+            }
 
-				UploadFile(path, _ftpRootUrl + relativePath, i != (len - 1));
-			}
+            if (contentLength.HasValue)
+            {
+                request.ContentLength = contentLength.Value;
+            }
 
-			foreach (var sourceSubDir in source.GetDirectories())
-			{
-				var relativePath = GetRelativePath(sourceSubDir.FullName);
+            return request;
+        }
 
-				if (!DirectoryExists(_ftpRootUrl + relativePath))
-				{
-					var request = CreateRequest(_ftpRootUrl + relativePath, true);
-					request.Method = WebRequestMethods.Ftp.MakeDirectory;
-					using (var response = (FtpWebResponse)request.GetResponse())
-					{
-						response.Close();
-					}
-				}
+        private bool DirectoryExists(string directoryUrl)
+        {
+            var result = false;
 
-				FtpCopyDirectory(sourceSubDir);
-			}
+            try
+            {
+                var request = CreateRequest(directoryUrl.EnsureEndsWith("/"));
+                request.Method = WebRequestMethods.Ftp.ListDirectory;
 
-			return true;
-		}
+                using (request.GetResponse())
+                {
+                    result = true;
+                }
+            }
+            catch (WebException)
+            {
+                result = false;
+            }
 
-		public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
-		{
-			_context = context;
-			_deployment = deployment;
-			_succeededFiles = 0;
-			_ftpRootUrl = deployment.Url;
+            return result;
+        }
 
-			if (!_ftpRootUrl.StartsWith("ftp://", StringComparison.InvariantCultureIgnoreCase))
-			{
-				_ftpRootUrl = "ftp://" + _ftpRootUrl;
-			}
+        private bool FtpCopyDirectory(DirectoryInfo source)
+        {
+            var files = source.GetFiles();
+            var len = files.Length;
 
-			_ftpRootUrl = _ftpRootUrl.EnsureEndsWith("/");
+            for (var i = 0; i < len; ++i)
+            {
+                var path = files[i].FullName;
+                var relativePath = GetRelativePath(path);
 
-			if (context.CreateZipArchive)
-			{
-				if (File.Exists(context.ZipPath))
-				{
-					var fileUrl = _ftpRootUrl + Path.GetFileName(context.ZipPath);
-					UploadFile(context.ZipPath, fileUrl, false);
-				}
-			}
-			else
-			{
-				FtpCopyDirectory(new DirectoryInfo(context.FolderContent));
-			}
+                UploadFile(path, _ftpRootUrl + relativePath, i != (len - 1));
+            }
 
-			context.Log.Info("{0} file(s) successfully uploaded via FTP.".FormatInvariant(_succeededFiles));
-		}
-	}
+            foreach (var sourceSubDir in source.GetDirectories())
+            {
+                var relativePath = GetRelativePath(sourceSubDir.FullName);
+
+                if (!DirectoryExists(_ftpRootUrl + relativePath))
+                {
+                    var request = CreateRequest(_ftpRootUrl + relativePath, true);
+                    request.Method = WebRequestMethods.Ftp.MakeDirectory;
+                    using (var response = (FtpWebResponse)request.GetResponse())
+                    {
+                        response.Close();
+                    }
+                }
+
+                FtpCopyDirectory(sourceSubDir);
+            }
+
+            return true;
+        }
+
+        private string GetRelativePath(string path)
+        {
+            var relativePath = path.Substring(_context.FolderContent.Length).Replace("\\", "/");
+            if (relativePath.StartsWith("/"))
+            {
+                return relativePath.Substring(1);
+            }
+
+            return relativePath;
+        }
+
+        private bool UploadFile(string path, string fileUrl, bool keepAlive = true)
+        {
+            var succeeded = false;
+            var bytesRead = 0;
+            var buffLength = 32768;
+            byte[] buff = new byte[buffLength];
+
+            var request = CreateRequest(fileUrl, keepAlive, (new FileInfo(path)).Length);
+            request.Method = WebRequestMethods.Ftp.UploadFile;
+
+            var requestStream = request.GetRequestStream();
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                while ((bytesRead = stream.Read(buff, 0, buffLength)) != 0)
+                {
+                    requestStream.Write(buff, 0, bytesRead);
+                }
+            }
+
+            requestStream.Close();
+
+            using (var response = (FtpWebResponse)request.GetResponse())
+            {
+                var statusCode = (int)response.StatusCode;
+                succeeded = statusCode >= 200 && statusCode <= 299;
+
+                if (succeeded)
+                {
+                    ++_succeededFiles;
+                }
+                else
+                {
+                    _context.Result.LastError = _context.T("Admin.Common.FtpStatus", statusCode, response.StatusCode.ToString());
+                    _context.Log.Error("The FTP transfer failed. FTP status {0} ({1}). File {3}".FormatInvariant(statusCode, response.StatusCode.ToString(), path));
+                }
+            }
+
+            return succeeded;
+        }
+
+        #endregion Private Methods
+    }
 }

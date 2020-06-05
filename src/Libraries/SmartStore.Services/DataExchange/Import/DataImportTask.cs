@@ -2,33 +2,48 @@
 
 namespace SmartStore.Services.DataExchange.Import
 {
-	// note: namespace persisted in ScheduleTask.Type
-	public partial class DataImportTask : ITask
-	{
-		private readonly IDataImporter _importer;
-		private readonly IImportProfileService _importProfileService;
+    // note: namespace persisted in ScheduleTask.Type
+    public partial class DataImportTask : ITask
+    {
+        #region Private Fields
 
-		public DataImportTask(
-			IDataImporter importer,
-			IImportProfileService importProfileService)
-		{
-			_importer = importer;
-			_importProfileService = importProfileService;
-		}
+        private readonly IDataImporter _importer;
 
-		public void Execute(TaskExecutionContext ctx)
-		{
-			var profileId = ctx.ScheduleTaskHistory.ScheduleTask.Alias.ToInt();
-			var profile = _importProfileService.GetImportProfileById(profileId);
+        private readonly IImportProfileService _importProfileService;
 
-			var request = new DataImportRequest(profile);
+        #endregion Private Fields
 
-			request.ProgressValueSetter = delegate (int val, int max, string msg)
-			{
-				ctx.SetProgress(val, max, msg, true);
-			};
+        #region Public Constructors
 
-			_importer.Import(request, ctx.CancellationToken);
-		}
-	}
+        public DataImportTask(
+            IDataImporter importer,
+            IImportProfileService importProfileService)
+        {
+            _importer = importer;
+            _importProfileService = importProfileService;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        public void Execute(TaskExecutionContext ctx)
+        {
+            var profileId = ctx.ScheduleTaskHistory.ScheduleTask.Alias.ToInt();
+            var profile = _importProfileService.GetImportProfileById(profileId);
+
+            var request = new DataImportRequest(profile);
+
+            request.ProgressValueSetter = delegate (int val, int max, string msg)
+            {
+                ctx.SetProgress(val, max, msg, true);
+            };
+
+            _importer.Import(request, ctx.CancellationToken);
+        }
+
+        #endregion Public Methods
+    }
 }

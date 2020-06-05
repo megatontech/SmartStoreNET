@@ -1,77 +1,81 @@
-﻿using System;
+﻿using SmartStore.Core.Domain;
+using SmartStore.Core.Domain.DataExchange;
+using SmartStore.Core.Logging;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using SmartStore.Core.Domain;
-using SmartStore.Core.Domain.DataExchange;
-using SmartStore.Core.Logging;
 
 namespace SmartStore.Services.DataExchange.Export.Deployment
 {
-	public class HttpFilePublisher : IFilePublisher
-	{
-		public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
-		{
-			var succeededFiles = 0;
-			var url = deployment.Url;
+    public class HttpFilePublisher : IFilePublisher
+    {
+        #region Public Methods
 
-			if (!url.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase) && !url.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
-				url = "http://" + url;
+        public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
+        {
+            var succeededFiles = 0;
+            var url = deployment.Url;
 
-			if (deployment.HttpTransmissionType == ExportHttpTransmissionType.MultipartFormDataPost)
-			{
-				var countFiles = 0;
-				ICredentials credentials = null;
+            if (!url.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase) && !url.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
+                url = "http://" + url;
 
-				if (deployment.Username.HasValue())
-					credentials = new NetworkCredential(deployment.Username, deployment.Password);
+            if (deployment.HttpTransmissionType == ExportHttpTransmissionType.MultipartFormDataPost)
+            {
+                var countFiles = 0;
+                ICredentials credentials = null;
 
-				using (var handler = new HttpClientHandler { Credentials = credentials })
-				using (var client = new HttpClient(handler))
-				using (var formData = new MultipartFormDataContent())
-				{
-					foreach (var path in context.GetDeploymentFiles())
-					{
-						byte[] fileData = File.ReadAllBytes(path);
-						formData.Add(new ByteArrayContent(fileData), "file {0}".FormatInvariant(++countFiles), Path.GetFileName(path));
-					}
+                if (deployment.Username.HasValue())
+                    credentials = new NetworkCredential(deployment.Username, deployment.Password);
 
-					var response = client.PostAsync(url, formData).Result;
+                using (var handler = new HttpClientHandler { Credentials = credentials })
+                using (var client = new HttpClient(handler))
+                using (var formData = new MultipartFormDataContent())
+                {
+                    foreach (var path in context.GetDeploymentFiles())
+                    {
+                        byte[] fileData = File.ReadAllBytes(path);
+                        formData.Add(new ByteArrayContent(fileData), "file {0}".FormatInvariant(++countFiles), Path.GetFileName(path));
+                    }
 
-					if (response.IsSuccessStatusCode)
-					{
-						succeededFiles = countFiles;
-					}
-					else if (response.Content != null)
-					{
-						context.Result.LastError = context.T("Admin.Common.HttpStatus", (int)response.StatusCode, response.StatusCode.ToString());
+                    var response = client.PostAsync(url, formData).Result;
 
-						var content = response.Content.ReadAsStringAsync().Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        succeededFiles = countFiles;
+                    }
+                    else if (response.Content != null)
+                    {
+                        context.Result.LastError = context.T("Admin.Common.HttpStatus", (int)response.StatusCode, response.StatusCode.ToString());
 
-						var msg = "Multipart form data upload failed. HTTP status {0} ({1}). Response: {2}".FormatInvariant(
-							(int)response.StatusCode, response.StatusCode.ToString(), content.NaIfEmpty().Truncate(2000, "..."));
+                        var content = response.Content.ReadAsStringAsync().Result;
 
-						context.Log.Error(msg);
-					}
-				}
-			}
-			else
-			{
-				using (var webClient = new WebClient())
-				{
-					if (deployment.Username.HasValue())
-						webClient.Credentials = new NetworkCredential(deployment.Username, deployment.Password);
+                        var msg = "Multipart form data upload failed. HTTP status {0} ({1}). Response: {2}".FormatInvariant(
+                            (int)response.StatusCode, response.StatusCode.ToString(), content.NaIfEmpty().Truncate(2000, "..."));
 
-					foreach (var path in context.GetDeploymentFiles())
-					{
-						webClient.UploadFile(url, path);
+                        context.Log.Error(msg);
+                    }
+                }
+            }
+            else
+            {
+                using (var webClient = new WebClient())
+                {
+                    if (deployment.Username.HasValue())
+                        webClient.Credentials = new NetworkCredential(deployment.Username, deployment.Password);
 
-						++succeededFiles;
-					}
-				}
-			}
+                    foreach (var path in context.GetDeploymentFiles())
+                    {
+                        webClient.UploadFile(url, path);
 
-			context.Log.Info("{0} file(s) successfully uploaded via HTTP ({1}).".FormatInvariant(succeededFiles, deployment.HttpTransmissionType.ToString()));
-		}
-	}
+                        ++succeededFiles;
+                    }
+                }
+            }
+
+            context.Log.Info("{0} file(s) successfully uploaded via HTTP ({1}).".FormatInvariant(succeededFiles, deployment.HttpTransmissionType.ToString()));
+        }
+
+        #endregion Public Methods
+    }
 }

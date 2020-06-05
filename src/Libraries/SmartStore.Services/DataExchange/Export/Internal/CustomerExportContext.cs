@@ -1,54 +1,78 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SmartStore.Collections;
+﻿using SmartStore.Collections;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.DataExchange.Export.Internal
 {
-	public class CustomerExportContext
-	{
-		protected List<int> _customerIds;
+    public class CustomerExportContext
+    {
+        #region Protected Fields
 
-		private Func<int[], Multimap<int, GenericAttribute>> _funcGenericAttributes;
+        protected List<int> _customerIds;
 
-		private LazyMultimap<GenericAttribute> _genericAttributes;
+        #endregion Protected Fields
 
-		public CustomerExportContext(
-			IEnumerable<Customer> customers,
-			Func<int[], Multimap<int, GenericAttribute>> genericAttributes)
-		{
-			if (customers == null)
-			{
-				_customerIds = new List<int>();
-			}
-			else
-			{
-				_customerIds = new List<int>(customers.Select(x => x.Id));
-			}
+        #region Private Fields
 
-			_funcGenericAttributes = genericAttributes;
-		}
+        private Func<int[], Multimap<int, GenericAttribute>> _funcGenericAttributes;
 
-		public void Clear()
-		{
-			if (_genericAttributes != null)
-				_genericAttributes.Clear();
+        private LazyMultimap<GenericAttribute> _genericAttributes;
 
-			_customerIds.Clear();
-		}
+        #endregion Private Fields
 
-		public LazyMultimap<GenericAttribute> GenericAttributes
-		{
-			get
-			{
-				if (_genericAttributes == null)
-				{
-					_genericAttributes = new LazyMultimap<GenericAttribute>(keys => _funcGenericAttributes(keys), _customerIds);
-				}
-				return _genericAttributes;
-			}
-		}
-	}
+        #region Public Constructors
+
+        public CustomerExportContext(
+            IEnumerable<Customer> customers,
+            Func<int[], Multimap<int, GenericAttribute>> genericAttributes)
+        {
+            if (customers == null)
+            {
+                _customerIds = new List<int>();
+            }
+            else
+            {
+                _customerIds = new List<int>(customers.Select(x => x.Id));
+            }
+
+            _funcGenericAttributes = genericAttributes;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public LazyMultimap<GenericAttribute> GenericAttributes
+        {
+            get
+            {
+                if (_genericAttributes == null)
+                {
+                    _genericAttributes = new LazyMultimap<GenericAttribute>(keys => _funcGenericAttributes(keys), _customerIds);
+                }
+                return _genericAttributes;
+            }
+        }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
+
+        public void Clear()
+        {
+            if (_genericAttributes != null)
+                _genericAttributes.Clear();
+
+            _customerIds.Clear();
+        }
+
+        #endregion Public Methods
+    }
 }
