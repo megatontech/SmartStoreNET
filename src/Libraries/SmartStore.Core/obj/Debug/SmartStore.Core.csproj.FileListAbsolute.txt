@@ -197,3 +197,4 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Libraries\SmartStore
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Libraries\SmartStore.Core\obj\Debug\SmartStore.Core.csproj.CopyComplete
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Libraries\SmartStore.Core\obj\Debug\SmartStore.Core.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Libraries\SmartStore.Core\obj\Debug\SmartStore.Core.pdb
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Libraries\SmartStore.Core\obj\Debug\SmartStore.Core.csprojAssemblyReference.cache

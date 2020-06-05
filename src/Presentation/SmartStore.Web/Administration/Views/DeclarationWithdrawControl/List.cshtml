@@ -1,36 +1,37 @@
-﻿@model Telerik.Web.Mvc.GridModel<DiscountModel>
+﻿@model Telerik.Web.Mvc.GridModel<DeclarationCalcRule>
 @using Telerik.Web.Mvc.UI
+@using SmartStore.Core.Domain.Wallet;
 @{
-    ViewBag.Title = T("Admin.Promotions.Discounts").Text;
+    ViewBag.Title = T("提现算法管理").Text;
 }
 <div class="section-header">
     <div class="title">
-        @T("Admin.Promotions.Discounts")
+        @T("提现算法参数设置")
     </div>
     <div class="options">
-		@{ Html.RenderWidget("admin_button_toolbar_before"); }
+        @{ Html.RenderWidget("admin_button_toolbar_before"); }
 
         <a href="@Url.Action("Create")" class="btn btn-primary">
-			<i class="fa fa-plus"></i>
-			<span>@T("Admin.Common.AddNew")</span>
-		</a>
+            <i class="fa fa-plus"></i>
+            <span>@T("Admin.Common.AddNew")</span>
+        </a>
 
-		@{ Html.RenderWidget("admin_button_toolbar_after"); }
+        @{ Html.RenderWidget("admin_button_toolbar_after"); }
     </div>
 </div>
 
-<div>
-	@(Html.Telerik().Grid<DiscountModel>(Model.Data)
+@*<div>
+    @(Html.Telerik().Grid<DeclarationCalcRule>(Model.Data)
 		.Name("discounts-grid")
 		.Columns(columns =>
 		{
-			columns.Bound(x => x.Name)
+			columns.Bound(x => x.isUse)
 				.Width(400)
 				.Template(x => Html.ActionLink(x.Name, "Edit", new { id = x.Id }))
 				.ClientTemplate("<a href=\"Edit/<#= Id #>\"><#= Name #></a>");
-			columns.Bound(x => x.StartDateUtc)
+			columns.Bound(x => x.UpdateTime)
 				.Width(120);
-			columns.Bound(x => x.EndDateUtc)
+			columns.Bound(x => x.)
 				.Width(120);
 			columns.Bound(x => x.UsePercentage)
 				.Width(120)
@@ -46,4 +47,4 @@
 		})
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Discount"))
 		.EnableCustomBinding(true))
-</div>
+</div>*@

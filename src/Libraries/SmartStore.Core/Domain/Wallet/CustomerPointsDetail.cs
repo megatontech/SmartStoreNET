@@ -23,7 +23,7 @@ namespace SmartStore.Core.Domain.Wallet
         /// 积分备注
         /// </summary>
         [DataMember]
-        public bool Comment { get; set; }
+        public string Comment { get; set; }
 
         /// <summary>
         /// 客户

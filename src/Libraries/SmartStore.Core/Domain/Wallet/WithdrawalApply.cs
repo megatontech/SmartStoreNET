@@ -41,10 +41,25 @@ namespace SmartStore.Core.Domain.Wallet
         [DataMember]
         public Guid OperaterID { get; set; }
         /// <summary>
-        /// 钱数
+        /// 提现钱数
         /// </summary>
         [DataMember]
         public decimal Amount { get; set; }
+        /// <summary>
+        /// 实际应到账钱数
+        /// </summary>
+        [DataMember]
+        public decimal ExpectAmount { get; set; }
+        /// <summary>
+        /// 手续费钱数
+        /// </summary>
+        [DataMember]
+        public decimal ToFeeAmount { get; set; }
+        /// <summary>
+        /// 转积分钱数
+        /// </summary>
+        [DataMember]
+        public decimal ToPointAmount { get; set; }
         /// <summary>
         /// 是否转出
         /// </summary>
@@ -91,7 +106,7 @@ namespace SmartStore.Core.Domain.Wallet
         [DataMember]
         public DateTime UpdateTime { get; set; }
         /// <summary>
-        /// 是否参与统计
+        /// 是否删除
         /// </summary>
         [DataMember]
         public bool IsCount { get; set; }

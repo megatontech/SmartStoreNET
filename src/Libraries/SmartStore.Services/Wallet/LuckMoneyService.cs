@@ -1,5 +1,8 @@
 ﻿using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Wallet;
+using System;
+using System.Linq;
+using System.Linq.Dynamic;
 
 namespace SmartStore.Services.Wallet
 {
@@ -29,6 +32,20 @@ namespace SmartStore.Services.Wallet
             _LuckMoneyRepository.Insert(luck);
         }
 
+        public LuckMoney GetLuckMoneyByCustomer(int id)
+        {
+            return _LuckMoneyRepository.Table.FirstOrDefault(x => x.Customer == id && x.StartTime >= DateTime.Now && x.EndTime <= DateTime.Now);
+        }
+
+        public LuckMoney GetLuckMoneyById(int id)
+        {
+            return _LuckMoneyRepository.Table.FirstOrDefault(x => x.Id == id );
+        }
+
+        public void Update(LuckMoney luck) 
+        {
+            _LuckMoneyRepository.Update(luck);
+        }
         #endregion Public Methods
     }
 }

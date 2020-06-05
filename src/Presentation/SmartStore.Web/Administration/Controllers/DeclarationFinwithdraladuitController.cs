@@ -138,6 +138,10 @@ namespace SmartStore.Admin.Controllers
         {
             return RedirectToAction("List");
         }
+        public ActionResult List()
+        {
+            return View();
+        }
 
         #endregion Public Methods
         private void PrepareStoreModel(DeclarationFinwithdraladuitModel model, WithdrawalApply apply)

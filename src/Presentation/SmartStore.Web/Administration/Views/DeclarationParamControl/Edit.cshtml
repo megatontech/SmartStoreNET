@@ -1,13 +1,13 @@
 ﻿@model DeclarationCalcRule
 @using SmartStore.Core.Domain.Wallet;
 @{
-    ViewBag.Title = T("当前结算参数值").Text;
+    ViewBag.Title = T("佣金算法管理").Text;
 }
 @using (Html.BeginForm())
 {
     <div class="section-header">
         <div class="title">
-            @T("当前结算参数值")
+            @T("佣金算法参数设置")
         </div>
         <div class="options">
             @{ Html.RenderWidget("admin_button_toolbar_before"); }

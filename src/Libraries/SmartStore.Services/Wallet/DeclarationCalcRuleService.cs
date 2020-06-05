@@ -58,6 +58,7 @@ namespace SmartStore.Services.Wallet
                     CalcRewardTwoPointPercent = 100,
                     Comment = "",
                     CreateTime = DateTime.Now,
+                    WithDrawToPointPercent =1,
                     isUse = true
                 };
                 Add(entity);

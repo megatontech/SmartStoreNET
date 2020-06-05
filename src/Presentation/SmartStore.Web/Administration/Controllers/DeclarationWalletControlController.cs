@@ -1,4 +1,6 @@
-﻿using SmartStore.Web.Framework.Controllers;
+﻿using SmartStore.Core.Domain.Wallet;
+using SmartStore.Services.Wallet;
+using SmartStore.Web.Framework.Controllers;
 using System.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
@@ -8,15 +10,21 @@ namespace SmartStore.Admin.Controllers
     /// </summary>
     public class DeclarationWalletControlController : AdminControllerBase
     {
-        #region Public Methods
+        private readonly IDeclarationCalcRuleService _calcruleService;
+        private readonly DeclarationCalcRule _calcrule;
 
-        // GET: DeclarationWalletControl/Create
+        public DeclarationWalletControlController(IDeclarationCalcRuleService calcruleService)
+        {
+            _calcruleService = calcruleService;
+            _calcrule = _calcruleService.GetDeclarationCalcRule();
+        }
+        #region Public Methods
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: DeclarationWalletControl/Create
+        // POST: DeclarationParamControl/Create
         [HttpPost]
         public ActionResult Create(FormCollection collection)
         {
@@ -32,13 +40,13 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        // GET: DeclarationWalletControl/Delete/5
+        // GET: DeclarationParamControl/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: DeclarationWalletControl/Delete/5
+        // POST: DeclarationParamControl/Delete/5
         [HttpPost]
         public ActionResult Delete(int id, FormCollection collection)
         {
@@ -54,19 +62,19 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        // GET: DeclarationWalletControl/Details/5
+        // GET: DeclarationParamControl/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: DeclarationWalletControl/Edit/5
-        public ActionResult Edit(int id)
+        // GET: DeclarationParamControl/Edit/5
+        public ActionResult Edit()
         {
-            return View();
+            return View(_calcrule);
         }
 
-        // POST: DeclarationWalletControl/Edit/5
+        // POST: DeclarationParamControl/Edit/5
         [HttpPost]
         public ActionResult Edit(int id, FormCollection collection)
         {
@@ -82,11 +90,12 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        // GET: DeclarationWalletControl
+        // GET: DeclarationParamControl
         public ActionResult Index()
         {
-            return View();
+            return View("edit", _calcrule);
         }
+
 
         #endregion Public Methods
     }

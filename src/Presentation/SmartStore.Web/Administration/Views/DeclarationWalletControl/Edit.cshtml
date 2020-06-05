@@ -1,32 +1,18 @@
-﻿@model DiscountModel
+﻿@model DeclarationCalcRule
+@using SmartStore.Core.Domain.Wallet;
 @{
-    ViewBag.Title = T("Admin.Promotions.Discounts.EditDiscountDetails").Text;
+    ViewBag.Title = T("钱包算法管理").Text;
 }
 @using (Html.BeginForm())
 {
     <div class="section-header">
         <div class="title">
-            @T("Admin.Promotions.Discounts.EditDiscountDetails") - @Model.Name @Html.ActionLink("(" + T("Admin.Promotions.Discounts.BackToList") + ")", "List")
+            @T("钱包算法参数设置")
         </div>
         <div class="options">
-			@{ Html.RenderWidget("admin_button_toolbar_before"); }
-
-            <button type="submit" name="save" value="save" class="btn btn-warning">
-				<i class="fa fa-check"></i>
-				<span>@T("Admin.Common.Save")</span>
-			</button>
-            <button type="submit" name="save" value="save-continue" class="btn btn-secondary">
-				@T("Admin.Common.SaveContinue")
-			</button>
-            <button type="submit" name="discount-delete" id="discount-delete" class="btn btn-danger">
-				<i class="far fa-trash-alt"></i>
-				<span>@T("Admin.Common.Delete")</span>
-			</button>
-
-			@{ Html.RenderWidget("admin_button_toolbar_after"); }
+            @{ Html.RenderWidget("admin_button_toolbar_before"); }
+            @{ Html.RenderWidget("admin_button_toolbar_after"); }
         </div>
     </div>
-
     Html.RenderPartial("_CreateOrUpdate", Model);
 }
-@Html.DeleteConfirmation("discount-delete")

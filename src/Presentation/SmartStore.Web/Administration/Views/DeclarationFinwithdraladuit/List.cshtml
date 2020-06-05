@@ -21,9 +21,7 @@
 		.Name("stores-grid")
 		.Columns(columns =>
 		{
-			columns.Bound(x => x.CustomerID)
-				.Template(x => Html.ActionLink(x.Name, "Edit", new { id = x.Id }))
-				.ClientTemplate("<a href=\"Edit/<#= Id #>\"><#= Name #></a>");
+			columns.Bound(x => x.CustomerID);
 			columns.Bound(x => x.Amount)
 				.ClientTemplate("<a href=\"<#= Url #>\" target=\"_blank\"><#= Url #></a>");
 			columns.Bound(x => x.WithdrawType);

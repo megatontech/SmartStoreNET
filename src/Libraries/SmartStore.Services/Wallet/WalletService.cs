@@ -19,25 +19,29 @@ namespace SmartStore.Services.Wallet
 
 
         #region Private Fields
+        private readonly IDeclarationCalcRuleService _calcruleService;
+        private readonly DeclarationCalcRule _calcrule;
 
         private readonly ILuckMoneyService _ILuckMoneyService;
         private readonly IWithdrawalDetailService _IWithdrawalDetailService;
         private readonly IWithdrawalTotalService _IWithdrawalTotalService;
-
         #endregion Private Fields
 
         #region Public Constructors
 
         public WalletService(ILuckMoneyService iLuckMoneyService,
-            IWithdrawalTotalService iWithdrawalTotalService,
+            IWithdrawalTotalService iWithdrawalTotalService, IDeclarationCalcRuleService calcruleService,
             IWithdrawalDetailService iWithdrawalDetailService
             )
         {
+            
             _ILuckMoneyService = iLuckMoneyService;
             _IWithdrawalTotalService = iWithdrawalTotalService;
             _IWithdrawalDetailService = iWithdrawalDetailService;
+            _calcruleService = calcruleService;
+            _calcrule = _calcruleService.GetDeclarationCalcRule();
             sdateTime = DateTime.Now;
-            edateTime = DateTime.Now.AddHours(2);
+            edateTime = DateTime.Now.AddHours(_calcrule.CalcRewardFourAliveHours);
         }
 
         #endregion Public Constructors
@@ -55,9 +59,11 @@ namespace SmartStore.Services.Wallet
         {
             var total = _IWithdrawalTotalService.Get(customer);
             total.TotalAmount += luck.Amount;
-            total.TotalPushAmount += luck.Amount;
+            total.TotalLuckyAmount += luck.Amount;
             total.UpdateTime = DateTime.Now;
             _IWithdrawalTotalService.Update(total);
+            luck.isOut = true;
+            _ILuckMoneyService.Update(luck);
             _IWithdrawalDetailService.Add(new WithdrawalDetail
             {
                 Amount = luck.Amount,

@@ -1394,6 +1394,12 @@
           <Property Name="CalcRewardTwoPercent" Type="Int32" Nullable="false" />
           <Property Name="CalcRewardFourEqual" Type="Boolean" Nullable="false" />
           <Property Name="CalcRewardFourPercent" Type="Int32" Nullable="false" />
+          <Property Name="CalcRewardFourAliveHours" Type="Int32" Nullable="false" />
+          <Property Name="WithDrawMaxAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="WithDrawMaxPercent" Type="Int32" Nullable="false" />
+          <Property Name="WithDrawToPointPercent" Type="Int32" Nullable="false" />
+          <Property Name="WithDrawApplyFeePercent" Type="Int32" Nullable="false" />
+          <Property Name="WithDrawApplyToPointPercent" Type="Int32" Nullable="false" />
           <Property Name="isUse" Type="Boolean" Nullable="false" />
           <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreateTime" Type="DateTime" Nullable="false" />
@@ -1477,6 +1483,9 @@
           <Property Name="CustomerID" Type="Guid" Nullable="false" />
           <Property Name="OperaterID" Type="Guid" Nullable="false" />
           <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ExpectAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ToFeeAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ToPointAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="isOut" Type="Boolean" Nullable="false" />
           <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="WithdrawTime" Type="DateTime" Nullable="false" />
@@ -1526,7 +1535,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
-          <Property Name="Comment" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Customer" Type="Int32" Nullable="false" />
           <Property Name="CustomerID" Type="Guid" Nullable="false" />
           <Property Name="IsCount" Type="Boolean" Nullable="false" />
@@ -5590,6 +5599,12 @@
                 <ScalarProperty Name="CalcRewardTwoPercent" ColumnName="CalcRewardTwoPercent" />
                 <ScalarProperty Name="CalcRewardFourEqual" ColumnName="CalcRewardFourEqual" />
                 <ScalarProperty Name="CalcRewardFourPercent" ColumnName="CalcRewardFourPercent" />
+                <ScalarProperty Name="CalcRewardFourAliveHours" ColumnName="CalcRewardFourAliveHours" />
+                <ScalarProperty Name="WithDrawMaxAmount" ColumnName="WithDrawMaxAmount" />
+                <ScalarProperty Name="WithDrawMaxPercent" ColumnName="WithDrawMaxPercent" />
+                <ScalarProperty Name="WithDrawToPointPercent" ColumnName="WithDrawToPointPercent" />
+                <ScalarProperty Name="WithDrawApplyFeePercent" ColumnName="WithDrawApplyFeePercent" />
+                <ScalarProperty Name="WithDrawApplyToPointPercent" ColumnName="WithDrawApplyToPointPercent" />
                 <ScalarProperty Name="isUse" ColumnName="isUse" />
                 <ScalarProperty Name="Comment" ColumnName="Comment" />
                 <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
@@ -5679,6 +5694,9 @@
                 <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
                 <ScalarProperty Name="OperaterID" ColumnName="OperaterID" />
                 <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="ExpectAmount" ColumnName="ExpectAmount" />
+                <ScalarProperty Name="ToFeeAmount" ColumnName="ToFeeAmount" />
+                <ScalarProperty Name="ToPointAmount" ColumnName="ToPointAmount" />
                 <ScalarProperty Name="isOut" ColumnName="isOut" />
                 <ScalarProperty Name="Comment" ColumnName="Comment" />
                 <ScalarProperty Name="WithdrawTime" ColumnName="WithdrawTime" />
@@ -7731,6 +7749,12 @@
           <Property Name="CalcRewardTwoPercent" Type="int" Nullable="false" />
           <Property Name="CalcRewardFourEqual" Type="bit" Nullable="false" />
           <Property Name="CalcRewardFourPercent" Type="int" Nullable="false" />
+          <Property Name="CalcRewardFourAliveHours" Type="int" Nullable="false" />
+          <Property Name="WithDrawMaxAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="WithDrawMaxPercent" Type="int" Nullable="false" />
+          <Property Name="WithDrawToPointPercent" Type="int" Nullable="false" />
+          <Property Name="WithDrawApplyFeePercent" Type="int" Nullable="false" />
+          <Property Name="WithDrawApplyToPointPercent" Type="int" Nullable="false" />
           <Property Name="isUse" Type="bit" Nullable="false" />
           <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
           <Property Name="CreateTime" Type="datetime" Nullable="false" />
@@ -7814,6 +7838,9 @@
           <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="OperaterID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ExpectAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ToFeeAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ToPointAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="isOut" Type="bit" Nullable="false" />
           <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
           <Property Name="WithdrawTime" Type="datetime" Nullable="false" />
@@ -7863,7 +7890,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
-          <Property Name="Comment" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
           <Property Name="Customer" Type="int" Nullable="false" />
           <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="IsCount" Type="bit" Nullable="false" />

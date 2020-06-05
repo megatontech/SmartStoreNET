@@ -80,7 +80,37 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember]
         public int CalcRewardFourPercent { get; set; }
+        /// <summary>
+        /// 红包有效时长
+        /// </summary>
+        [DataMember]
+        public int CalcRewardFourAliveHours { get; set; }
         #endregion
+        /// <summary>
+        /// 钱包提现额度限制
+        /// </summary>
+        [DataMember]
+        public decimal WithDrawMaxAmount { get; set; }
+        /// <summary>
+        /// 钱包提现额度限制百分比
+        /// </summary>
+        [DataMember]
+        public int WithDrawMaxPercent { get; set; }
+        /// <summary>
+        /// 一钱包额度可转换多少积分
+        /// </summary>
+        [DataMember]
+        public int WithDrawToPointPercent { get; set; }
+        /// <summary>
+        /// 提现手续费百分比
+        /// </summary>
+        [DataMember]
+        public int WithDrawApplyFeePercent { get; set; }
+        /// <summary>
+        /// 提现转化为积分百分比
+        /// </summary>
+        [DataMember]
+        public int WithDrawApplyToPointPercent { get; set; }
         /// <summary>
         /// 是否可用
         /// </summary>
