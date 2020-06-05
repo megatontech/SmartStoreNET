@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using SmartStore.Collections;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Customers;
-using SmartStore.Core.Domain.Orders;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SmartStore.Services.Customers
 {
@@ -14,39 +13,73 @@ namespace SmartStore.Services.Customers
     /// </summary>
     public partial interface ICustomerService
     {
-		#region Customers
+        #region Public Methods
 
-		/// <summary>
-		/// Finds customer records matching all criteria specified by <paramref name="q"/>
-		/// </summary>
-		/// <param name="q">The filter query</param>
-		/// <returns>Customer collection</returns>
-		IPagedList<Customer> SearchCustomers(CustomerSearchQuery q);
-		List<Customer> BuildTree();
-		List<Customer> BuildCurrentTree();
-		List<Customer> BuildAllTreeWithoutOrder();
-		/// <summary>
-		/// Gets all customers by customer format (including deleted ones)
-		/// </summary>
-		/// <param name="passwordFormat">Password format</param>
-		/// <returns>Customers</returns>
-		IPagedList<Customer> GetAllCustomersByPasswordFormat(PasswordFormat passwordFormat);
+        List<Customer> BuildAllTreeWithoutOrder();
 
-		/// <summary>
-		/// Gets online customers
-		/// </summary>
-		/// <param name="lastActivityFromUtc">Customer last activity date (from)</param>
-		/// <param name="customerRoleIds">A list of customer role identifiers to filter by (at least one match); pass null or empty list in order to load all customers; </param>
-		/// <param name="pageIndex">Page index</param>
-		/// <param name="pageSize">Page size</param>
-		/// <returns>Customer collection</returns>
-		IPagedList<Customer> GetOnlineCustomers(DateTime lastActivityFromUtc, int[] customerRoleIds, int pageIndex, int pageSize);
+        List<Customer> BuildCurrentTree();
 
-		/// <summary>
-		/// Delete a customer
-		/// </summary>
-		/// <param name="customer">Customer</param>
-		void DeleteCustomer(Customer customer);
+        List<Customer> BuildTree();
+
+        /// <summary>
+        /// Delete a customer
+        /// </summary>
+        /// <param name="customer">Customer</param>
+        void DeleteCustomer(Customer customer);
+
+        /// <summary>
+        /// Delete a customer role
+        /// </summary>
+        /// <param name="customerRole">Customer role</param>
+        void DeleteCustomerRole(CustomerRole customerRole);
+
+        /// <summary>
+        /// Delete guest customer records
+        /// </summary>
+        /// <param name="registrationFrom">Customer registration from; null to load all customers</param>
+        /// <param name="registrationTo">Customer registration to; null to load all customers</param>
+        /// <param name="onlyWithoutShoppingCart">A value indicating whether to delete customers only without shopping cart</param>
+        /// <returns>Number of deleted customers</returns>
+        Task<int> DeleteGuestCustomersAsync(DateTime? registrationFrom, DateTime? registrationTo, bool onlyWithoutShoppingCart, int maxItemsToDelete = 5000);
+
+        /// <summary>
+        /// Tries to find a guest/anonymous customer record by client ident. This method should be called when an
+        /// anonymous visitor rejects cookies and therefore cannot be identified automatically.
+        /// </summary>
+        /// <param name="clientIdent">
+        /// The client ident string, which is a hashed combination of client IP address and user agent.
+        /// Call <see cref="IWebHelper.GetClientIdent()"/> to obtain an ident string, or pass <c>null</c> to let this method obtain it automatically.</param>
+        /// <param name="maxAgeSeconds">The max age of the newly created guest customer record. The shorter, the better (default is 1 min.)</param>
+        /// <returns>The identified customer or <c>null</c></returns>
+        Customer FindGuestCustomerByClientIdent(string clientIdent = null, int maxAgeSeconds = 60);
+
+        /// <summary>
+        /// Gets all customer roles
+        /// </summary>
+        /// <param name="showHidden">A value indicating whether to show hidden records</param>
+        /// <returns>Customer role collection</returns>
+        IList<CustomerRole> GetAllCustomerRoles(bool showHidden = false);
+
+        /// <summary>
+        /// Gets all customers by customer format (including deleted ones)
+        /// </summary>
+        /// <param name="passwordFormat">Password format</param>
+        /// <returns>Customers</returns>
+        IPagedList<Customer> GetAllCustomersByPasswordFormat(PasswordFormat passwordFormat);
+
+        /// <summary>
+        /// Get customer by email
+        /// </summary>
+        /// <param name="email">Email</param>
+        /// <returns>Customer</returns>
+        Customer GetCustomerByEmail(string email);
+
+        /// <summary>
+        /// Gets a customer by GUID
+        /// </summary>
+        /// <param name="customerGuid">Customer GUID</param>
+        /// <returns>A customer</returns>
+        Customer GetCustomerByGuid(Guid customerGuid);
 
         /// <summary>
         /// Gets a customer
@@ -56,32 +89,12 @@ namespace SmartStore.Services.Customers
         Customer GetCustomerById(int customerId);
 
         /// <summary>
-        /// Get customers by identifiers
+        /// GetCustomerByMobile
         /// </summary>
-        /// <param name="customerIds">Customer identifiers</param>
-        /// <returns>Customers</returns>
-        IList<Customer> GetCustomersByIds(int[] customerIds);
+        /// <param name="Mobile"></param>
+        /// <returns></returns>
+        Customer GetCustomerByMobile(string Mobile);
 
-		/// <summary>
-		/// Get system account customers
-		/// </summary>
-		/// <returns>System account customers</returns>
-		IList<Customer> GetSystemAccountCustomers();
-
-		/// <summary>
-		/// Gets a customer by GUID
-		/// </summary>
-		/// <param name="customerGuid">Customer GUID</param>
-		/// <returns>A customer</returns>
-		Customer GetCustomerByGuid(Guid customerGuid);
-
-        /// <summary>
-        /// Get customer by email
-        /// </summary>
-        /// <param name="email">Email</param>
-        /// <returns>Customer</returns>
-        Customer GetCustomerByEmail(string email);
-        
         /// <summary>
         /// Get customer by system name
         /// </summary>
@@ -95,77 +108,6 @@ namespace SmartStore.Services.Customers
         /// <param name="username">Username</param>
         /// <returns>Customer</returns>
         Customer GetCustomerByUsername(string username);
-		/// <summary>
-		/// GetCustomerByMobile
-		/// </summary>
-		/// <param name="Mobile"></param>
-		/// <returns></returns>
-		Customer GetCustomerByMobile(string Mobile);
-		/// <summary>
-		/// Insert a guest customer
-		/// </summary>
-		/// <param name="customerGuid">The customer GUID. Pass <c>null</c> to create a random one.</param>
-		/// <returns>Customer</returns>
-		Customer InsertGuestCustomer(Guid? customerGuid = null);
-
-		/// <summary>
-		/// Tries to find a guest/anonymous customer record by client ident. This method should be called when an
-		/// anonymous visitor rejects cookies and therefore cannot be identified automatically.
-		/// </summary>
-		/// <param name="clientIdent">
-		/// The client ident string, which is a hashed combination of client IP address and user agent. 
-		/// Call <see cref="IWebHelper.GetClientIdent()"/> to obtain an ident string, or pass <c>null</c> to let this method obtain it automatically.</param>
-		/// <param name="maxAgeSeconds">The max age of the newly created guest customer record. The shorter, the better (default is 1 min.)</param>
-		/// <returns>The identified customer or <c>null</c></returns>
-		Customer FindGuestCustomerByClientIdent(string clientIdent = null, int maxAgeSeconds = 60);
-
-		/// <summary>
-		/// Insert a customer
-		/// </summary>
-		/// <param name="customer">Customer</param>
-		void InsertCustomer(Customer customer);
-
-        /// <summary>
-        /// Updates the customer
-        /// </summary>
-        /// <param name="customer">Customer</param>
-        void UpdateCustomer(Customer customer);
-
-		/// <summary>
-		/// Reset data required for checkout
-		/// </summary>
-		/// <param name="customer">Customer</param>
-		/// <param name="storeId">Store identifier</param>
-		/// <param name="clearCouponCodes">A value indicating whether to clear coupon code</param>
-		/// <param name="clearCheckoutAttributes">A value indicating whether to clear selected checkout attributes</param>
-		/// <param name="clearRewardPoints">A value indicating whether to clear "Use reward points" flag</param>
-		/// <param name="clearShippingMethod">A value indicating whether to clear selected shipping method</param>
-		/// <param name="clearPaymentMethod">A value indicating whether to clear selected payment method</param>
-		/// <param name="clearCreditBalance">A value indicating whether to clear credit balance.</param>
-		void ResetCheckoutData(Customer customer, int storeId,
-            bool clearCouponCodes = false, bool clearCheckoutAttributes = false,
-            bool clearRewardPoints = false, bool clearShippingMethod = true,
-            bool clearPaymentMethod = true,
-			bool clearCreditBalance = false);
-
-		/// <summary>
-		/// Delete guest customer records
-		/// </summary>
-		/// <param name="registrationFrom">Customer registration from; null to load all customers</param>
-		/// <param name="registrationTo">Customer registration to; null to load all customers</param>
-		/// <param name="onlyWithoutShoppingCart">A value indicating whether to delete customers only without shopping cart</param>
-		/// <returns>Number of deleted customers</returns>
-		Task<int> DeleteGuestCustomersAsync(DateTime? registrationFrom, DateTime? registrationTo, bool onlyWithoutShoppingCart, int maxItemsToDelete = 5000);
-
-        #endregion
-
-        #region Customer roles
-
-        /// <summary>
-        /// Delete a customer role
-        /// </summary>
-        /// <param name="customerRole">Customer role</param>
-        void DeleteCustomerRole(CustomerRole customerRole);
 
         /// <summary>
         /// Gets a customer role
@@ -182,11 +124,40 @@ namespace SmartStore.Services.Customers
         CustomerRole GetCustomerRoleBySystemName(string systemName);
 
         /// <summary>
-        /// Gets all customer roles
+        /// Get customers by identifiers
         /// </summary>
-        /// <param name="showHidden">A value indicating whether to show hidden records</param>
-        /// <returns>Customer role collection</returns>
-        IList<CustomerRole> GetAllCustomerRoles(bool showHidden = false);
+        /// <param name="customerIds">Customer identifiers</param>
+        /// <returns>Customers</returns>
+        IList<Customer> GetCustomersByIds(int[] customerIds);
+
+        /// <summary>
+        /// Gets online customers
+        /// </summary>
+        /// <param name="lastActivityFromUtc">Customer last activity date (from)</param>
+        /// <param name="customerRoleIds">A list of customer role identifiers to filter by (at least one match); pass null or empty list in order to load all customers; </param>
+        /// <param name="pageIndex">Page index</param>
+        /// <param name="pageSize">Page size</param>
+        /// <returns>Customer collection</returns>
+        IPagedList<Customer> GetOnlineCustomers(DateTime lastActivityFromUtc, int[] customerRoleIds, int pageIndex, int pageSize);
+
+        /// <summary>
+        /// Gets reward points histories
+        /// </summary>
+        /// <param name="customerIds">Customer identifiers</param>
+        /// <returns>Reward points histories</returns>
+        Multimap<int, RewardPointsHistory> GetRewardPointsHistoriesByCustomerIds(int[] customerIds);
+
+        /// <summary>
+        /// Get system account customers
+        /// </summary>
+        /// <returns>System account customers</returns>
+        IList<Customer> GetSystemAccountCustomers();
+
+        /// <summary>
+        /// Insert a customer
+        /// </summary>
+        /// <param name="customer">Customer</param>
+        void InsertCustomer(Customer customer);
 
         /// <summary>
         /// Inserts a customer role
@@ -195,30 +166,56 @@ namespace SmartStore.Services.Customers
         void InsertCustomerRole(CustomerRole customerRole);
 
         /// <summary>
+        /// Insert a guest customer
+        /// </summary>
+        /// <param name="customerGuid">The customer GUID. Pass <c>null</c> to create a random one.</param>
+        /// <returns>Customer</returns>
+        Customer InsertGuestCustomer(Guid? customerGuid = null);
+
+        /// <summary>
+        /// Reset data required for checkout
+        /// </summary>
+        /// <param name="customer">Customer</param>
+        /// <param name="storeId">Store identifier</param>
+        /// <param name="clearCouponCodes">A value indicating whether to clear coupon code</param>
+        /// <param name="clearCheckoutAttributes">A value indicating whether to clear selected checkout attributes</param>
+        /// <param name="clearRewardPoints">A value indicating whether to clear "Use reward points" flag</param>
+        /// <param name="clearShippingMethod">A value indicating whether to clear selected shipping method</param>
+        /// <param name="clearPaymentMethod">A value indicating whether to clear selected payment method</param>
+        /// <param name="clearCreditBalance">A value indicating whether to clear credit balance.</param>
+        void ResetCheckoutData(Customer customer, int storeId,
+            bool clearCouponCodes = false, bool clearCheckoutAttributes = false,
+            bool clearRewardPoints = false, bool clearShippingMethod = true,
+            bool clearPaymentMethod = true,
+            bool clearCreditBalance = false);
+
+        /// <summary>
+        /// Add or remove reward points for a product review
+        /// </summary>
+        /// <param name="customer">The customer</param>
+        /// <param name="product">The product</param>
+        /// <param name="add">Whether to add or remove points</param>
+        void RewardPointsForProductReview(Customer customer, Product product, bool add);
+
+        /// <summary>
+        /// Finds customer records matching all criteria specified by <paramref name="q"/>
+        /// </summary>
+        /// <param name="q">The filter query</param>
+        /// <returns>Customer collection</returns>
+        IPagedList<Customer> SearchCustomers(CustomerSearchQuery q);
+
+        /// <summary>
+        /// Updates the customer
+        /// </summary>
+        /// <param name="customer">Customer</param>
+        void UpdateCustomer(Customer customer);
+
+        /// <summary>
         /// Updates the customer role
         /// </summary>
         /// <param name="customerRole">Customer role</param>
         void UpdateCustomerRole(CustomerRole customerRole);
 
-        #endregion
-
-		#region Reward points
-
-		/// <summary>
-		/// Add or remove reward points for a product review
-		/// </summary>
-		/// <param name="customer">The customer</param>
-		/// <param name="product">The product</param>
-		/// <param name="add">Whether to add or remove points</param>
-		void RewardPointsForProductReview(Customer customer, Product product, bool add);
-
-		/// <summary>
-		/// Gets reward points histories
-		/// </summary>
-		/// <param name="customerIds">Customer identifiers</param>
-		/// <returns>Reward points histories</returns>
-		Multimap<int, RewardPointsHistory> GetRewardPointsHistoriesByCustomerIds(int[] customerIds);
-
-		#endregion Reward points
-	}
+        #endregion Public Methods
+    }
 }

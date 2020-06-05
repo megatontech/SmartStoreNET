@@ -4,13 +4,9 @@ namespace SmartStore.Services.Customers
 {
     public class ChangePasswordRequest
     {
-        public string Email { get; set; }
-        public bool ValidateRequest { get; set; }
-        public PasswordFormat NewPasswordFormat { get; set; }
-        public string NewPassword { get; set; }
-        public string OldPassword { get; set; }
+        #region Public Constructors
 
-        public ChangePasswordRequest(string email, bool validateRequest, 
+        public ChangePasswordRequest(string email, bool validateRequest,
             PasswordFormat newPasswordFormat, string newPassword, string oldPassword = "")
         {
             this.Email = email;
@@ -19,5 +15,23 @@ namespace SmartStore.Services.Customers
             this.NewPassword = newPassword;
             this.OldPassword = oldPassword;
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public string Email { get; set; }
+
+        public string NewPassword { get; set; }
+
+        public PasswordFormat NewPasswordFormat { get; set; }
+
+        public string OldPassword { get; set; }
+
+        public bool ValidateRequest { get; set; }
+
+        #endregion Public Properties
     }
 }

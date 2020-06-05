@@ -1,9 +1,8 @@
-using System;
-using System.Linq;
 using SmartStore.Core;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Common;
-using SmartStore.Data;
+using System;
+using System.Linq;
 
 namespace SmartStore.Services.Common
 {
@@ -12,14 +11,17 @@ namespace SmartStore.Services.Common
     /// </summary>
     public partial class MaintenanceService : IMaintenanceService
     {
-        #region Fields
+        #region Private Fields
+
+        private readonly CommonSettings _commonSettings;
 
         private readonly IDataProvider _dataProvider;
-        private readonly IDbContext _dbContext;
-        private readonly CommonSettings _commonSettings;
-        #endregion
 
-        #region Ctor
+        private readonly IDbContext _dbContext;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         /// <summary>
         /// Ctor
@@ -35,20 +37,22 @@ namespace SmartStore.Services.Common
             this._commonSettings = commonSettings;
         }
 
-        #endregion
+        #endregion Public Constructors
 
-        #region Methods
+
+
+        #region Public Methods
 
         /// <summary>
         /// Get the current ident value
         /// </summary>
         /// <typeparam name="T">Entity</typeparam>
         /// <returns>Integer ident; null if cannot get the result</returns>
-        public virtual int? GetTableIdent<T>() where T: BaseEntity
+        public virtual int? GetTableIdent<T>() where T : BaseEntity
         {
             if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduresSupported)
             {
-                //stored procedures are enabled and supported by the database. 
+                //stored procedures are enabled and supported by the database.
 
                 // TODO: find a better way to get table name
                 var tableName = typeof(T).Name;
@@ -87,6 +91,6 @@ namespace SmartStore.Services.Common
             }
         }
 
-        #endregion
+        #endregion Public Methods
     }
 }

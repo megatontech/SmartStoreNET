@@ -1,24 +1,40 @@
 ﻿using System.Collections.Generic;
 
-namespace SmartStore.Services.Customers 
+namespace SmartStore.Services.Customers
 {
     public class PasswordChangeResult
     {
-        public IList<string> Errors { get; set; }
+        #region Public Constructors
 
-        public PasswordChangeResult() 
+        public PasswordChangeResult()
         {
             this.Errors = new List<string>();
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public IList<string> Errors { get; set; }
 
         public bool Success
         {
             get { return (this.Errors.Count == 0); }
         }
 
-        public void AddError(string error) 
+        #endregion Public Properties
+
+
+
+        #region Public Methods
+
+        public void AddError(string error)
         {
             this.Errors.Add(error);
         }
+
+        #endregion Public Methods
     }
 }

@@ -4,14 +4,7 @@ namespace SmartStore.Services.Customers
 {
     public class CustomerRegistrationRequest
     {
-        public Customer Customer { get; set; }
-        public string Email { get; set; }
-        public string Mobile { get; set; }
-        public string ParentMobile { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public PasswordFormat PasswordFormat { get; set; }
-        public bool IsApproved { get; set; }
+        #region Public Constructors
 
         public CustomerRegistrationRequest(Customer customer, string email, string username,
             string password, string Mobile, string ParentMobile,
@@ -28,9 +21,33 @@ namespace SmartStore.Services.Customers
             this.ParentMobile = ParentMobile;
         }
 
-        //public bool IsValid  
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public Customer Customer { get; set; }
+
+        public string Email { get; set; }
+
+        public bool IsApproved { get; set; }
+
+        public string Mobile { get; set; }
+
+        public string ParentMobile { get; set; }
+
+        public string Password { get; set; }
+
+        public PasswordFormat PasswordFormat { get; set; }
+
+        public string Username { get; set; }
+
+        #endregion Public Properties
+
+        //public bool IsValid
         //{
-        //    get 
+        //    get
         //    {
         //        return (!CommonHelper.AreNullOrEmpty(
         //                    this.Email,

@@ -1,6 +1,6 @@
+using SmartStore.Core.Domain.Customers;
 using System;
 using System.Collections.Generic;
-using SmartStore.Core.Domain.Customers;
 
 namespace SmartStore.Services.Customers
 {
@@ -9,6 +9,8 @@ namespace SmartStore.Services.Customers
     /// </summary>
     public partial interface ICustomerContentService
     {
+        #region Public Methods
+
         /// <summary>
         /// Deletes a customer content
         /// </summary>
@@ -22,7 +24,7 @@ namespace SmartStore.Services.Customers
         /// <param name="approved">A value indicating whether to content is approved; null to load all records</param>
         /// <returns>Customer content</returns>
         IList<CustomerContent> GetAllCustomerContent(int customerId, bool? approved);
-        
+
         /// <summary>
         /// Gets all customer content
         /// </summary>
@@ -53,5 +55,7 @@ namespace SmartStore.Services.Customers
         /// </summary>
         /// <param name="content">Customer content</param>
         void UpdateCustomerContent(CustomerContent content);
+
+        #endregion Public Methods
     }
 }

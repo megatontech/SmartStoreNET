@@ -1,40 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using SmartStore.Core;
+﻿using SmartStore.Core;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Localization;
+using System;
+using System.Linq.Expressions;
 
 namespace SmartStore.Services.Customers
 {
-	/// <summary>
-	/// TODO
-	/// </summary>
-	public class CustomerAnonymizedEvent
-	{
-		private readonly IGdprTool _gdprTool;
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public class CustomerAnonymizedEvent
+    {
+        #region Private Fields
 
-		public CustomerAnonymizedEvent(Customer customer, IGdprTool gdprTool)
-		{
-			Guard.NotNull(customer, nameof(customer));
+        private readonly IGdprTool _gdprTool;
 
-			Customer = customer;
-			_gdprTool = gdprTool;
-		}
+        #endregion Private Fields
 
-		public Customer Customer { get; private set; }
+        #region Public Constructors
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="entity"></param>
-		/// <param name="expression"></param>
-		/// <param name="type"></param>
-		public void AnonymizeData<TEntity>(TEntity entity, Expression<Func<TEntity, object>> expression, IdentifierDataType type, Language language = null) 
-			where TEntity : BaseEntity
-		{
-			_gdprTool.AnonymizeData(entity, expression, type, language);
-		}
-	}
+        public CustomerAnonymizedEvent(Customer customer, IGdprTool gdprTool)
+        {
+            Guard.NotNull(customer, nameof(customer));
+
+            Customer = customer;
+            _gdprTool = gdprTool;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        public Customer Customer { get; private set; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="expression"></param>
+        /// <param name="type"></param>
+        public void AnonymizeData<TEntity>(TEntity entity, Expression<Func<TEntity, object>> expression, IdentifierDataType type, Language language = null)
+            where TEntity : BaseEntity
+        {
+            _gdprTool.AnonymizeData(entity, expression, type, language);
+        }
+
+        #endregion Public Methods
+    }
 }

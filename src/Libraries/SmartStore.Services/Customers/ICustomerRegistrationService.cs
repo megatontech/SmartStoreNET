@@ -7,20 +7,7 @@ namespace SmartStore.Services.Customers
     /// </summary>
     public partial interface ICustomerRegistrationService
     {
-        /// <summary>
-        /// Validate customer
-        /// </summary>
-        /// <param name="usernameOrEmail">Username or email</param>
-        /// <param name="password">Password</param>
-        /// <returns>Result</returns>
-        bool ValidateCustomer(string usernameOrEmail, string password);
-
-        /// <summary>
-        /// Register customer
-        /// </summary>
-        /// <param name="request">Request</param>
-        /// <returns>Result</returns>
-        CustomerRegistrationResult RegisterCustomer(CustomerRegistrationRequest request);
+        #region Public Methods
 
         /// <summary>
         /// Change password
@@ -28,6 +15,13 @@ namespace SmartStore.Services.Customers
         /// <param name="request">Request</param>
         /// <returns>Result</returns>
         PasswordChangeResult ChangePassword(ChangePasswordRequest request);
+
+        /// <summary>
+        /// Register customer
+        /// </summary>
+        /// <param name="request">Request</param>
+        /// <returns>Result</returns>
+        CustomerRegistrationResult RegisterCustomer(CustomerRegistrationRequest request);
 
         /// <summary>
         /// Sets a user email
@@ -42,5 +36,15 @@ namespace SmartStore.Services.Customers
         /// <param name="customer">Customer</param>
         /// <param name="newUsername">New Username</param>
         void SetUsername(Customer customer, string newUsername);
+
+        /// <summary>
+        /// Validate customer
+        /// </summary>
+        /// <param name="usernameOrEmail">Username or email</param>
+        /// <param name="password">Password</param>
+        /// <returns>Result</returns>
+        bool ValidateCustomer(string usernameOrEmail, string password);
+
+        #endregion Public Methods
     }
 }

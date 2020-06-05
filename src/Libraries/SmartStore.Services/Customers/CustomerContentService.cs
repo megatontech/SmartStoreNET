@@ -1,16 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Customers
 {
     public partial class CustomerContentService : ICustomerContentService
     {
+        #region Private Fields
+
         private readonly IRepository<CustomerContent> _contentRepository;
+
         private readonly IEventPublisher _eventPublisher;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public CustomerContentService(IRepository<CustomerContent> contentRepository, IEventPublisher eventPublisher)
         {
@@ -18,9 +25,15 @@ namespace SmartStore.Services.Customers
             _eventPublisher = eventPublisher;
         }
 
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
         public virtual void DeleteCustomerContent(CustomerContent content)
         {
-			Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content, nameof(content));
 
             _contentRepository.Delete(content);
         }
@@ -62,21 +75,22 @@ namespace SmartStore.Services.Customers
                 return null;
 
             return _contentRepository.GetById(contentId);
-                                          
         }
 
         public virtual void InsertCustomerContent(CustomerContent content)
         {
-			Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content, nameof(content));
 
-			_contentRepository.Insert(content);
+            _contentRepository.Insert(content);
         }
 
         public virtual void UpdateCustomerContent(CustomerContent content)
         {
-			Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content, nameof(content));
 
-			_contentRepository.Update(content);
+            _contentRepository.Update(content);
         }
+
+        #endregion Public Methods
     }
 }

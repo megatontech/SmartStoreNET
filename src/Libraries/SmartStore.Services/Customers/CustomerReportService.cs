@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Data.Entity;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Services.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 
 namespace SmartStore.Services.Customers
 {
@@ -16,17 +16,20 @@ namespace SmartStore.Services.Customers
     /// </summary>
     public partial class CustomerReportService : ICustomerReportService
     {
-        #region Fields
+        #region Private Fields
 
         private readonly IRepository<Customer> _customerRepository;
-        private readonly IRepository<Order> _orderRepository;
-        private readonly ICustomerService _customerService;
-        private readonly IDateTimeHelper _dateTimeHelper;
-        
-        #endregion
 
-        #region Ctor
-        
+        private readonly ICustomerService _customerService;
+
+        private readonly IDateTimeHelper _dateTimeHelper;
+
+        private readonly IRepository<Order> _orderRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
         /// <summary>
         /// Ctor
         /// </summary>
@@ -44,9 +47,11 @@ namespace SmartStore.Services.Customers
             this._dateTimeHelper = dateTimeHelper;
         }
 
-        #endregion
+        #endregion Public Constructors
 
-        #region Methods
+
+
+        #region Public Methods
 
         /// <summary>
         /// Get best customers
@@ -98,11 +103,13 @@ namespace SmartStore.Services.Customers
                         query2 = query2.OrderByDescending(x => x.OrderTotal);
                     }
                     break;
+
                 case 2:
                     {
                         query2 = query2.OrderByDescending(x => x.OrderCount);
                     }
                     break;
+
                 default:
                     throw new ArgumentException("Wrong orderBy parameter", "orderBy");
             }
@@ -139,13 +146,14 @@ namespace SmartStore.Services.Customers
                         from cr in c.CustomerRoles
                         where !c.Deleted &&
                         cr.Id == registeredCustomerRole.Id &&
-                        c.CreatedOnUtc >= date 
+                        c.CreatedOnUtc >= date
+
                         //&& c.CreatedOnUtc <= DateTime.UtcNow
                         select c;
             int count = query.Count();
             return count;
         }
 
-        #endregion
+        #endregion Public Methods
     }
 }

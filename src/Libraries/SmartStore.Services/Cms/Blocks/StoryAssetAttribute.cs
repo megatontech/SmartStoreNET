@@ -2,24 +2,6 @@
 
 namespace SmartStore.Services.Cms.Blocks
 {
-    /// <summary>
-    /// Specifies whether a property refers to an asset to be included in the story export.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public sealed class StoryAssetAttribute : Attribute
-    {
-        public StoryAssetAttribute(StoryAssetKind kind)
-        {
-            Kind = kind;
-        }
-
-        /// <summary>
-        /// The asset property kind.
-        /// </summary>
-        public StoryAssetKind Kind { get; private set; }
-    }
-
-
     public enum StoryAssetKind
     {
         /// <summary>
@@ -51,5 +33,32 @@ namespace SmartStore.Services.Cms.Blocks
         /// The property value is a link builder expression.
         /// </summary>
         Link
+    }
+
+    /// <summary>
+    /// Specifies whether a property refers to an asset to be included in the story export.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public sealed class StoryAssetAttribute : Attribute
+    {
+        #region Public Constructors
+
+        public StoryAssetAttribute(StoryAssetKind kind)
+        {
+            Kind = kind;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
+        /// <summary>
+        /// The asset property kind.
+        /// </summary>
+        public StoryAssetKind Kind { get; private set; }
+
+        #endregion Public Properties
     }
 }

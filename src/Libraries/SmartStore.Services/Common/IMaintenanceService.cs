@@ -7,6 +7,8 @@ namespace SmartStore.Services.Common
     /// </summary>
     public partial interface IMaintenanceService
     {
+        #region Public Methods
+
         /// <summary>
         /// Get the current ident value
         /// </summary>
@@ -20,5 +22,7 @@ namespace SmartStore.Services.Common
         /// <typeparam name="T">Entity</typeparam>
         /// <param name="ident">Ident value</param>
         void SetTableIdent<T>(int ident) where T : BaseEntity;
+
+        #endregion Public Methods
     }
 }

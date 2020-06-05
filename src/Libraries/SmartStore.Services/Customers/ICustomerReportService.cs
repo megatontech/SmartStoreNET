@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
+using System;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Customers
 {
@@ -12,6 +12,8 @@ namespace SmartStore.Services.Customers
     /// </summary>
     public partial interface ICustomerReportService
     {
+        #region Public Methods
+
         /// <summary>
         /// Get best customers
         /// </summary>
@@ -24,12 +26,14 @@ namespace SmartStore.Services.Customers
         /// <returns>Report</returns>
         IList<BestCustomerReportLine> GetBestCustomersReport(DateTime? startTime,
             DateTime? endTime, OrderStatus? os, PaymentStatus? ps, ShippingStatus? ss, int orderBy);
-        
+
         /// <summary>
         /// Gets a report of customers registered in the last days
         /// </summary>
         /// <param name="days">Customers registered in the last days</param>
         /// <returns>Number of registered customers</returns>
         int GetRegisteredCustomersReport(int days);
+
+        #endregion Public Methods
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using SmartStore.Core;
+﻿using SmartStore.Core;
 using SmartStore.Core.Caching;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Cms;
@@ -10,20 +6,36 @@ using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Security;
 using SmartStore.Core.Domain.Stores;
 using SmartStore.Data.Caching;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 
 namespace SmartStore.Services.Cms
 {
     public partial class MenuStorage : IMenuStorage
     {
+        #region Private Fields
+
         private const string MENU_ALLSYSTEMNAMEs_CACHE_KEY = "MenuStorage:SystemNames";
-        private const string MENU_USER_CACHE_KEY = "MenuStorage:Menus:User-{0}-{1}";
+
         private const string MENU_PATTERN_KEY = "MenuStorage:Menus:*";
 
-        private readonly IRepository<MenuRecord> _menuRepository;
-        private readonly IRepository<MenuItemRecord> _menuItemRepository;
-        private readonly IRepository<StoreMapping> _storeMappingRepository;
+        private const string MENU_USER_CACHE_KEY = "MenuStorage:Menus:User-{0}-{1}";
+
         private readonly IRepository<AclRecord> _aclRepository;
+
+        private readonly IRepository<MenuItemRecord> _menuItemRepository;
+
+        private readonly IRepository<MenuRecord> _menuRepository;
+
         private readonly ICommonServices _services;
+
+        private readonly IRepository<StoreMapping> _storeMappingRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public MenuStorage(
             IRepository<MenuRecord> menuRepository,
@@ -41,58 +53,19 @@ namespace SmartStore.Services.Cms
             QuerySettings = DbQuerySettings.Default;
         }
 
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
         public DbQuerySettings QuerySettings { get; set; }
 
-        public virtual void InsertMenu(MenuRecord menu)
-        {
-            Guard.NotNull(menu, nameof(MenuRecord));
+        #endregion Public Properties
 
-            menu.SystemName = menu.SystemName.ToValidPath();
 
-            _menuRepository.Insert(menu);
 
-            var systemNames = GetMenuSystemNames(false);
-            if (systemNames != null && menu.Published)
-            {
-                systemNames.Add(menu.SystemName);
-            }
-
-            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
-        }
-
-        public virtual void UpdateMenu(MenuRecord menu)
-        {
-            Guard.NotNull(menu, nameof(MenuRecord));
-
-            menu.SystemName = menu.SystemName.ToValidPath();
-
-            var modProps = _services.DbContext.GetModifiedProperties(menu);
-
-            _menuRepository.Update(menu);
-
-            var systemNames = GetMenuSystemNames(false);
-            if (systemNames != null)
-            {
-                if (modProps.TryGetValue(nameof(menu.Published), out var original))
-                {
-                    if (original.Convert<bool>() == true)
-                    {
-                        systemNames.Remove(menu.SystemName);
-                    }
-                    else
-                    {
-                        systemNames.Add(menu.SystemName);
-                    }
-                }
-                else if (modProps.TryGetValue(nameof(menu.SystemName), out original))
-                {
-                    systemNames.Remove((string)original);
-                    systemNames.Add(menu.SystemName);
-                }
-            }
-
-            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
-        }
+        #region Public Methods
 
         public virtual void DeleteMenu(MenuRecord menu)
         {
@@ -110,6 +83,46 @@ namespace SmartStore.Services.Cms
             _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
         }
 
+        public virtual void DeleteMenuItem(MenuItemRecord item, bool deleteChilds = true)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            if (!deleteChilds)
+            {
+                _menuItemRepository.Delete(item);
+            }
+            else
+            {
+                var ids = new HashSet<int> { item.Id };
+                GetChildIds(item.Id, ids);
+
+                foreach (var chunk in ids.Slice(200))
+                {
+                    var items = _menuItemRepository.Table.Where(x => chunk.Contains(x.Id)).ToList();
+                    _menuItemRepository.DeleteRange(items);
+                }
+            }
+
+            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
+
+            void GetChildIds(int parentId, HashSet<int> ids)
+            {
+                var childIds = _menuItemRepository.TableUntracked
+                    .Where(x => x.ParentItemId == parentId)
+                    .Select(x => x.Id)
+                    .ToList();
+
+                if (childIds.Any())
+                {
+                    ids.AddRange(childIds);
+                    childIds.Each(x => GetChildIds(x, ids));
+                }
+            }
+        }
+
         public virtual IPagedList<MenuRecord> GetAllMenus(
             string systemName = null,
             int storeId = 0,
@@ -119,6 +132,48 @@ namespace SmartStore.Services.Cms
         {
             var query = BuildMenuQuery(0, storeId, systemName, null, includeHidden);
             return new PagedList<MenuRecord>(query, pageIndex, pageSize);
+        }
+
+        public virtual MenuRecord GetMenuById(int id)
+        {
+            if (id == 0)
+            {
+                return null;
+            }
+
+            return _menuRepository.GetByIdCached(id, "db.menurecord.id-" + id);
+        }
+
+        public virtual MenuItemRecord GetMenuItemById(int id)
+        {
+            if (id == 0)
+            {
+                return null;
+            }
+
+            return _menuItemRepository.GetByIdCached(id, "db.menuitemrecord.id-" + id);
+        }
+
+        public virtual IList<MenuItemRecord> GetMenuItems(int menuId, int storeId = 0, bool includeHidden = false)
+        {
+            if (menuId == 0)
+            {
+                return new List<MenuItemRecord>();
+            }
+
+            var query = BuildMenuItemQuery(menuId, null, storeId, includeHidden);
+            return query.ToList();
+        }
+
+        public virtual IList<MenuItemRecord> GetMenuItems(string systemName, int storeId = 0, bool includeHidden = false)
+        {
+            if (systemName.IsEmpty())
+            {
+                return new List<MenuItemRecord>();
+            }
+
+            var query = BuildMenuItemQuery(0, systemName, storeId, includeHidden);
+            return query.ToList();
         }
 
         public virtual IEnumerable<MenuInfo> GetUserMenuInfos(IEnumerable<CustomerRole> roles = null, int storeId = 0)
@@ -168,27 +223,22 @@ namespace SmartStore.Services.Cms
             return userMenusInfo;
         }
 
-        public virtual MenuRecord GetMenuById(int id)
+        public virtual void InsertMenu(MenuRecord menu)
         {
-            if (id == 0)
+            Guard.NotNull(menu, nameof(MenuRecord));
+
+            menu.SystemName = menu.SystemName.ToValidPath();
+
+            _menuRepository.Insert(menu);
+
+            var systemNames = GetMenuSystemNames(false);
+            if (systemNames != null && menu.Published)
             {
-                return null;
+                systemNames.Add(menu.SystemName);
             }
 
-            return _menuRepository.GetByIdCached(id, "db.menurecord.id-" + id);
+            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
         }
-
-        public virtual bool MenuExists(string systemName)
-        {
-            if (systemName.IsEmpty())
-            {
-                return false;
-            }
-
-			return GetMenuSystemNames(true).Contains(systemName);
-        }
-
-        #region Menu items
 
         public virtual void InsertMenuItem(MenuItemRecord item)
         {
@@ -202,8 +252,52 @@ namespace SmartStore.Services.Cms
 
             _menuItemRepository.Insert(item);
 
-			_services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
-		}
+            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
+        }
+
+        public virtual bool MenuExists(string systemName)
+        {
+            if (systemName.IsEmpty())
+            {
+                return false;
+            }
+
+            return GetMenuSystemNames(true).Contains(systemName);
+        }
+
+        public virtual void UpdateMenu(MenuRecord menu)
+        {
+            Guard.NotNull(menu, nameof(MenuRecord));
+
+            menu.SystemName = menu.SystemName.ToValidPath();
+
+            var modProps = _services.DbContext.GetModifiedProperties(menu);
+
+            _menuRepository.Update(menu);
+
+            var systemNames = GetMenuSystemNames(false);
+            if (systemNames != null)
+            {
+                if (modProps.TryGetValue(nameof(menu.Published), out var original))
+                {
+                    if (original.Convert<bool>() == true)
+                    {
+                        systemNames.Remove(menu.SystemName);
+                    }
+                    else
+                    {
+                        systemNames.Add(menu.SystemName);
+                    }
+                }
+                else if (modProps.TryGetValue(nameof(menu.SystemName), out original))
+                {
+                    systemNames.Remove((string)original);
+                    systemNames.Add(menu.SystemName);
+                }
+            }
+
+            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
+        }
 
         public virtual void UpdateMenuItem(MenuItemRecord item)
         {
@@ -217,100 +311,38 @@ namespace SmartStore.Services.Cms
 
             _menuItemRepository.Update(item);
 
-			_services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
-		}
-
-        public virtual void DeleteMenuItem(MenuItemRecord item, bool deleteChilds = true)
-        {
-            if (item == null)
-            {
-                return;
-            }
-
-            if (!deleteChilds)
-            {
-                _menuItemRepository.Delete(item);
-            }
-			else
-			{
-				var ids = new HashSet<int> { item.Id };
-				GetChildIds(item.Id, ids);
-
-				foreach (var chunk in ids.Slice(200))
-				{
-					var items = _menuItemRepository.Table.Where(x => chunk.Contains(x.Id)).ToList();
-					_menuItemRepository.DeleteRange(items);
-				}
-			}
-
-			_services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
-
-			void GetChildIds(int parentId, HashSet<int> ids)
-            {
-                var childIds = _menuItemRepository.TableUntracked
-                    .Where(x => x.ParentItemId == parentId)
-                    .Select(x => x.Id)
-                    .ToList();
-
-                if (childIds.Any())
-                {
-                    ids.AddRange(childIds);
-                    childIds.Each(x => GetChildIds(x, ids));
-                }
-            }
+            _services.Cache.RemoveByPattern(MENU_PATTERN_KEY);
         }
 
-        public virtual MenuItemRecord GetMenuItemById(int id)
+        #endregion Public Methods
+
+
+
+        #region Protected Methods
+
+        protected virtual IQueryable<MenuItemRecord> BuildMenuItemQuery(
+            int menuId,
+            string systemName,
+            int storeId,
+            bool includeHidden)
         {
-            if (id == 0)
+            var singleMenu = menuId != 0 || (systemName.HasValue() && storeId != 0);
+            var menuQuery = BuildMenuQuery(menuId, storeId, systemName, null, includeHidden, !singleMenu, !singleMenu);
+
+            if (singleMenu)
             {
-                return null;
+                menuQuery = menuQuery.Take(1);
             }
 
-            return _menuItemRepository.GetByIdCached(id, "db.menuitemrecord.id-" + id);
+            var query =
+                from m in menuQuery
+                join mi in _menuItemRepository.Table on m.Id equals mi.MenuId
+                where includeHidden || mi.Published
+                orderby mi.ParentItemId, mi.DisplayOrder
+                select mi;
+
+            return query;
         }
-
-        public virtual IList<MenuItemRecord> GetMenuItems(int menuId, int storeId = 0, bool includeHidden = false)
-        {
-            if (menuId == 0)
-            {
-                return new List<MenuItemRecord>();
-            }
-
-            var query = BuildMenuItemQuery(menuId, null, storeId, includeHidden);
-            return query.ToList();
-        }
-
-        public virtual IList<MenuItemRecord> GetMenuItems(string systemName, int storeId = 0, bool includeHidden = false)
-        {
-            if (systemName.IsEmpty())
-            {
-                return new List<MenuItemRecord>();
-            }
-
-            var query = BuildMenuItemQuery(0, systemName, storeId, includeHidden);
-            return query.ToList();
-        }
-
-        #endregion
-
-        #region Utilities
-
-        private ISet GetMenuSystemNames(bool create)
-		{
-			if (create || _services.Cache.Contains(MENU_ALLSYSTEMNAMEs_CACHE_KEY))
-			{
-				return _services.Cache.GetHashSet(MENU_ALLSYSTEMNAMEs_CACHE_KEY, () =>
-				{
-					return _menuRepository.TableUntracked
-						.Where(x => x.Published)
-						.Select(x => x.SystemName)
-						.ToArray();
-				});
-			}
-
-			return null;
-		}
 
         protected virtual IQueryable<MenuRecord> BuildMenuQuery(
             int id,
@@ -345,7 +377,7 @@ namespace SmartStore.Services.Cms
 
             if (storeId > 0 && !QuerySettings.IgnoreMultiStore)
             {
-                query = 
+                query =
                     from x in query
                     join m in _storeMappingRepository.Table
                     on new { x1 = x.Id, x2 = entityName } equals new { x1 = m.EntityId, x2 = m.EntityName } into sm
@@ -360,7 +392,7 @@ namespace SmartStore.Services.Cms
             {
                 var allowedRoleIds = _services.WorkContext.CurrentCustomer.CustomerRoles.Where(x => x.Active).Select(x => x.Id).ToList();
 
-                query = 
+                query =
                     from x in query
                     join a in _aclRepository.Table
                     on new { x1 = x.Id, x2 = entityName } equals new { x1 = a.EntityId, x2 = a.EntityName } into ac
@@ -373,7 +405,7 @@ namespace SmartStore.Services.Cms
 
             if (applied && groupBy)
             {
-                query = 
+                query =
                     from x in query
                     group x by x.Id into grp
                     orderby grp.Key
@@ -388,30 +420,26 @@ namespace SmartStore.Services.Cms
             return query;
         }
 
-        protected virtual IQueryable<MenuItemRecord> BuildMenuItemQuery(
-            int menuId,
-            string systemName,
-            int storeId,
-            bool includeHidden)
-        {
-            var singleMenu = menuId != 0 || (systemName.HasValue() && storeId != 0);
-            var menuQuery = BuildMenuQuery(menuId, storeId, systemName, null, includeHidden, !singleMenu, !singleMenu);
+        #endregion Protected Methods
 
-            if (singleMenu)
+        #region Private Methods
+
+        private ISet GetMenuSystemNames(bool create)
+        {
+            if (create || _services.Cache.Contains(MENU_ALLSYSTEMNAMEs_CACHE_KEY))
             {
-                menuQuery = menuQuery.Take(1);
+                return _services.Cache.GetHashSet(MENU_ALLSYSTEMNAMEs_CACHE_KEY, () =>
+                {
+                    return _menuRepository.TableUntracked
+                        .Where(x => x.Published)
+                        .Select(x => x.SystemName)
+                        .ToArray();
+                });
             }
 
-            var query =
-                from m in menuQuery
-                join mi in _menuItemRepository.Table on m.Id equals mi.MenuId
-                where includeHidden || mi.Published
-                orderby mi.ParentItemId, mi.DisplayOrder
-                select mi;
-
-            return query;
+            return null;
         }
 
-        #endregion
+        #endregion Private Methods
     }
 }

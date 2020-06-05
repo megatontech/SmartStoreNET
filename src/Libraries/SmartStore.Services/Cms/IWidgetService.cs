@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using SmartStore.Core.Plugins;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Cms
 {
@@ -8,21 +8,29 @@ namespace SmartStore.Services.Cms
     /// </summary>
     public partial interface IWidgetService
     {
+        #region Public Methods
+
         /// <summary>
         /// Load active widgets
         /// </summary>
-		/// <param name="storeId">Load records allows only in specified store; pass 0 to load all records</param>
+        /// <param name="storeId">Load records allows only in specified store; pass 0 to load all records</param>
         /// <returns>Widgets</returns>
-		IEnumerable<Provider<IWidget>> LoadActiveWidgets(int storeId = 0);
+        IEnumerable<Provider<IWidget>> LoadActiveWidgets(int storeId = 0);
 
-        
         /// <summary>
         /// Load active widgets
         /// </summary>
         /// <param name="widgetZone">Widget zone</param>
+        /// <param name="storeId">Load records allows only in specified store; pass 0 to load all records</param>
+        /// <returns>Widgets</returns>
+        IEnumerable<Provider<IWidget>> LoadActiveWidgetsByWidgetZone(string widgetZone, int storeId = 0);
+
+        /// <summary>
+        /// Load all widgets
+        /// </summary>
 		/// <param name="storeId">Load records allows only in specified store; pass 0 to load all records</param>
         /// <returns>Widgets</returns>
-		IEnumerable<Provider<IWidget>> LoadActiveWidgetsByWidgetZone(string widgetZone, int storeId = 0);
+		IEnumerable<Provider<IWidget>> LoadAllWidgets(int storeId = 0);
 
         /// <summary>
         /// Load widget by system name
@@ -31,11 +39,6 @@ namespace SmartStore.Services.Cms
         /// <returns>Found widget</returns>
 		Provider<IWidget> LoadWidgetBySystemName(string systemName);
 
-        /// <summary>
-        /// Load all widgets
-        /// </summary>
-		/// <param name="storeId">Load records allows only in specified store; pass 0 to load all records</param>
-        /// <returns>Widgets</returns>
-		IEnumerable<Provider<IWidget>> LoadAllWidgets(int storeId = 0);
+        #endregion Public Methods
     }
 }

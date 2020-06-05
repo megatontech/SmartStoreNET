@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using SmartStore.Core.Caching;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Catalog
 {
@@ -13,15 +12,15 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial class ProductTemplateService : IProductTemplateService
     {
+        #region Private Fields
 
-        #region Fields
-
-        private readonly IRepository<ProductTemplate> _productTemplateRepository;
         private readonly IEventPublisher _eventPublisher;
 
-        #endregion
-        
-        #region Ctor
+        private readonly IRepository<ProductTemplate> _productTemplateRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         /// <summary>
         /// Ctor
@@ -35,9 +34,11 @@ namespace SmartStore.Services.Catalog
             _eventPublisher = eventPublisher;
         }
 
-        #endregion
+        #endregion Public Constructors
 
-        #region Methods
+
+
+        #region Public Methods
 
         /// <summary>
         /// Delete product template
@@ -64,7 +65,7 @@ namespace SmartStore.Services.Catalog
             var templates = query.ToList();
             return templates;
         }
- 
+
         /// <summary>
         /// Gets a product template
         /// </summary>
@@ -101,7 +102,7 @@ namespace SmartStore.Services.Catalog
 
             _productTemplateRepository.Update(productTemplate);
         }
-        
-        #endregion
+
+        #endregion Public Methods
     }
 }

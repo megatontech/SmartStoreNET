@@ -1,25 +1,29 @@
-﻿using System.IO;
-using SmartStore.Core.Domain;
+﻿using SmartStore.Core.Domain;
 using SmartStore.Core.Logging;
 using SmartStore.Utilities;
+using System.IO;
 
 namespace SmartStore.Services.DataExchange.Export.Deployment
 {
-	public class FileSystemFilePublisher : IFilePublisher
-	{
-		public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
-		{
-			var targetFolder = deployment.GetDeploymentFolder(true);
+    public class FileSystemFilePublisher : IFilePublisher
+    {
+        #region Public Methods
 
-			if (targetFolder.IsEmpty())
-				return;
+        public virtual void Publish(ExportDeploymentContext context, ExportDeployment deployment)
+        {
+            var targetFolder = deployment.GetDeploymentFolder(true);
 
-			if (!FileSystemHelper.CopyDirectory(new DirectoryInfo(context.FolderContent), new DirectoryInfo(targetFolder)))
-			{
-				context.Result.LastError = context.T("Admin.DataExchange.Export.Deployment.CopyFileFailed");
-			}
+            if (targetFolder.IsEmpty())
+                return;
 
-			context.Log.Info($"Copied export data files to {targetFolder}.");
-		}
-	}
+            if (!FileSystemHelper.CopyDirectory(new DirectoryInfo(context.FolderContent), new DirectoryInfo(targetFolder)))
+            {
+                context.Result.LastError = context.T("Admin.DataExchange.Export.Deployment.CopyFileFailed");
+            }
+
+            context.Log.Info($"Copied export data files to {targetFolder}.");
+        }
+
+        #endregion Public Methods
+    }
 }
