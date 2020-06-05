@@ -1,22 +1,35 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Catalog
 {
     public partial class ManufacturerTemplateService : IManufacturerTemplateService
     {
-        private readonly IRepository<ManufacturerTemplate> _manufacturerTemplateRepository;
+        #region Private Fields
+
         private readonly IEventPublisher _eventPublisher;
+
+        private readonly IRepository<ManufacturerTemplate> _manufacturerTemplateRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public ManufacturerTemplateService(IRepository<ManufacturerTemplate> manufacturerTemplateRepository, IEventPublisher eventPublisher)
         {
             _manufacturerTemplateRepository = manufacturerTemplateRepository;
             _eventPublisher = eventPublisher;
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
 
         public virtual void DeleteManufacturerTemplate(ManufacturerTemplate manufacturerTemplate)
         {
@@ -35,7 +48,7 @@ namespace SmartStore.Services.Catalog
             var templates = query.ToList();
             return templates;
         }
- 
+
         public virtual ManufacturerTemplate GetManufacturerTemplateById(int manufacturerTemplateId)
         {
             if (manufacturerTemplateId == 0)
@@ -58,7 +71,8 @@ namespace SmartStore.Services.Catalog
                 throw new ArgumentNullException("manufacturerTemplate");
 
             _manufacturerTemplateRepository.Update(manufacturerTemplate);
-
         }
+
+        #endregion Public Methods
     }
 }

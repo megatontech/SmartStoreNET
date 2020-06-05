@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using SmartStore.Collections;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Catalog
 {
@@ -13,62 +12,7 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial interface IDeclarationProductService
     {
-        #region Products
-
-        /// <summary>
-        /// Delete a product
-        /// </summary>
-        /// <param name="product">Product</param>
-        void DeleteProduct(DeclarationProduct product);
-
-        /// <summary>
-        /// Gets all products displayed on the home page
-        /// </summary>
-        /// <returns>Product collection</returns>
-        IList<DeclarationProduct> GetAllProductsDisplayedOnHomePage();
-
-        /// <summary>
-        /// Gets product
-        /// </summary>
-        /// <param name="productId">Product identifier</param>
-        /// <returns>Product</returns>
-        DeclarationProduct GetProductById(int productId);
-
-        /// <summary>
-        /// Gets products by identifier
-        /// </summary>
-        /// <param name="productIds">Product identifiers</param>
-		/// <param name="flags">Which navigation properties to eager load</param>
-        /// <returns>Products</returns>
-        IList<DeclarationProduct> GetProductsByIds(int[] productIds, ProductLoadFlags flags = ProductLoadFlags.None);
-
-        /// <summary>
-        /// Get product by system name.
-        /// </summary>
-        /// <param name="systemName">System name</param>
-        /// <returns>Product entity.</returns>
-        DeclarationProduct GetProductBySystemName(string systemName);
-
-        /// <summary>
-        /// Inserts a product
-        /// </summary>
-        /// <param name="product">Product</param>
-        void InsertProduct(DeclarationProduct product);
-
-        /// <summary>
-        /// Updates the product
-        /// </summary>
-        /// <param name="product">Product</param>
-		void UpdateProduct(DeclarationProduct product);
-
-
-
-        /// <summary>
-        /// Gets a product by name
-        /// </summary>
-        /// <param name="name">Product name</param>
-        /// <returns>Product</returns>
-        DeclarationProduct GetProductByName(string name);
+        #region Public Methods
 
         /// <summary>
         /// Adjusts inventory
@@ -98,19 +42,29 @@ namespace SmartStore.Services.Catalog
 		AdjustInventoryResult AdjustInventory(DeclarationProduct product, bool decrease, int quantity, string attributesXml);
 
         /// <summary>
-        /// Update HasTierPrices property (used for performance optimization)
-        /// </summary>
-		/// <param name="product">Product</param>
-        void UpdateHasTierPricesProperty(DeclarationProduct product);
-
-        /// <summary>
-        /// Update LowestAttributeCombinationPrice property (used for performance optimization)
+        /// Delete a product
         /// </summary>
         /// <param name="product">Product</param>
-        void UpdateLowestAttributeCombinationPriceProperty(DeclarationProduct product);
+        void DeleteProduct(DeclarationProduct product);
 
+        /// <summary>
+        /// Deletes a product picture
+        /// </summary>
+        /// <param name="productPicture">Product picture</param>
+        void DeleteProductPicture(ProductPicture productPicture);
 
-      
+        /// <summary>
+        /// Deletes a tier price
+        /// </summary>
+        /// <param name="tierPrice">Tier price</param>
+        void DeleteTierPrice(TierPrice tierPrice);
+
+        /// <summary>
+        /// Gets all products displayed on the home page
+        /// </summary>
+        /// <returns>Product collection</returns>
+        IList<DeclarationProduct> GetAllProductsDisplayedOnHomePage();
+
         /// <summary>
         /// Get applied discounts by product identifiers
         /// </summary>
@@ -118,15 +72,56 @@ namespace SmartStore.Services.Catalog
         /// <returns>Map of applied discounts</returns>
         Multimap<int, Discount> GetAppliedDiscountsByProductIds(int[] productIds);
 
-        #endregion Products
-
-        #region Tier prices
+        /// <summary>
+        /// Gets product
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <returns>Product</returns>
+        DeclarationProduct GetProductById(int productId);
 
         /// <summary>
-        /// Deletes a tier price
+        /// Gets a product by name
         /// </summary>
-        /// <param name="tierPrice">Tier price</param>
-        void DeleteTierPrice(TierPrice tierPrice);
+        /// <param name="name">Product name</param>
+        /// <returns>Product</returns>
+        DeclarationProduct GetProductByName(string name);
+
+        /// <summary>
+        /// Get product by system name.
+        /// </summary>
+        /// <param name="systemName">System name</param>
+        /// <returns>Product entity.</returns>
+        DeclarationProduct GetProductBySystemName(string systemName);
+
+        /// <summary>
+        /// Gets a product picture
+        /// </summary>
+        /// <param name="productPictureId">Product picture identifier</param>
+        /// <returns>Product picture</returns>
+        ProductPicture GetProductPictureById(int productPictureId);
+
+        /// <summary>
+        /// Gets a product pictures by product identifier
+        /// </summary>
+        /// <param name="productId">The product identifier</param>
+        /// <returns>Product pictures</returns>
+        IList<ProductPicture> GetProductPicturesByProductId(int productId);
+
+        /// <summary>
+        /// Get product pictures by product identifiers
+        /// </summary>
+        /// <param name="productIds">Product identifiers</param>
+        /// <param name="onlyFirstPicture">Whether to only load the first picture for each product</param>
+        /// <returns>Product pictures</returns>
+        Multimap<int, ProductPicture> GetProductPicturesByProductIds(int[] productIds, bool onlyFirstPicture = false);
+
+        /// <summary>
+        /// Gets products by identifier
+        /// </summary>
+        /// <param name="productIds">Product identifiers</param>
+		/// <param name="flags">Which navigation properties to eager load</param>
+        /// <returns>Products</returns>
+        IList<DeclarationProduct> GetProductsByIds(int[] productIds, ProductLoadFlags flags = ProductLoadFlags.None);
 
         /// <summary>
         /// Gets a tier price
@@ -145,48 +140,10 @@ namespace SmartStore.Services.Catalog
         Multimap<int, TierPrice> GetTierPricesByProductIds(int[] productIds, Customer customer = null, int storeId = 0);
 
         /// <summary>
-        /// Inserts a tier price
+        /// Inserts a product
         /// </summary>
-        /// <param name="tierPrice">Tier price</param>
-        void InsertTierPrice(TierPrice tierPrice);
-
-        /// <summary>
-        /// Updates the tier price
-        /// </summary>
-        /// <param name="tierPrice">Tier price</param>
-        void UpdateTierPrice(TierPrice tierPrice);
-
-        #endregion Tier prices
-
-        #region Product pictures
-
-        /// <summary>
-        /// Deletes a product picture
-        /// </summary>
-        /// <param name="productPicture">Product picture</param>
-        void DeleteProductPicture(ProductPicture productPicture);
-
-        /// <summary>
-        /// Gets a product pictures by product identifier
-        /// </summary>
-        /// <param name="productId">The product identifier</param>
-        /// <returns>Product pictures</returns>
-        IList<ProductPicture> GetProductPicturesByProductId(int productId);
-
-        /// <summary>
-        /// Get product pictures by product identifiers
-        /// </summary>
-        /// <param name="productIds">Product identifiers</param>
-        /// <param name="onlyFirstPicture">Whether to only load the first picture for each product</param>
-        /// <returns>Product pictures</returns>
-        Multimap<int, ProductPicture> GetProductPicturesByProductIds(int[] productIds, bool onlyFirstPicture = false);
-
-        /// <summary>
-        /// Gets a product picture
-        /// </summary>
-        /// <param name="productPictureId">Product picture identifier</param>
-        /// <returns>Product picture</returns>
-        ProductPicture GetProductPictureById(int productPictureId);
+        /// <param name="product">Product</param>
+        void InsertProduct(DeclarationProduct product);
 
         /// <summary>
         /// Inserts a product picture
@@ -195,12 +152,41 @@ namespace SmartStore.Services.Catalog
         void InsertProductPicture(ProductPicture productPicture);
 
         /// <summary>
+        /// Inserts a tier price
+        /// </summary>
+        /// <param name="tierPrice">Tier price</param>
+        void InsertTierPrice(TierPrice tierPrice);
+
+        /// <summary>
+        /// Update HasTierPrices property (used for performance optimization)
+        /// </summary>
+		/// <param name="product">Product</param>
+        void UpdateHasTierPricesProperty(DeclarationProduct product);
+
+        /// <summary>
+        /// Update LowestAttributeCombinationPrice property (used for performance optimization)
+        /// </summary>
+        /// <param name="product">Product</param>
+        void UpdateLowestAttributeCombinationPriceProperty(DeclarationProduct product);
+
+        /// <summary>
+        /// Updates the product
+        /// </summary>
+        /// <param name="product">Product</param>
+		void UpdateProduct(DeclarationProduct product);
+
+        /// <summary>
         /// Updates a product picture
         /// </summary>
         /// <param name="productPicture">Product picture</param>
         void UpdateProductPicture(ProductPicture productPicture);
 
-        #endregion Product pictures
+        /// <summary>
+        /// Updates the tier price
+        /// </summary>
+        /// <param name="tierPrice">Tier price</param>
+        void UpdateTierPrice(TierPrice tierPrice);
 
+        #endregion Public Methods
     }
 }

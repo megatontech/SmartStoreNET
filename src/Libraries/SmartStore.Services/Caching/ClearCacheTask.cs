@@ -1,6 +1,4 @@
-﻿using System;
-using SmartStore.Core.Caching;
-using SmartStore.Core.Infrastructure;
+﻿using SmartStore.Core.Caching;
 using SmartStore.Services.Tasks;
 
 namespace SmartStore.Services.Caching
@@ -10,19 +8,33 @@ namespace SmartStore.Services.Caching
     /// </summary>
     public partial class ClearCacheTask : ITask
     {
-		private readonly ICacheManager _cacheManager;
-		
-		public ClearCacheTask(ICacheManager cacheManager)
-		{
-			_cacheManager = cacheManager;
-		}
-		
-		/// <summary>
+        #region Private Fields
+
+        private readonly ICacheManager _cacheManager;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public ClearCacheTask(ICacheManager cacheManager)
+        {
+            _cacheManager = cacheManager;
+        }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
+
+        /// <summary>
         /// Executes a task
         /// </summary>
-		public void Execute(TaskExecutionContext ctx)
+        public void Execute(TaskExecutionContext ctx)
         {
-			_cacheManager.Clear();
+            _cacheManager.Clear();
         }
+
+        #endregion Public Methods
     }
 }

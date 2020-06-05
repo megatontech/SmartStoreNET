@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using SmartStore.Core.Domain.Affiliates;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Affiliates
 {
@@ -8,18 +8,20 @@ namespace SmartStore.Services.Affiliates
     /// </summary>
     public partial interface IAffiliateService
     {
+        #region Public Methods
+
+        /// <summary>
+        /// Marks affiliate as deleted
+        /// </summary>
+        /// <param name="affiliate">Affiliate</param>
+        void DeleteAffiliate(Affiliate affiliate);
+
         /// <summary>
         /// Gets an affiliate by affiliate identifier
         /// </summary>
         /// <param name="affiliateId">Affiliate identifier</param>
         /// <returns>Affiliate</returns>
         Affiliate GetAffiliateById(int affiliateId);
-
-        /// <summary>
-        /// Marks affiliate as deleted 
-        /// </summary>
-        /// <param name="affiliate">Affiliate</param>
-        void DeleteAffiliate(Affiliate affiliate);
 
         /// <summary>
         /// Gets all affiliates
@@ -39,6 +41,7 @@ namespace SmartStore.Services.Affiliates
         /// </summary>
         /// <param name="affiliate">Affiliate</param>
         void UpdateAffiliate(Affiliate affiliate);
-        
+
+        #endregion Public Methods
     }
 }

@@ -1,43 +1,40 @@
-﻿using SmartStore.Collections;
-using SmartStore.Core.Domain.Customers;
+﻿using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Wallet;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartStore.Services.Calc
 {
-    public partial  interface ICalcRewardService
+    public partial interface ICalcRewardService
     {
-        /// <summary>
-        /// 实时更新
-        /// </summary>
-        public DailyTotalContribution UpdateRealtimeData();
-        /// <summary>
-        /// 直推奖
-        /// </summary>
-        /// <param name="customer"></param>
-        /// <param name="order"></param>
-        void CalcRewardOne(Customer customer, DeclarationOrder order);
-        /// <summary>
-        /// 每日业绩分红
-        /// </summary>
-        /// <param name="CompanyTotal"></param>
-        void CalcRewardTwo(decimal CompanyTotal);
-        /// <summary>
-        /// 每日商城利润分红
-        /// </summary>
-        /// <param name="StoreTotal"></param>
-        void CalcRewardThree(decimal StoreTotal);
+        #region Public Methods
+
         /// <summary>
         /// 发红包
         /// </summary>
         /// <param name="StoreTotal"></param>
         /// <param name="isEqual"></param>
         void CalcRewardFour(decimal StoreTotal);
+
+        /// <summary>
+        /// 直推奖
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <param name="order"></param>
+        void CalcRewardOne(Customer customer, DeclarationOrder order);
+
+        /// <summary>
+        /// 每日商城利润分红
+        /// </summary>
+        /// <param name="StoreTotal"></param>
+        void CalcRewardThree(decimal StoreTotal);
+
+        /// <summary>
+        /// 每日业绩分红
+        /// </summary>
+        /// <param name="CompanyTotal"></param>
+        void CalcRewardTwo(decimal CompanyTotal);
+
         /// <summary>
         /// 查节点
         /// </summary>
@@ -49,5 +46,12 @@ namespace SmartStore.Services.Calc
         /// <param name="current"></param>
         /// <returns></returns>
         Customer recursiveFindNode(List<Customer> result, List<Customer> treeNode, Customer customer, int start, int end, int current);
+
+        /// <summary>
+        /// 实时更新
+        /// </summary>
+        public DailyTotalContribution UpdateRealtimeData();
+
+        #endregion Public Methods
     }
 }

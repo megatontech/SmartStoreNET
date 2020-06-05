@@ -1,7 +1,7 @@
 //Contributor:  Nicholas Mayne
 
-using System.Web.Routing;
 using SmartStore.Core.Plugins;
+using System.Web.Routing;
 
 namespace SmartStore.Services.Authentication.External
 {
@@ -9,7 +9,9 @@ namespace SmartStore.Services.Authentication.External
     /// Provides an interface for creating external authentication methods
     /// </summary>
     public partial interface IExternalAuthenticationMethod : IProvider, IUserEditable
-    {   
+    {
+        #region Public Methods
+
         /// <summary>
         /// Gets a route for displaying plugin in public store
         /// </summary>
@@ -17,5 +19,7 @@ namespace SmartStore.Services.Authentication.External
         /// <param name="controllerName">Controller name</param>
         /// <param name="routeValues">Route values</param>
         void GetPublicInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues);
+
+        #endregion Public Methods
     }
 }

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using SmartStore.Core.Domain.Catalog;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Catalog
 {
@@ -8,6 +8,14 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial interface ICompareProductsService
     {
+        #region Public Methods
+
+        /// <summary>
+        /// Adds a product to a "compare products" list
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        void AddProductToCompareList(int productId);
+
         /// <summary>
         /// Clears a "compare products" list
         /// </summary>
@@ -31,10 +39,6 @@ namespace SmartStore.Services.Catalog
         /// <param name="productId">Product identifier</param>
         void RemoveProductFromCompareList(int productId);
 
-        /// <summary>
-        /// Adds a product to a "compare products" list
-        /// </summary>
-        /// <param name="productId">Product identifier</param>
-        void AddProductToCompareList(int productId);
+        #endregion Public Methods
     }
 }

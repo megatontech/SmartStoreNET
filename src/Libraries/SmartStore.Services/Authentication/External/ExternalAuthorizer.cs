@@ -1,50 +1,62 @@
-using System;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Localization;
+using SmartStore.Core.Logging;
 using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Localization;
-using SmartStore.Core.Logging;
 using SmartStore.Services.Messages;
 using SmartStore.Services.Orders;
 using SmartStore.Utilities;
+using System;
 
 namespace SmartStore.Services.Authentication.External
 {
     public partial class ExternalAuthorizer : IExternalAuthorizer
     {
-        #region Fields
+        #region Private Fields
 
         private readonly IAuthenticationService _authenticationService;
-        private readonly IOpenAuthenticationService _openAuthenticationService;
-        private readonly IGenericAttributeService _genericAttributeService;
-        private readonly ICustomerRegistrationService _customerRegistrationService;
-        private readonly ICustomerActivityService _customerActivityService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IWorkContext _workContext;
-        private readonly CustomerSettings _customerSettings;
-        private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
-        private readonly IShoppingCartService _shoppingCartService;
-		private readonly IMessageFactory _messageFactory;
-		private readonly LocalizationSettings _localizationSettings;
-        #endregion
 
-        #region Ctor
+        private readonly ICustomerActivityService _customerActivityService;
+
+        private readonly ICustomerRegistrationService _customerRegistrationService;
+
+        private readonly CustomerSettings _customerSettings;
+
+        private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
+
+        private readonly IGenericAttributeService _genericAttributeService;
+
+        private readonly ILocalizationService _localizationService;
+
+        private readonly LocalizationSettings _localizationSettings;
+
+        private readonly IMessageFactory _messageFactory;
+
+        private readonly IOpenAuthenticationService _openAuthenticationService;
+
+        private readonly IShoppingCartService _shoppingCartService;
+
+        private readonly IWorkContext _workContext;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public ExternalAuthorizer(
-			IAuthenticationService authenticationService,
+            IAuthenticationService authenticationService,
             IOpenAuthenticationService openAuthenticationService,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
-            ICustomerActivityService customerActivityService, 
-			ILocalizationService localizationService,
-            IWorkContext workContext, 
-			CustomerSettings customerSettings,
+            ICustomerActivityService customerActivityService,
+            ILocalizationService localizationService,
+            IWorkContext workContext,
+            CustomerSettings customerSettings,
             ExternalAuthenticationSettings externalAuthenticationSettings,
             IShoppingCartService shoppingCartService,
-			IMessageFactory messageFactory,
-			LocalizationSettings localizationSettings)
+            IMessageFactory messageFactory,
+            LocalizationSettings localizationSettings)
         {
             _authenticationService = authenticationService;
             _openAuthenticationService = openAuthenticationService;
@@ -60,38 +72,11 @@ namespace SmartStore.Services.Authentication.External
             _localizationSettings = localizationSettings;
         }
 
-        #endregion
+        #endregion Public Constructors
 
-        #region Utilities
 
-        private bool RegistrationIsEnabled()
-        {
-            return _customerSettings.UserRegistrationType != UserRegistrationType.Disabled && !_externalAuthenticationSettings.AutoRegisterEnabled;
-        }
 
-        private bool AutoRegistrationIsEnabled()
-        {
-            return _customerSettings.UserRegistrationType != UserRegistrationType.Disabled && _externalAuthenticationSettings.AutoRegisterEnabled;
-        }
-
-        private bool AccountDoesNotExistAndUserIsNotLoggedOn(Customer userFound, Customer userLoggedIn)
-        {
-            return userFound == null && userLoggedIn == null;
-        }
-
-        private bool AccountIsAssignedToLoggedOnAccount(Customer userFound, Customer userLoggedIn)
-        {
-            return userFound.Id.Equals(userLoggedIn.Id);
-        }
-
-        private bool AccountAlreadyExists(Customer userFound, Customer userLoggedIn)
-        {
-            return userFound != null && userLoggedIn != null;
-        }
-
-        #endregion
-
-        #region Methods
+        #region Public Methods
 
         public virtual AuthorizationResult Authorize(OpenAuthenticationParameters parameters)
         {
@@ -130,13 +115,13 @@ namespace SmartStore.Services.Authentication.External
                     var registrationResult = _customerRegistrationService.RegisterCustomer(registrationRequest);
                     if (registrationResult.Success)
                     {
-						// store other parameters (form fields)
-						if (details.FirstName.HasValue())
-							currentCustomer.FirstName = details.FirstName;
+                        // store other parameters (form fields)
+                        if (details.FirstName.HasValue())
+                            currentCustomer.FirstName = details.FirstName;
                         if (details.LastName.HasValue())
-							currentCustomer.LastName = details.LastName;
+                            currentCustomer.LastName = details.LastName;
 
-						userFound = currentCustomer;
+                        userFound = currentCustomer;
                         _openAuthenticationService.AssociateExternalAccountWithUser(currentCustomer, parameters);
                         ExternalAuthorizerHelper.RemoveParameters();
 
@@ -145,7 +130,7 @@ namespace SmartStore.Services.Authentication.External
                         //authenticate
                         if (isApproved)
                             _authenticationService.SignIn(userFound ?? userLoggedIn, false);
-						
+
                         //notifications
                         if (_customerSettings.NotifyNewCustomerRegistration)
                             _messageFactory.SendCustomerRegisteredNotificationMessage(currentCustomer, _localizationSettings.DefaultAdminLanguageId);
@@ -153,24 +138,24 @@ namespace SmartStore.Services.Authentication.External
                         switch (_customerSettings.UserRegistrationType)
                         {
                             case UserRegistrationType.EmailValidation:
-                            {
-                                // email validation message
-                                _genericAttributeService.SaveAttribute(currentCustomer, SystemCustomerAttributeNames.AccountActivationToken, Guid.NewGuid().ToString());
-								_messageFactory.SendCustomerEmailValidationMessage(currentCustomer, _workContext.WorkingLanguage.Id);
+                                {
+                                    // email validation message
+                                    _genericAttributeService.SaveAttribute(currentCustomer, SystemCustomerAttributeNames.AccountActivationToken, Guid.NewGuid().ToString());
+                                    _messageFactory.SendCustomerEmailValidationMessage(currentCustomer, _workContext.WorkingLanguage.Id);
 
-                                return new AuthorizationResult(OpenAuthenticationStatus.AutoRegisteredEmailValidation);
-                            }
+                                    return new AuthorizationResult(OpenAuthenticationStatus.AutoRegisteredEmailValidation);
+                                }
                             case UserRegistrationType.AdminApproval:
-                            {
-                                return new AuthorizationResult(OpenAuthenticationStatus.AutoRegisteredAdminApproval);
-                            }
+                                {
+                                    return new AuthorizationResult(OpenAuthenticationStatus.AutoRegisteredAdminApproval);
+                                }
                             case UserRegistrationType.Standard:
-                            {
-								// send customer welcome message
-								_messageFactory.SendCustomerWelcomeMessage(currentCustomer, _workContext.WorkingLanguage.Id);
+                                {
+                                    // send customer welcome message
+                                    _messageFactory.SendCustomerWelcomeMessage(currentCustomer, _workContext.WorkingLanguage.Id);
 
-                                return new AuthorizationResult(OpenAuthenticationStatus.AutoRegisteredStandard);
-                            }
+                                    return new AuthorizationResult(OpenAuthenticationStatus.AutoRegisteredStandard);
+                                }
                             default:
                                 break;
                         }
@@ -185,7 +170,7 @@ namespace SmartStore.Services.Authentication.External
                         return result;
                     }
 
-                    #endregion
+                    #endregion Register user
                 }
                 else if (RegistrationIsEnabled())
                 {
@@ -207,8 +192,10 @@ namespace SmartStore.Services.Authentication.External
 
             // migrate shopping cart
             _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, userFound ?? userLoggedIn);
+
             // authenticate
             _authenticationService.SignIn(userFound ?? userLoggedIn, false);
+
             // activity log
             _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"),
                 userFound ?? userLoggedIn);
@@ -216,6 +203,37 @@ namespace SmartStore.Services.Authentication.External
             return new AuthorizationResult(OpenAuthenticationStatus.Authenticated);
         }
 
-        #endregion
+        #endregion Public Methods
+
+
+
+        #region Private Methods
+
+        private bool AccountAlreadyExists(Customer userFound, Customer userLoggedIn)
+        {
+            return userFound != null && userLoggedIn != null;
+        }
+
+        private bool AccountDoesNotExistAndUserIsNotLoggedOn(Customer userFound, Customer userLoggedIn)
+        {
+            return userFound == null && userLoggedIn == null;
+        }
+
+        private bool AccountIsAssignedToLoggedOnAccount(Customer userFound, Customer userLoggedIn)
+        {
+            return userFound.Id.Equals(userLoggedIn.Id);
+        }
+
+        private bool AutoRegistrationIsEnabled()
+        {
+            return _customerSettings.UserRegistrationType != UserRegistrationType.Disabled && _externalAuthenticationSettings.AutoRegisterEnabled;
+        }
+
+        private bool RegistrationIsEnabled()
+        {
+            return _customerSettings.UserRegistrationType != UserRegistrationType.Disabled && !_externalAuthenticationSettings.AutoRegisterEnabled;
+        }
+
+        #endregion Private Methods
     }
 }

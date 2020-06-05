@@ -1,7 +1,7 @@
+using SmartStore.Core.Domain.Blogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SmartStore.Core.Domain.Blogs;
 
 namespace SmartStore.Services.Blogs
 {
@@ -10,6 +10,8 @@ namespace SmartStore.Services.Blogs
     /// </summary>
     public static class BlogExtensions
     {
+        #region Public Methods
+
         /// <summary>
         /// Returns all posts published between the two dates.
         /// </summary>
@@ -20,7 +22,7 @@ namespace SmartStore.Services.Blogs
         public static IList<BlogPost> GetPostsByDate(this IList<BlogPost> source,
             DateTime dateFrom, DateTime dateTo)
         {
-            var list = source.ToList().FindAll(delegate(BlogPost p)
+            var list = source.ToList().FindAll(delegate (BlogPost p)
             {
                 return (dateFrom.Date <= p.CreatedOnUtc && p.CreatedOnUtc.Date <= dateTo);
             });
@@ -28,5 +30,7 @@ namespace SmartStore.Services.Blogs
             list.TrimExcess();
             return list;
         }
+
+        #endregion Public Methods
     }
 }

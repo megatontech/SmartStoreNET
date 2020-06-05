@@ -8,13 +8,15 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial interface IProductAttributeFormatter
     {
+        #region Public Methods
+
         /// <summary>
         /// Formats attributes
         /// </summary>
-		/// <param name="product">Product</param>
+        /// <param name="product">Product</param>
         /// <param name="attributes">Attributes</param>
         /// <returns>Attributes</returns>
-		string FormatAttributes(Product product, string attributes);
+        string FormatAttributes(Product product, string attributes);
 
         /// <summary>
         /// Formats attributes
@@ -33,5 +35,7 @@ namespace SmartStore.Services.Catalog
             Customer customer, string serapator = "<br />", bool htmlEncode = true, bool renderPrices = true,
             bool renderProductAttributes = true, bool renderGiftCardAttributes = true,
             bool allowHyperlinks = true);
+
+        #endregion Public Methods
     }
 }

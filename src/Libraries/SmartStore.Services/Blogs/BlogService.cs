@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Core;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Blogs;
-using SmartStore.Core.Domain.Stores;
-using SmartStore.Core.Events;
-using SmartStore.Services.Localization;
 using SmartStore.Core.Domain.Seo;
+using SmartStore.Core.Domain.Stores;
+using SmartStore.Services.Localization;
 using SmartStore.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Blogs
 {
@@ -17,41 +16,54 @@ namespace SmartStore.Services.Blogs
     /// </summary>
     public partial class BlogService : IBlogService
     {
-        #region Fields
+        #region Private Fields
 
         private readonly IRepository<BlogPost> _blogPostRepository;
-		private readonly IRepository<StoreMapping> _storeMappingRepository;
-		private readonly ICommonServices _services;
-		private readonly ILanguageService _languageService;
-        private readonly SeoSettings _seoSettings;
+
         private readonly BlogSettings _blogSettings;
 
-        #endregion
+        private readonly ILanguageService _languageService;
 
-        #region Ctor
+        private readonly SeoSettings _seoSettings;
+
+        private readonly ICommonServices _services;
+
+        private readonly IRepository<StoreMapping> _storeMappingRepository;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public BlogService(IRepository<BlogPost> blogPostRepository,
-			IRepository<StoreMapping> storeMappingRepository,
-			ICommonServices services,
-			ILanguageService languageService,
+            IRepository<StoreMapping> storeMappingRepository,
+            ICommonServices services,
+            ILanguageService languageService,
             SeoSettings seoSettings,
             BlogSettings blogSettings)
         {
             _blogPostRepository = blogPostRepository;
-			_storeMappingRepository = storeMappingRepository;
-			_services = services;
-			_languageService = languageService;
-			_blogSettings = blogSettings;
+            _storeMappingRepository = storeMappingRepository;
+            _services = services;
+            _languageService = languageService;
+            _blogSettings = blogSettings;
             _seoSettings = seoSettings;
 
             this.QuerySettings = DbQuerySettings.Default;
         }
 
-		public DbQuerySettings QuerySettings { get; set; }
+        #endregion Public Constructors
 
-        #endregion
 
-        #region Methods
+
+        #region Public Properties
+
+        public DbQuerySettings QuerySettings { get; set; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
 
         /// <summary>
         /// Deletes a blog post
@@ -63,19 +75,6 @@ namespace SmartStore.Services.Blogs
                 throw new ArgumentNullException("blogPost");
 
             _blogPostRepository.Delete(blogPost);
-        }
-
-        /// <summary>
-        /// Gets a blog post
-        /// </summary>
-        /// <param name="blogPostId">Blog post identifier</param>
-        /// <returns>Blog post</returns>
-        public virtual BlogPost GetBlogPostById(int blogPostId)
-        {
-            if (blogPostId == 0)
-                return null;
-
-                return _blogPostRepository.GetById(blogPostId);
         }
 
         /// <summary>
@@ -91,7 +90,7 @@ namespace SmartStore.Services.Blogs
 		/// <param name="maxAge">The maximum age of returned blog posts</param>
         /// <returns>Blog posts</returns>
 		public virtual IPagedList<BlogPost> GetAllBlogPosts(int storeId, int languageId,
-			DateTime? dateFrom, DateTime? dateTo, int pageIndex, int pageSize, bool showHidden = false, DateTime? maxAge = null)
+            DateTime? dateFrom, DateTime? dateTo, int pageIndex, int pageSize, bool showHidden = false, DateTime? maxAge = null)
         {
             var query = _blogPostRepository.Table;
 
@@ -104,8 +103,8 @@ namespace SmartStore.Services.Blogs
             if (languageId > 0)
                 query = query.Where(b => languageId == b.LanguageId);
 
-			if (maxAge.HasValue)
-				query = query.Where(b => b.CreatedOnUtc >= maxAge.Value);
+            if (maxAge.HasValue)
+                query = query.Where(b => b.CreatedOnUtc >= maxAge.Value);
 
             if (!showHidden)
             {
@@ -114,25 +113,25 @@ namespace SmartStore.Services.Blogs
                 query = query.Where(b => !b.EndDateUtc.HasValue || b.EndDateUtc >= utcNow);
             }
 
-			if (storeId > 0 && !QuerySettings.IgnoreMultiStore)
-			{
-				//Store mapping
-				query = from bp in query
-						join sm in _storeMappingRepository.Table
-						on new { c1 = bp.Id, c2 = "BlogPost" } equals new { c1 = sm.EntityId, c2 = sm.EntityName } into bp_sm
-						from sm in bp_sm.DefaultIfEmpty()
-						where !bp.LimitedToStores || storeId == sm.StoreId
-						select bp;
+            if (storeId > 0 && !QuerySettings.IgnoreMultiStore)
+            {
+                //Store mapping
+                query = from bp in query
+                        join sm in _storeMappingRepository.Table
+                        on new { c1 = bp.Id, c2 = "BlogPost" } equals new { c1 = sm.EntityId, c2 = sm.EntityName } into bp_sm
+                        from sm in bp_sm.DefaultIfEmpty()
+                        where !bp.LimitedToStores || storeId == sm.StoreId
+                        select bp;
 
-				//only distinct blog posts (group by ID)
-				query = from bp in query
-						group bp by bp.Id into bpGroup
-						orderby bpGroup.Key
-						select bpGroup.FirstOrDefault();
-			}
+                //only distinct blog posts (group by ID)
+                query = from bp in query
+                        group bp by bp.Id into bpGroup
+                        orderby bpGroup.Key
+                        select bpGroup.FirstOrDefault();
+            }
 
             query = query.OrderByDescending(b => b.CreatedOnUtc);
-            
+
             var blogPosts = new PagedList<BlogPost>(query, pageIndex, pageSize);
             return blogPosts;
         }
@@ -148,19 +147,19 @@ namespace SmartStore.Services.Blogs
         /// <param name="showHidden">A value indicating whether to show hidden records</param>
         /// <returns>Blog posts</returns>
 		public virtual IPagedList<BlogPost> GetAllBlogPostsByTag(
-			int storeId, 
-			int languageId, 
-			string tag,
-            int pageIndex, 
-			int pageSize, 
-			bool showHidden = false)
+            int storeId,
+            int languageId,
+            string tag,
+            int pageIndex,
+            int pageSize,
+            bool showHidden = false)
         {
             tag = tag.Trim();
 
             //we laod all records and only then filter them by tag
-			var blogPostsAll = GetAllBlogPosts(storeId, languageId, null, null, 0, int.MaxValue, showHidden);
+            var blogPostsAll = GetAllBlogPosts(storeId, languageId, null, null, 0, int.MaxValue, showHidden);
             var taggedBlogPosts = new List<BlogPost>();
-            
+
             foreach (var blogPost in blogPostsAll)
             {
                 var tags = blogPost.ParseTags().Select(x => SeoHelper.GetSeName(x,
@@ -189,7 +188,7 @@ namespace SmartStore.Services.Blogs
         {
             var blogPostTags = new List<BlogPostTag>();
 
-			var blogPosts = GetAllBlogPosts(storeId, languageId, null, null, 0, int.MaxValue, showHidden);
+            var blogPosts = GetAllBlogPosts(storeId, languageId, null, null, 0, int.MaxValue, showHidden);
             foreach (var blogPost in blogPosts)
             {
                 var tags = blogPost.ParseTags();
@@ -211,6 +210,19 @@ namespace SmartStore.Services.Blogs
             }
 
             return blogPostTags;
+        }
+
+        /// <summary>
+        /// Gets a blog post
+        /// </summary>
+        /// <param name="blogPostId">Blog post identifier</param>
+        /// <returns>Blog post</returns>
+        public virtual BlogPost GetBlogPostById(int blogPostId)
+        {
+            if (blogPostId == 0)
+                return null;
+
+            return _blogPostRepository.GetById(blogPostId);
         }
 
         /// <summary>
@@ -236,7 +248,7 @@ namespace SmartStore.Services.Blogs
 
             _blogPostRepository.Update(blogPost);
         }
-        
+
         /// <summary>
         /// Update blog post comment totals
         /// </summary>
@@ -262,6 +274,6 @@ namespace SmartStore.Services.Blogs
             UpdateBlogPost(blogPost);
         }
 
-        #endregion
+        #endregion Public Methods
     }
 }

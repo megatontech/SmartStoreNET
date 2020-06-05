@@ -1,10 +1,11 @@
 //Contributor:  Nicholas Mayne
 
-
 namespace SmartStore.Services.Authentication.External
 {
     public struct RegistrationDetails
     {
+        #region Public Constructors
+
         public RegistrationDetails(OpenAuthenticationParameters parameters)
             : this()
         {
@@ -20,10 +21,12 @@ namespace SmartStore.Services.Authentication.External
                             UserName = claim.Contact.Email;
                         }
                     }
+
                     //first name
                     if (string.IsNullOrEmpty(FirstName))
                         if (claim.Name != null)
                             FirstName = claim.Name.First;
+
                     //last name
                     if (string.IsNullOrEmpty(LastName))
                         if (claim.Name != null)
@@ -31,11 +34,24 @@ namespace SmartStore.Services.Authentication.External
                 }
         }
 
-        public string UserName { get; set; }
-        public string Mobile { get; set; }
-        public string ParentMobile { get; set; }
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
+
         public string EmailAddress { get; set; }
+
         public string FirstName { get; set; }
+
         public string LastName { get; set; }
+
+        public string Mobile { get; set; }
+
+        public string ParentMobile { get; set; }
+
+        public string UserName { get; set; }
+
+        #endregion Public Properties
     }
 }

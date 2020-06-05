@@ -1,41 +1,55 @@
-﻿using System.Web.Mvc;
-using Autofac.Integration.Mvc;
+﻿using Autofac.Integration.Mvc;
+using System.Web.Mvc;
 
 namespace SmartStore.Services.Catalog.Modelling
 {
-	[ModelBinderType(typeof(ProductVariantQuery))]
-	public class ProductAttributeQueryModelBinder : IModelBinder
-	{
-		private readonly IProductVariantQueryFactory _factory;
+    [ModelBinderType(typeof(ProductVariantQuery))]
+    public class ProductAttributeQueryModelBinder : IModelBinder
+    {
+        #region Private Fields
 
-		public ProductAttributeQueryModelBinder(IProductVariantQueryFactory factory)
-		{
-			_factory = factory;
-		}
+        private readonly IProductVariantQueryFactory _factory;
 
-		public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
-		{
-			if (_factory.Current != null)
-			{
-				// Don't bind again for current request
-				return _factory.Current;
-			}
+        #endregion Private Fields
 
-			if (controllerContext.IsChildAction)
-			{
-				// Never attempt to bind in child actions. We require the binding to happen in a parent action.
-				return _factory.Current;
-			}
+        #region Public Constructors
 
-			var modelType = bindingContext.ModelType;
+        public ProductAttributeQueryModelBinder(IProductVariantQueryFactory factory)
+        {
+            _factory = factory;
+        }
 
-			if (modelType != typeof(ProductVariantQuery))
-			{
-				return new ProductVariantQuery();
-			}
+        #endregion Public Constructors
 
-			var query = _factory.CreateFromQuery();
-			return query;
-		}
-	}
+
+
+        #region Public Methods
+
+        public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        {
+            if (_factory.Current != null)
+            {
+                // Don't bind again for current request
+                return _factory.Current;
+            }
+
+            if (controllerContext.IsChildAction)
+            {
+                // Never attempt to bind in child actions. We require the binding to happen in a parent action.
+                return _factory.Current;
+            }
+
+            var modelType = bindingContext.ModelType;
+
+            if (modelType != typeof(ProductVariantQuery))
+            {
+                return new ProductVariantQuery();
+            }
+
+            var query = _factory.CreateFromQuery();
+            return query;
+        }
+
+        #endregion Public Methods
+    }
 }

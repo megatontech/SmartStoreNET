@@ -1,30 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
-using SmartStore.Collections;
+﻿using SmartStore.Collections;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Localization;
 using SmartStore.Core.Domain.Stores;
 using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Localization;
 using SmartStore.Services.Search.Modelling;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace SmartStore.Services.Catalog.Extensions
 {
-	public class ProductUrlHelper
+    public class ProductUrlHelper
     {
-        private readonly HttpRequestBase _httpRequest;
-        private readonly ICommonServices _services;
-        private readonly IProductAttributeParser _productAttributeParser;
-        private readonly IProductAttributeService _productAttributeService;
-        private readonly Lazy<ILanguageService> _languageService;
+        #region Private Fields
+
         private readonly Lazy<ICatalogSearchQueryAliasMapper> _catalogSearchQueryAliasMapper;
-        private readonly Lazy<LocalizationSettings> _localizationSettings;
+
+        private readonly HttpRequestBase _httpRequest;
 
         private readonly int _languageId;
+
+        private readonly Lazy<ILanguageService> _languageService;
+
+        private readonly Lazy<LocalizationSettings> _localizationSettings;
+
+        private readonly IProductAttributeParser _productAttributeParser;
+
+        private readonly IProductAttributeService _productAttributeService;
+
+        private readonly ICommonServices _services;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public ProductUrlHelper(
             HttpRequestBase httpRequest,
@@ -46,10 +58,11 @@ namespace SmartStore.Services.Catalog.Extensions
             _languageId = _services.WorkContext.WorkingLanguage.Id;
         }
 
-        /// <summary>
-        /// URL of the product page used to create the new product URL. Created from route if <c>null</c>.
-        /// </summary>
-        public string Url { get; set; }
+        #endregion Public Constructors
+
+
+
+        #region Public Properties
 
         /// <summary>
         /// Initial query string used to create the new query string. Usually <c>null</c>.
@@ -57,68 +70,15 @@ namespace SmartStore.Services.Catalog.Extensions
         public QueryString InitialQuery { get; set; }
 
         /// <summary>
-        /// Converts a query object into a URL query string
+        /// URL of the product page used to create the new product URL. Created from route if <c>null</c>.
         /// </summary>
-        /// <param name="query">Product variant query</param>
-        /// <returns>URL query string</returns>
-        public virtual string ToQueryString(ProductVariantQuery query)
-        {
-            var qs = InitialQuery != null
-                ? new QueryString(InitialQuery)
-                : new QueryString();
+        public string Url { get; set; }
 
-            // Checkout Attributes
-            foreach (var item in query.CheckoutAttributes)
-            {
-                if (item.Date.HasValue)
-                {
-                    qs.Add(item.ToString(), string.Join("-", item.Date.Value.Year, item.Date.Value.Month, item.Date.Value.Day));
-                }
-                else
-                {
-                    qs.Add(item.ToString(), item.Value);
-                }
-            }
+        #endregion Public Properties
 
-            // Gift cards
-            foreach (var item in query.GiftCards)
-            {
-                qs.Add(item.ToString(), item.Value);
-            }
 
-            // Variants
-            foreach (var item in query.Variants)
-            {
-                if (item.Alias.IsEmpty())
-                {
-                    item.Alias = _catalogSearchQueryAliasMapper.Value.GetVariantAliasById(item.AttributeId, _languageId);
-                }
 
-                if (item.Date.HasValue)
-                {
-                    qs.Add(item.ToString(), string.Join("-", item.Date.Value.Year, item.Date.Value.Month, item.Date.Value.Day));
-                }
-                else if (item.IsFile || item.IsText)
-                {
-                    qs.Add(item.ToString(), item.Value);
-                }
-                else
-                {
-                    if (item.ValueAlias.IsEmpty())
-                    {
-                        item.ValueAlias = _catalogSearchQueryAliasMapper.Value.GetVariantOptionAliasById(item.Value.ToInt(), _languageId);
-                    }
-
-                    var value = item.ValueAlias.HasValue()
-                        ? $"{item.ValueAlias}-{item.Value}"
-                        : item.Value;
-
-                    qs.Add(item.ToString(), value);
-                }
-            }
-
-            return qs.ToString(false);
-        }
+        #region Public Methods
 
         /// <summary>
         /// Deserializes attributes XML into a product variant query
@@ -187,44 +147,6 @@ namespace SmartStore.Services.Catalog.Extensions
         }
 
         /// <summary>
-        /// Creates a product URL including variant query string.
-        /// </summary>
-        /// <param name="query">Product variant query</param>
-        /// <param name="productSeName">Product SEO name</param>
-        /// <returns>Product URL</returns>
-        public virtual string GetProductUrl(ProductVariantQuery query, string productSeName)
-        {
-            if (productSeName.IsEmpty())
-                return null;
-
-            var url = Url ?? UrlHelper.GenerateUrl(
-                "Product",
-                null,
-                null,
-                new RouteValueDictionary(new { SeName = productSeName }),
-                RouteTable.Routes,
-                _httpRequest.RequestContext,
-                false);
-
-            return url + ToQueryString(query);
-        }
-
-        /// <summary>
-        /// Creates a product URL including variant query string.
-        /// </summary>
-        /// <param name="productId">Product identifier</param>
-        /// <param name="productSeName">Product SEO name</param>
-        /// <param name="attributesXml">XML formatted attributes</param>
-        /// <returns>Product URL</returns>
-        public virtual string GetProductUrl(int productId, string productSeName, string attributesXml)
-        {
-            var query = new ProductVariantQuery();
-            DeserializeQuery(query, productId, attributesXml);
-
-            return GetProductUrl(query, productSeName);
-        }
-
-        /// <summary>
         /// Creates an absolute product URL.
         /// </summary>
         /// <param name="productId">Product identifier</param>
@@ -288,5 +210,109 @@ namespace SmartStore.Services.Catalog.Extensions
 
             return url;
         }
+
+        /// <summary>
+        /// Creates a product URL including variant query string.
+        /// </summary>
+        /// <param name="query">Product variant query</param>
+        /// <param name="productSeName">Product SEO name</param>
+        /// <returns>Product URL</returns>
+        public virtual string GetProductUrl(ProductVariantQuery query, string productSeName)
+        {
+            if (productSeName.IsEmpty())
+                return null;
+
+            var url = Url ?? UrlHelper.GenerateUrl(
+                "Product",
+                null,
+                null,
+                new RouteValueDictionary(new { SeName = productSeName }),
+                RouteTable.Routes,
+                _httpRequest.RequestContext,
+                false);
+
+            return url + ToQueryString(query);
+        }
+
+        /// <summary>
+        /// Creates a product URL including variant query string.
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <param name="productSeName">Product SEO name</param>
+        /// <param name="attributesXml">XML formatted attributes</param>
+        /// <returns>Product URL</returns>
+        public virtual string GetProductUrl(int productId, string productSeName, string attributesXml)
+        {
+            var query = new ProductVariantQuery();
+            DeserializeQuery(query, productId, attributesXml);
+
+            return GetProductUrl(query, productSeName);
+        }
+
+        /// <summary>
+        /// Converts a query object into a URL query string
+        /// </summary>
+        /// <param name="query">Product variant query</param>
+        /// <returns>URL query string</returns>
+        public virtual string ToQueryString(ProductVariantQuery query)
+        {
+            var qs = InitialQuery != null
+                ? new QueryString(InitialQuery)
+                : new QueryString();
+
+            // Checkout Attributes
+            foreach (var item in query.CheckoutAttributes)
+            {
+                if (item.Date.HasValue)
+                {
+                    qs.Add(item.ToString(), string.Join("-", item.Date.Value.Year, item.Date.Value.Month, item.Date.Value.Day));
+                }
+                else
+                {
+                    qs.Add(item.ToString(), item.Value);
+                }
+            }
+
+            // Gift cards
+            foreach (var item in query.GiftCards)
+            {
+                qs.Add(item.ToString(), item.Value);
+            }
+
+            // Variants
+            foreach (var item in query.Variants)
+            {
+                if (item.Alias.IsEmpty())
+                {
+                    item.Alias = _catalogSearchQueryAliasMapper.Value.GetVariantAliasById(item.AttributeId, _languageId);
+                }
+
+                if (item.Date.HasValue)
+                {
+                    qs.Add(item.ToString(), string.Join("-", item.Date.Value.Year, item.Date.Value.Month, item.Date.Value.Day));
+                }
+                else if (item.IsFile || item.IsText)
+                {
+                    qs.Add(item.ToString(), item.Value);
+                }
+                else
+                {
+                    if (item.ValueAlias.IsEmpty())
+                    {
+                        item.ValueAlias = _catalogSearchQueryAliasMapper.Value.GetVariantOptionAliasById(item.Value.ToInt(), _languageId);
+                    }
+
+                    var value = item.ValueAlias.HasValue()
+                        ? $"{item.ValueAlias}-{item.Value}"
+                        : item.Value;
+
+                    qs.Add(item.ToString(), value);
+                }
+            }
+
+            return qs.ToString(false);
+        }
+
+        #endregion Public Methods
     }
 }

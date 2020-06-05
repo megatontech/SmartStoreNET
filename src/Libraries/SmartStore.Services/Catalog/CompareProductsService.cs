@@ -1,9 +1,9 @@
+using SmartStore.Core.Domain.Catalog;
+using SmartStore.Services.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SmartStore.Core.Domain.Catalog;
-using SmartStore.Services.Search;
 
 namespace SmartStore.Services.Catalog
 {
@@ -12,49 +12,72 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial class CompareProductsService : ICompareProductsService
     {
+        #region Private Fields
+
         private const string COMPARE_PRODUCTS_COOKIE_NAME = "sm.CompareProducts";
 
-        private readonly HttpContextBase _httpContext;
-        private readonly IProductService _productService;
-		private readonly ICatalogSearchService _catalogSearchService;
+        private readonly ICatalogSearchService _catalogSearchService;
 
-		public CompareProductsService(
-			HttpContextBase httpContext,
-			IProductService productService,
-			ICatalogSearchService catalogSearchService)
+        private readonly HttpContextBase _httpContext;
+
+        private readonly IProductService _productService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public CompareProductsService(
+            HttpContextBase httpContext,
+            IProductService productService,
+            ICatalogSearchService catalogSearchService)
         {
             _httpContext = httpContext;
             _productService = productService;
-			_catalogSearchService = catalogSearchService;
+            _catalogSearchService = catalogSearchService;
         }
 
-        #region Utilities
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
 
         /// <summary>
-        /// Gets a "compare products" identifier list
+        /// Adds a product to a "compare products" list
         /// </summary>
-        /// <returns>"compare products" identifier list</returns>
-        protected virtual HashSet<int> GetComparedProductIds()
+        /// <param name="productId">Product identifier</param>
+        public virtual void AddProductToCompareList(int productId)
         {
+            var oldProductIds = GetComparedProductIds();
+            var newProductIds = new List<int>();
+            newProductIds.Add(productId);
+
+            foreach (int oldProductId in oldProductIds)
+            {
+                if (oldProductId != productId)
+                    newProductIds.Add(oldProductId);
+            }
+
             var compareCookie = _httpContext.Request.Cookies.Get(COMPARE_PRODUCTS_COOKIE_NAME);
-            if ((compareCookie == null) || (compareCookie.Values == null))
+            if (compareCookie == null)
             {
-                return new HashSet<int>();
+                compareCookie = new HttpCookie(COMPARE_PRODUCTS_COOKIE_NAME);
+                compareCookie.HttpOnly = true;
             }
 
-            var values = compareCookie.Values.GetValues("CompareProductIds");
-            if (values == null)
+            compareCookie.Values.Clear();
+            int maxProducts = 4;
+            int i = 1;
+            foreach (int newProductId in newProductIds)
             {
-                return new HashSet<int>();
+                compareCookie.Values.Add("CompareProductIds", newProductId.ToString());
+                if (i == maxProducts)
+                    break;
+                i++;
             }
-
-            var result = new HashSet<int>(values.Select(x => x.ToInt()));
-            return result;
+            compareCookie.Expires = DateTime.Now.AddDays(10.0);
+            _httpContext.Response.Cookies.Set(compareCookie);
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Clears a "compare products" list
@@ -85,19 +108,18 @@ namespace SmartStore.Services.Catalog
 
         public virtual int GetComparedProductsCount()
         {
-			var productIds = GetComparedProductIds();
-			if (productIds.Count == 0)
-				return 0;
+            var productIds = GetComparedProductIds();
+            if (productIds.Count == 0)
+                return 0;
 
-			var searchQuery = new CatalogSearchQuery()
-				.VisibleOnly()
-				.WithProductIds(productIds.ToArray())
-				.BuildHits(false);
+            var searchQuery = new CatalogSearchQuery()
+                .VisibleOnly()
+                .WithProductIds(productIds.ToArray())
+                .BuildHits(false);
 
-			var result = _catalogSearchService.Search(searchQuery);
+            var result = _catalogSearchService.Search(searchQuery);
             return result.TotalHitsCount;
         }
-
 
         /// <summary>
         /// Removes a product from a "compare products" list
@@ -120,43 +142,34 @@ namespace SmartStore.Services.Catalog
             _httpContext.Response.Cookies.Set(compareCookie);
         }
 
+        #endregion Public Methods
+
+
+
+        #region Protected Methods
+
         /// <summary>
-        /// Adds a product to a "compare products" list
+        /// Gets a "compare products" identifier list
         /// </summary>
-        /// <param name="productId">Product identifier</param>
-        public virtual void AddProductToCompareList(int productId)
+        /// <returns>"compare products" identifier list</returns>
+        protected virtual HashSet<int> GetComparedProductIds()
         {
-            var oldProductIds = GetComparedProductIds();
-            var newProductIds = new List<int>();
-            newProductIds.Add(productId);
-			
-			foreach (int oldProductId in oldProductIds)
-			{
-				if (oldProductId != productId)
-					newProductIds.Add(oldProductId);
-			}
-
             var compareCookie = _httpContext.Request.Cookies.Get(COMPARE_PRODUCTS_COOKIE_NAME);
-			if (compareCookie == null)
-			{
-				compareCookie = new HttpCookie(COMPARE_PRODUCTS_COOKIE_NAME);
-				compareCookie.HttpOnly = true;
-			}
-
-            compareCookie.Values.Clear();
-            int maxProducts = 4;
-            int i = 1;
-            foreach (int newProductId in newProductIds)
+            if ((compareCookie == null) || (compareCookie.Values == null))
             {
-                compareCookie.Values.Add("CompareProductIds", newProductId.ToString());
-                if (i == maxProducts)
-                    break;
-                i++;
+                return new HashSet<int>();
             }
-            compareCookie.Expires = DateTime.Now.AddDays(10.0);
-            _httpContext.Response.Cookies.Set(compareCookie);
+
+            var values = compareCookie.Values.GetValues("CompareProductIds");
+            if (values == null)
+            {
+                return new HashSet<int>();
+            }
+
+            var result = new HashSet<int>(values.Select(x => x.ToInt()));
+            return result;
         }
 
-        #endregion
+        #endregion Protected Methods
     }
 }

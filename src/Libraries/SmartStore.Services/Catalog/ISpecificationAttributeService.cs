@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Collections;
 using SmartStore.Core.Domain.Catalog;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Catalog
 {
@@ -10,27 +10,13 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial interface ISpecificationAttributeService
     {
-        #region Specification attribute
+        #region Public Methods
 
         /// <summary>
-        /// Gets a specification attribute
+        /// Deletes a product specification attribute mapping
         /// </summary>
-        /// <param name="specificationAttributeId">The specification attribute identifier</param>
-        /// <returns>Specification attribute</returns>
-        SpecificationAttribute GetSpecificationAttributeById(int specificationAttributeId);
-
-        /// <summary>
-        /// Gets specification attributes
-        /// </summary>
-		/// <returns>Specification attribute query</returns>
-        IQueryable<SpecificationAttribute> GetSpecificationAttributes();
-
-		/// <summary>
-		/// Gets specification attributes by identifier
-		/// </summary>
-		/// <param name="ids">Identifiers</param>
-		/// <returns>Specification attribute query</returns>
-		IQueryable<SpecificationAttribute> GetSpecificationAttributesByIds(int[] ids);
+        /// <param name="productSpecificationAttribute">Product specification attribute</param>
+        void DeleteProductSpecificationAttribute(ProductSpecificationAttribute productSpecificationAttribute);
 
         /// <summary>
         /// Deletes a specification attribute
@@ -39,20 +25,48 @@ namespace SmartStore.Services.Catalog
         void DeleteSpecificationAttribute(SpecificationAttribute specificationAttribute);
 
         /// <summary>
-        /// Inserts a specification attribute
+        /// Deletes a specification attribute option
         /// </summary>
-        /// <param name="specificationAttribute">The specification attribute</param>
-        void InsertSpecificationAttribute(SpecificationAttribute specificationAttribute);
+        /// <param name="specificationAttributeOption">The specification attribute option</param>
+        void DeleteSpecificationAttributeOption(SpecificationAttributeOption specificationAttributeOption);
 
         /// <summary>
-        /// Updates the specification attribute
+        /// Gets a product specification attribute mapping
         /// </summary>
-        /// <param name="specificationAttribute">The specification attribute</param>
-        void UpdateSpecificationAttribute(SpecificationAttribute specificationAttribute);
+        /// <param name="productSpecificationAttributeId">Product specification attribute mapping identifier</param>
+        /// <returns>Product specification attribute mapping</returns>
+        ProductSpecificationAttribute GetProductSpecificationAttributeById(int productSpecificationAttributeId);
 
-        #endregion
+        /// <summary>
+        /// Gets a product specification attribute mapping collection
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <returns>Product specification attribute mapping collection</returns>
+        IList<ProductSpecificationAttribute> GetProductSpecificationAttributesByProductId(int productId);
 
-        #region Specification attribute option
+        /// <summary>
+        /// Gets a product specification attribute mapping collection
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <param name="allowFiltering">0 to load attributes with AllowFiltering set to false, 0 to load attributes with AllowFiltering set to true, null to load all attributes</param>
+        /// <param name="showOnProductPage">0 to load attributes with ShowOnProductPage set to false, 0 to load attributes with ShowOnProductPage set to true, null to load all attributes</param>
+        /// <returns>Product specification attribute mapping collection</returns>
+        IList<ProductSpecificationAttribute> GetProductSpecificationAttributesByProductId(int productId,
+            bool? allowFiltering, bool? showOnProductPage);
+
+        /// <summary>
+        /// Get product specification attributes by product identifiers
+        /// </summary>
+        /// <param name="productIds">Product identifiers</param>
+        /// <returns>Map of product specification attributes</returns>
+        Multimap<int, ProductSpecificationAttribute> GetProductSpecificationAttributesByProductIds(int[] productIds);
+
+        /// <summary>
+        /// Gets a specification attribute
+        /// </summary>
+        /// <param name="specificationAttributeId">The specification attribute identifier</param>
+        /// <returns>Specification attribute</returns>
+        SpecificationAttribute GetSpecificationAttributeById(int specificationAttributeId);
 
         /// <summary>
         /// Gets a specification attribute option
@@ -76,63 +90,17 @@ namespace SmartStore.Services.Catalog
         Multimap<int, SpecificationAttributeOption> GetSpecificationAttributeOptionsBySpecificationAttributeIds(int[] specificationAttributeIds);
 
         /// <summary>
-        /// Deletes a specification attribute option
+        /// Gets specification attributes
         /// </summary>
-        /// <param name="specificationAttributeOption">The specification attribute option</param>
-        void DeleteSpecificationAttributeOption(SpecificationAttributeOption specificationAttributeOption);
+		/// <returns>Specification attribute query</returns>
+        IQueryable<SpecificationAttribute> GetSpecificationAttributes();
 
         /// <summary>
-        /// Inserts a specification attribute option
+        /// Gets specification attributes by identifier
         /// </summary>
-        /// <param name="specificationAttributeOption">The specification attribute option</param>
-        void InsertSpecificationAttributeOption(SpecificationAttributeOption specificationAttributeOption);
-
-        /// <summary>
-        /// Updates the specification attribute
-        /// </summary>
-        /// <param name="specificationAttributeOption">The specification attribute option</param>
-        void UpdateSpecificationAttributeOption(SpecificationAttributeOption specificationAttributeOption);
-
-        #endregion
-
-        #region Product specification attribute
-
-        /// <summary>
-        /// Deletes a product specification attribute mapping
-        /// </summary>
-        /// <param name="productSpecificationAttribute">Product specification attribute</param>
-        void DeleteProductSpecificationAttribute(ProductSpecificationAttribute productSpecificationAttribute);
-
-        /// <summary>
-        /// Gets a product specification attribute mapping collection
-        /// </summary>
-        /// <param name="productId">Product identifier</param>
-        /// <returns>Product specification attribute mapping collection</returns>
-        IList<ProductSpecificationAttribute> GetProductSpecificationAttributesByProductId(int productId);
-
-        /// <summary>
-        /// Gets a product specification attribute mapping collection
-        /// </summary>
-        /// <param name="productId">Product identifier</param>
-        /// <param name="allowFiltering">0 to load attributes with AllowFiltering set to false, 0 to load attributes with AllowFiltering set to true, null to load all attributes</param>
-        /// <param name="showOnProductPage">0 to load attributes with ShowOnProductPage set to false, 0 to load attributes with ShowOnProductPage set to true, null to load all attributes</param>
-        /// <returns>Product specification attribute mapping collection</returns>
-        IList<ProductSpecificationAttribute> GetProductSpecificationAttributesByProductId(int productId,
-            bool? allowFiltering, bool? showOnProductPage);
-
-        /// <summary>
-        /// Gets a product specification attribute mapping 
-        /// </summary>
-        /// <param name="productSpecificationAttributeId">Product specification attribute mapping identifier</param>
-        /// <returns>Product specification attribute mapping</returns>
-        ProductSpecificationAttribute GetProductSpecificationAttributeById(int productSpecificationAttributeId);
-
-        /// <summary>
-        /// Get product specification attributes by product identifiers
-        /// </summary>
-        /// <param name="productIds">Product identifiers</param>
-        /// <returns>Map of product specification attributes</returns>
-        Multimap<int, ProductSpecificationAttribute> GetProductSpecificationAttributesByProductIds(int[] productIds);
+        /// <param name="ids">Identifiers</param>
+        /// <returns>Specification attribute query</returns>
+        IQueryable<SpecificationAttribute> GetSpecificationAttributesByIds(int[] ids);
 
         /// <summary>
         /// Inserts a product specification attribute mapping
@@ -141,11 +109,35 @@ namespace SmartStore.Services.Catalog
         void InsertProductSpecificationAttribute(ProductSpecificationAttribute productSpecificationAttribute);
 
         /// <summary>
+        /// Inserts a specification attribute
+        /// </summary>
+        /// <param name="specificationAttribute">The specification attribute</param>
+        void InsertSpecificationAttribute(SpecificationAttribute specificationAttribute);
+
+        /// <summary>
+        /// Inserts a specification attribute option
+        /// </summary>
+        /// <param name="specificationAttributeOption">The specification attribute option</param>
+        void InsertSpecificationAttributeOption(SpecificationAttributeOption specificationAttributeOption);
+
+        /// <summary>
         /// Updates the product specification attribute mapping
         /// </summary>
         /// <param name="productSpecificationAttribute">Product specification attribute mapping</param>
         void UpdateProductSpecificationAttribute(ProductSpecificationAttribute productSpecificationAttribute);
 
-        #endregion
+        /// <summary>
+        /// Updates the specification attribute
+        /// </summary>
+        /// <param name="specificationAttribute">The specification attribute</param>
+        void UpdateSpecificationAttribute(SpecificationAttribute specificationAttribute);
+
+        /// <summary>
+        /// Updates the specification attribute
+        /// </summary>
+        /// <param name="specificationAttributeOption">The specification attribute option</param>
+        void UpdateSpecificationAttributeOption(SpecificationAttributeOption specificationAttributeOption);
+
+        #endregion Public Methods
     }
 }

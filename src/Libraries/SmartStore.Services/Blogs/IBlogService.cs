@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Blogs;
+using System;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Blogs
 {
@@ -10,18 +10,13 @@ namespace SmartStore.Services.Blogs
     /// </summary>
     public partial interface IBlogService
     {
+        #region Public Methods
+
         /// <summary>
         /// Deletes a blog post
         /// </summary>
         /// <param name="blogPost">Blog post</param>
         void DeleteBlogPost(BlogPost blogPost);
-
-        /// <summary>
-        /// Gets a blog post
-        /// </summary>
-        /// <param name="blogPostId">Blog post identifier</param>
-        /// <returns>Blog post</returns>
-        BlogPost GetBlogPostById(int blogPostId);
 
         /// <summary>
         /// Gets all blog posts
@@ -36,7 +31,7 @@ namespace SmartStore.Services.Blogs
 		/// <param name="maxAge">The maximum age of returned blog posts</param>
         /// <returns>Blog posts</returns>
 		IPagedList<BlogPost> GetAllBlogPosts(int storeId, int languageId,
-			DateTime? dateFrom, DateTime? dateTo, int pageIndex, int pageSize, bool showHidden = false, DateTime? maxAge = null);
+            DateTime? dateFrom, DateTime? dateTo, int pageIndex, int pageSize, bool showHidden = false, DateTime? maxAge = null);
 
         /// <summary>
         /// Gets all blog posts
@@ -61,6 +56,13 @@ namespace SmartStore.Services.Blogs
 		IList<BlogPostTag> GetAllBlogPostTags(int storeId, int languageId, bool showHidden = false);
 
         /// <summary>
+        /// Gets a blog post
+        /// </summary>
+        /// <param name="blogPostId">Blog post identifier</param>
+        /// <returns>Blog post</returns>
+        BlogPost GetBlogPostById(int blogPostId);
+
+        /// <summary>
         /// Inserts an blog post
         /// </summary>
         /// <param name="blogPost">Blog post</param>
@@ -77,5 +79,7 @@ namespace SmartStore.Services.Blogs
         /// </summary>
         /// <param name="blogPost">Blog post</param>
         void UpdateCommentTotals(BlogPost blogPost);
+
+        #endregion Public Methods
     }
 }

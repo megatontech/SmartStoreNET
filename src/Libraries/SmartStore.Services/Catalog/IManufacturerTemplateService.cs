@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using SmartStore.Core.Domain.Catalog;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Catalog
 {
@@ -8,6 +8,8 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial interface IManufacturerTemplateService
     {
+        #region Public Methods
+
         /// <summary>
         /// Delete manufacturer template
         /// </summary>
@@ -38,5 +40,7 @@ namespace SmartStore.Services.Catalog
         /// </summary>
         /// <param name="manufacturerTemplate">Manufacturer template</param>
         void UpdateManufacturerTemplate(ManufacturerTemplate manufacturerTemplate);
+
+        #endregion Public Methods
     }
 }

@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Affiliates;
 using SmartStore.Core.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Affiliates
 {
@@ -12,14 +12,15 @@ namespace SmartStore.Services.Affiliates
     /// </summary>
     public partial class AffiliateService : IAffiliateService
     {
-        #region Fields
+        #region Private Fields
 
         private readonly IRepository<Affiliate> _affiliateRepository;
+
         private readonly IEventPublisher _eventPublisher;
 
-        #endregion
+        #endregion Private Fields
 
-        #region Ctor
+        #region Public Constructors
 
         /// <summary>
         /// Ctor
@@ -33,25 +34,14 @@ namespace SmartStore.Services.Affiliates
             _eventPublisher = eventPublisher;
         }
 
-        #endregion
+        #endregion Public Constructors
 
-        #region Methods
-        
-        /// <summary>
-        /// Gets an affiliate by affiliate identifier
-        /// </summary>
-        /// <param name="affiliateId">Affiliate identifier</param>
-        /// <returns>Affiliate</returns>
-        public virtual Affiliate GetAffiliateById(int affiliateId)
-        {
-            if (affiliateId == 0)
-                return null;
-            
-            return _affiliateRepository.GetById(affiliateId);
-        }
+
+
+        #region Public Methods
 
         /// <summary>
-        /// Marks affiliate as deleted 
+        /// Marks affiliate as deleted
         /// </summary>
         /// <param name="affiliate">Affiliate</param>
         public virtual void DeleteAffiliate(Affiliate affiliate)
@@ -61,6 +51,19 @@ namespace SmartStore.Services.Affiliates
 
             affiliate.Deleted = true;
             UpdateAffiliate(affiliate);
+        }
+
+        /// <summary>
+        /// Gets an affiliate by affiliate identifier
+        /// </summary>
+        /// <param name="affiliateId">Affiliate identifier</param>
+        /// <returns>Affiliate</returns>
+        public virtual Affiliate GetAffiliateById(int affiliateId)
+        {
+            if (affiliateId == 0)
+                return null;
+
+            return _affiliateRepository.GetById(affiliateId);
         }
 
         /// <summary>
@@ -103,7 +106,6 @@ namespace SmartStore.Services.Affiliates
             _affiliateRepository.Update(affiliate);
         }
 
-        #endregion
-        
+        #endregion Public Methods
     }
 }

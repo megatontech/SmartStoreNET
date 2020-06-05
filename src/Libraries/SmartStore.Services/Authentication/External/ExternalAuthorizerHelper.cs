@@ -1,24 +1,20 @@
 //Contributor:  Nicholas Mayne
 
-using System.Collections.Generic;
-using System.Web;
 using SmartStore.Core.Infrastructure;
+using System.Web;
 
 namespace SmartStore.Services.Authentication.External
 {
     public static partial class ExternalAuthorizerHelper
     {
-        private static HttpSessionStateBase GetSession()
-        {
-            var session = EngineContext.Current.Resolve<HttpSessionStateBase>();
-            return session;
-        }
+        #region Public Methods
 
-        public static void StoreParametersForRoundTrip(OpenAuthenticationParameters parameters)
+        public static void RemoveParameters()
         {
             var session = GetSession();
-            session["sm.externalauth.parameters"] = parameters;
+            session.Remove("sm.externalauth.parameters");
         }
+
         public static OpenAuthenticationParameters RetrieveParametersFromRoundTrip(bool removeOnRetrieval)
         {
             var session = GetSession();
@@ -29,10 +25,24 @@ namespace SmartStore.Services.Authentication.External
             return parameters as OpenAuthenticationParameters;
         }
 
-        public static void RemoveParameters()
+        public static void StoreParametersForRoundTrip(OpenAuthenticationParameters parameters)
         {
             var session = GetSession();
-            session.Remove("sm.externalauth.parameters");
+            session["sm.externalauth.parameters"] = parameters;
         }
+
+        #endregion Public Methods
+
+
+
+        #region Private Methods
+
+        private static HttpSessionStateBase GetSession()
+        {
+            var session = EngineContext.Current.Resolve<HttpSessionStateBase>();
+            return session;
+        }
+
+        #endregion Private Methods
     }
 }

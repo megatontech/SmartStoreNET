@@ -1,389 +1,403 @@
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Globalization;
-using System.Linq;
-using SmartStore.Core.Logging;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Localization;
 using SmartStore.Core.Domain.Media;
+using SmartStore.Core.Domain.Seo;
 using SmartStore.Core.Localization;
+using SmartStore.Core.Logging;
 using SmartStore.Services.Localization;
 using SmartStore.Services.Media;
 using SmartStore.Services.Search;
 using SmartStore.Services.Seo;
 using SmartStore.Services.Stores;
-using SmartStore.Core.Domain.Seo;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace SmartStore.Services.Catalog
 {
     public partial class CopyProductService : ICopyProductService
     {
-		private readonly IRepository<Product> _productRepository;
-		private readonly IRepository<RelatedProduct> _relatedProductRepository;
-		private readonly IRepository<CrossSellProduct> _crossSellProductRepository;
-		private readonly ICommonServices _services;
-		private readonly IProductService _productService;
-        private readonly IProductAttributeService _productAttributeService;
-        private readonly ILanguageService _languageService;
-        private readonly ILocalizedEntityService _localizedEntityService;
-        private readonly IPictureService _pictureService;
-        private readonly IDownloadService _downloadService;
-        private readonly IProductAttributeParser _productAttributeParser;
-        private readonly IUrlRecordService _urlRecordService;
-		private readonly IStoreMappingService _storeMappingService;
-		private readonly ICatalogSearchService _catalogSearchService;
-		private readonly SeoSettings _seoSettings;
+        #region Private Fields
 
-		public CopyProductService(
-			IRepository<Product> productRepository,
-			IRepository<RelatedProduct> relatedProductRepository,
-			IRepository<CrossSellProduct> crossSellProductRepository,
-			ICommonServices services,
-			IProductService productService,
+        private readonly ICatalogSearchService _catalogSearchService;
+
+        private readonly IRepository<CrossSellProduct> _crossSellProductRepository;
+
+        private readonly IDownloadService _downloadService;
+
+        private readonly ILanguageService _languageService;
+
+        private readonly ILocalizedEntityService _localizedEntityService;
+
+        private readonly IPictureService _pictureService;
+
+        private readonly IProductAttributeParser _productAttributeParser;
+
+        private readonly IProductAttributeService _productAttributeService;
+
+        private readonly IRepository<Product> _productRepository;
+
+        private readonly IProductService _productService;
+
+        private readonly IRepository<RelatedProduct> _relatedProductRepository;
+
+        private readonly SeoSettings _seoSettings;
+
+        private readonly ICommonServices _services;
+
+        private readonly IStoreMappingService _storeMappingService;
+
+        private readonly IUrlRecordService _urlRecordService;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public CopyProductService(
+            IRepository<Product> productRepository,
+            IRepository<RelatedProduct> relatedProductRepository,
+            IRepository<CrossSellProduct> crossSellProductRepository,
+            ICommonServices services,
+            IProductService productService,
             IProductAttributeService productAttributeService,
-			ILanguageService languageService,
+            ILanguageService languageService,
             ILocalizedEntityService localizedEntityService,
-			IPictureService pictureService,
-			IDownloadService downloadService,
+            IPictureService pictureService,
+            IDownloadService downloadService,
             IProductAttributeParser productAttributeParser,
-			IUrlRecordService urlRecordService,
-			IStoreMappingService storeMappingService,
-			ICatalogSearchService catalogSearchService,
-			SeoSettings seoSettings)
+            IUrlRecordService urlRecordService,
+            IStoreMappingService storeMappingService,
+            ICatalogSearchService catalogSearchService,
+            SeoSettings seoSettings)
         {
-			_productRepository = productRepository;
-			_relatedProductRepository = relatedProductRepository;
-			_crossSellProductRepository = crossSellProductRepository;
-			_services = services;
-			_productService = productService;
+            _productRepository = productRepository;
+            _relatedProductRepository = relatedProductRepository;
+            _crossSellProductRepository = crossSellProductRepository;
+            _services = services;
+            _productService = productService;
             _productAttributeService = productAttributeService;
             _languageService = languageService;
             _localizedEntityService = localizedEntityService;
             _pictureService = pictureService;
             _downloadService = downloadService;
             _productAttributeParser = productAttributeParser;
-			_urlRecordService = urlRecordService;
-			_storeMappingService = storeMappingService;
-			_catalogSearchService = catalogSearchService;
-			_seoSettings = seoSettings;
+            _urlRecordService = urlRecordService;
+            _storeMappingService = storeMappingService;
+            _catalogSearchService = catalogSearchService;
+            _seoSettings = seoSettings;
 
-			T = NullLocalizer.Instance;
+            T = NullLocalizer.Instance;
         }
 
-		public Localizer T { get; set; }
+        #endregion Public Constructors
 
-		public virtual Product CopyProduct(
-			Product product, 
-			string newName, 
-			bool isPublished, 
-			bool copyImages, 
-			bool copyAssociatedProducts = true)
+
+
+        #region Public Properties
+
+        public Localizer T { get; set; }
+
+        #endregion Public Properties
+
+
+
+        #region Public Methods
+
+        public virtual Product CopyProduct(
+            Product product,
+            string newName,
+            bool isPublished,
+            bool copyImages,
+            bool copyAssociatedProducts = true)
         {
-			Guard.NotNull(product, nameof(product));
-			Guard.NotEmpty(newName, nameof(newName));
+            Guard.NotNull(product, nameof(product));
+            Guard.NotEmpty(newName, nameof(newName));
 
-			using (_services.Chronometer.Step("Copy product " + product.Id))
-			{
-				Product clone = null;
-				var utcNow = DateTime.UtcNow;
-				var languages = _languageService.GetAllLanguages(true);
+            using (_services.Chronometer.Step("Copy product " + product.Id))
+            {
+                Product clone = null;
+                var utcNow = DateTime.UtcNow;
+                var languages = _languageService.GetAllLanguages(true);
 
-				// Media stuff
-				int? sampleDownloadId = null;
-				var clonedPictures = new Dictionary<int, Picture>(); // Key = former ID, Value = cloned picture
+                // Media stuff
+                int? sampleDownloadId = null;
+                var clonedPictures = new Dictionary<int, Picture>(); // Key = former ID, Value = cloned picture
 
-				using (var scope = new DbContextScope(ctx: _productRepository.Context,
-					autoCommit: false,
-					autoDetectChanges: false,
-					proxyCreation: true,
-					validateOnSave: false,
-					forceNoTracking: true,
-					hooksEnabled: false))
-				{
-					if (product.HasSampleDownload)
-					{
+                using (var scope = new DbContextScope(ctx: _productRepository.Context,
+                    autoCommit: false,
+                    autoDetectChanges: false,
+                    proxyCreation: true,
+                    validateOnSave: false,
+                    forceNoTracking: true,
+                    hooksEnabled: false))
+                {
+                    if (product.HasSampleDownload)
+                    {
                         var sampleDownload = _downloadService.GetDownloadById((int)product.SampleDownloadId);
-						var sampleDownloadClone = CopyDownload(sampleDownload);
+                        var sampleDownloadClone = CopyDownload(sampleDownload);
                         sampleDownloadId = sampleDownloadClone.Id;
                     }
 
-					if (copyImages)
-					{
-						clonedPictures = CopyPictures(product, newName);
-					}
+                    if (copyImages)
+                    {
+                        clonedPictures = CopyPictures(product, newName);
+                    }
 
-					// Product
-					clone = new Product
-					{
-						ProductTypeId = product.ProductTypeId,
-						ParentGroupedProductId = product.ParentGroupedProductId,
-						VisibleIndividually = product.VisibleIndividually,
-						Name = newName,
-						ShortDescription = product.ShortDescription,
-						FullDescription = product.FullDescription,
-						ProductTemplateId = product.ProductTemplateId,
-						AdminComment = product.AdminComment,
-						ShowOnHomePage = product.ShowOnHomePage,
-						HomePageDisplayOrder = product.HomePageDisplayOrder,
-						MetaKeywords = product.MetaKeywords,
-						MetaDescription = product.MetaDescription,
-						MetaTitle = product.MetaTitle,
-						AllowCustomerReviews = product.AllowCustomerReviews,
-						LimitedToStores = product.LimitedToStores,
-						Sku = product.Sku,
-						ManufacturerPartNumber = product.ManufacturerPartNumber,
-						Gtin = product.Gtin,
-						IsGiftCard = product.IsGiftCard,
-						GiftCardType = product.GiftCardType,
-						RequireOtherProducts = product.RequireOtherProducts,
-						RequiredProductIds = product.RequiredProductIds,
-						AutomaticallyAddRequiredProducts = product.AutomaticallyAddRequiredProducts,
-						IsDownload = product.IsDownload,
-						UnlimitedDownloads = product.UnlimitedDownloads,
-						MaxNumberOfDownloads = product.MaxNumberOfDownloads,
-						DownloadExpirationDays = product.DownloadExpirationDays,
-						DownloadActivationType = product.DownloadActivationType,
-						HasSampleDownload = product.HasSampleDownload,
-						SampleDownloadId = sampleDownloadId,
-						HasUserAgreement = product.HasUserAgreement,
-						UserAgreementText = product.UserAgreementText,
-						IsRecurring = product.IsRecurring,
-						RecurringCycleLength = product.RecurringCycleLength,
-						RecurringCyclePeriod = product.RecurringCyclePeriod,
-						RecurringTotalCycles = product.RecurringTotalCycles,
-						IsShipEnabled = product.IsShipEnabled,
-						IsFreeShipping = product.IsFreeShipping,
-						AdditionalShippingCharge = product.AdditionalShippingCharge,
-						IsEsd = product.IsEsd,
-						IsTaxExempt = product.IsTaxExempt,
-						TaxCategoryId = product.TaxCategoryId,
-						ManageInventoryMethod = product.ManageInventoryMethod,
-						StockQuantity = product.StockQuantity,
-						DisplayStockAvailability = product.DisplayStockAvailability,
-						DisplayStockQuantity = product.DisplayStockQuantity,
-						MinStockQuantity = product.MinStockQuantity,
-						LowStockActivityId = product.LowStockActivityId,
-						NotifyAdminForQuantityBelow = product.NotifyAdminForQuantityBelow,
-						BackorderMode = product.BackorderMode,
-						AllowBackInStockSubscriptions = product.AllowBackInStockSubscriptions,
-						OrderMinimumQuantity = product.OrderMinimumQuantity,
-						OrderMaximumQuantity = product.OrderMaximumQuantity,
-						QuantityStep = product.QuantityStep,
-						QuantiyControlType = product.QuantiyControlType,
-						HideQuantityControl = product.HideQuantityControl,
-						AllowedQuantities = product.AllowedQuantities,
-						DisableBuyButton = product.DisableBuyButton,
-						DisableWishlistButton = product.DisableWishlistButton,
-						AvailableForPreOrder = product.AvailableForPreOrder,
-						CallForPrice = product.CallForPrice,
-						Price = product.Price,
-						OldPrice = product.OldPrice,
-						ProductCost = product.ProductCost,
-						SpecialPrice = product.SpecialPrice,
-						SpecialPriceStartDateTimeUtc = product.SpecialPriceStartDateTimeUtc,
-						SpecialPriceEndDateTimeUtc = product.SpecialPriceEndDateTimeUtc,
-						CustomerEntersPrice = product.CustomerEntersPrice,
-						MinimumCustomerEnteredPrice = product.MinimumCustomerEnteredPrice,
-						MaximumCustomerEnteredPrice = product.MaximumCustomerEnteredPrice,
-						LowestAttributeCombinationPrice = product.LowestAttributeCombinationPrice,
-						Weight = product.Weight,
-						Length = product.Length,
-						Width = product.Width,
-						Height = product.Height,
-						AvailableStartDateTimeUtc = product.AvailableStartDateTimeUtc,
-						AvailableEndDateTimeUtc = product.AvailableEndDateTimeUtc,
-						DisplayOrder = product.DisplayOrder,
-						Published = isPublished,
-						Deleted = product.Deleted,
-						IsSystemProduct = product.IsSystemProduct,
-						DeliveryTimeId = product.DeliveryTimeId,
-						QuantityUnitId = product.QuantityUnitId,
-						BasePriceEnabled = product.BasePriceEnabled,
-						BasePriceMeasureUnit = product.BasePriceMeasureUnit,
-						BasePriceAmount = product.BasePriceAmount,
-						BasePriceBaseAmount = product.BasePriceBaseAmount,
-						BundleTitleText = product.BundleTitleText,
-						BundlePerItemShipping = product.BundlePerItemShipping,
-						BundlePerItemPricing = product.BundlePerItemPricing,
-						BundlePerItemShoppingCart = product.BundlePerItemShoppingCart,
-						CustomsTariffNumber = product.CustomsTariffNumber,
-						CountryOfOriginId = product.CountryOfOriginId,
-						CreatedOnUtc = utcNow,
-						UpdatedOnUtc = utcNow
-					};
+                    // Product
+                    clone = new Product
+                    {
+                        ProductTypeId = product.ProductTypeId,
+                        ParentGroupedProductId = product.ParentGroupedProductId,
+                        VisibleIndividually = product.VisibleIndividually,
+                        Name = newName,
+                        ShortDescription = product.ShortDescription,
+                        FullDescription = product.FullDescription,
+                        ProductTemplateId = product.ProductTemplateId,
+                        AdminComment = product.AdminComment,
+                        ShowOnHomePage = product.ShowOnHomePage,
+                        HomePageDisplayOrder = product.HomePageDisplayOrder,
+                        MetaKeywords = product.MetaKeywords,
+                        MetaDescription = product.MetaDescription,
+                        MetaTitle = product.MetaTitle,
+                        AllowCustomerReviews = product.AllowCustomerReviews,
+                        LimitedToStores = product.LimitedToStores,
+                        Sku = product.Sku,
+                        ManufacturerPartNumber = product.ManufacturerPartNumber,
+                        Gtin = product.Gtin,
+                        IsGiftCard = product.IsGiftCard,
+                        GiftCardType = product.GiftCardType,
+                        RequireOtherProducts = product.RequireOtherProducts,
+                        RequiredProductIds = product.RequiredProductIds,
+                        AutomaticallyAddRequiredProducts = product.AutomaticallyAddRequiredProducts,
+                        IsDownload = product.IsDownload,
+                        UnlimitedDownloads = product.UnlimitedDownloads,
+                        MaxNumberOfDownloads = product.MaxNumberOfDownloads,
+                        DownloadExpirationDays = product.DownloadExpirationDays,
+                        DownloadActivationType = product.DownloadActivationType,
+                        HasSampleDownload = product.HasSampleDownload,
+                        SampleDownloadId = sampleDownloadId,
+                        HasUserAgreement = product.HasUserAgreement,
+                        UserAgreementText = product.UserAgreementText,
+                        IsRecurring = product.IsRecurring,
+                        RecurringCycleLength = product.RecurringCycleLength,
+                        RecurringCyclePeriod = product.RecurringCyclePeriod,
+                        RecurringTotalCycles = product.RecurringTotalCycles,
+                        IsShipEnabled = product.IsShipEnabled,
+                        IsFreeShipping = product.IsFreeShipping,
+                        AdditionalShippingCharge = product.AdditionalShippingCharge,
+                        IsEsd = product.IsEsd,
+                        IsTaxExempt = product.IsTaxExempt,
+                        TaxCategoryId = product.TaxCategoryId,
+                        ManageInventoryMethod = product.ManageInventoryMethod,
+                        StockQuantity = product.StockQuantity,
+                        DisplayStockAvailability = product.DisplayStockAvailability,
+                        DisplayStockQuantity = product.DisplayStockQuantity,
+                        MinStockQuantity = product.MinStockQuantity,
+                        LowStockActivityId = product.LowStockActivityId,
+                        NotifyAdminForQuantityBelow = product.NotifyAdminForQuantityBelow,
+                        BackorderMode = product.BackorderMode,
+                        AllowBackInStockSubscriptions = product.AllowBackInStockSubscriptions,
+                        OrderMinimumQuantity = product.OrderMinimumQuantity,
+                        OrderMaximumQuantity = product.OrderMaximumQuantity,
+                        QuantityStep = product.QuantityStep,
+                        QuantiyControlType = product.QuantiyControlType,
+                        HideQuantityControl = product.HideQuantityControl,
+                        AllowedQuantities = product.AllowedQuantities,
+                        DisableBuyButton = product.DisableBuyButton,
+                        DisableWishlistButton = product.DisableWishlistButton,
+                        AvailableForPreOrder = product.AvailableForPreOrder,
+                        CallForPrice = product.CallForPrice,
+                        Price = product.Price,
+                        OldPrice = product.OldPrice,
+                        ProductCost = product.ProductCost,
+                        SpecialPrice = product.SpecialPrice,
+                        SpecialPriceStartDateTimeUtc = product.SpecialPriceStartDateTimeUtc,
+                        SpecialPriceEndDateTimeUtc = product.SpecialPriceEndDateTimeUtc,
+                        CustomerEntersPrice = product.CustomerEntersPrice,
+                        MinimumCustomerEnteredPrice = product.MinimumCustomerEnteredPrice,
+                        MaximumCustomerEnteredPrice = product.MaximumCustomerEnteredPrice,
+                        LowestAttributeCombinationPrice = product.LowestAttributeCombinationPrice,
+                        Weight = product.Weight,
+                        Length = product.Length,
+                        Width = product.Width,
+                        Height = product.Height,
+                        AvailableStartDateTimeUtc = product.AvailableStartDateTimeUtc,
+                        AvailableEndDateTimeUtc = product.AvailableEndDateTimeUtc,
+                        DisplayOrder = product.DisplayOrder,
+                        Published = isPublished,
+                        Deleted = product.Deleted,
+                        IsSystemProduct = product.IsSystemProduct,
+                        DeliveryTimeId = product.DeliveryTimeId,
+                        QuantityUnitId = product.QuantityUnitId,
+                        BasePriceEnabled = product.BasePriceEnabled,
+                        BasePriceMeasureUnit = product.BasePriceMeasureUnit,
+                        BasePriceAmount = product.BasePriceAmount,
+                        BasePriceBaseAmount = product.BasePriceBaseAmount,
+                        BundleTitleText = product.BundleTitleText,
+                        BundlePerItemShipping = product.BundlePerItemShipping,
+                        BundlePerItemPricing = product.BundlePerItemPricing,
+                        BundlePerItemShoppingCart = product.BundlePerItemShoppingCart,
+                        CustomsTariffNumber = product.CustomsTariffNumber,
+                        CountryOfOriginId = product.CountryOfOriginId,
+                        CreatedOnUtc = utcNow,
+                        UpdatedOnUtc = utcNow
+                    };
 
-					// Category mappings
-					foreach (var pc in product.ProductCategories)
-					{
-						clone.ProductCategories.Add(new ProductCategory
-						{
-							CategoryId = pc.CategoryId,
-							IsFeaturedProduct = pc.IsFeaturedProduct,
-							DisplayOrder = pc.DisplayOrder
-						});
-					}
+                    // Category mappings
+                    foreach (var pc in product.ProductCategories)
+                    {
+                        clone.ProductCategories.Add(new ProductCategory
+                        {
+                            CategoryId = pc.CategoryId,
+                            IsFeaturedProduct = pc.IsFeaturedProduct,
+                            DisplayOrder = pc.DisplayOrder
+                        });
+                    }
 
-					// Manufacturer mappings
-					foreach (var pm in product.ProductManufacturers)
-					{
-						clone.ProductManufacturers.Add(new ProductManufacturer
-						{
-							ManufacturerId = pm.ManufacturerId,
-							IsFeaturedProduct = pm.IsFeaturedProduct,
-							DisplayOrder = pm.DisplayOrder
-						});
-					}
+                    // Manufacturer mappings
+                    foreach (var pm in product.ProductManufacturers)
+                    {
+                        clone.ProductManufacturers.Add(new ProductManufacturer
+                        {
+                            ManufacturerId = pm.ManufacturerId,
+                            IsFeaturedProduct = pm.IsFeaturedProduct,
+                            DisplayOrder = pm.DisplayOrder
+                        });
+                    }
 
-					// Picture mappings
-					if (copyImages)
-					{
-						foreach (var pp in product.ProductPictures)
-						{
-							var pictureClone = clonedPictures.Get(pp.PictureId);
-							if (pictureClone != null)
-							{
-								clone.ProductPictures.Add(new ProductPicture
-								{
-									PictureId = pictureClone.Id,
-									DisplayOrder = pp.DisplayOrder
-								});
-							}
-						}
-					}
+                    // Picture mappings
+                    if (copyImages)
+                    {
+                        foreach (var pp in product.ProductPictures)
+                        {
+                            var pictureClone = clonedPictures.Get(pp.PictureId);
+                            if (pictureClone != null)
+                            {
+                                clone.ProductPictures.Add(new ProductPicture
+                                {
+                                    PictureId = pictureClone.Id,
+                                    DisplayOrder = pp.DisplayOrder
+                                });
+                            }
+                        }
+                    }
 
-					// Product specifications
-					foreach (var psa in product.ProductSpecificationAttributes)
-					{
-						clone.ProductSpecificationAttributes.Add(new ProductSpecificationAttribute
-						{
-							SpecificationAttributeOptionId = psa.SpecificationAttributeOptionId,
-							AllowFiltering = psa.AllowFiltering,
-							ShowOnProductPage = psa.ShowOnProductPage,
-							DisplayOrder = psa.DisplayOrder
-						});
-					}
+                    // Product specifications
+                    foreach (var psa in product.ProductSpecificationAttributes)
+                    {
+                        clone.ProductSpecificationAttributes.Add(new ProductSpecificationAttribute
+                        {
+                            SpecificationAttributeOptionId = psa.SpecificationAttributeOptionId,
+                            AllowFiltering = psa.AllowFiltering,
+                            ShowOnProductPage = psa.ShowOnProductPage,
+                            DisplayOrder = psa.DisplayOrder
+                        });
+                    }
 
-					// Tier prices
-					foreach (var tp in product.TierPrices)
-					{
-						clone.TierPrices.Add(new TierPrice
-						{
-							StoreId = tp.StoreId,
-							CustomerRoleId = tp.CustomerRoleId,
-							Quantity = tp.Quantity,
-							Price = tp.Price,
-							CalculationMethod = tp.CalculationMethod
-						});
-					}
+                    // Tier prices
+                    foreach (var tp in product.TierPrices)
+                    {
+                        clone.TierPrices.Add(new TierPrice
+                        {
+                            StoreId = tp.StoreId,
+                            CustomerRoleId = tp.CustomerRoleId,
+                            Quantity = tp.Quantity,
+                            Price = tp.Price,
+                            CalculationMethod = tp.CalculationMethod
+                        });
+                    }
 
-					// Discount mapping
-					foreach (var discount in product.AppliedDiscounts)
-					{
-						clone.AppliedDiscounts.Add(discount);
-					}
+                    // Discount mapping
+                    foreach (var discount in product.AppliedDiscounts)
+                    {
+                        clone.AppliedDiscounts.Add(discount);
+                    }
 
-					// Tags
-					foreach (var tag in product.ProductTags)
-					{
-						clone.ProductTags.Add(tag);
-					}
+                    // Tags
+                    foreach (var tag in product.ProductTags)
+                    {
+                        clone.ProductTags.Add(tag);
+                    }
 
-					// >>>>>>> Put clone to db (from here on we need the product clone's ID)
-					_productRepository.Insert(clone);
-					Commit();
+                    // >>>>>>> Put clone to db (from here on we need the product clone's ID)
+                    _productRepository.Insert(clone);
+                    Commit();
 
-					// Related products mapping
-					foreach (var rp in _productService.GetRelatedProductsByProductId1(product.Id, true))
-					{
-						_relatedProductRepository.Insert(new RelatedProduct
-						{
-							ProductId1 = clone.Id,
-							ProductId2 = rp.ProductId2,
-							DisplayOrder = rp.DisplayOrder
-						});
-					}
+                    // Related products mapping
+                    foreach (var rp in _productService.GetRelatedProductsByProductId1(product.Id, true))
+                    {
+                        _relatedProductRepository.Insert(new RelatedProduct
+                        {
+                            ProductId1 = clone.Id,
+                            ProductId2 = rp.ProductId2,
+                            DisplayOrder = rp.DisplayOrder
+                        });
+                    }
 
-					// CrossSell products mapping
-					foreach (var csp in _productService.GetCrossSellProductsByProductId1(product.Id, true))
-					{
-						_crossSellProductRepository.Insert(new CrossSellProduct
-						{
-							ProductId1 = clone.Id,
-							ProductId2 = csp.ProductId2
-						});
-					}
+                    // CrossSell products mapping
+                    foreach (var csp in _productService.GetCrossSellProductsByProductId1(product.Id, true))
+                    {
+                        _crossSellProductRepository.Insert(new CrossSellProduct
+                        {
+                            ProductId1 = clone.Id,
+                            ProductId2 = csp.ProductId2
+                        });
+                    }
 
-					// Store mapping
-					var selectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(product);
-					foreach (var id in selectedStoreIds)
-					{
-						_storeMappingService.InsertStoreMapping(clone, id);
-					}
+                    // Store mapping
+                    var selectedStoreIds = _storeMappingService.GetStoresIdsWithAccess(product);
+                    foreach (var id in selectedStoreIds)
+                    {
+                        _storeMappingService.InsertStoreMapping(clone, id);
+                    }
 
-					// SEO
-					ProcessSlug(clone);
+                    // SEO
+                    ProcessSlug(clone);
 
-					// Localization
-					ProcessLocalization(product, clone, languages);
+                    // Localization
+                    ProcessLocalization(product, clone, languages);
 
-					// Attr stuff ...
-					ProcessAttributes(product, clone, newName, copyImages, clonedPictures, languages);
+                    // Attr stuff ...
+                    ProcessAttributes(product, clone, newName, copyImages, clonedPictures, languages);
 
-					// update computed properties
-					clone.HasTierPrices = clone.TierPrices.Count > 0;
-					clone.HasDiscountsApplied = clone.AppliedDiscounts.Count > 0;
-					clone.LowestAttributeCombinationPrice = _productAttributeService.GetLowestCombinationPrice(clone.Id);
-					clone.MainPictureId = clone.ProductPictures.OrderBy(x => x.DisplayOrder).Select(x => x.PictureId).FirstOrDefault();
+                    // update computed properties
+                    clone.HasTierPrices = clone.TierPrices.Count > 0;
+                    clone.HasDiscountsApplied = clone.AppliedDiscounts.Count > 0;
+                    clone.LowestAttributeCombinationPrice = _productAttributeService.GetLowestCombinationPrice(clone.Id);
+                    clone.MainPictureId = clone.ProductPictures.OrderBy(x => x.DisplayOrder).Select(x => x.PictureId).FirstOrDefault();
 
-					// Associated products
-					if (copyAssociatedProducts && product.ProductType != ProductType.BundledProduct)
-					{
-						ProcessAssociatedProducts(product, clone, isPublished, copyImages);
-					}
+                    // Associated products
+                    if (copyAssociatedProducts && product.ProductType != ProductType.BundledProduct)
+                    {
+                        ProcessAssociatedProducts(product, clone, isPublished, copyImages);
+                    }
 
-					// Bundle items
-					ProcessBundleItems(product, clone);
+                    // Bundle items
+                    ProcessBundleItems(product, clone);
 
-                    // Downloads 
+                    // Downloads
                     CopyDownloads(product.Id, clone.Id, "Product");
-                    
+
                     // >>>>>>> Our final commit
                     Commit();
-				}
+                }
 
-				return clone;
-			}
+                return clone;
+            }
         }
 
-		private void Commit()
-		{
-			_services.DbContext.SaveChanges();
-		}
+        #endregion Public Methods
 
-		private Dictionary<int, Download> CopyDownloads(int productId, int cloneId, string entityName = "")
-		{
-			var downloads = _downloadService.GetDownloadsFor(productId, entityName);
-            var clonedDownloads = new Dictionary<int, Download>();
 
-            if (!downloads.Any())
-			{
-				return null;
-			}
 
-            using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
-            {
-                foreach (var download in downloads)
-                {
-                    download.EntityId = cloneId;
-                    var clone = CopyDownload(download);
-                    clonedDownloads[clone.Id] = clone;
-                }
-			}
-				
-			return clonedDownloads;
-		}
+        #region Private Methods
+
+        private void Commit()
+        {
+            _services.DbContext.SaveChanges();
+        }
 
         private Download CopyDownload(Download download)
         {
@@ -408,304 +422,331 @@ namespace SmartStore.Services.Catalog
             return clone;
         }
 
+        private Dictionary<int, Download> CopyDownloads(int productId, int cloneId, string entityName = "")
+        {
+            var downloads = _downloadService.GetDownloadsFor(productId, entityName);
+            var clonedDownloads = new Dictionary<int, Download>();
+
+            if (!downloads.Any())
+            {
+                return null;
+            }
+
+            using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
+            {
+                foreach (var download in downloads)
+                {
+                    download.EntityId = cloneId;
+                    var clone = CopyDownload(download);
+                    clonedDownloads[clone.Id] = clone;
+                }
+            }
+
+            return clonedDownloads;
+        }
+
+        private Picture CopyPicture(Picture picture, string seoFilename)
+        {
+            using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
+            {
+                var buffer = _pictureService.LoadPictureBinary(picture);
+
+                var clone = _pictureService.InsertPicture(
+                    buffer,
+                    picture.MimeType,
+                    seoFilename,
+                    true,
+                    picture.Width ?? 0,
+                    picture.Height ?? 0,
+                    false);
+
+                return clone;
+            }
+        }
+
         private Dictionary<int, Picture> CopyPictures(Product product, string newProductName)
-		{
-			var clonedPictures = new Dictionary<int, Picture>();
-			var seoFilename = _pictureService.GetPictureSeName(newProductName);
+        {
+            var clonedPictures = new Dictionary<int, Picture>();
+            var seoFilename = _pictureService.GetPictureSeName(newProductName);
 
-			foreach (var pp in product.ProductPictures)
-			{
-				var clone = CopyPicture(pp.Picture, seoFilename);
-				clonedPictures[pp.PictureId] = clone;
-			}
+            foreach (var pp in product.ProductPictures)
+            {
+                var clone = CopyPicture(pp.Picture, seoFilename);
+                clonedPictures[pp.PictureId] = clone;
+            }
 
-			return clonedPictures;
-		}
+            return clonedPictures;
+        }
 
-		private Picture CopyPicture(Picture picture, string seoFilename)
-		{
-			using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
-			{
-				var buffer = _pictureService.LoadPictureBinary(picture);
+        private void ProcessAssociatedProducts(Product product, Product clone, bool isPublished, bool copyImages)
+        {
+            var searchQuery = new CatalogSearchQuery().HasParentGroupedProduct(product.Id);
 
-				var clone = _pictureService.InsertPicture(
-					buffer,
-					picture.MimeType,
-					seoFilename,
-					true,
-					picture.Width ?? 0,
-					picture.Height ?? 0,
-					false);
+            var query = _catalogSearchService.PrepareQuery(searchQuery);
+            var associatedProducts = query.OrderBy(p => p.DisplayOrder).ToList();
 
-				return clone;
-			}	
-		}
+            foreach (var associatedProduct in associatedProducts)
+            {
+                var associatedProductCopy = CopyProduct(associatedProduct, T("Admin.Common.CopyOf", associatedProduct.Name), isPublished, copyImages, false);
+                associatedProductCopy.ParentGroupedProductId = clone.Id;
+            }
+        }
 
-		private void ProcessSlug(Product clone)
-		{
-			using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
-			{
-				var slug = clone.ValidateSeName("", clone.Name, true, _urlRecordService, _seoSettings);
-				_urlRecordService.SaveSlug(clone, slug, 0);
-			}
-		}
+        private void ProcessAttributes(
+            Product product,
+            Product clone,
+            string newName,
+            bool copyImages,
+            Dictionary<int, Picture> clonedPictures,
+            IEnumerable<Language> languages)
+        {
+            // Former attribute id > clone
+            var pvaMap = new Dictionary<int, ProductVariantAttribute>();
 
-		private void ProcessLocalization(Product product, Product clone, IEnumerable<Language> languages)
-		{
-			using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
-			{
-				foreach (var lang in languages)
-				{
-					var name = product.GetLocalized(x => x.Name, lang, false, false);
-					if (!String.IsNullOrEmpty(name))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.Name, name, lang.Id);
+            // Former attribute value id > clone
+            var pvavMap = new Dictionary<int, ProductVariantAttributeValue>();
 
-					var shortDescription = product.GetLocalized(x => x.ShortDescription, lang, false, false);
-					if (!String.IsNullOrEmpty(shortDescription))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.ShortDescription, shortDescription, lang.Id);
+            var pictureSeName = _pictureService.GetPictureSeName(newName);
 
-					var fullDescription = product.GetLocalized(x => x.FullDescription, lang, false, false);
-					if (!String.IsNullOrEmpty(fullDescription))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.FullDescription, fullDescription, lang.Id);
+            foreach (var pva in product.ProductVariantAttributes)
+            {
+                var pvaClone = new ProductVariantAttribute
+                {
+                    ProductAttributeId = pva.ProductAttributeId,
+                    TextPrompt = pva.TextPrompt,
+                    IsRequired = pva.IsRequired,
+                    AttributeControlTypeId = pva.AttributeControlTypeId,
+                    DisplayOrder = pva.DisplayOrder
+                };
 
-					var metaKeywords = product.GetLocalized(x => x.MetaKeywords, lang, false, false);
-					if (!String.IsNullOrEmpty(metaKeywords))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.MetaKeywords, metaKeywords, lang.Id);
+                clone.ProductVariantAttributes.Add(pvaClone);
 
-					var metaDescription = product.GetLocalized(x => x.MetaDescription, lang, false, false);
-					if (!String.IsNullOrEmpty(metaDescription))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.MetaDescription, metaDescription, lang.Id);
+                // Save associated value (used for combinations copying)
+                pvaMap[pva.Id] = pvaClone;
 
-					var metaTitle = product.GetLocalized(x => x.MetaTitle, lang, false, false);
-					if (!String.IsNullOrEmpty(metaTitle))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.MetaTitle, metaTitle, lang.Id);
+                // Product variant attribute values
+                foreach (var pvav in pva.ProductVariantAttributeValues)
+                {
+                    var pvavClone = new ProductVariantAttributeValue
+                    {
+                        Name = pvav.Name,
+                        Color = pvav.Color,
+                        PriceAdjustment = pvav.PriceAdjustment,
+                        WeightAdjustment = pvav.WeightAdjustment,
+                        IsPreSelected = pvav.IsPreSelected,
+                        DisplayOrder = pvav.DisplayOrder,
+                        ValueTypeId = pvav.ValueTypeId,
+                        LinkedProductId = pvav.LinkedProductId,
+                        Quantity = pvav.Quantity,
+                        PictureId = copyImages ? pvav.PictureId : 0 // we'll clone this later
+                    };
 
-					var bundleTitleText = product.GetLocalized(x => x.BundleTitleText, lang, false, false);
-					if (!String.IsNullOrEmpty(bundleTitleText))
-						_localizedEntityService.SaveLocalizedValue(clone, x => x.BundleTitleText, bundleTitleText, lang.Id);
+                    pvaClone.ProductVariantAttributeValues.Add(pvavClone);
 
-					// Search engine name.
-					var slug = clone.ValidateSeName("", name, false, _urlRecordService, _seoSettings, lang.Id);
-					_urlRecordService.SaveSlug(clone, slug, lang.Id);
-				}
-			}
-		}
+                    // Save associated value (used for combinations copying)
+                    pvavMap.Add(pvav.Id, pvavClone);
+                }
+            }
 
-		private void ProcessAssociatedProducts(Product product, Product clone, bool isPublished, bool copyImages)
-		{
-			var searchQuery = new CatalogSearchQuery().HasParentGroupedProduct(product.Id);
+            // >>>>>> Commit
+            Commit();
 
-			var query = _catalogSearchService.PrepareQuery(searchQuery);
-			var associatedProducts = query.OrderBy(p => p.DisplayOrder).ToList();
+            // Attribute value localization
+            foreach (var pvav in product.ProductVariantAttributes.SelectMany(x => x.ProductVariantAttributeValues).ToArray())
+            {
+                foreach (var lang in languages)
+                {
+                    var name = pvav.GetLocalized(x => x.Name, lang, false, false);
+                    if (!String.IsNullOrEmpty(name))
+                    {
+                        var pvavClone = pvavMap.Get(pvav.Id);
+                        if (pvavClone != null)
+                        {
+                            _localizedEntityService.SaveLocalizedValue(pvavClone, x => x.Name, name, lang.Id);
+                        }
+                    }
+                }
+            }
 
-			foreach (var associatedProduct in associatedProducts)
-			{
-				var associatedProductCopy = CopyProduct(associatedProduct, T("Admin.Common.CopyOf", associatedProduct.Name), isPublished, copyImages, false);
-				associatedProductCopy.ParentGroupedProductId = clone.Id;
-			}
-		}
+            // Clone attribute value images
+            if (copyImages)
+            {
+                // Reduce value set to those with assigned pictures
+                var allValueClonesWithPictures = pvavMap.Values.Where(x => x.PictureId > 0).ToArray();
 
-		private void ProcessBundleItems(Product product, Product clone)
-		{
-			var bundledItems = _productService.GetBundleItems(product.Id, true);
+                // Get those pictures for cloning
+                var allPictures = _pictureService.GetPicturesByIds(allValueClonesWithPictures.Select(x => x.PictureId).ToArray(), true);
 
-			foreach (var bundleItem in bundledItems)
-			{
-				var newBundleItem = bundleItem.Item.Clone();
-				newBundleItem.BundleProductId = clone.Id;
+                foreach (var pvavClone in allValueClonesWithPictures)
+                {
+                    var picture = allPictures.FirstOrDefault(x => x.Id == pvavClone.PictureId);
+                    if (picture != null)
+                    {
+                        var pictureClone = CopyPicture(picture, pictureSeName);
+                        clonedPictures[pvavClone.PictureId] = pictureClone;
+                        pvavClone.PictureId = pictureClone.Id;
+                    }
+                }
+            }
 
-				_productService.InsertBundleItem(newBundleItem);
+            // >>>>>> Commit attributes & values
+            Commit();
 
-				foreach (var itemFilter in bundleItem.Item.AttributeFilters)
-				{
-					var newItemFilter = itemFilter.Clone();
-					newItemFilter.BundleItemId = newBundleItem.Id;
+            // attribute combinations
+            using (var scope = new DbContextScope(lazyLoading: false, forceNoTracking: false))
+            {
+                scope.LoadCollection(product, (Product p) => p.ProductVariantAttributeCombinations);
+            }
 
-					_productAttributeService.InsertProductBundleItemAttributeFilter(newItemFilter);
-				}
-			}
-		}
+            foreach (var combination in product.ProductVariantAttributeCombinations)
+            {
+                // Generate new AttributesXml according to new value IDs
+                string newAttributesXml = "";
+                var parsedProductVariantAttributes = _productAttributeParser.ParseProductVariantAttributes(combination.AttributesXml);
+                foreach (var oldPva in parsedProductVariantAttributes)
+                {
+                    if (!pvaMap.ContainsKey(oldPva.Id))
+                        continue;
 
-		private void ProcessAttributes(
-			Product product, 
-			Product clone, 
-			string newName, 
-			bool copyImages,
-			Dictionary<int, Picture> clonedPictures,
-			IEnumerable<Language> languages)
-		{
-			// Former attribute id > clone
-			var pvaMap = new Dictionary<int, ProductVariantAttribute>();
+                    var newPva = pvaMap.Get(oldPva.Id);
 
-			// Former attribute value id > clone
-			var pvavMap = new Dictionary<int, ProductVariantAttributeValue>();
+                    if (newPva == null)
+                        continue;
 
-			var pictureSeName = _pictureService.GetPictureSeName(newName);
+                    var oldPvaValuesStr = _productAttributeParser.ParseValues(combination.AttributesXml, oldPva.Id);
+                    foreach (var oldPvaValueStr in oldPvaValuesStr)
+                    {
+                        if (newPva.ShouldHaveValues())
+                        {
+                            // attribute values
+                            int oldPvaValue = oldPvaValueStr.Convert<int>();
+                            if (pvavMap.ContainsKey(oldPvaValue))
+                            {
+                                var newPvav = pvavMap.Get(oldPvaValue);
+                                if (newPvav != null)
+                                {
+                                    newAttributesXml = _productAttributeParser.AddProductAttribute(newAttributesXml, newPva, newPvav.Id.ToString());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // just a text
+                            newAttributesXml = _productAttributeParser.AddProductAttribute(newAttributesXml, newPva, oldPvaValueStr);
+                        }
+                    }
+                }
 
-			foreach (var pva in product.ProductVariantAttributes)
-			{
-				var pvaClone = new ProductVariantAttribute
-				{
-					ProductAttributeId = pva.ProductAttributeId,
-					TextPrompt = pva.TextPrompt,
-					IsRequired = pva.IsRequired,
-					AttributeControlTypeId = pva.AttributeControlTypeId,
-					DisplayOrder = pva.DisplayOrder
-				};
+                var newAssignedPictureIds = new HashSet<string>();
+                foreach (var strPicId in combination.AssignedPictureIds.EmptyNull().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var newPic = clonedPictures.Get(strPicId.Convert<int>());
+                    if (newPic != null)
+                    {
+                        newAssignedPictureIds.Add(newPic.Id.ToString(CultureInfo.InvariantCulture));
+                    }
+                }
 
-				clone.ProductVariantAttributes.Add(pvaClone);
+                var combinationClone = new ProductVariantAttributeCombination
+                {
+                    AttributesXml = newAttributesXml,
+                    StockQuantity = combination.StockQuantity,
+                    AllowOutOfStockOrders = combination.AllowOutOfStockOrders,
+                    Sku = combination.Sku,
+                    Gtin = combination.Gtin,
+                    ManufacturerPartNumber = combination.ManufacturerPartNumber,
+                    Price = combination.Price,
+                    AssignedPictureIds = copyImages ? String.Join(",", newAssignedPictureIds) : null,
+                    Length = combination.Length,
+                    Width = combination.Width,
+                    Height = combination.Height,
+                    BasePriceAmount = combination.BasePriceAmount,
+                    BasePriceBaseAmount = combination.BasePriceBaseAmount,
+                    DeliveryTimeId = combination.DeliveryTimeId,
+                    QuantityUnitId = combination.QuantityUnitId,
+                    IsActive = combination.IsActive
 
-				// Save associated value (used for combinations copying)
-				pvaMap[pva.Id] = pvaClone;
+                    //IsDefaultCombination = combination.IsDefaultCombination
+                };
 
-				// Product variant attribute values
-				foreach (var pvav in pva.ProductVariantAttributeValues)
-				{
-					var pvavClone = new ProductVariantAttributeValue
-					{
-						Name = pvav.Name,
-						Color = pvav.Color,
-						PriceAdjustment = pvav.PriceAdjustment,
-						WeightAdjustment = pvav.WeightAdjustment,
-						IsPreSelected = pvav.IsPreSelected,
-						DisplayOrder = pvav.DisplayOrder,
-						ValueTypeId = pvav.ValueTypeId,
-						LinkedProductId = pvav.LinkedProductId,
-						Quantity = pvav.Quantity,
-						PictureId = copyImages ? pvav.PictureId : 0 // we'll clone this later
-					};
+                clone.ProductVariantAttributeCombinations.Add(combinationClone);
+            }
 
-					pvaClone.ProductVariantAttributeValues.Add(pvavClone);
+            // >>>>>> Commit combinations
+            Commit();
+        }
 
-					// Save associated value (used for combinations copying)
-					pvavMap.Add(pvav.Id, pvavClone);
-				}
-			}
+        private void ProcessBundleItems(Product product, Product clone)
+        {
+            var bundledItems = _productService.GetBundleItems(product.Id, true);
 
-			// >>>>>> Commit
-			Commit();
+            foreach (var bundleItem in bundledItems)
+            {
+                var newBundleItem = bundleItem.Item.Clone();
+                newBundleItem.BundleProductId = clone.Id;
 
-			// Attribute value localization
-			foreach (var pvav in product.ProductVariantAttributes.SelectMany(x => x.ProductVariantAttributeValues).ToArray())
-			{
-				foreach (var lang in languages)
-				{
-					var name = pvav.GetLocalized(x => x.Name, lang, false, false);
-					if (!String.IsNullOrEmpty(name))
-					{
-						var pvavClone = pvavMap.Get(pvav.Id);
-						if (pvavClone != null)
-						{
-							_localizedEntityService.SaveLocalizedValue(pvavClone, x => x.Name, name, lang.Id);
-						}
-					}					
-				}
-			}			
+                _productService.InsertBundleItem(newBundleItem);
 
-			// Clone attribute value images
-			if (copyImages)
-			{
-				// Reduce value set to those with assigned pictures
-				var allValueClonesWithPictures = pvavMap.Values.Where(x => x.PictureId > 0).ToArray();
-				// Get those pictures for cloning
-				var allPictures = _pictureService.GetPicturesByIds(allValueClonesWithPictures.Select(x => x.PictureId).ToArray(), true);
+                foreach (var itemFilter in bundleItem.Item.AttributeFilters)
+                {
+                    var newItemFilter = itemFilter.Clone();
+                    newItemFilter.BundleItemId = newBundleItem.Id;
 
-				foreach (var pvavClone in allValueClonesWithPictures)
-				{
-					var picture = allPictures.FirstOrDefault(x => x.Id == pvavClone.PictureId);
-					if (picture != null)
-					{
-						var pictureClone = CopyPicture(picture, pictureSeName);
-						clonedPictures[pvavClone.PictureId] = pictureClone;
-						pvavClone.PictureId = pictureClone.Id;
-					}
-				}
-			}
+                    _productAttributeService.InsertProductBundleItemAttributeFilter(newItemFilter);
+                }
+            }
+        }
 
-			// >>>>>> Commit attributes & values
-			Commit();
+        private void ProcessLocalization(Product product, Product clone, IEnumerable<Language> languages)
+        {
+            using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
+            {
+                foreach (var lang in languages)
+                {
+                    var name = product.GetLocalized(x => x.Name, lang, false, false);
+                    if (!String.IsNullOrEmpty(name))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.Name, name, lang.Id);
 
-			// attribute combinations
-			using (var scope = new DbContextScope(lazyLoading: false, forceNoTracking: false))
-			{
-				scope.LoadCollection(product, (Product p) => p.ProductVariantAttributeCombinations);
-			}
+                    var shortDescription = product.GetLocalized(x => x.ShortDescription, lang, false, false);
+                    if (!String.IsNullOrEmpty(shortDescription))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.ShortDescription, shortDescription, lang.Id);
 
-			foreach (var combination in product.ProductVariantAttributeCombinations)
-			{
-				// Generate new AttributesXml according to new value IDs
-				string newAttributesXml = "";
-				var parsedProductVariantAttributes = _productAttributeParser.ParseProductVariantAttributes(combination.AttributesXml);
-				foreach (var oldPva in parsedProductVariantAttributes)
-				{
-					if (!pvaMap.ContainsKey(oldPva.Id))
-						continue;
+                    var fullDescription = product.GetLocalized(x => x.FullDescription, lang, false, false);
+                    if (!String.IsNullOrEmpty(fullDescription))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.FullDescription, fullDescription, lang.Id);
 
-					var newPva = pvaMap.Get(oldPva.Id);
+                    var metaKeywords = product.GetLocalized(x => x.MetaKeywords, lang, false, false);
+                    if (!String.IsNullOrEmpty(metaKeywords))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.MetaKeywords, metaKeywords, lang.Id);
 
-					if (newPva == null)
-						continue;
+                    var metaDescription = product.GetLocalized(x => x.MetaDescription, lang, false, false);
+                    if (!String.IsNullOrEmpty(metaDescription))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.MetaDescription, metaDescription, lang.Id);
 
-					var oldPvaValuesStr = _productAttributeParser.ParseValues(combination.AttributesXml, oldPva.Id);
-					foreach (var oldPvaValueStr in oldPvaValuesStr)
-					{
-						if (newPva.ShouldHaveValues())
-						{
-							// attribute values
-							int oldPvaValue = oldPvaValueStr.Convert<int>();
-							if (pvavMap.ContainsKey(oldPvaValue))
-							{
-								var newPvav = pvavMap.Get(oldPvaValue);
-								if (newPvav != null)
-								{
-									newAttributesXml = _productAttributeParser.AddProductAttribute(newAttributesXml, newPva, newPvav.Id.ToString());
-								}
-							}
-						}
-						else
-						{
-							// just a text
-							newAttributesXml = _productAttributeParser.AddProductAttribute(newAttributesXml, newPva, oldPvaValueStr);
-						}
-					}
-				}
+                    var metaTitle = product.GetLocalized(x => x.MetaTitle, lang, false, false);
+                    if (!String.IsNullOrEmpty(metaTitle))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.MetaTitle, metaTitle, lang.Id);
 
-				var newAssignedPictureIds = new HashSet<string>();
-				foreach (var strPicId in combination.AssignedPictureIds.EmptyNull().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-				{
-					var newPic = clonedPictures.Get(strPicId.Convert<int>());
-					if (newPic != null)
-					{
-						newAssignedPictureIds.Add(newPic.Id.ToString(CultureInfo.InvariantCulture));
-					}
-				}
+                    var bundleTitleText = product.GetLocalized(x => x.BundleTitleText, lang, false, false);
+                    if (!String.IsNullOrEmpty(bundleTitleText))
+                        _localizedEntityService.SaveLocalizedValue(clone, x => x.BundleTitleText, bundleTitleText, lang.Id);
 
-				var combinationClone = new ProductVariantAttributeCombination
-				{
-					AttributesXml = newAttributesXml,
-					StockQuantity = combination.StockQuantity,
-					AllowOutOfStockOrders = combination.AllowOutOfStockOrders,
-					Sku = combination.Sku,
-					Gtin = combination.Gtin,
-					ManufacturerPartNumber = combination.ManufacturerPartNumber,
-					Price = combination.Price,
-					AssignedPictureIds = copyImages ? String.Join(",", newAssignedPictureIds) : null,
-					Length = combination.Length,
-					Width = combination.Width,
-					Height = combination.Height,
-					BasePriceAmount = combination.BasePriceAmount,
-					BasePriceBaseAmount = combination.BasePriceBaseAmount,
-					DeliveryTimeId = combination.DeliveryTimeId,
-					QuantityUnitId = combination.QuantityUnitId,
-					IsActive = combination.IsActive
-					//IsDefaultCombination = combination.IsDefaultCombination
-				};
+                    // Search engine name.
+                    var slug = clone.ValidateSeName("", name, false, _urlRecordService, _seoSettings, lang.Id);
+                    _urlRecordService.SaveSlug(clone, slug, lang.Id);
+                }
+            }
+        }
 
-				clone.ProductVariantAttributeCombinations.Add(combinationClone);
-			}
+        private void ProcessSlug(Product clone)
+        {
+            using (var scope = new DbContextScope(ctx: _productRepository.Context, autoCommit: true))
+            {
+                var slug = clone.ValidateSeName("", clone.Name, true, _urlRecordService, _seoSettings);
+                _urlRecordService.SaveSlug(clone, slug, 0);
+            }
+        }
 
-			// >>>>>> Commit combinations
-			Commit();
-		}
-	}
+        #endregion Private Methods
+    }
 }

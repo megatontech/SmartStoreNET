@@ -1,22 +1,35 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartStore.Services.Catalog
 {
     public partial class CategoryTemplateService : ICategoryTemplateService
     {
+        #region Private Fields
+
         private readonly IRepository<CategoryTemplate> _categoryTemplateRepository;
+
         private readonly IEventPublisher _eventPublisher;
 
-		public CategoryTemplateService(IRepository<CategoryTemplate> categoryTemplateRepository, IEventPublisher eventPublisher)
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        public CategoryTemplateService(IRepository<CategoryTemplate> categoryTemplateRepository, IEventPublisher eventPublisher)
         {
             _categoryTemplateRepository = categoryTemplateRepository;
             _eventPublisher = eventPublisher;
         }
+
+        #endregion Public Constructors
+
+
+
+        #region Public Methods
 
         public virtual void DeleteCategoryTemplate(CategoryTemplate categoryTemplate)
         {
@@ -35,7 +48,7 @@ namespace SmartStore.Services.Catalog
             var templates = query.ToList();
             return templates;
         }
- 
+
         public virtual CategoryTemplate GetCategoryTemplateById(int categoryTemplateId)
         {
             if (categoryTemplateId == 0)
@@ -59,5 +72,7 @@ namespace SmartStore.Services.Catalog
 
             _categoryTemplateRepository.Update(categoryTemplate);
         }
+
+        #endregion Public Methods
     }
 }

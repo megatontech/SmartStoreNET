@@ -1,129 +1,133 @@
-﻿using System.Linq;
-using SmartStore.Core.Domain.Catalog;
+﻿using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Orders;
 using SmartStore.Services.Seo;
+using System.Linq;
 
 namespace SmartStore.Services.Catalog.Extensions
 {
-	public static class ProductUrlHelperExtensions
-	{
-		/// <summary>
-		/// Creates a product URL including variant query string.
-		/// </summary>
-		/// <param name="helper">Product URL helper</param>
-		/// <param name="productId">Product identifier</param>
-		/// <param name="productSeName">Product SEO name</param>
-		/// <param name="bundleItemId">Bundle item identifier. Use 0 if it's not a bundle item.</param>
-		/// <param name="variantValues">Variant values</param>
-		/// <returns>Product URL</returns>
-		public static string GetProductUrl(
-			this ProductUrlHelper helper,
-			int productId,
-			string productSeName,
-			int bundleItemId,
-			params ProductVariantAttributeValue[] variantValues)
-		{
-			Guard.NotZero(productId, nameof(productId));
+    public static class ProductUrlHelperExtensions
+    {
+        #region Public Methods
 
-			var query = new ProductVariantQuery();
+        /// <summary>
+        /// Creates a product URL including variant query string.
+        /// </summary>
+        /// <param name="helper">Product URL helper</param>
+        /// <param name="productId">Product identifier</param>
+        /// <param name="productSeName">Product SEO name</param>
+        /// <param name="bundleItemId">Bundle item identifier. Use 0 if it's not a bundle item.</param>
+        /// <param name="variantValues">Variant values</param>
+        /// <returns>Product URL</returns>
+        public static string GetProductUrl(
+            this ProductUrlHelper helper,
+            int productId,
+            string productSeName,
+            int bundleItemId,
+            params ProductVariantAttributeValue[] variantValues)
+        {
+            Guard.NotZero(productId, nameof(productId));
 
-			foreach (var value in variantValues)
-			{
-				var attribute = value.ProductVariantAttribute;
+            var query = new ProductVariantQuery();
 
-				query.AddVariant(new ProductVariantQueryItem(value.Id.ToString())
-				{
-					ProductId = productId,
-					BundleItemId = bundleItemId,
-					AttributeId = attribute.ProductAttributeId,
-					VariantAttributeId = attribute.Id,
-					Alias = attribute.ProductAttribute.Alias,
-					ValueAlias = value.Alias
-				});
-			}
+            foreach (var value in variantValues)
+            {
+                var attribute = value.ProductVariantAttribute;
 
-			return helper.GetProductUrl(query, productSeName);
-		}
+                query.AddVariant(new ProductVariantQueryItem(value.Id.ToString())
+                {
+                    ProductId = productId,
+                    BundleItemId = bundleItemId,
+                    AttributeId = attribute.ProductAttributeId,
+                    VariantAttributeId = attribute.Id,
+                    Alias = attribute.ProductAttribute.Alias,
+                    ValueAlias = value.Alias
+                });
+            }
 
-		/// <summary>
-		/// Creates a product URL including variant query string.
-		/// </summary>
-		/// <param name="helper">Product URL helper</param>
-		/// <param name="product">Product entity</param>
-		/// <param name="variantValues">Variant values</param>
-		/// <returns>Product URL</returns>
-		public static string GetProductUrl(
-			this ProductUrlHelper helper,
-			Product product,
-			params ProductVariantAttributeValue[] variantValues)
-		{
-			Guard.NotNull(product, nameof(product));
+            return helper.GetProductUrl(query, productSeName);
+        }
 
-			return helper.GetProductUrl(product.Id, product.GetSeName(), 0, variantValues);
-		}
+        /// <summary>
+        /// Creates a product URL including variant query string.
+        /// </summary>
+        /// <param name="helper">Product URL helper</param>
+        /// <param name="product">Product entity</param>
+        /// <param name="variantValues">Variant values</param>
+        /// <returns>Product URL</returns>
+        public static string GetProductUrl(
+            this ProductUrlHelper helper,
+            Product product,
+            params ProductVariantAttributeValue[] variantValues)
+        {
+            Guard.NotNull(product, nameof(product));
 
-		/// <summary>
-		/// Creates a product URL including variant query string.
-		/// </summary>
-		/// <param name="helper">Product URL helper</param>
-		/// <param name="productSeName">Product SEO name</param>
-		/// <param name="cartItem">Organized shopping cart item</param>
-		/// <returns>Product URL</returns>
-		public static string GetProductUrl(
-			this ProductUrlHelper helper,
-			string productSeName,
-			OrganizedShoppingCartItem cartItem)
-		{
-			Guard.NotNull(cartItem, nameof(cartItem));
+            return helper.GetProductUrl(product.Id, product.GetSeName(), 0, variantValues);
+        }
 
-			var query = new ProductVariantQuery();
-			var product = cartItem.Item.Product;
+        /// <summary>
+        /// Creates a product URL including variant query string.
+        /// </summary>
+        /// <param name="helper">Product URL helper</param>
+        /// <param name="productSeName">Product SEO name</param>
+        /// <param name="cartItem">Organized shopping cart item</param>
+        /// <returns>Product URL</returns>
+        public static string GetProductUrl(
+            this ProductUrlHelper helper,
+            string productSeName,
+            OrganizedShoppingCartItem cartItem)
+        {
+            Guard.NotNull(cartItem, nameof(cartItem));
 
-			if (product.ProductType != ProductType.BundledProduct)
-			{
-				helper.DeserializeQuery(query, product.Id, cartItem.Item.AttributesXml);
-			}
-			else if (cartItem.ChildItems != null && product.BundlePerItemPricing)
-			{
-				foreach (var childItem in cartItem.ChildItems.Where(x => x.Item.Id != cartItem.Item.Id))
-				{
-					helper.DeserializeQuery(query, childItem.Item.ProductId, childItem.Item.AttributesXml, childItem.BundleItemData.Item.Id);
-				}
-			}
+            var query = new ProductVariantQuery();
+            var product = cartItem.Item.Product;
 
-			return helper.GetProductUrl(query, productSeName);
-		}
+            if (product.ProductType != ProductType.BundledProduct)
+            {
+                helper.DeserializeQuery(query, product.Id, cartItem.Item.AttributesXml);
+            }
+            else if (cartItem.ChildItems != null && product.BundlePerItemPricing)
+            {
+                foreach (var childItem in cartItem.ChildItems.Where(x => x.Item.Id != cartItem.Item.Id))
+                {
+                    helper.DeserializeQuery(query, childItem.Item.ProductId, childItem.Item.AttributesXml, childItem.BundleItemData.Item.Id);
+                }
+            }
 
-		/// <summary>
-		/// Creates a product URL including variant query string.
-		/// </summary>
-		/// <param name="helper">Product URL helper</param>
-		/// <param name="productSeName">Product SEO name</param>
-		/// <param name="orderItem">Order item</param>
-		/// <returns>Product URL</returns>
-		public static string GetProductUrl(
-			this ProductUrlHelper helper,
-			string productSeName,
-			OrderItem orderItem)
-		{
-			Guard.NotNull(orderItem, nameof(orderItem));
+            return helper.GetProductUrl(query, productSeName);
+        }
 
-			var query = new ProductVariantQuery();
+        /// <summary>
+        /// Creates a product URL including variant query string.
+        /// </summary>
+        /// <param name="helper">Product URL helper</param>
+        /// <param name="productSeName">Product SEO name</param>
+        /// <param name="orderItem">Order item</param>
+        /// <returns>Product URL</returns>
+        public static string GetProductUrl(
+            this ProductUrlHelper helper,
+            string productSeName,
+            OrderItem orderItem)
+        {
+            Guard.NotNull(orderItem, nameof(orderItem));
 
-			if (orderItem.Product.ProductType != ProductType.BundledProduct)
-			{
-				helper.DeserializeQuery(query, orderItem.ProductId, orderItem.AttributesXml);
-			}
-			else if (orderItem.Product.BundlePerItemPricing && orderItem.BundleData.HasValue())
-			{
-				var bundleData = orderItem.GetBundleData();
+            var query = new ProductVariantQuery();
 
-				bundleData.ForEach(x => helper.DeserializeQuery(query, x.ProductId, x.AttributesXml, x.BundleItemId));
-			}
+            if (orderItem.Product.ProductType != ProductType.BundledProduct)
+            {
+                helper.DeserializeQuery(query, orderItem.ProductId, orderItem.AttributesXml);
+            }
+            else if (orderItem.Product.BundlePerItemPricing && orderItem.BundleData.HasValue())
+            {
+                var bundleData = orderItem.GetBundleData();
 
-			return helper.GetProductUrl(query, productSeName);
-		}
-	}
+                bundleData.ForEach(x => helper.DeserializeQuery(query, x.ProductId, x.AttributesXml, x.BundleItemId));
+            }
+
+            return helper.GetProductUrl(query, productSeName);
+        }
+
+        #endregion Public Methods
+    }
 }

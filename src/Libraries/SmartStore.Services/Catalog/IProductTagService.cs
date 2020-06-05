@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using SmartStore.Core.Domain.Catalog;
+using System.Collections.Generic;
 
 namespace SmartStore.Services.Catalog
 {
@@ -8,17 +8,13 @@ namespace SmartStore.Services.Catalog
     /// </summary>
     public partial interface IProductTagService
     {
+        #region Public Methods
+
         /// <summary>
         /// Delete a product tag
         /// </summary>
         /// <param name="productTag">Product tag</param>
         void DeleteProductTag(ProductTag productTag);
-
-        /// <summary>
-        /// Gets all product tags
-        /// </summary>
-        /// <returns>Product tags</returns>
-        IList<ProductTag> GetAllProductTags();
 
         /// <summary>
         /// Gets all product tag names
@@ -27,12 +23,26 @@ namespace SmartStore.Services.Catalog
         IList<string> GetAllProductTagNames();
 
         /// <summary>
+        /// Gets all product tags
+        /// </summary>
+        /// <returns>Product tags</returns>
+        IList<ProductTag> GetAllProductTags();
+
+        /// <summary>
+        /// Get number of products
+        /// </summary>
+        /// <param name="productTagId">Product tag identifier</param>
+        /// <param name="storeId">Store identifier</param>
+        /// <returns>Number of products</returns>
+        int GetProductCount(int productTagId, int storeId);
+
+        /// <summary>
         /// Gets product tag
         /// </summary>
         /// <param name="productTagId">Product tag identifier</param>
         /// <returns>Product tag</returns>
         ProductTag GetProductTagById(int productTagId);
-        
+
         /// <summary>
         /// Gets product tag by name
         /// </summary>
@@ -52,12 +62,6 @@ namespace SmartStore.Services.Catalog
         /// <param name="productTag">Product tag</param>
         void UpdateProductTag(ProductTag productTag);
 
-		/// <summary>
-		/// Get number of products
-		/// </summary>
-		/// <param name="productTagId">Product tag identifier</param>
-		/// <param name="storeId">Store identifier</param>
-		/// <returns>Number of products</returns>
-		int GetProductCount(int productTagId, int storeId);
+        #endregion Public Methods
     }
 }
