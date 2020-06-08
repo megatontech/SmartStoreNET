@@ -22,6 +22,8 @@ namespace SmartStore.Services.Search
 
 		private readonly IProductService _productService;
 		private readonly IRepository<Product> _productRepository;
+		private readonly IRepository<DeclarationProduct> _DeclarationproductRepository;
+		
 		private readonly IRepository<ProductManufacturer> _productManufacturerRepository;
 		private readonly IRepository<ProductCategory> _productCategoryRepository;
 		private readonly IRepository<LocalizedProperty> _localizedPropertyRepository;
@@ -45,7 +47,9 @@ namespace SmartStore.Services.Search
 			ICommonServices services,
 			IDeliveryTimeService deliveryTimeService,
 			IManufacturerService manufacturerService,
-			ICategoryService categoryService)
+			ICategoryService categoryService,
+			IRepository<DeclarationProduct> declarationproductRepository
+			)
 		{
 			_productService = productService;
 			_productRepository = productRepository;
@@ -59,6 +63,7 @@ namespace SmartStore.Services.Search
 			_deliveryTimeService = deliveryTimeService;
 			_manufacturerService = manufacturerService;
 			_categoryService = categoryService;
+			_DeclarationproductRepository = declarationproductRepository;
 
 			QuerySettings = DbQuerySettings.Default;
 		}
@@ -86,6 +91,48 @@ namespace SmartStore.Services.Search
         }
 
         protected virtual IQueryable<Product> ApplySearchTerm(IQueryable<Product> query, CatalogSearchQuery searchQuery)
+		{
+			var term = searchQuery.Term;
+			var fields = searchQuery.Fields;
+			var languageId = searchQuery.LanguageId ?? 0;
+
+			if (term.HasValue() && fields != null && fields.Length != 0 && fields.Any(x => x.HasValue()))
+			{
+				// SearchMode.ExactMatch doesn't make sense here
+				if (searchQuery.Mode == SearchMode.StartsWith)
+				{
+					query =
+						from p in query
+						join lp in _localizedPropertyRepository.Table on p.Id equals lp.EntityId into plp
+						from lp in plp.DefaultIfEmpty()
+						where
+						(fields.Contains("name") && p.Name.StartsWith(term)) ||
+						(fields.Contains("sku") && p.Sku.StartsWith(term)) ||
+						(fields.Contains("shortdescription") && p.ShortDescription.StartsWith(term)) ||
+						(languageId != 0 && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "Name" && lp.LocaleValue.StartsWith(term)) ||
+						(languageId != 0 && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "ShortDescription" && lp.LocaleValue.StartsWith(term))
+						select p;
+				}
+				else
+				{
+					query =
+						from p in query
+						join lp in _localizedPropertyRepository.Table on p.Id equals lp.EntityId into plp
+						from lp in plp.DefaultIfEmpty()
+						where
+						(fields.Contains("name") && p.Name.Contains(term)) ||
+						(fields.Contains("sku") && p.Sku.Contains(term)) ||
+						(fields.Contains("shortdescription") && p.ShortDescription.Contains(term)) ||
+						(languageId != 0 && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "Name" && lp.LocaleValue.Contains(term)) ||
+						(languageId != 0 && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "ShortDescription" && lp.LocaleValue.Contains(term))
+						select p;
+				}
+			}
+
+			return query;
+		}
+
+		protected virtual IQueryable<DeclarationProduct> ApplySearchTerm(IQueryable<DeclarationProduct> query, CatalogSearchQuery searchQuery)
 		{
 			var term = searchQuery.Term;
 			var fields = searchQuery.Fields;
@@ -538,6 +585,417 @@ namespace SmartStore.Services.Search
 			return query;
 		}
 
+		protected virtual IQueryable<DeclarationProduct> GetDeclarationProductQuery(CatalogSearchQuery searchQuery, IQueryable<DeclarationProduct> baseQuery)
+		{
+			var ordered = false;
+			var utcNow = DateTime.UtcNow;
+			var categoryId = 0;
+			var manufacturerId = 0;
+			var query = baseQuery ?? _DeclarationproductRepository.Table;
+
+			query = query.Where(x => !x.Deleted && !x.IsSystemProduct);
+			query = ApplySearchTerm(query, searchQuery);
+
+			#region Filters
+
+			var filters = new List<ISearchFilter>();
+			FlattenFilters(searchQuery.Filters, filters);
+
+			var productIds = GetIdList(filters, "id");
+			if (productIds.Any())
+			{
+				query = query.Where(x => productIds.Contains(x.Id));
+			}
+
+			var categoryIds = GetIdList(filters, "categoryid");
+			if (categoryIds.Any())
+			{
+				categoryId = categoryIds.First();
+				if (categoryIds.Count == 1 && categoryId == 0)
+				{
+					// Has no category.
+					//query = query.Where(x => x.ProductCategories.Count == 0);
+				}
+				else
+				{
+					//query = QueryCategories(query, categoryIds, null);
+				}
+			}
+
+			var featuredCategoryIds = GetIdList(filters, "featuredcategoryid");
+			var notFeaturedCategoryIds = GetIdList(filters, "notfeaturedcategoryid");
+			if (featuredCategoryIds.Any())
+			{
+				categoryId = categoryId == 0 ? featuredCategoryIds.First() : categoryId;
+				//query = QueryCategories(query, featuredCategoryIds, true);
+			}
+			if (notFeaturedCategoryIds.Any())
+			{
+				categoryId = categoryId == 0 ? notFeaturedCategoryIds.First() : categoryId;
+				//query = QueryCategories(query, notFeaturedCategoryIds, false);
+			}
+
+			var manufacturerIds = GetIdList(filters, "manufacturerid");
+			if (manufacturerIds.Any())
+			{
+				manufacturerId = manufacturerIds.First();
+				if (manufacturerIds.Count == 1 && manufacturerId == 0)
+				{
+					// Has no manufacturer.
+					//query = query.Where(x => x.ProductManufacturers.Count == 0);
+				}
+				else
+				{
+					//query = QueryManufacturers(query, manufacturerIds, null);
+				}
+			}
+
+			var featuredManuIds = GetIdList(filters, "featuredmanufacturerid");
+			var notFeaturedManuIds = GetIdList(filters, "notfeaturedmanufacturerid");
+			if (featuredManuIds.Any())
+			{
+				manufacturerId = manufacturerId == 0 ? featuredManuIds.First() : manufacturerId;
+				//query = QueryManufacturers(query, featuredManuIds, true);
+			}
+			if (notFeaturedManuIds.Any())
+			{
+				manufacturerId = manufacturerId == 0 ? notFeaturedManuIds.First() : manufacturerId;
+			//	query = QueryManufacturers(query, notFeaturedManuIds, false);
+			}
+
+			var tagIds = GetIdList(filters, "tagid");
+			//if (tagIds.Any())
+			//{
+			//	query =
+			//		from p in query
+			//		from pt in p.ProductTags.Where(pt => tagIds.Contains(pt.Id))
+			//		select p;
+			//}
+
+			if (!QuerySettings.IgnoreAcl)
+			{
+				var roleIds = GetIdList(filters, "roleid");
+				if (roleIds.Any())
+				{
+					query =
+						from p in query
+						join acl in _aclRepository.Table on new { pid = p.Id, pname = "Product" } equals new { pid = acl.EntityId, pname = acl.EntityName } into pacl
+						from acl in pacl.DefaultIfEmpty()
+						where !p.SubjectToAcl || roleIds.Contains(acl.CustomerRoleId)
+						select p;
+				}
+			}
+
+			var deliverTimeIds = GetIdList(filters, "deliveryid");
+			if (deliverTimeIds.Any())
+			{
+				query = query.Where(x => x.DeliveryTimeId != null && deliverTimeIds.Contains(x.DeliveryTimeId.Value));
+			}
+
+			var parentProductIds = GetIdList(filters, "parentid");
+			if (parentProductIds.Any())
+			{
+				query = query.Where(x => parentProductIds.Contains(x.ParentGroupedProductId));
+			}
+
+			foreach (IAttributeSearchFilter filter in filters)
+			{
+				var rangeFilter = filter as IRangeSearchFilter;
+
+				if (filter.FieldName == "id")
+				{
+					if (rangeFilter != null)
+					{
+						var lower = filter.Term as int?;
+						var upper = rangeFilter.UpperTerm as int?;
+
+						if (lower.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => x.Id >= lower.Value);
+							else
+								query = query.Where(x => x.Id > lower.Value);
+						}
+
+						if (upper.HasValue)
+						{
+							if (rangeFilter.IncludesUpper)
+								query = query.Where(x => x.Id <= upper.Value);
+							else
+								query = query.Where(x => x.Id < upper.Value);
+						}
+					}
+				}
+				else if (filter.FieldName == "categoryid")
+				{
+					if (rangeFilter != null && 1 == ((filter.Term as int?) ?? 0) && int.MaxValue == ((rangeFilter.UpperTerm as int?) ?? 0))
+					{
+						// Has any category.
+						//query = query.Where(x => x.ProductCategories.Count > 0);
+					}
+				}
+				else if (filter.FieldName == "manufacturerid")
+				{
+					if (rangeFilter != null && 1 == ((filter.Term as int?) ?? 0) && int.MaxValue == ((rangeFilter.UpperTerm as int?) ?? 0))
+					{
+						// Has any manufacturer.
+						//query = query.Where(x => x.ProductManufacturers.Count > 0);
+					}
+				}
+				else if (filter.FieldName == "published")
+				{
+					query = query.Where(x => x.Published == (bool)filter.Term);
+				}
+				else if (filter.FieldName == "availablestart")
+				{
+					if (rangeFilter != null)
+					{
+						var lower = filter.Term as DateTime?;
+						var upper = rangeFilter.UpperTerm as DateTime?;
+
+						if (lower.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => !x.AvailableStartDateTimeUtc.HasValue || x.AvailableStartDateTimeUtc >= lower.Value);
+							else
+								query = query.Where(x => !x.AvailableStartDateTimeUtc.HasValue || x.AvailableStartDateTimeUtc > lower.Value);
+						}
+
+						if (upper.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => !x.AvailableStartDateTimeUtc.HasValue || x.AvailableStartDateTimeUtc <= upper.Value);
+							else
+								query = query.Where(x => !x.AvailableStartDateTimeUtc.HasValue || x.AvailableStartDateTimeUtc < upper.Value);
+						}
+					}
+				}
+				else if (filter.FieldName == "availableend")
+				{
+					if (rangeFilter != null)
+					{
+						var lower = filter.Term as DateTime?;
+						var upper = rangeFilter.UpperTerm as DateTime?;
+
+						if (lower.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => !x.AvailableEndDateTimeUtc.HasValue || x.AvailableEndDateTimeUtc >= lower.Value);
+							else
+								query = query.Where(x => !x.AvailableEndDateTimeUtc.HasValue || x.AvailableEndDateTimeUtc > lower.Value);
+						}
+
+						if (upper.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => !x.AvailableEndDateTimeUtc.HasValue || x.AvailableEndDateTimeUtc <= upper.Value);
+							else
+								query = query.Where(x => !x.AvailableEndDateTimeUtc.HasValue || x.AvailableEndDateTimeUtc < upper.Value);
+						}
+					}
+				}
+				else if (filter.FieldName == "visibleindividually")
+				{
+					query = query.Where(x => x.VisibleIndividually == (bool)filter.Term);
+				}
+				else if (filter.FieldName == "showonhomepage")
+				{
+					query = query.Where(p => p.ShowOnHomePage == (bool)filter.Term);
+				}
+				else if (filter.FieldName == "typeid")
+				{
+					query = query.Where(x => x.ProductTypeId == (int)filter.Term);
+				}
+				else if (filter.FieldName == "stockquantity")
+				{
+					if (rangeFilter != null)
+					{
+						var lower = filter.Term as int?;
+						var upper = rangeFilter.UpperTerm as int?;
+
+						if (lower.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => x.StockQuantity >= lower.Value);
+							else
+								query = query.Where(x => x.StockQuantity > lower.Value);
+						}
+
+						if (upper.HasValue)
+						{
+							if (rangeFilter.IncludesUpper)
+								query = query.Where(x => x.StockQuantity <= upper.Value);
+							else
+								query = query.Where(x => x.StockQuantity < upper.Value);
+						}
+					}
+				}
+				else if (filter.FieldName == "rating")
+				{
+					query = query.Where(x => x.ApprovedTotalReviews != 0 && ((double)x.ApprovedRatingSum / (double)x.ApprovedTotalReviews) >= (double)filter.Term);
+				}
+				else if (filter.FieldName == "available")
+				{
+					// We cannot include ManageInventoryMethod.ManageStockByAttributes because it's only functional with MergeWithCombination.
+					var manageStock = (int)ManageInventoryMethod.ManageStock;
+
+					query = query.Where(x =>
+						x.ManageInventoryMethodId != manageStock ||
+						(x.ManageInventoryMethodId == manageStock && (x.StockQuantity > 0 || x.BackorderModeId != (int)BackorderMode.NoBackorders))
+					);
+				}
+				else if (filter.FieldName.StartsWith("price"))
+				{
+					if (rangeFilter != null)
+					{
+						var lower = filter.Term as double?;
+						var upper = rangeFilter.UpperTerm as double?;
+
+						if (lower.HasValue)
+						{
+							var minPrice = Convert.ToDecimal(lower.Value);
+
+							query = query.Where(x =>
+								((x.SpecialPrice.HasValue &&
+								((!x.SpecialPriceStartDateTimeUtc.HasValue || x.SpecialPriceStartDateTimeUtc.Value < utcNow) &&
+								(!x.SpecialPriceEndDateTimeUtc.HasValue || x.SpecialPriceEndDateTimeUtc.Value > utcNow))) &&
+								(x.SpecialPrice >= minPrice))
+								||
+								((!x.SpecialPrice.HasValue ||
+								((x.SpecialPriceStartDateTimeUtc.HasValue && x.SpecialPriceStartDateTimeUtc.Value > utcNow) ||
+								(x.SpecialPriceEndDateTimeUtc.HasValue && x.SpecialPriceEndDateTimeUtc.Value < utcNow))) &&
+								(x.Price >= minPrice))
+							);
+						}
+
+						if (upper.HasValue)
+						{
+							var maxPrice = Convert.ToDecimal(upper);
+
+							query = query.Where(x =>
+								((x.SpecialPrice.HasValue &&
+								((!x.SpecialPriceStartDateTimeUtc.HasValue || x.SpecialPriceStartDateTimeUtc.Value < utcNow) &&
+								(!x.SpecialPriceEndDateTimeUtc.HasValue || x.SpecialPriceEndDateTimeUtc.Value > utcNow))) &&
+								(x.SpecialPrice <= maxPrice))
+								||
+								((!x.SpecialPrice.HasValue ||
+								((x.SpecialPriceStartDateTimeUtc.HasValue && x.SpecialPriceStartDateTimeUtc.Value > utcNow) ||
+								(x.SpecialPriceEndDateTimeUtc.HasValue && x.SpecialPriceEndDateTimeUtc.Value < utcNow))) &&
+								(x.Price <= maxPrice))
+							);
+						}
+					}
+				}
+				else if (filter.FieldName == "createdon")
+				{
+					if (rangeFilter != null)
+					{
+						var lower = filter.Term as DateTime?;
+						var upper = rangeFilter.UpperTerm as DateTime?;
+
+						if (lower.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => x.CreatedOnUtc >= lower.Value);
+							else
+								query = query.Where(x => x.CreatedOnUtc > lower.Value);
+						}
+
+						if (upper.HasValue)
+						{
+							if (rangeFilter.IncludesLower)
+								query = query.Where(x => x.CreatedOnUtc <= upper.Value);
+							else
+								query = query.Where(x => x.CreatedOnUtc < upper.Value);
+						}
+					}
+				}
+				else if (filter.FieldName == "storeid")
+				{
+					if (!QuerySettings.IgnoreMultiStore)
+					{
+						var storeId = (int)filter.Term;
+						if (storeId != 0)
+						{
+							query =
+								from p in query
+								join sm in _storeMappingRepository.Table on new { pid = p.Id, pname = "Product" } equals new { pid = sm.EntityId, pname = sm.EntityName } into psm
+								from sm in psm.DefaultIfEmpty()
+								where !p.LimitedToStores || sm.StoreId == storeId
+								select p;
+						}
+					}
+				}
+			}
+
+			#endregion
+
+			// Grouping is very slow if there are many products.
+			query =
+				from p in query
+				group p by p.Id into grp
+				orderby grp.Key
+				select grp.FirstOrDefault();
+
+			#region Sorting
+
+			foreach (var sort in searchQuery.Sorting)
+			{
+				if (sort.FieldName.IsEmpty())
+				{
+					// Sort by relevance.
+					if (categoryId != 0)
+					{
+					//	query = OrderBy(ref ordered, query, x => x.ProductCategories.Where(pc => pc.CategoryId == categoryId).FirstOrDefault().DisplayOrder);
+					}
+					else if (manufacturerId != 0)
+					{
+						//query = OrderBy(ref ordered, query, x => x.ProductManufacturers.Where(pm => pm.ManufacturerId == manufacturerId).FirstOrDefault().DisplayOrder);
+					}
+					else if (FindFilter(searchQuery.Filters, "parentid") != null)
+					{
+						query = OrderBy(ref ordered, query, x => x.DisplayOrder);
+					}
+					else
+					{
+						query = OrderBy(ref ordered, query, x => x.Name);
+					}
+				}
+				else if (sort.FieldName == "createdon")
+				{
+					query = OrderBy(ref ordered, query, x => x.CreatedOnUtc, sort.Descending);
+				}
+				else if (sort.FieldName == "name")
+				{
+					query = OrderBy(ref ordered, query, x => x.Name, sort.Descending);
+				}
+				else if (sort.FieldName == "price")
+				{
+					query = OrderBy(ref ordered, query, x => x.Price, sort.Descending);
+				}
+				else
+				{
+					query = OrderBy(ref ordered, query, x => x.Name);
+				}
+			}
+
+			if (!ordered)
+			{
+				if (FindFilter(searchQuery.Filters, "parentid") != null)
+				{
+					query = query.OrderBy(x => x.DisplayOrder);
+				}
+				else
+				{
+					query = query.OrderBy(x => x.Id);
+				}
+			}
+
+			#endregion
+
+			return query;
+		}
+
 		protected virtual IDictionary<string, FacetGroup> GetFacets(CatalogSearchQuery searchQuery, int totalHits)
 		{
 			var result = new Dictionary<string, FacetGroup>();
@@ -792,5 +1250,10 @@ namespace SmartStore.Services.Search
 		{
 			return GetProductQuery(searchQuery, baseQuery);
 		}
+		public IQueryable<DeclarationProduct> PrepareDeclarationQuery(CatalogSearchQuery searchQuery, IQueryable<DeclarationProduct> baseQuery = null)
+		{
+			return GetDeclarationProductQuery(searchQuery, baseQuery);
+		}
+		
 	}
 }

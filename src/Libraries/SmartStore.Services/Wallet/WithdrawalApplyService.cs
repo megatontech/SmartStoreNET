@@ -62,8 +62,8 @@ namespace SmartStore.Services.Wallet
                 CustomerID = customer.CustomerGuid,
                 IsCount = false,
                 isOut = false,
-                PointGetType = -1,
-                PointUseType = 1,
+                PointGetType = PointGetType.Withdraw,
+                PointUseType = PointUseType.Shop,
                 UpdateTime = DateTime.Now
             }) ;
             _IWithdrawalDetailService.Add(new WithdrawalDetail()
@@ -136,8 +136,8 @@ namespace SmartStore.Services.Wallet
                 CustomerID = customer.CustomerGuid,
                 IsCount = false,
                 isOut = false,
-                PointGetType = -1,
-                PointUseType = 1,
+                PointGetType = PointGetType.Withdraw,
+                PointUseType = PointUseType.Shop,
                 UpdateTime = DateTime.Now
             });
             _IWithdrawalDetailService.Add(new WithdrawalDetail()
@@ -181,9 +181,9 @@ namespace SmartStore.Services.Wallet
                 Operater = customer.Id,
                 OperaterID = customer.CustomerGuid,
                 UpdateTime = DateTime.Now,
-                WithdrawStatus = 1,
+                WithdrawStatus = WithdrawalApplyStatus.Pending,
                 WithdrawTime = DateTime.Now,
-                WithdrawType = 1
+                WithdrawType = WithdrawalApplyType.Cash
 
             }) ;
             

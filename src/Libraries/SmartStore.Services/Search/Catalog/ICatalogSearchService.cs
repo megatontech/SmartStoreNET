@@ -22,5 +22,6 @@ namespace SmartStore.Services.Search
 		/// <param name="baseQuery">Optional query used to build the product query.</param>
 		/// <returns>Product queryable</returns>
 		IQueryable<Product> PrepareQuery(CatalogSearchQuery searchQuery, IQueryable<Product> baseQuery = null);
+		IQueryable<DeclarationProduct> PrepareDeclarationQuery(CatalogSearchQuery searchQuery, IQueryable<DeclarationProduct> baseQuery = null);
 	}
 }

@@ -53,13 +53,13 @@ namespace SmartStore.Core.Domain.Wallet
         /// 积分使用类型
         /// </summary>
         [DataMember]
-        public int PointGetType { get; set; }
+        public PointGetType PointGetType { get; set; }
 
         /// <summary>
         /// 积分获取类型
         /// </summary>
         [DataMember]
-        public int PointUseType { get; set; }
+        public PointUseType PointUseType { get; set; }
 
         /// <summary>
         /// 最后更新时间

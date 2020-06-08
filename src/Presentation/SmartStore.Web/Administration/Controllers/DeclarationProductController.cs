@@ -203,7 +203,7 @@ namespace SmartStore.Admin.Controllers
             _seoSettings = seoSettings;
             _mediaSettings = mediaSettings;
             _searchSettings = searchSettings;
-            //Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+            //Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, DeclarationProduct>());
         }
 
         #endregion Constructors
@@ -211,7 +211,7 @@ namespace SmartStore.Admin.Controllers
         #region Update[...]
 
         [NonAction]
-        protected void UpdateProductBundleItems(Product product, ProductModel model)
+        protected void UpdateProductBundleItems(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -229,7 +229,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        protected void UpdateProductDownloads(Product product, ProductModel model)
+        protected void UpdateProductDownloads(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -268,7 +268,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        protected void UpdateProductGeneralInfo(Product product, ProductModel model)
+        protected void UpdateProductGeneralInfo(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -324,7 +324,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        protected void UpdateProductInventory(Product product, ProductModel model)
+        protected void UpdateProductInventory(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -355,17 +355,17 @@ namespace SmartStore.Admin.Controllers
                 !p.Deleted &&
                 !p.IsSystemProduct)
             {
-                _backInStockSubscriptionService.SendNotificationsToSubscribers(p);
+                //_backInStockSubscriptionService.SendNotificationsToSubscribers(p);
             }
 
             if (p.StockQuantity != prevStockQuantity && p.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
             {
-                _productService.AdjustInventory(p.convertProduct(), true, 0, string.Empty);
+                _productService.AdjustInventory(p, true, 0, string.Empty);
             }
         }
 
         [NonAction]
-        protected void UpdateProductPictures(Product product, ProductModel model)
+        protected void UpdateProductPictures(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -382,7 +382,7 @@ namespace SmartStore.Admin.Controllers
         //    }
         //}
         [NonAction]
-        protected void UpdateProductPrice(Product product, ProductModel model)
+        protected void UpdateProductPrice(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -418,7 +418,7 @@ namespace SmartStore.Admin.Controllers
         //            productTag = productTag2;
         //        }
         [NonAction]
-        protected void UpdateProductSeo(Product product, ProductModel model)
+        protected void UpdateProductSeo(DeclarationProduct product, DeclarationProductModel model)
         {
             var p = product;
             var m = model;
@@ -437,17 +437,17 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        private Product convertDeclaration(DeclarationProduct dproduct)
-        {
-            Product dto = Mapper.Map<Product>(dproduct);
-            return dto;
-        }
-
-        private DeclarationProduct convertDeclaration(Product dproduct)
+        private DeclarationProduct convertDeclaration(DeclarationProduct dproduct)
         {
             DeclarationProduct dto = Mapper.Map<DeclarationProduct>(dproduct);
             return dto;
         }
+
+        //private Product convertDeclaration(DeclarationProduct dproduct)
+        //{
+        //    Product dto = Mapper.Map<DeclarationProduct>(dproduct);
+        //    return dto;
+        //}
 
         //[NonAction]
         //protected void UpdateProductTags(DeclarationProduct product, params string[] rawProductTags)
@@ -498,7 +498,7 @@ namespace SmartStore.Admin.Controllers
         //    }
 
         [NonAction]
-        private void UpdateDataOfExistingProduct(Product product, ProductModel model, bool editMode)
+        private void UpdateDataOfExistingProduct(DeclarationProduct product, DeclarationProductModel model, bool editMode)
         {
             var p = product;
             var m = model;
@@ -521,7 +521,7 @@ namespace SmartStore.Admin.Controllers
             if (editMode)
             {
                 // we need the event to be fired
-                _productService.UpdateProduct(p.convertProduct());
+                _productService.UpdateProduct(p);
             }
 
             foreach (var localized in model.Locales)
@@ -559,7 +559,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        private void UpdateLocales(ProductVariantAttributeValue pvav, ProductModel.ProductVariantAttributeValueModel model)
+        private void UpdateLocales(ProductVariantAttributeValue pvav, DeclarationProductModel.ProductVariantAttributeValueModel model)
         {
             foreach (var localized in model.Locales)
             {
@@ -569,7 +569,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        private void UpdatePictureSeoNames(Product product)
+        private void UpdatePictureSeoNames(DeclarationProduct product)
         {
             foreach (var pp in product.ProductPictures)
             {
@@ -582,7 +582,7 @@ namespace SmartStore.Admin.Controllers
         #region Utitilies
 
         [NonAction]
-        protected void PrepareProductModel(ProductModel model, Product product, bool setPredefinedValues, bool excludeProperties)
+        protected void PrepareProductModel(DeclarationProductModel model, DeclarationProduct product, bool setPredefinedValues, bool excludeProperties)
         {
             Guard.NotNull(model, nameof(model));
 
@@ -615,7 +615,7 @@ namespace SmartStore.Admin.Controllers
 
                 if (model.ProductUrl.IsEmpty())
                 {
-                    model.ProductUrl = Url.RouteUrl("Product", new { SeName = product.GetSeName() }, Request.Url.Scheme);
+                    model.ProductUrl = Url.RouteUrl("DeclarationProduct", new { SeName = product.GetSeName() }, Request.Url.Scheme);
                 }
 
                 // downloads
@@ -663,10 +663,10 @@ namespace SmartStore.Admin.Controllers
                 });
             }
 
-            // Product tags
+            // DeclarationProduct tags
             if (product != null)
             {
-                model.ProductTags = product.ProductTags.Select(x => x.Name).ToArray();
+                //model.ProductTags = product.ProductTags.Select(x => x.Name).ToArray();
             }
 
             var allTags = _productTagService.GetAllProductTagNames();
@@ -766,7 +766,7 @@ namespace SmartStore.Admin.Controllers
             model.AvailableDiscounts = discounts.ToList();
             if (product != null && !excludeProperties)
             {
-                model.SelectedDiscountIds = product.AppliedDiscounts.Select(d => d.Id).ToArray();
+                //model.SelectedDiscountIds = product.AppliedDiscounts.Select(d => d.Id).ToArray();
             }
 
             var inventoryMethods = ((ManageInventoryMethod[])Enum.GetValues(typeof(ManageInventoryMethod))).Where(
@@ -813,7 +813,7 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        private IQueryable<Product> ApplySorting(IQueryable<Product> query, GridCommand command)
+        private IQueryable<DeclarationProduct> ApplySorting(IQueryable<DeclarationProduct> query, GridCommand command)
         {
             if (command.SortDescriptors != null && command.SortDescriptors.Count > 0)
             {
@@ -902,7 +902,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        private void PrepareAclModel(ProductModel model, Product product, bool excludeProperties)
+        private void PrepareAclModel(DeclarationProductModel model, DeclarationProduct product, bool excludeProperties)
         {
             Guard.NotNull(model, nameof(model));
 
@@ -922,7 +922,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        private void PrepareProductPictureThumbnailModel(ProductModel model, Product product, PictureInfo defaultPicture)
+        private void PrepareProductPictureThumbnailModel(DeclarationProductModel model, DeclarationProduct product, PictureInfo defaultPicture)
         {
             Guard.NotNull(model, nameof(model));
 
@@ -931,7 +931,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        private void PrepareStoresMappingModel(ProductModel model, Product product, bool excludeProperties)
+        private void PrepareStoresMappingModel(DeclarationProductModel model, DeclarationProduct product, bool excludeProperties)
         {
             Guard.NotNull(model, nameof(model));
 
@@ -969,10 +969,10 @@ namespace SmartStore.Admin.Controllers
 
         #endregion Misc
 
-        #region Product list / create / edit / delete
+        #region DeclarationProduct list / create / edit / delete
 
         [HttpPost]
-        public ActionResult CopyProduct(ProductModel model)
+        public ActionResult CopyProduct(DeclarationProductModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
@@ -980,13 +980,13 @@ namespace SmartStore.Admin.Controllers
             var copyModel = model.CopyProductModel;
             try
             {
-                Product newProduct = null;
+                DeclarationProduct newProduct = null;
                 var product = _productService.GetProductById(copyModel.Id);
 
                 for (var i = 1; i <= copyModel.NumberOfCopies; ++i)
                 {
                     var newName = copyModel.NumberOfCopies > 1 ? $"{copyModel.Name} {i}" : copyModel.Name;
-                    newProduct = _copyProductService.CopyProduct((product).convertProduct(), newName, copyModel.Published, copyModel.CopyImages);
+                    //newProduct = _copyProductService.CopyProduct((product), newName, copyModel.Published, copyModel.CopyImages);
                 }
 
                 if (newProduct != null)
@@ -1011,12 +1011,12 @@ namespace SmartStore.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
 
-            var model = new ProductModel();
+            var model = new DeclarationProductModel();
             model.IsTaxExempt = true;
             PrepareProductModel(model, null, true, true);
 
             //product
-            AddLocales(_languageService, model.Locales);
+            //AddLocales(_languageService, model.Locales);
             PrepareAclModel(model, null, false);
             PrepareStoresMappingModel(model, null, false);
 
@@ -1025,7 +1025,7 @@ namespace SmartStore.Admin.Controllers
 
         [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
         [ValidateInput(false)]
-        public ActionResult Create(ProductModel model, bool continueEditing, FormCollection form)
+        public ActionResult Create(DeclarationProductModel model, bool continueEditing, FormCollection form)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
@@ -1044,7 +1044,7 @@ namespace SmartStore.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var product = new Product();
+                var product = new DeclarationProduct();
 
                 MapModelToProduct(model, product, form);
 
@@ -1062,9 +1062,9 @@ namespace SmartStore.Admin.Controllers
                 {
                     product.BundleTitleText = _localizationService.GetResource("Products.Bundle.BundleIncludes");
                 }
-                //Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+                //Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, DeclarationProduct>());
                 //DeclarationProduct dto = Mapper.Map<DeclarationProduct>(product);
-                _productService.InsertProduct(product.convertProduct());
+                _productService.InsertProduct(product);
 
                 UpdateDataOfExistingProduct(product, model, false);
 
@@ -1156,7 +1156,7 @@ namespace SmartStore.Admin.Controllers
 
             var model = product.ToModel();
             model.IsTaxExempt = true;
-            PrepareProductModel(model, product.convertProduct(), false, false);
+            PrepareProductModel(model, product, false, false);
 
             AddLocales(_languageService, model.Locales, (locale, languageId) =>
             {
@@ -1170,16 +1170,16 @@ namespace SmartStore.Admin.Controllers
                 locale.BundleTitleText = product.GetLocalized(x => x.BundleTitleText, languageId, false, false);
             });
 
-            PrepareProductPictureThumbnailModel(model, product.convertProduct(), _pictureService.GetPictureInfo(product.MainPictureId));
-            PrepareAclModel(model, product.convertProduct(), false);
-            PrepareStoresMappingModel(model, product.convertProduct(), false);
+            PrepareProductPictureThumbnailModel(model, product, _pictureService.GetPictureInfo(product.MainPictureId));
+            PrepareAclModel(model, product, false);
+            PrepareStoresMappingModel(model, product, false);
 
             return View(model);
         }
 
         [HttpPost, ParameterBasedOnFormName("save-continue", "continueEditing")]
         [ValidateInput(false)]
-        public ActionResult Edit(ProductModel model, bool continueEditing, FormCollection form)
+        public ActionResult Edit(DeclarationProductModel model, bool continueEditing, FormCollection form)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1213,8 +1213,8 @@ namespace SmartStore.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                MapModelToProduct(model, product.convertProduct(), form);
-                UpdateDataOfExistingProduct(product.convertProduct(), model, true);
+                MapModelToProduct(model, product, form);
+                UpdateDataOfExistingProduct(product, model, true);
 
                 // activity log
                 _customerActivityService.InsertActivity("EditProduct", _localizationService.GetResource("ActivityLog.EditProduct"), product.Name);
@@ -1224,13 +1224,13 @@ namespace SmartStore.Admin.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            PrepareProductModel(model, product.convertProduct(), false, true);
+            PrepareProductModel(model, product, false, true);
 
-            PrepareProductPictureThumbnailModel(model, product.convertProduct(), _pictureService.GetPictureInfo(product.MainPictureId));
+            PrepareProductPictureThumbnailModel(model, product, _pictureService.GetPictureInfo(product.MainPictureId));
 
-            PrepareAclModel(model, product.convertProduct(), true);
+            PrepareAclModel(model, product, true);
 
-            PrepareStoresMappingModel(model, product.convertProduct(), true);
+            PrepareStoresMappingModel(model, product, true);
 
             return View(model);
         }
@@ -1293,7 +1293,7 @@ namespace SmartStore.Admin.Controllers
 
                 var model = product.ToModel();
 
-                PrepareProductModel(model, product.convertProduct(), false, false);
+                PrepareProductModel(model, product, false, false);
 
                 AddLocales(_languageService, model.Locales, (locale, languageId) =>
                 {
@@ -1307,11 +1307,11 @@ namespace SmartStore.Admin.Controllers
                     locale.BundleTitleText = product.GetLocalized(x => x.BundleTitleText, languageId, false, false);
                 });
 
-                PrepareProductPictureThumbnailModel(model, product.convertProduct(), _pictureService.GetPictureInfo(product.MainPictureId));
+                PrepareProductPictureThumbnailModel(model, product, _pictureService.GetPictureInfo(product.MainPictureId));
 
-                PrepareAclModel(model, product.convertProduct(), false);
+                PrepareAclModel(model, product, false);
 
-                PrepareStoresMappingModel(model, product.convertProduct(), false);
+                PrepareStoresMappingModel(model, product, false);
 
                 return PartialView(viewPath.NullEmpty() ?? "_CreateOrUpdate." + tabName, model);
             }
@@ -1324,11 +1324,11 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult ProductList(GridCommand command, ProductListModel model)
         {
-            var gridModel = new GridModel<ProductModel>();
+            var gridModel = new GridModel<DeclarationProductModel>();
 
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
-                gridModel.Data = Enumerable.Empty<ProductModel>();
+                gridModel.Data = Enumerable.Empty<DeclarationProductModel>();
                 NotifyAccessDenied();
             }
             else
@@ -1362,15 +1362,15 @@ namespace SmartStore.Admin.Controllers
                 else if (model.SearchCategoryId != 0)
                     searchQuery = searchQuery.WithCategoryIds(null, model.SearchCategoryId);
 
-                var query = _catalogSearchService.PrepareQuery(searchQuery);
-                query = ApplySorting(query, command);
+                var query = _catalogSearchService.PrepareDeclarationQuery(searchQuery);
+                //query = ApplySorting(query, command);
 
-                var products = new PagedList<Product>(query, command.Page - 1, command.PageSize);
-                var pictureInfos = _pictureService.GetPictureInfos(products);
+                var products = new PagedList<DeclarationProduct>(query, command.Page - 1, command.PageSize);
+               var pictureInfos = _pictureService.GetPictureInfos(products.Select(x=>x.Id).ToArray());
                 //_mediaSettings.CartThumbPictureSize
                 gridModel.Data = products.Select(x =>
                 {
-                    var productModel = new ProductModel
+                    var productModel = new DeclarationProductModel
                     {
                         Sku = x.Sku,
                         Published = x.Published,
@@ -1403,9 +1403,9 @@ namespace SmartStore.Admin.Controllers
         }
 
         [NonAction]
-        protected void MapModelToProduct(ProductModel model, Product product, FormCollection form)
+        protected void MapModelToProduct(DeclarationProductModel model, DeclarationProduct product, FormCollection form)
         {
-            //Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, Product>());
+            //Mapper.Initialize(cfg => cfg.CreateMap<DeclarationProduct, DeclarationProduct>());
             //DeclarationProduct dproduct = Mapper.Map<DeclarationProduct>(product);
             if (model.LoadedTabs == null || model.LoadedTabs.Length == 0)
             {
@@ -1433,7 +1433,7 @@ namespace SmartStore.Admin.Controllers
                         break;
 
                     case "discounts":
-                        //UpdateProductDiscounts((product.convertProduct()), model);
+                        //UpdateProductDiscounts((product), model);
                         break;
 
                     case "downloads":
@@ -1461,9 +1461,9 @@ namespace SmartStore.Admin.Controllers
             _eventPublisher.Publish(new ModelBoundEvent(model, product, form));
         }
 
-        #endregion Product list / create / edit / delete
+        #endregion DeclarationProduct list / create / edit / delete
 
-        #region Product categories
+        #region DeclarationProduct categories
 
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductCategoryDelete(int id, GridCommand command)
@@ -1480,7 +1480,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductCategoryInsert(GridCommand command, ProductModel.ProductCategoryModel model)
+        public ActionResult ProductCategoryInsert(GridCommand command, DeclarationProductModel.ProductCategoryModel model)
         {
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1508,7 +1508,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult ProductCategoryList(GridCommand command, int productId)
         {
-            var model = new GridModel<ProductModel.ProductCategoryModel>();
+            var model = new GridModel<DeclarationProductModel.ProductCategoryModel>();
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1517,7 +1517,7 @@ namespace SmartStore.Admin.Controllers
                     .Select(x =>
                     {
                         var node = _categoryService.GetCategoryTree(x.CategoryId, true);
-                        return new ProductModel.ProductCategoryModel
+                        return new DeclarationProductModel.ProductCategoryModel
                         {
                             Id = x.Id,
                             Category = node != null ? _categoryService.GetCategoryPath(node, aliasPattern: "<span class='badge badge-secondary'>{0}</span>") : string.Empty,
@@ -1534,7 +1534,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                model.Data = Enumerable.Empty<ProductModel.ProductCategoryModel>();
+                model.Data = Enumerable.Empty<DeclarationProductModel.ProductCategoryModel>();
 
                 NotifyAccessDenied();
             }
@@ -1546,7 +1546,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductCategoryUpdate(GridCommand command, ProductModel.ProductCategoryModel model)
+        public ActionResult ProductCategoryUpdate(GridCommand command, DeclarationProductModel.ProductCategoryModel model)
         {
             var productCategory = _categoryService.GetProductCategoryById(model.Id);
 
@@ -1574,9 +1574,9 @@ namespace SmartStore.Admin.Controllers
             return ProductCategoryList(command, productCategory.ProductId);
         }
 
-        #endregion Product categories
+        #endregion DeclarationProduct categories
 
-        #region Product manufacturers
+        #region DeclarationProduct manufacturers
 
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductManufacturerDelete(int id, GridCommand command)
@@ -1593,7 +1593,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductManufacturerInsert(GridCommand command, ProductModel.ProductManufacturerModel model)
+        public ActionResult ProductManufacturerInsert(GridCommand command, DeclarationProductModel.ProductManufacturerModel model)
         {
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1621,7 +1621,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult ProductManufacturerList(GridCommand command, int productId)
         {
-            var model = new GridModel<ProductModel.ProductManufacturerModel>();
+            var model = new GridModel<DeclarationProductModel.ProductManufacturerModel>();
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1629,7 +1629,7 @@ namespace SmartStore.Admin.Controllers
                 var productManufacturersModel = productManufacturers
                     .Select(x =>
                     {
-                        return new ProductModel.ProductManufacturerModel
+                        return new DeclarationProductModel.ProductManufacturerModel
                         {
                             Id = x.Id,
                             Manufacturer = _manufacturerService.GetManufacturerById(x.ManufacturerId).Name,
@@ -1646,7 +1646,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                model.Data = Enumerable.Empty<ProductModel.ProductManufacturerModel>();
+                model.Data = Enumerable.Empty<DeclarationProductModel.ProductManufacturerModel>();
 
                 NotifyAccessDenied();
             }
@@ -1658,7 +1658,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductManufacturerUpdate(GridCommand command, ProductModel.ProductManufacturerModel model)
+        public ActionResult ProductManufacturerUpdate(GridCommand command, DeclarationProductModel.ProductManufacturerModel model)
         {
             var productManufacturer = _manufacturerService.GetProductManufacturerById(model.Id);
 
@@ -1687,9 +1687,9 @@ namespace SmartStore.Admin.Controllers
             return ProductManufacturerList(command, productManufacturer.ProductId);
         }
 
-        #endregion Product manufacturers
+        #endregion DeclarationProduct manufacturers
 
-        #region Product pictures
+        #region DeclarationProduct pictures
 
         public ActionResult ProductPictureAdd(int pictureId, int displayOrder, int productId)
         {
@@ -1716,7 +1716,7 @@ namespace SmartStore.Admin.Controllers
 
             _pictureService.SetSeoFilename(pictureId, _pictureService.GetPictureSeName(product.Name));
 
-            return Json(new { Result = true, message = T("Admin.Product.Picture.Added").JsText.ToString() }, JsonRequestBehavior.AllowGet);
+            return Json(new { Result = true, message = T("Admin.DeclarationProduct.Picture.Added").JsText.ToString() }, JsonRequestBehavior.AllowGet);
         }
 
         [GridAction(EnableCustomBinding = true)]
@@ -1743,7 +1743,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult ProductPictureList(GridCommand command, int productId)
         {
-            var model = new GridModel<ProductModel.ProductPictureModel>();
+            var model = new GridModel<DeclarationProductModel.ProductPictureModel>();
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1752,7 +1752,7 @@ namespace SmartStore.Admin.Controllers
                 var productPicturesModel = productPictures
                     .Select(x =>
                     {
-                        var pictureModel = new ProductModel.ProductPictureModel
+                        var pictureModel = new DeclarationProductModel.ProductPictureModel
                         {
                             Id = x.Id,
                             ProductId = x.ProductId,
@@ -1779,7 +1779,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                model.Data = Enumerable.Empty<ProductModel.ProductPictureModel>();
+                model.Data = Enumerable.Empty<DeclarationProductModel.ProductPictureModel>();
 
                 NotifyAccessDenied();
             }
@@ -1791,7 +1791,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductPictureUpdate(ProductModel.ProductPictureModel model, GridCommand command)
+        public ActionResult ProductPictureUpdate(DeclarationProductModel.ProductPictureModel model, GridCommand command)
         {
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -1807,9 +1807,9 @@ namespace SmartStore.Admin.Controllers
             return ProductPictureList(command, model.ProductId);
         }
 
-        #endregion Product pictures
+        #endregion DeclarationProduct pictures
 
-        #region Product specification attributes
+        #region DeclarationProduct specification attributes
 
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductSpecAttrDelete(int psaId, GridCommand command)
@@ -1944,9 +1944,9 @@ namespace SmartStore.Admin.Controllers
             return Json(new { success = success, message = message });
         }
 
-        #endregion Product specification attributes
+        #endregion DeclarationProduct specification attributes
 
-        #region Product tags
+        #region DeclarationProduct tags
 
         //edit
         public ActionResult EditProductTag(int id)
@@ -2059,7 +2059,7 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-        #endregion Product tags
+        #endregion DeclarationProduct tags
 
         #region Low stock reports
 
@@ -2141,7 +2141,7 @@ namespace SmartStore.Admin.Controllers
                                 !product.Deleted &&
                                 !product.IsSystemProduct)
                             {
-                                _backInStockSubscriptionService.SendNotificationsToSubscribers((product).convertProduct());
+                               // _backInStockSubscriptionService.SendNotificationsToSubscribers((product));
                             }
 
                             if (product.StockQuantity != prevStockQuantity && product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
@@ -2194,10 +2194,10 @@ namespace SmartStore.Admin.Controllers
                 if (model.SearchCategoryId != 0)
                     searchQuery = searchQuery.WithCategoryIds(null, model.SearchCategoryId);
 
-                var query = _catalogSearchService.PrepareQuery(searchQuery);
+                var query = _catalogSearchService.PrepareDeclarationQuery(searchQuery);
                 query = ApplySorting(query, command);
 
-                var products = new PagedList<Product>(query, command.Page - 1, command.PageSize);
+                var products = new PagedList<DeclarationProduct>(query, command.Page - 1, command.PageSize);
 
                 gridModel.Data = products.Select(x =>
                 {
@@ -2257,7 +2257,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult TierPriceInsert(GridCommand command, ProductModel.TierPriceModel model)
+        public ActionResult TierPriceInsert(GridCommand command, DeclarationProductModel.TierPriceModel model)
         {
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -2287,7 +2287,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult TierPriceList(GridCommand command, int productId)
         {
-            var model = new GridModel<ProductModel.TierPriceModel>();
+            var model = new GridModel<DeclarationProductModel.TierPriceModel>();
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -2305,7 +2305,7 @@ namespace SmartStore.Admin.Controllers
                     .ThenBy(x => x.CustomerRoleId)
                     .Select(x =>
                     {
-                        var tierPriceModel = new ProductModel.TierPriceModel
+                        var tierPriceModel = new DeclarationProductModel.TierPriceModel
                         {
                             Id = x.Id,
                             StoreId = x.StoreId,
@@ -2319,15 +2319,15 @@ namespace SmartStore.Admin.Controllers
                         switch (x.CalculationMethod)
                         {
                             case TierPriceCalculationMethod.Fixed:
-                                tierPriceModel.CalculationMethod = T("Admin.Product.Price.Tierprices.Fixed").Text;
+                                tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Fixed").Text;
                                 break;
 
                             case TierPriceCalculationMethod.Adjustment:
-                                tierPriceModel.CalculationMethod = T("Admin.Product.Price.Tierprices.Adjustment").Text;
+                                tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Adjustment").Text;
                                 break;
 
                             case TierPriceCalculationMethod.Percental:
-                                tierPriceModel.CalculationMethod = T("Admin.Product.Price.Tierprices.Percental").Text;
+                                tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Percental").Text;
                                 break;
 
                             default:
@@ -2364,7 +2364,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                model.Data = Enumerable.Empty<ProductModel.TierPriceModel>();
+                model.Data = Enumerable.Empty<DeclarationProductModel.TierPriceModel>();
 
                 NotifyAccessDenied();
             }
@@ -2376,7 +2376,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult TierPriceUpdate(GridCommand command, ProductModel.TierPriceModel model)
+        public ActionResult TierPriceUpdate(GridCommand command, DeclarationProductModel.TierPriceModel model)
         {
             var tierPrice = _productService.GetTierPriceById(model.Id);
 
@@ -2397,7 +2397,7 @@ namespace SmartStore.Admin.Controllers
 
         #endregion Tier prices
 
-        #region Product variant attributes
+        #region DeclarationProduct variant attributes
 
         public ActionResult AllProductVariantAttributes(string label, int selectedId)
         {
@@ -2468,7 +2468,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductVariantAttributeInsert(GridCommand command, ProductModel.ProductVariantAttributeModel model)
+        public ActionResult ProductVariantAttributeInsert(GridCommand command, DeclarationProductModel.ProductVariantAttributeModel model)
         {
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -2502,7 +2502,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult ProductVariantAttributeList(GridCommand command, int productId)
         {
-            var model = new GridModel<ProductModel.ProductVariantAttributeModel>();
+            var model = new GridModel<DeclarationProductModel.ProductVariantAttributeModel>();
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -2510,7 +2510,7 @@ namespace SmartStore.Admin.Controllers
                 var productVariantAttributesModel = productVariantAttributes
                     .Select(x =>
                     {
-                        var pvaModel = new ProductModel.ProductVariantAttributeModel
+                        var pvaModel = new DeclarationProductModel.ProductVariantAttributeModel
                         {
                             Id = x.Id,
                             ProductId = x.ProductId,
@@ -2526,7 +2526,7 @@ namespace SmartStore.Admin.Controllers
                         if (x.ShouldHaveValues())
                         {
                             pvaModel.ValueCount = x.ProductVariantAttributeValues != null ? x.ProductVariantAttributeValues.Count : 0;
-                            pvaModel.ViewEditUrl = Url.Action("EditAttributeValues", "Product", new { productVariantAttributeId = x.Id });
+                            pvaModel.ViewEditUrl = Url.Action("EditAttributeValues", "DeclarationProduct", new { productVariantAttributeId = x.Id });
                             pvaModel.ViewEditText = T("Admin.Catalog.Products.ProductVariantAttributes.Attributes.Values.ViewLink", pvaModel.ValueCount);
 
                             if (x.ProductAttribute.ProductAttributeOptionsSets.Any())
@@ -2546,7 +2546,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                model.Data = Enumerable.Empty<ProductModel.ProductVariantAttributeModel>();
+                model.Data = Enumerable.Empty<DeclarationProductModel.ProductVariantAttributeModel>();
 
                 NotifyAccessDenied();
             }
@@ -2558,7 +2558,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductVariantAttributeUpdate(GridCommand command, ProductModel.ProductVariantAttributeModel model)
+        public ActionResult ProductVariantAttributeUpdate(GridCommand command, DeclarationProductModel.ProductVariantAttributeModel model)
         {
             var pva = _productAttributeService.GetProductVariantAttributeById(model.Id);
 
@@ -2589,9 +2589,9 @@ namespace SmartStore.Admin.Controllers
             return ProductVariantAttributeList(command, pva.ProductId);
         }
 
-        #endregion Product variant attributes
+        #endregion DeclarationProduct variant attributes
 
-        #region Product variant attribute values
+        #region DeclarationProduct variant attribute values
 
         public ActionResult EditAttributeValues(int productVariantAttributeId)
         {
@@ -2606,7 +2606,7 @@ namespace SmartStore.Admin.Controllers
             if (product == null)
                 throw new ArgumentException(T("Products.NotFound", pva.ProductId));
 
-            var model = new ProductModel.ProductVariantAttributeValueListModel
+            var model = new DeclarationProductModel.ProductVariantAttributeValueListModel
             {
                 ProductName = product.Name,
                 ProductId = pva.ProductId,
@@ -2626,7 +2626,7 @@ namespace SmartStore.Admin.Controllers
             if (pva == null)
                 throw new ArgumentException(T("Products.Variants.NotFound", productVariantAttributeId));
 
-            var model = new ProductModel.ProductVariantAttributeValueModel
+            var model = new DeclarationProductModel.ProductVariantAttributeValueModel
             {
                 ProductId = pva.ProductId,
                 ProductVariantAttributeId = productVariantAttributeId,
@@ -2660,11 +2660,11 @@ namespace SmartStore.Admin.Controllers
 
             var pvav = _productAttributeService.GetProductVariantAttributeValueById(id);
             if (pvav == null)
-                return RedirectToAction("List", "Product");
+                return RedirectToAction("List", "DeclarationProduct");
 
             var linkedProduct = _productService.GetProductById(pvav.LinkedProductId);
 
-            var model = new ProductModel.ProductVariantAttributeValueModel
+            var model = new DeclarationProductModel.ProductVariantAttributeValueModel
             {
                 ProductId = pvav.ProductVariantAttribute.ProductId,
                 ProductVariantAttributeId = pvav.ProductVariantAttributeId,
@@ -2706,7 +2706,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost, GridAction(EnableCustomBinding = true)]
         public ActionResult ProductAttributeValueList(int productVariantAttributeId, GridCommand command)
         {
-            var gridModel = new GridModel<ProductModel.ProductVariantAttributeValueModel>();
+            var gridModel = new GridModel<DeclarationProductModel.ProductVariantAttributeValueModel>();
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
@@ -2718,7 +2718,7 @@ namespace SmartStore.Admin.Controllers
                 {
                     var linkedProduct = _productService.GetProductById(x.LinkedProductId);
 
-                    var model = new ProductModel.ProductVariantAttributeValueModel
+                    var model = new DeclarationProductModel.ProductVariantAttributeValueModel
                     {
                         Id = x.Id,
                         ProductVariantAttributeId = x.ProductVariantAttributeId,
@@ -2757,7 +2757,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                gridModel.Data = Enumerable.Empty<ProductModel.ProductVariantAttributeValueModel>();
+                gridModel.Data = Enumerable.Empty<DeclarationProductModel.ProductVariantAttributeValueModel>();
 
                 NotifyAccessDenied();
             }
@@ -2768,9 +2768,9 @@ namespace SmartStore.Admin.Controllers
             };
         }
 
-        #endregion Product variant attribute values
+        #endregion DeclarationProduct variant attribute values
 
-        #region Product variant attribute combinations
+        #region DeclarationProduct variant attribute combinations
 
         public ActionResult AttributeCombinationCreatePopup(string btnId, string formId, int productId)
         {
@@ -2779,13 +2779,13 @@ namespace SmartStore.Admin.Controllers
 
             var product = _productService.GetProductById(productId);
             if (product == null)
-                return RedirectToAction("List", "Product");
+                return RedirectToAction("List", "DeclarationProduct");
 
             var model = new ProductVariantAttributeCombinationModel();
 
-            PrepareProductAttributeCombinationModel(model, null, (product).convertProduct());
-            PrepareVariantCombinationAttributes(model, (product).convertProduct());
-            PrepareVariantCombinationPictures(model, (product).convertProduct());
+            PrepareProductAttributeCombinationModel(model, null, (product));
+            PrepareVariantCombinationAttributes(model, (product));
+            PrepareVariantCombinationPictures(model, (product));
             PrepareDeliveryTimes(model);
             PrepareViewBag(btnId, formId, false, false);
 
@@ -2805,7 +2805,7 @@ namespace SmartStore.Admin.Controllers
 
             var product = _productService.GetProductById(productId);
             if (product == null)
-                return RedirectToAction("List", "Product");
+                return RedirectToAction("List", "DeclarationProduct");
 
             var warnings = new List<string>();
             var variantAttributes = _productAttributeService.GetProductVariantAttributesByProductId(product.Id);
@@ -2813,7 +2813,7 @@ namespace SmartStore.Admin.Controllers
             var attributeXml = query.CreateSelectedAttributesXml(product.Id, 0, variantAttributes, _productAttributeParser, _localizationService,
                 _downloadService, _catalogSettings, this.Request, warnings);
 
-            warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, (product).convertProduct(), attributeXml));
+            //warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, (product), attributeXml));
 
             if (_productAttributeParser.FindProductVariantAttributeCombination(product.Id, attributeXml) != null)
             {
@@ -2831,9 +2831,9 @@ namespace SmartStore.Admin.Controllers
                 _productService.UpdateLowestAttributeCombinationPriceProperty(product);
             }
 
-            PrepareProductAttributeCombinationModel(model, null, (product).convertProduct());
-            PrepareVariantCombinationAttributes(model, (product).convertProduct());
-            PrepareVariantCombinationPictures(model, (product).convertProduct());
+            PrepareProductAttributeCombinationModel(model, null, (product));
+            PrepareVariantCombinationAttributes(model, (product));
+            PrepareVariantCombinationPictures(model, (product));
             PrepareDeliveryTimes(model);
             PrepareViewBag(btnId, formId, warnings.Count == 0, false);
 
@@ -2851,18 +2851,18 @@ namespace SmartStore.Admin.Controllers
             var combination = _productAttributeService.GetProductVariantAttributeCombinationById(id);
             if (combination == null)
             {
-                return RedirectToAction("List", "Product");
+                return RedirectToAction("List", "DeclarationProduct");
             }
 
             var product = _productService.GetProductById(combination.ProductId);
             if (product == null)
-                return RedirectToAction("List", "Product");
+                return RedirectToAction("List", "DeclarationProduct");
 
             var model = combination.ToModel();
 
-            PrepareProductAttributeCombinationModel(model, combination, (product).convertProduct(), true);
-            PrepareVariantCombinationAttributes(model, (product).convertProduct());
-            PrepareVariantCombinationPictures(model, (product).convertProduct());
+            PrepareProductAttributeCombinationModel(model, combination, (product), true);
+            PrepareVariantCombinationAttributes(model, (product));
+            PrepareVariantCombinationPictures(model, (product));
             PrepareDeliveryTimes(model, model.DeliveryTimeId);
             PrepareViewBag(btnId, formId);
 
@@ -2880,7 +2880,7 @@ namespace SmartStore.Admin.Controllers
             {
                 var combination = _productAttributeService.GetProductVariantAttributeCombinationById(model.Id);
                 if (combination == null)
-                    return RedirectToAction("List", "Product");
+                    return RedirectToAction("List", "DeclarationProduct");
 
                 string attributeXml = combination.AttributesXml;
                 combination = model.ToEntity(combination);
@@ -2889,7 +2889,7 @@ namespace SmartStore.Admin.Controllers
 
                 _productAttributeService.UpdateProductVariantAttributeCombination(combination);
 
-                _productService.UpdateLowestAttributeCombinationPriceProperty((combination.Product).convertProduct());
+               // _productService.UpdateLowestAttributeCombinationPriceProperty((combination.DeclarationProduct));
 
                 PrepareViewBag(btnId, formId, true);
             }
@@ -2910,8 +2910,8 @@ namespace SmartStore.Admin.Controllers
             if (!exists)
             {
                 var product = _productService.GetProductById(productId);
-                if (product != null)
-                    warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, (product).convertProduct(), attributeXml));
+                //if (product != null)
+                   // warnings.AddRange(_shoppingCartService.GetShoppingCartItemAttributeWarnings(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, (product), attributeXml));
             }
 
             if (warnings.Count > 0)
@@ -2950,7 +2950,7 @@ namespace SmartStore.Admin.Controllers
             if (product == null)
                 throw new ArgumentException(T("Products.NotFound", productId));
 
-            _productAttributeService.CreateAllProductVariantAttributeCombinations((product).convertProduct());
+            //_productAttributeService.CreateAllProductVariantAttributeCombinations((product));
 
             _productService.UpdateLowestAttributeCombinationPriceProperty(product);
 
@@ -3013,13 +3013,13 @@ namespace SmartStore.Admin.Controllers
                     pvacModel.ProductId = product.Id;
                     pvacModel.ProductUrlTitle = productUrlTitle;
                     pvacModel.ProductUrl = _productUrlHelper.GetProductUrl(product.Id, productSeName, x.AttributesXml);
-                    pvacModel.AttributesXml = _productAttributeFormatter.FormatAttributes((product).convertProduct(), x.AttributesXml, customer, "<br />", true, true, true, false);
+                    //pvacModel.AttributesXml = _productAttributeFormatter.FormatAttributes((product), x.AttributesXml, customer, "<br />", true, true, true, false);
 
                     // Not really necessary here:
                     //var warnings = _shoppingCartService.GetShoppingCartItemAttributeWarnings(
                     //		customer,
                     //		ShoppingCartType.ShoppingCart,
-                    //		x.Product,
+                    //		x.DeclarationProduct,
                     //		x.AttributesXml,
                     //		combination: x);
 
@@ -3063,7 +3063,7 @@ namespace SmartStore.Admin.Controllers
         private void PrepareProductAttributeCombinationModel(
                                                                                             ProductVariantAttributeCombinationModel model,
             ProductVariantAttributeCombination entity,
-            Product product, bool formatAttributes = false)
+            DeclarationProduct product, bool formatAttributes = false)
         {
             if (model == null)
                 throw new ArgumentNullException("model");
@@ -3085,11 +3085,11 @@ namespace SmartStore.Admin.Controllers
 
             if (formatAttributes && entity != null)
             {
-                model.AttributesXml = _productAttributeFormatter.FormatAttributes(product, entity.AttributesXml, _workContext.CurrentCustomer, "<br />", true, true, true, false);
+                //model.AttributesXml = _productAttributeFormatter.FormatAttributes(product, entity.AttributesXml, _workContext.CurrentCustomer, "<br />", true, true, true, false);
             }
         }
 
-        private void PrepareVariantCombinationAttributes(ProductVariantAttributeCombinationModel model, Product product)
+        private void PrepareVariantCombinationAttributes(ProductVariantAttributeCombinationModel model, DeclarationProduct product)
         {
             var productVariantAttributes = _productAttributeService.GetProductVariantAttributesByProductId(product.Id);
             foreach (var attribute in productVariantAttributes)
@@ -3124,7 +3124,7 @@ namespace SmartStore.Admin.Controllers
             }
         }
 
-        private void PrepareVariantCombinationPictures(ProductVariantAttributeCombinationModel model, Product product)
+        private void PrepareVariantCombinationPictures(ProductVariantAttributeCombinationModel model, DeclarationProduct product)
         {
             var pictures = _pictureService.GetPicturesByProductId(product.Id);
             foreach (var picture in pictures)
@@ -3145,7 +3145,7 @@ namespace SmartStore.Admin.Controllers
             ViewBag.IsEdit = isEdit;
         }
 
-        #endregion Product variant attribute combinations
+        #endregion DeclarationProduct variant attribute combinations
 
         #region downloads
 

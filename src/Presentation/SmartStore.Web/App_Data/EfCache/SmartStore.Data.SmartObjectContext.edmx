@@ -1492,8 +1492,8 @@
           <Property Name="WithdrawAuditTime" Type="DateTime" Nullable="false" />
           <Property Name="WithdrawAuditCustomer" Type="Int32" Nullable="false" />
           <Property Name="WithdrawAuditComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="WithdrawType" Type="Int32" Nullable="false" />
-          <Property Name="WithdrawStatus" Type="Int32" Nullable="false" />
+          <Property Name="WithdrawType" Type="Self.WithdrawalApplyType" Nullable="false" />
+          <Property Name="WithdrawStatus" Type="Self.WithdrawalApplyStatus" Nullable="false" />
           <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
           <Property Name="IsCount" Type="Boolean" Nullable="false" />
         </EntityType>
@@ -1540,8 +1540,8 @@
           <Property Name="CustomerID" Type="Guid" Nullable="false" />
           <Property Name="IsCount" Type="Boolean" Nullable="false" />
           <Property Name="isOut" Type="Boolean" Nullable="false" />
-          <Property Name="PointGetType" Type="Int32" Nullable="false" />
-          <Property Name="PointUseType" Type="Int32" Nullable="false" />
+          <Property Name="PointGetType" Type="Self.PointGetType" Nullable="false" />
+          <Property Name="PointUseType" Type="Self.PointUseType" Nullable="false" />
           <Property Name="UpdateTime" Type="DateTime" Nullable="false" />
         </EntityType>
         <EntityType Name="ScheduleTaskHistory" customannotation:ClrType="SmartStore.Core.Domain.Tasks.ScheduleTaskHistory, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
@@ -2214,6 +2214,30 @@
           <Member Name="RoundMidpointUp" Value="1" />
           <Member Name="AlwaysRoundDown" Value="2" />
           <Member Name="AlwaysRoundUp" Value="3" />
+        </EnumType>
+        <EnumType Name="WithdrawalApplyType" IsFlags="false" customannotation:ClrType="SmartStore.Core.Domain.Wallet.WithdrawalApplyType, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null" UnderlyingType="Int32">
+          <Member Name="Cash" Value="10" />
+          <Member Name="Point" Value="20" />
+          <Member Name="Coupon" Value="30" />
+          <Member Name="Present" Value="40" />
+        </EnumType>
+        <EnumType Name="WithdrawalApplyStatus" IsFlags="false" customannotation:ClrType="SmartStore.Core.Domain.Wallet.WithdrawalApplyStatus, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null" UnderlyingType="Int32">
+          <Member Name="Pending" Value="10" />
+          <Member Name="Processing" Value="20" />
+          <Member Name="Complete" Value="30" />
+          <Member Name="Cancelled" Value="40" />
+        </EnumType>
+        <EnumType Name="PointGetType" IsFlags="false" customannotation:ClrType="SmartStore.Core.Domain.Wallet.PointGetType, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null" UnderlyingType="Int32">
+          <Member Name="Withdraw" Value="10" />
+          <Member Name="Convert" Value="20" />
+          <Member Name="Shop" Value="30" />
+          <Member Name="Reward" Value="40" />
+        </EnumType>
+        <EnumType Name="PointUseType" IsFlags="false" customannotation:ClrType="SmartStore.Core.Domain.Wallet.PointUseType, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null" UnderlyingType="Int32">
+          <Member Name="Shop" Value="10" />
+          <Member Name="Recall" Value="20" />
+          <Member Name="Send" Value="30" />
+          <Member Name="Convert" Value="40" />
         </EnumType>
         <EnumType Name="EmailAttachmentStorageLocation" IsFlags="false" customannotation:ClrType="SmartStore.Core.Domain.Messages.EmailAttachmentStorageLocation, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null" UnderlyingType="Int32">
           <Member Name="Blob" Value="0" />

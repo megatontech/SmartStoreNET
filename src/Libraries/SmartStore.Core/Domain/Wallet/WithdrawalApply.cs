@@ -8,6 +8,7 @@ using SmartStore.Core.Domain.Directory;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Localization;
 using SmartStore.Core.Domain.Media;
+using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Security;
 using SmartStore.Core.Domain.Seo;
 using SmartStore.Core.Domain.Stores;
@@ -94,12 +95,12 @@ namespace SmartStore.Core.Domain.Wallet
         /// 转账类型
         /// </summary>
         [DataMember]
-        public int WithdrawType { get; set; }
+        public WithdrawalApplyType WithdrawType { get; set; }
         /// <summary>
         /// 转账状态
         /// </summary>
         [DataMember]
-        public int WithdrawStatus { get; set; }
+        public WithdrawalApplyStatus WithdrawStatus { get; set; }
         /// <summary>
         /// 最后更新日期
         /// </summary>

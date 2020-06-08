@@ -248,5 +248,11 @@ namespace SmartStore.Services.Search
 			var linqCatalogSearchService = _services.Container.ResolveNamed<ICatalogSearchService>("linq");
 			return linqCatalogSearchService.PrepareQuery(searchQuery, baseQuery);
 		}
+		public IQueryable<DeclarationProduct> PrepareDeclarationQuery(CatalogSearchQuery searchQuery, IQueryable<DeclarationProduct> baseQuery = null)
+		{
+			var linqCatalogSearchService = _services.Container.ResolveNamed<ICatalogSearchService>("linq");
+			return linqCatalogSearchService.PrepareDeclarationQuery(searchQuery, baseQuery);
+		}
+		
 	}
 }

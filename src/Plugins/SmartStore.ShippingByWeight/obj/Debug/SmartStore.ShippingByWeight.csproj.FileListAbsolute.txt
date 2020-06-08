@@ -35,3 +35,4 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.S
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.ShippingByWeight\obj\Debug\SmartStore.ShippingByWeight.csproj.CopyComplete
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.ShippingByWeight\obj\Debug\SmartStore.ShippingByWeight.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.ShippingByWeight\obj\Debug\SmartStore.ShippingByWeight.pdb
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Plugins\SmartStore.ShippingByWeight\obj\Debug\SmartStore.ShippingByWeight.csprojAssemblyReference.cache

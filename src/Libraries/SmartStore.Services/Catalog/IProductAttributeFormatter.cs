@@ -17,6 +17,7 @@ namespace SmartStore.Services.Catalog
         /// <param name="attributes">Attributes</param>
         /// <returns>Attributes</returns>
         string FormatAttributes(Product product, string attributes);
+        string FormatAttributes(DeclarationProduct product, string attributes);
 
         /// <summary>
         /// Formats attributes

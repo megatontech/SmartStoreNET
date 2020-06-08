@@ -95,9 +95,9 @@ namespace SmartStore.Admin
             return Mapper.Map<Product, ProductModel>(entity);
         }
 
-        public static ProductModel ToModel(this DeclarationProduct entity)
+        public static DeclarationProductModel ToModel(this DeclarationProduct entity)
         {
-            return Mapper.Map<DeclarationProduct, ProductModel>(entity);
+            return Mapper.Map<DeclarationProduct, DeclarationProductModel>(entity);
         }
 
         public static Product ToEntity(this ProductModel model)
