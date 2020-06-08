@@ -1241,7 +1241,7 @@ namespace SmartStore.Admin.Controllers
             return RedirectToAction("List");
         }
 
-        public ActionResult List(ProductListModel model)
+        public ActionResult List(DeclarationProductListModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
                 return AccessDeniedView();
@@ -1322,7 +1322,7 @@ namespace SmartStore.Admin.Controllers
         }
 
         [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult ProductList(GridCommand command, ProductListModel model)
+        public ActionResult ProductList(GridCommand command, DeclarationProductListModel model)
         {
             var gridModel = new GridModel<DeclarationProductModel>();
 

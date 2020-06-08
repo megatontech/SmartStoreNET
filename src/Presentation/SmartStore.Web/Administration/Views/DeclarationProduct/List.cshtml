@@ -92,7 +92,7 @@
 	</div>
 	
 	<div>
-		@(Html.Telerik().Grid<ProductModel>()
+		@(Html.Telerik().Grid<DeclarationProductModel>()
 			.Name("products-grid")
 			.Columns(columns =>
 			{
@@ -144,7 +144,7 @@
 				x.SortMode(GridSortMode.SingleColumn);
 			})
 			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
-			.DataBinding(dataBinding => dataBinding.Ajax().Select("ProductList", "Product"))
+			.DataBinding(dataBinding => dataBinding.Ajax().Select("ProductList", "DeclarationProduct"))
 			.ClientEvents(events => events.OnDataBinding("productsGrid_onDataBinding").OnDataBound("productsGrid_onDataBound"))
 			.EnableCustomBinding(true)
 			.PreserveGridState())
