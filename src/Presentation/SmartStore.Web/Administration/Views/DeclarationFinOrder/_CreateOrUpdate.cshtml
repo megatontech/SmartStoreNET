@@ -1,0 +1,28 @@
+﻿@model DeclarationOrder
+@using SmartStore.Core.Domain.Orders;
+
+@Html.ValidationSummary(false)
+
+@if (Model.Id == 0)
+{
+    @Html.HiddenFor(model => model.Id)
+}
+    <table class="adminContent">
+
+        <tr>
+            <td class="adminTitle">
+                下单金额
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.OrderTotal)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                下单人
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.CustomerId)
+            </td>
+        </tr>
+    </table>

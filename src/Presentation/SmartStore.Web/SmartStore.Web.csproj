@@ -262,6 +262,7 @@
     <Compile Include="Controllers\CatalogController.cs" />
     <Compile Include="Controllers\CatalogHelper.cs" />
     <Compile Include="Controllers\CatalogHelper.MapProduct.cs" />
+    <Compile Include="Controllers\DeclarationOrderController.cs" />
     <Compile Include="Controllers\CheckoutController.cs" />
     <Compile Include="Controllers\EntityController.cs" />
     <Compile Include="Controllers\CommonController.cs" />
@@ -1865,6 +1866,13 @@
     <Content Include="Views\Shared\Menus\ListGroup.cshtml" />
     <Content Include="Views\Shared\Menus\Main.cshtml" />
     <Content Include="Views\Catalog\Menus\Categories.cshtml" />
+    <Content Include="Views\DeclarationOrder\Partials\CheckoutProgress.cshtml" />
+    <Content Include="Views\DeclarationOrder\BillingAddress.cshtml" />
+    <Content Include="Views\DeclarationOrder\Completed.cshtml" />
+    <Content Include="Views\DeclarationOrder\Confirm.cshtml" />
+    <Content Include="Views\DeclarationOrder\PaymentMethod.cshtml" />
+    <Content Include="Views\DeclarationOrder\ShippingAddress.cshtml" />
+    <Content Include="Views\DeclarationOrder\ShippingMethod.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

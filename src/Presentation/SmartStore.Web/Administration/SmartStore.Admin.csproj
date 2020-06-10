@@ -199,6 +199,7 @@
     <Compile Include="Controllers\ImportController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
     <Compile Include="Controllers\DeclarationProductController.cs" />
+    <Compile Include="Controllers\DeclarationFinOrderController.cs" />
     <Compile Include="Controllers\QuantityUnitController.cs" />
     <Compile Include="Controllers\DeliveryTimeController.cs" />
     <Compile Include="Controllers\DiscountController.cs" />
@@ -727,6 +728,32 @@
     <Content Include="Views\DeclarationWithdrawControl\Create.cshtml" />
     <Content Include="Views\DeclarationWithdrawControl\Edit.cshtml" />
     <Content Include="Views\DeclarationWithdrawControl\List.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_AutoUpdateOrderItem.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_Edit.BillingAndShipment.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_Edit.Info.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_Edit.OrderNotes.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_Edit.Products.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_ProductAddAttributes.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_ProductAddGiftCardInfo.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\AddProductToOrder.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\AddProductToOrderDetails.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\AddressEdit.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\AddShipment.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\BestsellersBriefReportByAmount.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\BestsellersBriefReportByQuantity.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\BestsellersReport.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\Edit.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\List.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\NeverSoldReport.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\OrderAverageReport.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\OrderIncompleteReport.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\PartiallyRefundOrderPopup.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\ShipmentDetails.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\ShipmentDetails.Print.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\ShipmentList.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\UploadLicenseFilePopup.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\_CreateOrUpdate.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />
