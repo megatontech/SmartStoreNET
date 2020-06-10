@@ -474,27 +474,27 @@ namespace SmartStore.Core.Domain.Orders
 		[DataMember]
 		public bool AcceptThirdPartyEmailHandOver { get; set; }
 
-		#endregion
+        #endregion
 
-		#region Navigation properties
+        #region Navigation properties
 
-		/// <summary>
-		/// Gets or sets the customer
-		/// </summary>
-		[DataMember]
+        /// <summary>
+        /// Gets or sets the customer
+        /// </summary>
+        [NotMapped]
         public virtual Customer Customer { get; set; }
 
         /// <summary>
         /// Gets or sets the billing address
         /// </summary>
-		[DataMember]
-		public virtual Address BillingAddress { get; set; }
+		[NotMapped]
+        public virtual Address BillingAddress { get; set; }
 
         /// <summary>
         /// Gets or sets the shipping address
         /// </summary>
-		[DataMember]
-		public virtual Address ShippingAddress { get; set; }
+		[NotMapped]
+        public virtual Address ShippingAddress { get; set; }
         
         /// <summary>
         /// Gets or sets the reward points history record
@@ -502,38 +502,38 @@ namespace SmartStore.Core.Domain.Orders
         [NotMapped]
         public virtual RewardPointsHistory RedeemedRewardPointsEntry { get; set; }
 
-		///// <summary>
-		///// Gets or sets the wallet history.
-		///// </summary>
-		//public virtual ICollection<WalletHistory> WalletHistory
-		//{
-		//	get { return _walletHistory ?? (_walletHistory = new HashSet<WalletHistory>()); }
-		//	protected set { _walletHistory = value; }
-		//}
+        ///// <summary>
+        ///// Gets or sets the wallet history.
+        ///// </summary>
+        //public virtual ICollection<WalletHistory> WalletHistory
+        //{
+        //	get { return _walletHistory ?? (_walletHistory = new HashSet<WalletHistory>()); }
+        //	protected set { _walletHistory = value; }
+        //}
 
-		///// <summary>
-		///// Gets or sets discount usage history
-		///// </summary>
-		//public virtual ICollection<DiscountUsageHistory> DiscountUsageHistory
-  //      {
-		//	get { return _discountUsageHistory ?? (_discountUsageHistory = new HashSet<DiscountUsageHistory>()); }
-  //          protected set { _discountUsageHistory = value; }
-  //      }
+        ///// <summary>
+        ///// Gets or sets discount usage history
+        ///// </summary>
+        //public virtual ICollection<DiscountUsageHistory> DiscountUsageHistory
+        //      {
+        //	get { return _discountUsageHistory ?? (_discountUsageHistory = new HashSet<DiscountUsageHistory>()); }
+        //          protected set { _discountUsageHistory = value; }
+        //      }
 
-   //     /// <summary>
-   //     /// Gets or sets gift card usage history (gift card that were used with this order)
-   //     /// </summary>
-   //     public virtual ICollection<GiftCardUsageHistory> GiftCardUsageHistory
-   //     {
-			//get { return _giftCardUsageHistory ?? (_giftCardUsageHistory = new HashSet<GiftCardUsageHistory>()); }
-   //         protected set { _giftCardUsageHistory = value; }
-   //     }
+        //     /// <summary>
+        //     /// Gets or sets gift card usage history (gift card that were used with this order)
+        //     /// </summary>
+        //     public virtual ICollection<GiftCardUsageHistory> GiftCardUsageHistory
+        //     {
+        //get { return _giftCardUsageHistory ?? (_giftCardUsageHistory = new HashSet<GiftCardUsageHistory>()); }
+        //         protected set { _giftCardUsageHistory = value; }
+        //     }
 
         /// <summary>
         /// Gets or sets order notes
         /// </summary>
-		[DataMember]
-		public virtual ICollection<OrderNote> OrderNotes
+        [NotMapped]
+        public virtual ICollection<OrderNote> OrderNotes
         {
 			get { return _orderNotes ?? (_orderNotes = new HashSet<OrderNote>()); }
             protected set { _orderNotes = value; }
@@ -542,8 +542,8 @@ namespace SmartStore.Core.Domain.Orders
         /// <summary>
         /// Gets or sets order items
         /// </summary>
-		[DataMember]
-		public virtual ICollection<OrderItem> OrderItems
+		[NotMapped]
+        public virtual ICollection<OrderItem> OrderItems
         {
 			get { return _orderItems ?? (_orderItems = new HashSet<OrderItem>()); }
             protected set { _orderItems = value; }

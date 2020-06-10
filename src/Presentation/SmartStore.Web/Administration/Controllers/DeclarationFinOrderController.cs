@@ -1156,7 +1156,6 @@ namespace SmartStore.Admin.Controllers
 
 
 
-
             _DeclarationOrderService.InsertOrder(model);
             return RedirectToAction("List");
         }

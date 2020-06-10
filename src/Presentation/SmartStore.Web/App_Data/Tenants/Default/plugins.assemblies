@@ -11,8 +11,8 @@ Mono.Math.dll
 Org.Mentalis.Security.Cryptography.dll
 SmartStore.FacebookAuth.dll
 SmartStore.Shipping.dll
-SmartStore.Clickatell.dll
 SmartStore.OfflinePayment.dll
+SmartStore.Clickatell.dll
 MiniProfiler.dll
 MiniProfiler.EntityFramework6.dll
 SmartStore.DevTools.dll
