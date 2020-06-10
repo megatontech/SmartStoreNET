@@ -50,6 +50,7 @@ namespace SmartStore.Admin.Controllers
     public partial class DeclarationFinOrderController : AdminControllerBase
     {
         #region Fields
+        private readonly IWebHelper _webHelper;
 
         private readonly IAddressService _addressService;
         private readonly AddressSettings _addressSettings;
@@ -100,6 +101,7 @@ namespace SmartStore.Admin.Controllers
         #region Ctor
 
         public DeclarationFinOrderController(IOrderService orderService,
+            IWebHelper webHelper,
             IOrderReportService orderReportService,
             IOrderProcessingService orderProcessingService,
             IDateTimeHelper dateTimeHelper,
@@ -176,7 +178,7 @@ namespace SmartStore.Admin.Controllers
             _customerActivityService = customerActivityService;
             _catalogSearchService = catalogSearchService;
             _pdfConverter = pdfConverter;
-
+            _webHelper = webHelper;
             _catalogSettings = catalogSettings;
             _taxSettings = taxSettings;
             _measureSettings = measureSettings;
@@ -1084,6 +1086,76 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult Create(DeclarationOrder model, bool continueEditing, FormCollection form)
         {
+            var customer = _customerService.GetCustomerById(model.CustomerId);
+            var order = new DeclarationOrder
+            {
+                StoreId = 0,
+                OrderGuid = Guid.NewGuid(),
+                CustomerId = customer.Id,
+                CustomerLanguageId = customer.GetLanguage().Id,
+                //CustomerTaxDisplayType = TaxDisplayType.ExcludingTax,
+                CustomerIp = _webHelper.GetCurrentIpAddress(),
+                OrderSubtotalInclTax = 0M,
+                OrderSubtotalExclTax = 0M,
+                OrderSubTotalDiscountInclTax = 0M,
+                OrderSubTotalDiscountExclTax = 0M,
+                OrderShippingInclTax = 0M,
+                OrderShippingExclTax = 0M,
+                OrderShippingTaxRate = 0M,
+                PaymentMethodAdditionalFeeInclTax = 0M,
+                PaymentMethodAdditionalFeeExclTax = 0M,
+                PaymentMethodAdditionalFeeTaxRate = 0M,
+                TaxRates = "",
+                OrderTax = 0M,
+                OrderTotalRounding = model.OrderTotal,
+                OrderTotal = model.OrderTotal,
+                RefundedAmount = decimal.Zero,
+                OrderDiscount = 0M,
+                CreditBalance = 0M,
+                CheckoutAttributeDescription = "",
+                CheckoutAttributesXml = "",
+                CustomerCurrencyCode = "",
+                CurrencyRate = 0M,
+                AffiliateId = 0,
+                OrderStatus = OrderStatus.Pending,
+                AllowStoringCreditCardNumber = false,
+                CardType = string.Empty,
+                CardName = string.Empty,
+                CardNumber = string.Empty,
+                MaskedCreditCardNumber = string.Empty,
+                CardCvv2 = string.Empty,
+                CardExpirationMonth = string.Empty,
+                CardExpirationYear = string.Empty,
+                AllowStoringDirectDebit = false,
+                DirectDebitAccountHolder = string.Empty,
+                DirectDebitAccountNumber = string.Empty,
+                DirectDebitBankCode      = string.Empty,
+                DirectDebitBankName      = string.Empty,
+                DirectDebitBIC           = string.Empty,
+                DirectDebitCountry       = string.Empty,
+                DirectDebitIban          = string.Empty,
+                PaymentMethodSystemName = string.Empty,
+                AuthorizationTransactionId = string.Empty,
+                AuthorizationTransactionCode = string.Empty,
+                AuthorizationTransactionResult = string.Empty,
+                CaptureTransactionId = string.Empty,
+                CaptureTransactionResult = string.Empty,
+                SubscriptionTransactionId = string.Empty,
+                PurchaseOrderNumber = string.Empty,
+                PaymentStatus = PaymentStatus.Pending,
+                PaidDateUtc = DateTime.Now,
+                BillingAddress = new Address(),
+                ShippingAddress = new Address(),
+                //ShippingStatus = ShippingStatus.NotYetShipped,
+                ShippingMethod = string.Empty,
+                ShippingRateComputationMethodSystemName = string.Empty,
+                VatNumber = string.Empty,
+                CustomerOrderComment = "",
+                AcceptThirdPartyEmailHandOver = false
+            };
+
+
+
 
             _DeclarationOrderService.InsertOrder(model);
             return RedirectToAction("List");

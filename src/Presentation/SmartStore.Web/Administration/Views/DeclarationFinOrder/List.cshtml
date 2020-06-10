@@ -12,14 +12,11 @@
     <div class="section-header">
         <div class="title">
             <i class="far fa-chart-bar"></i>
-            @T("报单订单")
+            @T("报单下单")
         </div>
         <div class="options d-flex">
             @{ Html.RenderWidget("admin_button_toolbar_before"); }
-            <a href="@Url.Action("Create")" class="btn btn-primary">
-                <i class="fa fa-plus"></i>
-                <span>@T("Admin.Common.AddNew")</span>
-            </a>
+
             <div class="input-group d-inline-flex mr-3" style="width: 400px">
                 @*@Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("Admin.Orders.List.GoDirectlyToNumber") })*@
                 <div class="input-group-append">
@@ -35,7 +32,10 @@
                 </button>*@
                 </div>
             </div>
-
+            <a href="@Url.Action("Create")" class="btn btn-primary">
+                <i class="fa fa-plus"></i>
+                <span>@T("Admin.Common.AddNew")</span>
+            </a>
             @*<div class="dropdown dropdown-menu-right mx-1">
             <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">
                 @T("Admin.Common.Export.PDF")
