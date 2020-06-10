@@ -1041,23 +1041,24 @@ namespace SmartStore.Admin.Controllers
                     ModelState.AddModelError("FileVersion", T("Admin.Catalog.Products.Download.SemanticVersion.NotValid"));
                 }
             }
-            var category = new Category();
+            //var category = new Category();
 
-            if (_categoryService.GetProductCategoryById(999999) != null) { category = _categoryService.GetCategoryById(999999); }
-            else {
-                category.Id = 999999;
-                category.Name = "报单产品";
-                category.ParentCategoryId = 0;
-                category.Deleted = false;
-                category.UpdatedOnUtc = DateTime.Now;
-                category.Published = true;
-                category.PictureId = 999999;
-                category.CreatedOnUtc = DateTime.Now;
-                category.ShowOnHomePage = true;
-                category.DisplayOrder = 0;
-                category.DefaultViewMode = "grid";
-                _categoryService.InsertCategory(category);
-                category = _categoryService.GetCategoryById(999999); }
+            //if (_categoryService.GetProductCategoryById(28) != null) { category = _categoryService.GetCategoryById(28); }
+            //else {
+            //    category.Id = 28;
+            //    category.Name = "报单产品";
+            //    category.ParentCategoryId = 0;
+            //    category.Deleted = false;
+            //    category.UpdatedOnUtc = DateTime.Now;
+            //    category.Published = true;
+            //    //category.PictureId = 999999;
+            //    category.CreatedOnUtc = DateTime.Now;
+            //    category.ShowOnHomePage = true;
+            //    category.DisplayOrder = 0;
+            //    category.DefaultViewMode = "grid";
+            //    MediaHelper.UpdatePictureTransientStateFor(category, c => c.PictureId);
+            //    _categoryService.InsertCategory(category);
+            //    category = _categoryService.GetCategoryById(28); }
 
             if (ModelState.IsValid)
             {

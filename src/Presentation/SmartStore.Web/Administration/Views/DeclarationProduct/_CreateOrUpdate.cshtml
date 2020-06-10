@@ -28,7 +28,7 @@
         .Visible(Model.ProductTypeId == (int)ProductType.SimpleProduct || (Model.ProductTypeId == (int)ProductType.BundledProduct && !Model.BundlePerItemShoppingCart))
         .Icon("fa fa-archive fa-lg fa-fw")
         .LinkHtmlAttributes(new { data_tab_name = "Inventory" })
-        .Action("LoadEditTab", "Product", new { id = Model.Id, tabName = "Inventory" })
+        .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Inventory" })
         .Ajax();
 
     //if (Model.Id > 0)
@@ -55,7 +55,7 @@
     x.Add().Text(T("Admin.Catalog.Products.Price").Text)
             .Icon("fa fa-euro-sign fa-lg fa-fw")
             .LinkHtmlAttributes(new { data_tab_name = "Price" })
-            .Action("LoadEditTab", "Product", new { id = Model.Id, tabName = "Price" })
+            .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Price" })
             .Ajax();
 
     //x.Add().Text(T("Admin.Catalog.Products.Discounts").Text)
@@ -68,12 +68,12 @@
     x.Add().Text(T("Admin.Catalog.Products.Pictures").Text)
         .Icon("far fa-image fa-lg fa-fw")
         .LinkHtmlAttributes(new { data_tab_name = "Pictures" })
-        .Action("LoadEditTab", "Product", new { id = Model.Id, tabName = "Pictures" })
+        .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Pictures" })
         .Ajax();
     x.Add().Text(T("Admin.Catalog.Products.Categories").Text)
         .Icon("fa fa-sitemap fa-lg fa-fw")
         .LinkHtmlAttributes(new { data_tab_name = "Categories" })
-        .Action("LoadEditTab", "Product", new { id = Model.Id, tabName = "Categories" })
+        .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Categories" })
         .Ajax();
     //x.Add().Text(T("Admin.Catalog.Products.Manufacturers").Text)
     //    .Icon("far fa-building fa-lg fa-fw")
@@ -107,7 +107,7 @@
     x.Add().Text(T("产品可见性").Text)
         .Icon("fa fa-users fa-lg fa-fw")
         .LinkHtmlAttributes(new { data_tab_name = "Acl" })
-        .Action("LoadEditTab", "Product", new { id = Model.Id, tabName = "Acl" })
+        .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Acl" })
         .Ajax();
     //x.Add().Text(T("Admin.Common.Stores").Text)
     //    .Icon("fa fa-globe fa-lg fa-fw")

@@ -49,7 +49,7 @@
 		.Title(T("Admin.Catalog.Products.Copy"))
 		.Size(WindowSize.Large)
 		.Content(@<text>
-			<form method="POST" action="@Url.Action("CopyProduct", "Product")">
+			<form method="POST" action="@Url.Action("CopyProduct", "DeclarationProduct")">
 				@Html.HiddenFor(model => Model.CopyProductModel.Id)
 				<table class="adminContent">
 					<tr>
