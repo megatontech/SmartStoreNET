@@ -43,7 +43,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Telerik.Web.Mvc;
-
+using SmartStore.Services.Calc;
 namespace SmartStore.Admin.Controllers
 {
     [AdminAuthorize]
@@ -87,6 +87,7 @@ namespace SmartStore.Admin.Controllers
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductService _productService;
+        private readonly IDeclarationProductService _dproductService;
         private readonly SearchSettings _searchSettings;
         private readonly IShipmentService _shipmentService;
         private readonly IShoppingCartService _shoppingCartService;
@@ -95,7 +96,7 @@ namespace SmartStore.Admin.Controllers
         private readonly ITaxService _taxService;
         private readonly TaxSettings _taxSettings;
         private readonly IWorkContext _workContext;
-
+        private readonly ICalcRewardService _CalcRewardService;
         #endregion Fields
 
         #region Ctor
@@ -116,6 +117,7 @@ namespace SmartStore.Admin.Controllers
             ICountryService countryService,
             IStateProvinceService stateProvinceService,
             IProductService productService,
+            IDeclarationProductService dproductService,
             IPermissionService permissionService,
             ICategoryService categoryService,
             IManufacturerService manufacturerService,
@@ -141,7 +143,7 @@ namespace SmartStore.Admin.Controllers
             PdfSettings pdfSettings,
             AddressSettings addressSettings,
             AdminAreaSettings adminAreaSettings,
-            SearchSettings searchSettings,
+            SearchSettings searchSettings, IDeclarationOrderService declarationOrderService, ICalcRewardService calcRewardService,
             ShoppingCartSettings shoppingCartSettings)
         {
             _orderService = orderService;
@@ -159,6 +161,7 @@ namespace SmartStore.Admin.Controllers
             _countryService = countryService;
             _stateProvinceService = stateProvinceService;
             _productService = productService;
+            _dproductService = dproductService;
             _permissionService = permissionService;
             _categoryService = categoryService;
             _manufacturerService = manufacturerService;
@@ -187,6 +190,8 @@ namespace SmartStore.Admin.Controllers
             _adminAreaSettings = adminAreaSettings;
             _searchSettings = searchSettings;
             _shoppingCartSettings = shoppingCartSettings;
+            _DeclarationOrderService = declarationOrderService;
+            _CalcRewardService = calcRewardService;
         }
 
         #endregion Ctor
@@ -1012,17 +1017,17 @@ namespace SmartStore.Admin.Controllers
 
                     orderModel.HasPaymentMethod = orderModel.PaymentMethod.HasValue();
 
-                    if (x.ShippingAddress != null && orderModel.IsShippable)
-                    {
-                        orderModel.ShippingAddressString = string.Concat(x.ShippingAddress.Address1,
-                            ", ", x.ShippingAddress.ZipPostalCode,
-                             " ", x.ShippingAddress.City);
+                    //if (x.ShippingAddress != null && orderModel.IsShippable)
+                    //{
+                    //    orderModel.ShippingAddressString = string.Concat(x.ShippingAddress.Address1,
+                    //        ", ", x.ShippingAddress.ZipPostalCode,
+                    //         " ", x.ShippingAddress.City);
 
-                        if (x.ShippingAddress.CountryId > 0)
-                        {
-                            orderModel.ShippingAddressString += ", " + x.ShippingAddress.Country.TwoLetterIsoCode;
-                        }
-                    }
+                    //    if (x.ShippingAddress.CountryId > 0)
+                    //    {
+                    //        orderModel.ShippingAddressString += ", " + x.ShippingAddress.Country.TwoLetterIsoCode;
+                    //    }
+                    //}
 
                     orderModel.ViaShippingMethod = viaShippingMethodString.FormatInvariant(orderModel.ShippingMethod);
                     orderModel.WithPaymentMethod = withPaymentMethodString.FormatInvariant(orderModel.PaymentMethod);
@@ -1087,6 +1092,7 @@ namespace SmartStore.Admin.Controllers
         public ActionResult Create(DeclarationOrder model, bool continueEditing, FormCollection form)
         {
             var customer = _customerService.GetCustomerById(model.CustomerId);
+            var product = _dproductService.GetProductById(model.ProductID);
             var order = new DeclarationOrder
             {
                 StoreId = 0,
@@ -1144,8 +1150,8 @@ namespace SmartStore.Admin.Controllers
                 PurchaseOrderNumber = string.Empty,
                 PaymentStatus = PaymentStatus.Pending,
                 PaidDateUtc = DateTime.Now,
-                BillingAddress = new Address(),
-                ShippingAddress = new Address(),
+                //BillingAddress = new Address(),
+                //ShippingAddress = new Address(),
                 //ShippingStatus = ShippingStatus.NotYetShipped,
                 ShippingMethod = string.Empty,
                 ShippingRateComputationMethodSystemName = string.Empty,
@@ -1153,10 +1159,19 @@ namespace SmartStore.Admin.Controllers
                 CustomerOrderComment = "",
                 AcceptThirdPartyEmailHandOver = false
             };
-
-
-
+            model.OrderGuid = Guid.NewGuid();
             _DeclarationOrderService.InsertOrder(model);
+            var neworder = _DeclarationOrderService.GetOrderByGuid(model.OrderGuid);
+            List<OrderItem> OrderItems = new List<OrderItem>();
+            OrderItems.Add(new OrderItem() {
+                 ProductId = product.Id,
+                 OrderId = neworder.Id,
+                 OrderItemGuid = Guid.NewGuid(),
+                Quantity = 1,
+                ProductCost = product.Price
+            });
+            _orderService.InsertOrderItem( OrderItems);
+            _CalcRewardService.CalcRewardOne(customer, model);
             return RedirectToAction("List");
         }
 

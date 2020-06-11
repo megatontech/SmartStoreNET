@@ -152,16 +152,16 @@ namespace SmartStore.Services.Orders
 			if (endTime.HasValue)
 				query = query.Where(x => endTime.Value >= x.CreatedOnUtc);
 
-			if (billingEmail.HasValue())
-				query = query.Where(x => x.BillingAddress != null && !String.IsNullOrEmpty(x.BillingAddress.Email) && x.BillingAddress.Email.Contains(billingEmail));
+			//if (billingEmail.HasValue())
+			//	query = query.Where(x => x.BillingAddress != null && !String.IsNullOrEmpty(x.BillingAddress.Email) && x.BillingAddress.Email.Contains(billingEmail));
 
-			if (billingName.HasValue())
-			{
-				query = query.Where(x => x.BillingAddress != null && (
-					(!String.IsNullOrEmpty(x.BillingAddress.LastName) && x.BillingAddress.LastName.Contains(billingName)) ||
-					(!String.IsNullOrEmpty(x.BillingAddress.FirstName) && x.BillingAddress.FirstName.Contains(billingName))
-				));
-			}
+			//if (billingName.HasValue())
+			//{
+			//	query = query.Where(x => x.BillingAddress != null && (
+			//		(!String.IsNullOrEmpty(x.BillingAddress.LastName) && x.BillingAddress.LastName.Contains(billingName)) ||
+			//		(!String.IsNullOrEmpty(x.BillingAddress.FirstName) && x.BillingAddress.FirstName.Contains(billingName))
+			//	));
+			//}
 
 			if (orderNumber.HasValue())
 				query = query.Where(x => x.OrderNumber.ToLower().Contains(orderNumber.ToLower()));

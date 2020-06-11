@@ -142,7 +142,7 @@ namespace SmartStore.Services.Orders
         /// </summary>
         /// <param name="order">Order</param>
         void InsertOrder(Order order);
-
+        void InsertOrderItem(List<OrderItem> items);
         /// <summary>
         /// Updates the order
         /// </summary>

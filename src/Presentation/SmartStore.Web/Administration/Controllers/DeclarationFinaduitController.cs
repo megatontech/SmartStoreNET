@@ -1014,17 +1014,17 @@ namespace SmartStore.Admin.Controllers
 
                     orderModel.HasPaymentMethod = orderModel.PaymentMethod.HasValue();
 
-                    if (x.ShippingAddress != null && orderModel.IsShippable)
-                    {
-                        orderModel.ShippingAddressString = string.Concat(x.ShippingAddress.Address1,
-                            ", ", x.ShippingAddress.ZipPostalCode,
-                             " ", x.ShippingAddress.City);
+                    //if (x.ShippingAddress != null && orderModel.IsShippable)
+                    //{
+                    //    orderModel.ShippingAddressString = string.Concat(x.ShippingAddress.Address1,
+                    //        ", ", x.ShippingAddress.ZipPostalCode,
+                    //         " ", x.ShippingAddress.City);
 
-                        if (x.ShippingAddress.CountryId > 0)
-                        {
-                            orderModel.ShippingAddressString += ", " + x.ShippingAddress.Country.TwoLetterIsoCode;
-                        }
-                    }
+                    //    if (x.ShippingAddress.CountryId > 0)
+                    //    {
+                    //        orderModel.ShippingAddressString += ", " + x.ShippingAddress.Country.TwoLetterIsoCode;
+                    //    }
+                    //}
 
                     orderModel.ViaShippingMethod = viaShippingMethodString.FormatInvariant(orderModel.ShippingMethod);
                     orderModel.WithPaymentMethod = withPaymentMethodString.FormatInvariant(orderModel.PaymentMethod);

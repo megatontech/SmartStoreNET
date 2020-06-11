@@ -189,6 +189,9 @@
     </Compile>
     <Compile Include="Blogs\BlogMessageFactoryExtensions.cs" />
     <Compile Include="Calc\CalcRewardService.cs" />
+    <Compile Include="Calc\CalcRewardThreeTask.cs" />
+    <Compile Include="Calc\CalcRewardFourTask.cs" />
+    <Compile Include="Calc\CalcRewardTwoTask.cs" />
     <Compile Include="Calc\ICalcRewardService.cs" />
     <Compile Include="Catalog\CategoryTreeChangeHandler.cs" />
     <Compile Include="Catalog\CatalogMessageFactoryExtensions.cs" />

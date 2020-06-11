@@ -1,4 +1,5 @@
-﻿using SmartStore.Core.Domain.Customers;
+﻿using SmartStore.Core.Data;
+using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Declaration;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Wallet;
@@ -8,6 +9,7 @@ using SmartStore.Services.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SmartStore.Services.Calc
 {
@@ -30,7 +32,8 @@ namespace SmartStore.Services.Calc
         private readonly IDailyTotalContributionService _totalContributeService;
 
         private readonly IWalletService _walletService;
-
+        private readonly IRepository<DeclarationOrder> _declarationOrderRepository;
+        private readonly IRepository<Order> _OrderRepository;
         #endregion Private Fields
 
         //private
@@ -40,6 +43,8 @@ namespace SmartStore.Services.Calc
         public CalcRewardService(IWalletService walletService, ICustomerService customerService, IDeclarationCapRuleService declarationCapRuleService,
            IDeclarationCalcRuleService calcruleService,
            IDailyTotalContributionService totalContributeService,
+           IRepository<DeclarationOrder> declarationOrderRepository,
+           IRepository<Order> orderRepository,
            IDailyCustomerContributionDetailService customerContributeService
            )
         {
@@ -51,6 +56,8 @@ namespace SmartStore.Services.Calc
             _customerContributeService = customerContributeService;
             _calcrule = _calcruleService.GetDeclarationCalcRule();
             _rule = _DeclarationCapRuleService.GetAllRule().ToList();
+            _declarationOrderRepository = declarationOrderRepository;
+            _OrderRepository = orderRepository;
         }
 
         #endregion Public Constructors
@@ -277,7 +284,27 @@ namespace SmartStore.Services.Calc
             //按每个人的贡献值发放分红*
             _walletService.SendRewardToWalletTwo(list);
         }
-
+        public virtual async Task<int> CalcRewardTwoAsync(
+            decimal CompanyTotal)
+        {
+            CompanyTotal = GetTodayDOrderAmount();
+            CalcRewardTwo(CompanyTotal);
+            return 0;
+        }
+        public virtual async Task<int> CalcRewardThreeAsync(
+            decimal StoreTotal)
+        {
+            StoreTotal = GetTodayOrderAmount();
+            CalcRewardThree(StoreTotal);
+            return 0;
+        }
+        public virtual async Task<int> CalcRewardFourAsync(
+            decimal StoreTotal)
+        {
+            StoreTotal = GetTodayOrderAmount();
+            CalcRewardFour(StoreTotal);
+            return 0;
+        }
         /// <summary>
         /// 填充客户。计算每人每个线中业绩
         /// </summary>
@@ -410,6 +437,27 @@ namespace SmartStore.Services.Calc
         }
 
         #endregion Public Methods
+        public decimal GetTodayDOrderAmount() { 
+            decimal todayAmount = 0M;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
+            var dorder = from d in _declarationOrderRepository.Table
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
+                         select d;
+            todayAmount = dorder.ToList().Sum(x => x.OrderTotal);
+
+            return todayAmount; 
+        }
+        public decimal GetTodayOrderAmount() {
+            decimal todayAmount = 0M;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
+            var order = from d in _OrderRepository.Table
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
+                         select d;
+            todayAmount = order.ToList().Sum(x => x.OrderTotal);
+            return todayAmount; 
+        }
     }
 
     public class LeftMoneyPackage

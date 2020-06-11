@@ -237,7 +237,10 @@ namespace SmartStore.Services.Orders
 
             _orderRepository.Insert(order);
         }
-
+        public virtual void InsertOrderItem(List<OrderItem> items)
+        {
+            _orderItemRepository.InsertRange(items);
+        }
         public virtual void UpdateOrder(Order order)
         {
             if (order == null)

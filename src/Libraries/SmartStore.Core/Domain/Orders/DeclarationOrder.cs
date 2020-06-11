@@ -481,26 +481,26 @@ namespace SmartStore.Core.Domain.Orders
         /// <summary>
         /// Gets or sets the customer
         /// </summary>
-        [NotMapped]
+        [DataMember]
         public virtual Customer Customer { get; set; }
 
-        /// <summary>
-        /// Gets or sets the billing address
-        /// </summary>
-		[NotMapped]
-        public virtual Address BillingAddress { get; set; }
+  //      /// <summary>
+  //      /// Gets or sets the billing address
+  //      /// </summary>
+		//[NotMapped]
+  //      public virtual Address BillingAddress { get; set; }
 
-        /// <summary>
-        /// Gets or sets the shipping address
-        /// </summary>
-		[NotMapped]
-        public virtual Address ShippingAddress { get; set; }
+  //      /// <summary>
+  //      /// Gets or sets the shipping address
+  //      /// </summary>
+		//[NotMapped]
+  //      public virtual Address ShippingAddress { get; set; }
         
-        /// <summary>
-        /// Gets or sets the reward points history record
-        /// </summary>
-        [NotMapped]
-        public virtual RewardPointsHistory RedeemedRewardPointsEntry { get; set; }
+        ///// <summary>
+        ///// Gets or sets the reward points history record
+        ///// </summary>
+        //[NotMapped]
+        //public virtual RewardPointsHistory RedeemedRewardPointsEntry { get; set; }
 
         ///// <summary>
         ///// Gets or sets the wallet history.
@@ -594,50 +594,51 @@ namespace SmartStore.Core.Domain.Orders
                 this.PaymentStatusId = (int)value;
             }
         }
+        [NotMapped]
+        public int ProductID { get; set; }
+        //      /// <summary>
+        //      /// Gets or sets the shipping status
+        //      /// </summary>
+        //[DataMember]
+        //public ShippingStatus ShippingStatus
+        //      {
+        //          get
+        //          {
+        //              return (ShippingStatus)this.ShippingStatusId;
+        //          }
+        //          set
+        //          {
+        //              this.ShippingStatusId = (int)value;
+        //          }
+        //      }
 
-  //      /// <summary>
-  //      /// Gets or sets the shipping status
-  //      /// </summary>
-		//[DataMember]
-		//public ShippingStatus ShippingStatus
-  //      {
-  //          get
-  //          {
-  //              return (ShippingStatus)this.ShippingStatusId;
-  //          }
-  //          set
-  //          {
-  //              this.ShippingStatusId = (int)value;
-  //          }
-  //      }
+        //      /// <summary>
+        //      /// Gets or sets the customer tax display type
+        //      /// </summary>
+        //[DataMember]
+        //public TaxDisplayType CustomerTaxDisplayType
+        //      {
+        //          get
+        //          {
+        //              return (TaxDisplayType)this.CustomerTaxDisplayTypeId;
+        //          }
+        //          set
+        //          {
+        //              this.CustomerTaxDisplayTypeId = (int)value;
+        //          }
+        //      }
 
-  //      /// <summary>
-  //      /// Gets or sets the customer tax display type
-  //      /// </summary>
-		//[DataMember]
-		//public TaxDisplayType CustomerTaxDisplayType
-  //      {
-  //          get
-  //          {
-  //              return (TaxDisplayType)this.CustomerTaxDisplayTypeId;
-  //          }
-  //          set
-  //          {
-  //              this.CustomerTaxDisplayTypeId = (int)value;
-  //          }
-  //      }
+        //      /// <summary>
+        //      /// Gets the applied tax rates
+        //      /// </summary>
+        //      public SortedDictionary<decimal, decimal> TaxRatesDictionary
+        //      {
+        //          get
+        //          {
+        //              return ParseTaxRates(this.TaxRates);
+        //          }
+        //      }
 
-  //      /// <summary>
-  //      /// Gets the applied tax rates
-  //      /// </summary>
-  //      public SortedDictionary<decimal, decimal> TaxRatesDictionary
-  //      {
-  //          get
-  //          {
-  //              return ParseTaxRates(this.TaxRates);
-  //          }
-  //      }
-        
         #endregion
     }
 }

@@ -2,6 +2,7 @@
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Wallet;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SmartStore.Services.Calc
 {
@@ -34,7 +35,9 @@ namespace SmartStore.Services.Calc
         /// </summary>
         /// <param name="CompanyTotal"></param>
         void CalcRewardTwo(decimal CompanyTotal);
-
+         Task<int> CalcRewardTwoAsync(decimal CompanyTotal);
+         Task<int> CalcRewardThreeAsync(decimal StoreTotal);
+         Task<int> CalcRewardFourAsync(decimal StoreTotal);
         /// <summary>
         /// 查节点
         /// </summary>
