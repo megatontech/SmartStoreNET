@@ -37,6 +37,7 @@ using SmartStore.Core.Domain.Shipping;
 using SmartStore.Core.Domain.Stores;
 using SmartStore.Core.Domain.Tax;
 using SmartStore.Core.Domain.Themes;
+using SmartStore.Core.Domain.Wallet;
 using SmartStore.Core.Domain.Topics;
 using SmartStore.Core.Plugins;
 using SmartStore.Services.Seo;
@@ -211,6 +212,10 @@ namespace SmartStore.Admin.Infrastructure
                 .ForMember(dest => dest.CreatedOn, mo => mo.Ignore())
                 .ForMember(dest => dest.UpdatedOn, mo => mo.Ignore())
                 .ForMember(dest => dest.GridPageSize, mo => mo.Ignore());
+            CreateMap<WithdrawalDetailModel, WithdrawalDetail>();
+            CreateMap<WithdrawalTotalModel, WithdrawalTotal>();
+            CreateMap<WithdrawalDetail, WithdrawalDetailModel > ();
+            CreateMap<WithdrawalTotal, WithdrawalTotalModel > ();
             CreateMap<CategoryModel, Category>()
                 .ForMember(dest => dest.HasDiscountsApplied, mo => mo.Ignore())
                 .ForMember(dest => dest.CreatedOnUtc, mo => mo.Ignore())

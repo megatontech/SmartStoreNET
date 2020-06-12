@@ -43,8 +43,10 @@ namespace SmartStore.Admin.Models.Customers
 		[SmartResourceDisplayName("Admin.Customers.Customers.Fields.Title")]
 		public string Title { get; set; }
 		public bool TitleEnabled { get; set; }
-
-		public bool GenderEnabled { get; set; }
+        [SmartResourceDisplayName("是否为报单用户")]
+        public bool IsCustomer { get; set; }
+        
+        public bool GenderEnabled { get; set; }
         [SmartResourceDisplayName("Admin.Customers.Customers.Fields.Gender")]
         public string Gender { get; set; }
 
@@ -106,6 +108,9 @@ namespace SmartStore.Admin.Models.Customers
         [SmartResourceDisplayName("Admin.Customers.Customers.Fields.Phone")]
         [AllowHtml]
         public string Phone { get; set; }
+        [SmartResourceDisplayName("上级手机号")]
+        [AllowHtml]
+        public string ParentPhone { get; set; }
 
         public bool FaxEnabled { get; set; }
         [SmartResourceDisplayName("Admin.Customers.Customers.Fields.Fax")]

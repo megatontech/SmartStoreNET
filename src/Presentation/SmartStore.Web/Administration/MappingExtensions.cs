@@ -312,7 +312,14 @@ namespace SmartStore.Admin
         }
 
         #endregion Queued email
-
+        public static WithdrawalTotalModel ToModel(this WithdrawalTotal entity)
+        {
+            return Mapper.Map<WithdrawalTotal, WithdrawalTotalModel>(entity);
+        }
+        public static WithdrawalDetailModel ToModel(this WithdrawalDetail entity)
+        {
+            return Mapper.Map<WithdrawalDetail, WithdrawalDetailModel>(entity);
+        }
         #region Campaigns
 
         public static CampaignModel ToModel(this Campaign entity)

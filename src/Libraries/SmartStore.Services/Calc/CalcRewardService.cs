@@ -273,7 +273,7 @@ namespace SmartStore.Services.Calc
 
             //每个贡献值的价值
             var pointValue = (decimal)0;
-            if (totalPoint != 0) { pointValue = Math.Round(reward / totalPoint); }
+            if (totalPoint != 0) { pointValue = (reward / totalPoint); }
 
             //每个人的贡献值
             foreach (var item in list)

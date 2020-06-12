@@ -1,0 +1,135 @@
+﻿@model WithdrawalTotalModel
+@using SmartStore.Core.Domain.Wallet
+@using Telerik.Web.Mvc.UI
+@{
+    var allString = T("Admin.Common.All").Text;
+
+    ViewBag.Title = T("钱包流水").Text;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            <i class="fa fa-cube"></i>
+            @T("钱包流水")
+        </div>
+        <div class="options">
+            @{ Html.RenderWidget("admin_button_toolbar_before"); }
+            @{ Html.RenderWidget("admin_button_toolbar_after"); }
+        </div>
+    </div>
+    <div>
+        @(Html.Telerik().Grid<WithdrawalTotalModel>()
+            .Name("products-grid")
+            .Columns(columns =>
+            {
+                //columns.Bound(x => x.Id)
+                //    .Filterable(false)
+                //    .Sortable(false)
+                //    .Template(x => string.Format("<input type='checkbox' name='checkedRecords' value='{0}' class='checkboxGroups'/>", x.Id))
+                //    .ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
+                //    .Title("<input id='mastercheckbox' type='checkbox'/>")
+                //    .Width(50)
+                //    .HtmlAttributes(new { style = "text-align:center" })
+                //    .HeaderHtmlAttributes(new { style = "text-align:center" });
+
+                columns.Bound(x => x.CustomerId);
+                columns.Bound(x => x.CustomerName);
+                columns.Bound(x => x.TotalAmount)
+                    .Format("{0:0.00}")
+                    .RightAlign();
+                columns.Bound(x => x.TotalDecShareAmount).Centered();
+                columns.Bound(x => x.TotalFreezeAmount).Centered();
+                columns.Bound(x => x.TotalLuckyAmount).Centered();
+                columns.Bound(x => x.TotalPushAmount).Centered();
+                columns.Bound(x => x.TotalStoreShareAmount).Centered();
+                columns.Bound(x => x.UpdateTime);
+                columns.Bound(x => x.IsCount)
+                    .Template(item => @Html.SymbolForBool(item.IsCount))
+                    .Centered();
+            })
+            .Sortable(x =>
+            {
+                x.AllowUnsort(true);
+                x.SortMode(GridSortMode.SingleColumn);
+            })
+            //.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+            .DataBinding(dataBinding => dataBinding.Ajax().Select("Wallet", "DeclarationWalletOverview"))
+            .ClientEvents(events => events.OnDataBinding("productsGrid_onDataBinding").OnDataBound("productsGrid_onDataBound"))
+            //.EnableCustomBinding(true)
+            .PreserveGridState())
+    </div>
+
+    <script type="text/javascript">
+		var selectedIds = [];
+		$(function () {
+			$("#products-grid").thumbZoomer();
+			$('#mastercheckbox').click(function () {
+				$('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
+			});
+            $('#delete-selected').click(function (e) {
+                if (confirm(@T("Admin.Common.AskToProceed").JsText)) {
+                    e.preventDefault();
+                    //redirect to required URL
+                    setLocation('@(Url.Action("DeleteSelected", "Product"))?selectedIds=' + selectedIds.join(","));
+                    return false;
+                }
+			});
+
+			//wire up checkboxes.
+			$(document).on('change', '#products-grid input[type=checkbox][id!=mastercheckbox]', function (e) {
+				var $check = $(this);
+				if ($check.is(":checked") == true) {
+					var checked = jQuery.inArray($check.val(), selectedIds);
+					if (checked == -1) {
+						//add id to selectedIds.
+						selectedIds.push($check.val());
+					}
+				}
+				else {
+					var checked = jQuery.inArray($check.val(), selectedIds);
+					if (checked > -1) {
+						//remove id from selectedIds.
+						selectedIds = $.grep(selectedIds, function (item, index) {
+							return item != $check.val();
+						});
+					}
+				}
+				productsGrid_updateMasterCheckbox();
+			});
+		});
+
+		function productsGrid_onDataBinding(e) {
+			var searchModel = {
+				@*//SearchProductName: $('#@Html.FieldIdFor(model => model.SearchProductName)').val(),*@
+				SearchCategoryId: $('#SearchCategoryId').val(),
+				SearchManufacturerId: $('#SearchManufacturerId').val(),
+				SearchStoreId: $('#SearchStoreId').val(),
+				SearchProductTypeId: $('#SearchProductTypeId').val(),
+				SearchWithoutCategories: $('#SearchWithoutCategories').val(),
+				SearchWithoutManufacturers: $('#SearchWithoutManufacturers').val(),
+				SearchIsPublished: $('#SearchIsPublished').val(),
+				SearchHomePageProducts: $('#SearchHomePageProducts').val()
+			};
+			e.data = searchModel;
+		}
+
+		function productsGrid_onDataBound(e) {
+			$('#products-grid input[type=checkbox][id!=mastercheckbox]').each(function () {
+				var currentId = $(this).val();
+				var checked = jQuery.inArray(currentId, selectedIds);
+				//set checked based on if current checkbox's value is in selectedIds.
+				$(this).attr('checked', checked > -1);
+			});
+
+			productsGrid_updateMasterCheckbox();
+		}
+
+		function productsGrid_updateMasterCheckbox() {
+			var numChkBoxes = $('#products-grid input[type=checkbox][id!=mastercheckbox]').length;
+			var numChkBoxesChecked = $('#products-grid input[type=checkbox][checked][id!=mastercheckbox]').length;
+			$('#mastercheckbox').attr('checked', numChkBoxes == numChkBoxesChecked && numChkBoxes > 0);
+		}
+    </script>
+
+}

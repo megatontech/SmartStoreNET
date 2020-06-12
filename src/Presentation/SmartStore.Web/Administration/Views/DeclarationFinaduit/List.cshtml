@@ -158,23 +158,21 @@
                     .RightAlign()
                     .ClientTemplate(
                         "<div class='pr-2'><big style='font-weight:600'><#= OrderTotal #></big> <i class='<#= PaymentStatusLabelClass #>' title='<#= PaymentStatus #>'></i></div>" +
-                        "<# if(HasPaymentMethod){ #><div class='muted pr-2'><#= WithPaymentMethod #></div><# } #>")
-                    .FooterTemplate(
-                        string.Format("<div class='pr-2'><div class='font-weight-medium mb-2'>{0}:</div>" +
-                        (hideProfitReport ? "{1}" : "<div>{1}: <span id=\"aggregator-profit-block\" class=\"float-right\"></span></div>") +
-                        "<div>{2}: <span id=\"aggregator-tax-block\" class=\"float-right\"></span></div>" +
-                        "<div>{3}: <span id=\"aggregator-total-block\" class=\"float-right\"></span></div></div>",
-                        @T("Admin.Orders.Report.Summary").Text,
-                        (hideProfitReport ? "" : @T("Admin.Orders.Report.Profit").Text),
-                        @T("Admin.Orders.Report.Tax").Text,
-                        @T("Admin.Orders.Report.Total").Text));
+                        "<# if(HasPaymentMethod){ #><div class='muted pr-2'><#= WithPaymentMethod #></div><# } #>");
+
+                columns.Bound(x => x.Id)
+                     .Width(200)
+                     .RightAlign()
+                     .ClientTemplate(
+                         "审核 驳回").Title("操作");
+
             })
             .Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
             .DataBinding(dataBinding => dataBinding.Ajax().Select("OrderList", "DeclarationFinaduit"))
             .PreserveGridState()
             .EnableCustomBinding(true))
 	</div>
-	
+              
     <script type="text/javascript">
 		@*used by widget SmartStore.CommonExportProviders::ExportButtonsGeneral.cshtml*@
 		var selectedIds = [];

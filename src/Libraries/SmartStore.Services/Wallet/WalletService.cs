@@ -181,13 +181,13 @@ namespace SmartStore.Services.Wallet
                 var total = _IWithdrawalTotalService.Get(customer);
                 var finalAmount = customer.TotalPointsValue2 > customer.CapLinesTotal ? customer.CapLinesTotal : customer.TotalPointsValue2;
                 total.TotalAmount += finalAmount;
-                total.TotalPushAmount += customer.TotalPointsValue2;
+                total.TotalDecShareAmount += finalAmount;
                 total.UpdateTime = DateTime.Now;
                 _IWithdrawalTotalService.Update(total);
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
                     Amount = finalAmount,
-                    Comment = "营业额度分红入账" + finalAmount+"封顶值"+customer.CapLinesTotal + "贡献值分红"+ customer.TotalPointsValue2,
+                    Comment = "营业额度分红入账：" + finalAmount+"封顶值："+customer.CapLinesTotal + "贡献值预计分红：" + customer.TotalPointsValue2,
                     Customer = customer.Id,
                     isOut = false,
                     WithdrawTime = DateTime.Now,

@@ -489,7 +489,7 @@ namespace SmartStore.Admin.Controllers
 
             //default value
             model.Active = true;
-
+            model.IsCustomer = true;
             return View(model);
         }
 
@@ -515,7 +515,7 @@ namespace SmartStore.Admin.Controllers
             {
                 ModelState.AddModelError("", T("Account.Register.Errors.UsernameAlreadyExists"));
             }
-
+            
             // Validate customer roles.
             var allCustomerRoles = _customerService.GetAllCustomerRoles(true);
             var newCustomerRoles = new List<CustomerRole>();
@@ -555,7 +555,19 @@ namespace SmartStore.Admin.Controllers
                     CreatedOnUtc = DateTime.UtcNow,
                     LastActivityDateUtc = DateTime.UtcNow,
                 };
-
+                if (model.IsCustomer)
+                {
+                    customer.Mobile = model.Phone;
+                    customer.IsCustomer = true;
+                    customer.ParentMobile = model.ParentPhone;
+                    if (!string.IsNullOrEmpty(customer.ParentMobile) && _customerService.GetCustomerByMobile(customer.ParentMobile) != null)
+                    {
+                        var parent = _customerService.GetCustomerByMobile(customer.ParentMobile);
+                        customer.ParentID = parent.Id;
+                        customer.ParentCustomerGuid = parent.CustomerGuid;
+                        customer.ParentMobile = parent.Mobile;
+                    }
+                }
                 if (_customerSettings.TitleEnabled)
                     customer.Title = model.Title;
                 if (_customerSettings.DateOfBirthEnabled)

@@ -2,6 +2,7 @@
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Wallet;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SmartStore.Services.Wallet
@@ -47,6 +48,11 @@ namespace SmartStore.Services.Wallet
                 _WithdrawalTotalRepository.Insert(total);
                 return _WithdrawalTotalRepository.GetFirst(x => x.CustomerId == customer.Id);
             }
+        }
+
+        public List<WithdrawalTotal> GetAll()
+        {
+            return _WithdrawalTotalRepository.Table.Where(x => x.IsCount == false).ToList();
         }
 
         public void Update(WithdrawalTotal entity)

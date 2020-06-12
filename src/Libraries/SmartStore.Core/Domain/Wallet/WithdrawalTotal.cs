@@ -1,6 +1,7 @@
 ﻿using SmartStore.Core.Domain.Localization;
 using SmartStore.Core.Domain.Seo;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace SmartStore.Core.Domain.Wallet
@@ -24,7 +25,12 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember] 
         public int CustomerId { get; set; }
-
+        /// <summary>
+        /// 用户id
+        /// </summary>
+        [NotMapped]
+        public string CustomerName { get; set; }
+        
         /// <summary>
         /// 是否参与统计
         /// </summary>
@@ -38,7 +44,7 @@ namespace SmartStore.Core.Domain.Wallet
         public decimal TotalAmount { get; set; }
 
         /// <summary>
-        /// 佣金分红
+        /// 营业额度分红
         /// </summary>
         [DataMember] 
         public decimal TotalDecShareAmount { get; set; }
@@ -56,7 +62,7 @@ namespace SmartStore.Core.Domain.Wallet
         public decimal TotalLuckyAmount { get; set; }
 
         /// <summary>
-        /// 直推分红
+        /// 直推佣金、推广佣金
         /// </summary>
         [DataMember] 
         public decimal TotalPushAmount { get; set; }

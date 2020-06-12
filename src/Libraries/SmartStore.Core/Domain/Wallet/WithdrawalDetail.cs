@@ -38,6 +38,11 @@ namespace SmartStore.Core.Domain.Wallet
         [DataMember] 
         public Guid CustomerID { get; set; }
         /// <summary>
+        /// 用户id
+        /// </summary>
+        [NotMapped]
+        public string CustomerName { get; set; }
+        /// <summary>
         /// 操作人ID
         /// </summary>
         [DataMember] 

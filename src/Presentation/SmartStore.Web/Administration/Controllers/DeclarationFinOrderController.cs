@@ -1159,6 +1159,7 @@ namespace SmartStore.Admin.Controllers
                 CustomerOrderComment = "",
                 AcceptThirdPartyEmailHandOver = false
             };
+            model.PaidDateUtc = DateTime.Now;
             model.OrderGuid = Guid.NewGuid();
             _DeclarationOrderService.InsertOrder(model);
             var neworder = _DeclarationOrderService.GetOrderByGuid(model.OrderGuid);
