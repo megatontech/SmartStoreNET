@@ -9,7 +9,7 @@ namespace SmartStore.Services.Calc
     /// <summary>
     /// Represents a task for deleting guest customers
     /// </summary>
-    public partial class CalcRewardTwoTask : ITask
+    public partial class UpdateRealtimeData : ITask
     {
         #region Private Fields
 
@@ -20,7 +20,7 @@ namespace SmartStore.Services.Calc
 
         #region Public Constructors
 
-        public CalcRewardTwoTask(ICustomerService customerService, ICalcRewardService calcService)
+        public UpdateRealtimeData(ICustomerService customerService, ICalcRewardService calcService)
         {
             _customerService = customerService;
             _calcService = calcService;
@@ -28,8 +28,7 @@ namespace SmartStore.Services.Calc
 
         public void Execute(TaskExecutionContext ctx)
         {
-            var total = 0M;
-            _calcService.CalcRewardTwoAsync(total);
+            _calcService.UpdateRealtimeData();
         }
 
         #endregion Public Constructors
@@ -43,7 +42,7 @@ namespace SmartStore.Services.Calc
         //    //60*24 = 1 day
         //    var olderThanMinutes = 1440; // TODO: move to settings
         //    var total = 0M;
-        //    await _calcService.CalcRewardTwoAsync(total);
+        //    await _calcService.CalcRewardThreeAsync(total);
         //}
 
         #endregion Public Methods

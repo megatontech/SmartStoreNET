@@ -45,7 +45,7 @@ namespace SmartStore.Services.Wallet
             else {
                 DeclarationCalcRule entity = new DeclarationCalcRule()
                 {
-                    UpdateTime = DateTime.Now,
+                    UpdateTime = DateTime.UtcNow,
                     CalcRewardFourEqual = false,
                     CalcRewardFourPercent = 10,
                     CalcRewardOneL1Percent = 15,
@@ -57,7 +57,7 @@ namespace SmartStore.Services.Wallet
                     CalcRewardTwoPercent = 25,
                     CalcRewardTwoPointPercent = 100,
                     Comment = "",
-                    CreateTime = DateTime.Now,
+                    CreateTime = DateTime.UtcNow,
                     WithDrawToPointPercent =1,
                     isUse = true
                 };

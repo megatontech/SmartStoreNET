@@ -40,8 +40,8 @@ namespace SmartStore.Services.Wallet
             _IWithdrawalDetailService = iWithdrawalDetailService;
             _calcruleService = calcruleService;
             _calcrule = _calcruleService.GetDeclarationCalcRule();
-            sdateTime = DateTime.Now;
-            edateTime = DateTime.Now.AddHours(_calcrule.CalcRewardFourAliveHours);
+            sdateTime = DateTime.UtcNow;
+            edateTime = DateTime.UtcNow.AddHours(_calcrule.CalcRewardFourAliveHours);
         }
 
         #endregion Public Constructors
@@ -60,7 +60,7 @@ namespace SmartStore.Services.Wallet
             var total = _IWithdrawalTotalService.Get(customer);
             total.TotalAmount += luck.Amount;
             total.TotalLuckyAmount += luck.Amount;
-            total.UpdateTime = DateTime.Now;
+            total.UpdateTime = DateTime.UtcNow;
             _IWithdrawalTotalService.Update(total);
             luck.isOut = true;
             _ILuckMoneyService.Update(luck);
@@ -70,7 +70,7 @@ namespace SmartStore.Services.Wallet
                 Comment = "领取红包入账" + luck.Amount.ToString("F2"),
                 Customer = customer.Id,
                 isOut = false,
-                WithdrawTime = DateTime.Now,
+                WithdrawTime = DateTime.UtcNow,
                 WithdrawType = 4,
                 CustomerID = customer.CustomerGuid
             });
@@ -120,7 +120,7 @@ namespace SmartStore.Services.Wallet
                 var total = _IWithdrawalTotalService.Get(customer);
                 total.TotalAmount += amount;
                 total.TotalPushAmount += amount;
-                total.UpdateTime = DateTime.Now;
+                total.UpdateTime = DateTime.UtcNow;
                 _IWithdrawalTotalService.Update(total);
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
@@ -128,7 +128,7 @@ namespace SmartStore.Services.Wallet
                     Comment = "直推佣金入账" + amount.ToString("F2"),
                     Customer = customer.Id,
                     isOut = false,
-                    WithdrawTime = DateTime.Now,
+                    WithdrawTime = DateTime.UtcNow,
                     WithdrawType = 1,
                     CustomerID = customer.CustomerGuid
                 });
@@ -150,7 +150,7 @@ namespace SmartStore.Services.Wallet
                 var total = _IWithdrawalTotalService.Get(customer);
                 total.TotalAmount += customer.TotalPointsValue3;
                 total.TotalPushAmount += customer.TotalPointsValue3;
-                total.UpdateTime = DateTime.Now;
+                total.UpdateTime = DateTime.UtcNow;
                 _IWithdrawalTotalService.Update(total);
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
@@ -158,7 +158,7 @@ namespace SmartStore.Services.Wallet
                     Comment = "商城利润分红入账"+ customer.TotalPointsValue3.ToString("F2"),
                     Customer = customer.Id,
                     isOut = false,
-                    WithdrawTime = DateTime.Now,
+                    WithdrawTime = DateTime.UtcNow,
                     WithdrawType = 3,
                     CustomerID = customer.CustomerGuid
                 });
@@ -182,7 +182,7 @@ namespace SmartStore.Services.Wallet
                 var finalAmount = customer.TotalPointsValue2 > customer.CapLinesTotal ? customer.CapLinesTotal : customer.TotalPointsValue2;
                 total.TotalAmount += finalAmount;
                 total.TotalDecShareAmount += finalAmount;
-                total.UpdateTime = DateTime.Now;
+                total.UpdateTime = DateTime.UtcNow;
                 _IWithdrawalTotalService.Update(total);
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
@@ -190,7 +190,7 @@ namespace SmartStore.Services.Wallet
                     Comment = "营业额度分红入账：" + finalAmount+"封顶值："+customer.CapLinesTotal + "贡献值预计分红：" + customer.TotalPointsValue2,
                     Customer = customer.Id,
                     isOut = false,
-                    WithdrawTime = DateTime.Now,
+                    WithdrawTime = DateTime.UtcNow,
                     WithdrawType = 2,
                     CustomerID = customer.CustomerGuid
                 });

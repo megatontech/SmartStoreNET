@@ -760,6 +760,7 @@
     <Content Include="Views\DeclarationFinOrder\Create.cshtml" />
     <Content Include="Views\DeclarationWalletOverview\List.cshtml" />
     <Content Include="Views\DeclarationWalletOverview\MainList.cshtml" />
+    <Content Include="Views\DeclarationFinOrder\ReportRegisteredCustomers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />

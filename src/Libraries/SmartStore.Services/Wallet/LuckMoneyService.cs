@@ -34,7 +34,7 @@ namespace SmartStore.Services.Wallet
 
         public LuckMoney GetLuckMoneyByCustomer(int id)
         {
-            return _LuckMoneyRepository.Table.FirstOrDefault(x => x.Customer == id && x.StartTime >= DateTime.Now && x.EndTime <= DateTime.Now);
+            return _LuckMoneyRepository.Table.FirstOrDefault(x => x.Customer == id && x.StartTime >= DateTime.UtcNow && x.EndTime <= DateTime.UtcNow);
         }
 
         public LuckMoney GetLuckMoneyById(int id)

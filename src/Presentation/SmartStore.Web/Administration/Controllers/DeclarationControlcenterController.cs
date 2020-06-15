@@ -112,7 +112,7 @@ namespace SmartStore.Admin.Controllers
             //Customer customer = _CustomerService.GetCustomerById(33);
             //DeclarationOrder order = _DeclarationOrder.GetOrderById(13);
             DailyTotalContribution model = _CalcRewardService.UpdateRealtimeData();
-            _CalcRewardService.CalcRewardTwoAsync(0M);
+            //_CalcRewardService.CalcRewardTwoAsync(0M);
             //_CalcRewardService.CalcRewardTwo(1400M);
             //_CalcRewardService.CalcRewardThree(500M);
             //_CalcRewardService.CalcRewardFour(100M);

@@ -1,0 +1,32 @@
+﻿@model IList<OrderIncompleteReportLineModel>
+
+<div class="card shadow-sm mb-4">
+	<h6 class="card-header font-weight-medium border-bottom-0">
+		<i class="fa fa-users pr-2"></i>
+		@T("今日销售额前五会员")
+	</h6>
+
+	<div class="table-responsive">
+		<table class="table table-striped m-0">
+			<thead>
+				<tr>
+					<th>@T("账号")</th>
+					<th>@T("订单数")</th>
+                    <th>@T("订单金额")</th>
+				</tr>
+			</thead>
+            <tbody>
+                @foreach (var x in Model)
+                {
+                    <tr>
+                        <td>@x.Item</td>
+                        <td>@x.Total</td>
+                        <td>@x.Count</td>
+                    </tr>
+                }
+               
+            </tbody>
+		</table>
+	</div>
+</div>
+

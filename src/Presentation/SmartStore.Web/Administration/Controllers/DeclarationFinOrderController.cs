@@ -44,6 +44,10 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Telerik.Web.Mvc;
 using SmartStore.Services.Calc;
+using SmartStore.Admin.Models.Customers;
+using Microsoft.Ajax.Utilities;
+using WebGrease.Css.Extensions;
+
 namespace SmartStore.Admin.Controllers
 {
     [AdminAuthorize]
@@ -63,6 +67,7 @@ namespace SmartStore.Admin.Controllers
         private readonly ICurrencyService _currencyService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerService _customerService;
+        private readonly ICustomerReportService _customerReportService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IDeclarationOrderService _DeclarationOrderService;
         private readonly IDownloadService _downloadService;
@@ -132,6 +137,7 @@ namespace SmartStore.Admin.Controllers
             IPriceCalculationService priceCalculationService,
             IEventPublisher eventPublisher,
             ICustomerService customerService,
+            ICustomerReportService customerReportService,
             PluginMediator pluginMediator,
             IAffiliateService affiliateService,
             ICustomerActivityService customerActivityService,
@@ -192,6 +198,7 @@ namespace SmartStore.Admin.Controllers
             _shoppingCartSettings = shoppingCartSettings;
             _DeclarationOrderService = declarationOrderService;
             _CalcRewardService = calcRewardService;
+            _customerReportService = customerReportService;
         }
 
         #endregion Ctor
@@ -2633,8 +2640,19 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult BestsellersBriefReportByAmount()
         {
-            var model = GetBestsellersBriefReportModel(5, 2);
-            return PartialView(model);
+            IList<BestsellersReportLineModel> models = new List<BestsellersReportLineModel>();
+            var product = _dproductService.GetAllProductsDisplayedOnHomePage();
+            var report = _DeclarationOrderService.GetAllOrders(0, 0, int.MaxValue);
+            foreach (var item in product)
+            {
+                BestsellersReportLineModel rmodel = new BestsellersReportLineModel();
+                rmodel.ProductName = item.Name;
+                rmodel.TotalAmount = report.Where(x => x.ProductID == item.Id).Sum(x => x.OrderTotal).ToString("F2");
+                rmodel.TotalQuantity = report.Count(x => x.ProductID == item.Id);
+                models.Add(rmodel);
+            }
+            models = models.OrderByDescending(x => x.TotalAmount).ToList();
+            return PartialView(models);
         }
 
         [GridAction(EnableCustomBinding = true)]
@@ -2651,11 +2669,63 @@ namespace SmartStore.Admin.Controllers
                 Data = gridModel
             };
         }
+        [ChildActionOnly]
+        public ActionResult ReportRegisteredCustomers()
+        {
+            //今日报单会员销售额前五
+            var model = new List<OrderIncompleteReportLineModel>();
+            var customer = _customerService.BuildCurrentTree();
+            customer.OrderBy(x => x.CurrentOrderSum).Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
+            {
+                Item = x.Username,
+                Count = x.OrderList.Count(),
+                Total = x.CurrentOrderSum.ToString("F2")
+            }));
+            return PartialView(model);
+        }
+        [NonAction]
+        protected IList<RegisteredCustomerReportLineModel> GetReportRegisteredCustomersModel()
+        {
+            var report = new List<RegisteredCustomerReportLineModel>();
+            report.Add(new RegisteredCustomerReportLineModel()
+            {
+                Period = T("Admin.Customers.Reports.RegisteredCustomers.Fields.Period.7days"),
+                Customers = _customerReportService.GetRegisteredCustomersReport(7)
+            });
+            report.Add(new RegisteredCustomerReportLineModel()
+            {
+                Period = T("Admin.Customers.Reports.RegisteredCustomers.Fields.Period.14days"),
+                Customers = _customerReportService.GetRegisteredCustomersReport(14)
+            });
+            report.Add(new RegisteredCustomerReportLineModel()
+            {
+                Period = T("Admin.Customers.Reports.RegisteredCustomers.Fields.Period.month"),
+                Customers = _customerReportService.GetRegisteredCustomersReport(30)
+            });
+            report.Add(new RegisteredCustomerReportLineModel()
+            {
+                Period = T("Admin.Customers.Reports.RegisteredCustomers.Fields.Period.year"),
+                Customers = _customerReportService.GetRegisteredCustomersReport(365)
+            });
+
+            return report;
+        }
 
         public ActionResult BestsellersBriefReportByQuantity()
         {
-            var model = GetBestsellersBriefReportModel(5, 1);
-            return PartialView(model);
+            IList<BestsellersReportLineModel> models = new List<BestsellersReportLineModel>();
+            var product = _dproductService.GetAllProductsDisplayedOnHomePage();
+            var report = _DeclarationOrderService.GetAllOrders(0, 0, int.MaxValue);
+            foreach (var item in product)
+            {
+                BestsellersReportLineModel rmodel = new BestsellersReportLineModel();
+                rmodel.ProductName = item.Name;
+                rmodel.TotalAmount = report.Where(x => x.ProductID == item.Id).Sum(x => x.OrderTotal).ToString("F2");
+                rmodel.TotalQuantity = report.Count(x => x.ProductID == item.Id);
+                models.Add(rmodel);
+            }
+            models = models.OrderByDescending(x => x.TotalQuantity).ToList();
+            return PartialView(models);
         }
 
         [GridAction(EnableCustomBinding = true)]
@@ -2800,7 +2870,15 @@ namespace SmartStore.Admin.Controllers
         [ChildActionOnly]
         public ActionResult OrderIncompleteReport()
         {
-            var model = GetOrderIncompleteReportModel();
+            //今日报单会员订单数前五
+            var model = new List<OrderIncompleteReportLineModel>();
+            var customer = _customerService.BuildCurrentTree();
+            customer.OrderBy(x => x.OrderList.Count()).Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
+            {
+                Item = x.Username,
+                Count = x.OrderList.Count(),
+                Total = x.CurrentOrderSum.ToString("F2")
+            }));
             return PartialView(model);
         }
 
@@ -2835,30 +2913,19 @@ namespace SmartStore.Admin.Controllers
         [NonAction]
         protected IList<BestsellersReportLineModel> GetBestsellersBriefReportModel(int recordsToReturn, int orderBy)
         {
-            var report = _orderReportService.BestSellersReport(0, null, null,
-                null, null, null, 0, recordsToReturn, orderBy, true);
-
-            var model = report.Select(x =>
+            IList<BestsellersReportLineModel> models = new List<BestsellersReportLineModel>();
+            var product = _dproductService.GetAllProductsDisplayedOnHomePage();
+            var report = _DeclarationOrderService.GetAllOrders(0,0,int.MaxValue);
+            foreach (var item in product)
             {
-                var product = _productService.GetProductById(x.ProductId);
-
-                var m = new BestsellersReportLineModel()
-                {
-                    ProductId = x.ProductId,
-                    TotalAmount = _priceFormatter.FormatPrice(x.TotalAmount, true, false),
-                    TotalQuantity = x.TotalQuantity,
-                };
-
-                if (product != null)
-                {
-                    m.ProductName = product.Name;
-                    m.ProductTypeName = product.GetProductTypeLabel(_localizationService);
-                    m.ProductTypeLabelHint = product.ProductTypeLabelHint;
-                }
-                return m;
-            }).ToList();
-
-            return model;
+                BestsellersReportLineModel rmodel = new BestsellersReportLineModel();
+                rmodel.ProductName = item.Name;
+                rmodel.TotalAmount = report.Where(x => x.ProductID == item.Id).Sum(x=>x.OrderTotal).ToString("F2");
+                rmodel.TotalQuantity = report.Count(x => x.ProductID == item.Id);
+                models.Add(rmodel);
+            }
+            models = models.OrderByDescending(x => x.TotalAmount).ToList();
+            return models;
         }
 
         [NonAction]

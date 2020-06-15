@@ -49,7 +49,7 @@ namespace SmartStore.Services.Wallet
             //减余额，加积分，记日志
             var total = _IWithdrawalTotalService.Get(customer);
             total.TotalAmount -= model.Amount;
-            total.UpdateTime = DateTime.Now;
+            total.UpdateTime = DateTime.UtcNow;
             _IWithdrawalTotalService.Update(total);
             var pointVal = 0;
             pointVal = (int)model.Amount * (int)_calcrule.WithDrawToPointPercent;
@@ -64,7 +64,7 @@ namespace SmartStore.Services.Wallet
                 isOut = false,
                 PointGetType = PointGetType.Withdraw,
                 PointUseType = PointUseType.Shop,
-                UpdateTime = DateTime.Now
+                UpdateTime = DateTime.UtcNow
             }) ;
             _IWithdrawalDetailService.Add(new WithdrawalDetail()
             {
@@ -76,7 +76,7 @@ namespace SmartStore.Services.Wallet
                 isOut = true,
                 Operater = customer.Id,
                 OperaterID = customer.CustomerGuid,
-                WithdrawTime = DateTime.Now,
+                WithdrawTime = DateTime.UtcNow,
                 WithdrawType = 2
             }) ;
         }
@@ -123,7 +123,7 @@ namespace SmartStore.Services.Wallet
             this._WithdrawalApplyRepository.Update(withdrawal);
             var total = _IWithdrawalTotalService.Get(customer);
             total.TotalFreezeAmount -= withdrawal.Amount;
-            total.UpdateTime = DateTime.Now;
+            total.UpdateTime = DateTime.UtcNow;
             _IWithdrawalTotalService.Update(total);
             var pointVal = 0f;
             pointVal = (float)withdrawal.Amount * (float)(_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
@@ -138,7 +138,7 @@ namespace SmartStore.Services.Wallet
                 isOut = false,
                 PointGetType = PointGetType.Withdraw,
                 PointUseType = PointUseType.Shop,
-                UpdateTime = DateTime.Now
+                UpdateTime = DateTime.UtcNow
             });
             _IWithdrawalDetailService.Add(new WithdrawalDetail()
             {
@@ -150,7 +150,7 @@ namespace SmartStore.Services.Wallet
                 isOut = true,
                 Operater = customer.Id,
                 OperaterID = customer.CustomerGuid,
-                WithdrawTime = DateTime.Now,
+                WithdrawTime = DateTime.UtcNow,
                 WithdrawType = 2
             });
         }
@@ -165,7 +165,7 @@ namespace SmartStore.Services.Wallet
             var total = _IWithdrawalTotalService.Get(customer);
             total.TotalAmount -= amount;
             total.TotalFreezeAmount += amount;
-            total.UpdateTime = DateTime.Now;
+            total.UpdateTime = DateTime.UtcNow;
             _IWithdrawalTotalService.Update(total);
             this._WithdrawalApplyRepository.Insert(new WithdrawalApply()
             {
@@ -180,9 +180,9 @@ namespace SmartStore.Services.Wallet
                 isOut = true,
                 Operater = customer.Id,
                 OperaterID = customer.CustomerGuid,
-                UpdateTime = DateTime.Now,
+                UpdateTime = DateTime.UtcNow,
                 WithdrawStatus = WithdrawalApplyStatus.Pending,
-                WithdrawTime = DateTime.Now,
+                WithdrawTime = DateTime.UtcNow,
                 WithdrawType = WithdrawalApplyType.Cash
 
             }) ;

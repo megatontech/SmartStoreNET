@@ -279,6 +279,7 @@ namespace SmartStore.Web.Framework
 			//钱包服务
 			builder.RegisterType<WalletService>().As<IWalletService>().InstancePerRequest();
 			//计算分红
+			//builder.RegisterType<CalcRewardService>().As<ICalcRewardService>().InstancePerRequest();
 			builder.RegisterType<CalcRewardService>().As<ICalcRewardService>().InstancePerRequest();
 			//封顶规则
 			builder.RegisterType<DeclarationCapRuleService>().As<IDeclarationCapRuleService>().InstancePerRequest();

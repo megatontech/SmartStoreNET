@@ -33,7 +33,7 @@ namespace SmartStore.Services.Wallet
 
         public DailyCustomerContributionDetail Get(int id,Guid guid)
         {
-            var today = DateTime.Now.Date;
+            var today = DateTime.UtcNow.Date;
             if (!_DailyCustomerContributionDetailRepository.Table.Any(x => x.CreateTime >= today&&x.Customer==id))
             {
                 DailyCustomerContributionDetail dailyTotalContribution = new DailyCustomerContributionDetail()
@@ -48,7 +48,7 @@ namespace SmartStore.Services.Wallet
                     TotalPointValue=0M,
                     CustomerID= guid,
                     TotalValue = 0M,
-                    UpdateTime = DateTime.Now
+                    UpdateTime = DateTime.UtcNow
                 };
                 _DailyCustomerContributionDetailRepository.Insert(dailyTotalContribution);
                 return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime >= today && x.Customer == id);
