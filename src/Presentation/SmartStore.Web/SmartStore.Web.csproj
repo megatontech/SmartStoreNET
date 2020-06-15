@@ -1873,6 +1873,8 @@
     <Content Include="Views\DeclarationOrder\PaymentMethod.cshtml" />
     <Content Include="Views\DeclarationOrder\ShippingAddress.cshtml" />
     <Content Include="Views\DeclarationOrder\ShippingMethod.cshtml" />
+    <Content Include="Views\Common\Partials\BottomShopBar.cshtml" />
+    <Content Include="Views\Common\Partials\BottomShopBar.Tools.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -20,12 +20,12 @@
 
 		@{ Html.RenderWidget("header_menu_before"); }
 
-		@if (Model.HasContactUsPage)
+		@*@if (Model.HasContactUsPage)
 		{
 			<a class="menubar-link" href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a>
-		}
+		}*@
 
-		@{ Html.SmartStore().Menu().Name("HelpAndService").Template("Dropdown").Render(); }
+		@*@{ Html.SmartStore().Menu().Name("HelpAndService").Template("Dropdown").Render(); }*@
 
 		@if (Model.IsCustomerImpersonated)
 		{
@@ -37,7 +37,7 @@
 	</nav>
 
     <nav class="menubar-group menubar-group--special">
-        @if (Model.NewsEnabled)
+        @*@if (Model.NewsEnabled)
         {
             <a class="menubar-link" href="@Url.RouteUrl("NewsArchive")">
                 @T("News")
@@ -54,7 +54,7 @@
             <a class="menubar-link" href="@Url.RouteUrl("Boards")">
                 @T("Forum.Forums")
             </a>
-        }
+        }*@
         @{ Html.RenderWidget("header_menu_special_after"); }
     </nav>
 

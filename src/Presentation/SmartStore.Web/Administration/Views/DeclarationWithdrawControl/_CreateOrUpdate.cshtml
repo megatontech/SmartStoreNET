@@ -10,23 +10,41 @@
 @Html.ValidationSummary(false)
 @Html.HiddenFor(model => model.Id)
 
+@using (Html.BeginForm())
+{
 
     <table class="adminContent">
         <tr>
-            <td class="adminTitle">
-                提现手续费百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL1Percent)
+            <td>
+                <div class="table-responsive">
+                    <table class="table admin-table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="xt-header align-top text-center" scope="col">参数名称</th>
+                                <th class="xt-header text-center" scope="col">参数值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    提现手续费百分比
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayTextFor(model => model.CalcRewardOneL1Percent)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    提现转积分百分比
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayTextFor(model => model.CalcRewardOneL2Percent)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </td>
         </tr>
-        <tr>
-            <td class="adminTitle">
-                提现转积分百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL2Percent)
-            </td>
-        </tr>
-        
     </table>
+}

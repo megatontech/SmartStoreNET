@@ -4,14 +4,14 @@
 @{
     var allString = T("Admin.Common.All").Text;
 
-    ViewBag.Title = T("钱包流水").Text;
+    ViewBag.Title = T("后台钱包流水").Text;
 }
 @using (Html.BeginForm())
 {
     <div class="section-header">
         <div class="title">
             <i class="fa fa-cube"></i>
-            @T("钱包流水")
+            @T("后台钱包流水")
         </div>
         <div class="options">
             @{ Html.RenderWidget("admin_button_toolbar_before"); }
@@ -33,19 +33,18 @@
                 //	.HtmlAttributes(new { style = "text-align:center" })
                 //	.HeaderHtmlAttributes(new { style = "text-align:center" });
 
-                columns.Bound(x => x.Customer);
-                columns.Bound(x => x.CustomerName);
-                columns.Bound(x => x.Amount)
+                columns.Bound(x => x.Customer).Title("会员id").Centered();
+                columns.Bound(x => x.CustomerName).Title("会员名字").Centered();
+                columns.Bound(x => x.Amount).Title("金额")
                     .Format("{0:0.00}")
                     .RightAlign();
-                columns.Bound(x => x.Comment)
+                columns.Bound(x => x.Comment).Title("详情")
                     .Centered();
-                columns.Bound(x => x.WithdrawType)
+                columns.Bound(x => x.WithdrawType).Title("类型")
 
                     .Centered();
-                columns.Bound(x => x.WithdrawTime);
-                columns.Bound(x => x.IsCount)
-                    .Centered();
+                columns.Bound(x => x.WithdrawTime).Title("时间").Centered();
+               
             })
             .Sortable(x =>
             {

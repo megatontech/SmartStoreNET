@@ -11,14 +11,38 @@
 @Html.HiddenFor(model => model.Id)
 
 
+<table class="adminContent">
+    
+
+</table>
+
+@using (Html.BeginForm())
+{
+
     <table class="adminContent">
         <tr>
-            <td class="adminTitle">
-                余额转积分比例1：？积分
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL1Percent)
+            <td>
+                <div class="table-responsive">
+                    <table class="table admin-table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="xt-header text-center" scope="col">参数名称</th>
+                                <th class="xt-header text-center" scope="col">参数值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    余额转积分比例1：？积分
+                                </td>
+                                <td class="text-center">
+                                    @Html.DisplayTextFor(model => model.CalcRewardOneL1Percent)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </td>
         </tr>
-        
     </table>
+}

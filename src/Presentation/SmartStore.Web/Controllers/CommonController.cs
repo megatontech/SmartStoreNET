@@ -392,7 +392,30 @@ namespace SmartStore.Web.Controllers
 			return PartialView(model);
         }
 
-		[ChildActionOnly]
+
+        [ChildActionOnly]
+        public ActionResult BottomShopBar()
+        {
+            var customer = _services.WorkContext.CurrentCustomer;
+            var isAdmin = customer.IsAdmin();
+            var isRegistered = isAdmin || customer.IsRegistered();
+
+            var model = new ShopBarModel
+            {
+                IsAuthenticated = isRegistered,
+                CustomerEmailUsername = isRegistered ? (_customerSettings.CustomerLoginType != CustomerLoginType.Email ? customer.Username : customer.Email) : "",
+                IsCustomerImpersonated = _services.WorkContext.OriginalCustomerIfImpersonated != null,
+                DisplayAdminLink = _services.Permissions.Authorize(StandardPermissionProvider.AccessAdminPanel),
+                ShoppingCartEnabled = _services.Permissions.Authorize(StandardPermissionProvider.EnableShoppingCart) && _shoppingCartSettings.MiniShoppingCartEnabled,
+                WishlistEnabled = _services.Permissions.Authorize(StandardPermissionProvider.EnableWishlist),
+                CompareProductsEnabled = _catalogSettings.CompareProductsEnabled,
+                PublicStoreNavigationAllowed = _services.Permissions.Authorize(StandardPermissionProvider.PublicStoreAllowNavigation)
+            };
+
+            return PartialView(model);
+        }
+
+        [ChildActionOnly]
 		[GdprConsent]
 		public ActionResult Footer()
         {

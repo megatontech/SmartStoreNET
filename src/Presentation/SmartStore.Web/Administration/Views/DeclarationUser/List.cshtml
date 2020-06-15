@@ -32,78 +32,18 @@
     </div>
 
 	<div class="row mt-3 grid-filter" style="display: none">
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.SearchEmail)
-			@Html.TextBoxFor(model => Model.SearchEmail, new { @class = "form-control sf" })
-		</div>
-
-		@if (Model.UsernamesEnabled)
-		{
+		
 			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
 				@Html.SmartLabelFor(model => model.SearchUsername)
 				@Html.TextBoxFor(model => Model.SearchUsername, new { @class = "form-control sf" })
 			</div>
-		}
 
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.SearchTerm)
-			@Html.TextBoxFor(model => Model.SearchTerm, new { @class = "form-control sf", placeholder = T("Admin.Customers.Customers.List.SearchTerm.Hint").Text })
-		</div>
-
-		@if (Model.DateOfBirthEnabled)
-		{
-			var monthOfBirthValues = new List<SelectListItem>();
-			for (int i = 1; i <= 12; i++)
-			{
-				monthOfBirthValues.Add(new SelectListItem { Text = i.ToString(CultureInfo.InvariantCulture), Value = i.ToString(CultureInfo.InvariantCulture) });
-			}
-
-			var dayOfBirthValues = new List<SelectListItem>();
-			for (int i = 1; i <= 31; i++)
-			{
-				dayOfBirthValues.Add(new SelectListItem { Text = i.ToString(CultureInfo.InvariantCulture), Value = i.ToString(CultureInfo.InvariantCulture) });
-			}
-
-			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-				<div>
-					@Html.SmartLabelFor(model => model.SearchMonthOfBirth)
-				</div>
-				<div class="form-row">
-					<div class="col">
-						@Html.DropDownListFor(model => Model.SearchMonthOfBirth, monthOfBirthValues, T("Admin.Customers.Customers.List.SearchDateOfBirth.Month").Text)
-					</div>
-					<div class="col">
-						@Html.DropDownListFor(model => Model.SearchDayOfBirth, dayOfBirthValues, T("Admin.Customers.Customers.List.SearchDateOfBirth.Day").Text)
-					</div>
-				</div>
-			</div>
-		}
-
-		@if (Model.PhoneEnabled)
-		{
+		
 			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
 				@Html.SmartLabelFor(model => model.SearchPhone)
 				@Html.TextBoxFor(model => Model.SearchPhone, new { @class = "form-control sf" })
 			</div>
-		}
 
-		@if (Model.ZipPostalCodeEnabled)
-		{
-			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-				@Html.SmartLabelFor(model => model.SearchZipPostalCode)
-				@Html.TextBoxFor(model => Model.SearchZipPostalCode, new { @class = "form-control sf" })
-			</div>
-		}
-
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.SearchCustomerRoleIds)
-			@Html.DropDownList("SearchCustomerRoleIds", Model.AvailableCustomerRoles, null, new { multiple = "multiple", @class = "form-control" })
-		</div>
-
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.SearchActiveOnly)
-			@Html.EditorFor(model => Model.SearchActiveOnly, new { @class = "form-control sf" })
-		</div>
 
 		<div class="col-sm-6 col-lg-4 col-xl-3 form-group ml-auto">
 			<button type="submit" id="search-customers" name="search-customers" class="btn btn-warning btn-block">
@@ -154,7 +94,7 @@
 				.Title(String.Empty)
 				.HtmlAttributes(new { align = "right", @class = "omega" });
 		})
-		.Pageable(settings => settings.Total(Model.Customers.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.Total(Model.Customers.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("CustomerList", "Customer"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

@@ -4,14 +4,14 @@
 @{
     var allString = T("Admin.Common.All").Text;
 
-    ViewBag.Title = T("钱包流水").Text;
+    ViewBag.Title = T("后台钱包总览").Text;
 }
 @using (Html.BeginForm())
 {
     <div class="section-header">
         <div class="title">
             <i class="fa fa-cube"></i>
-            @T("钱包流水")
+            @T("后台钱包总览")
         </div>
         <div class="options">
             @{ Html.RenderWidget("admin_button_toolbar_before"); }
@@ -33,20 +33,18 @@
                 //    .HtmlAttributes(new { style = "text-align:center" })
                 //    .HeaderHtmlAttributes(new { style = "text-align:center" });
 
-                columns.Bound(x => x.CustomerId);
-                columns.Bound(x => x.CustomerName);
-                columns.Bound(x => x.TotalAmount)
+                columns.Bound(x => x.CustomerId).Title("会员id").Centered();
+                columns.Bound(x => x.CustomerName).Title("会员名字").Centered();
+                columns.Bound(x => x.TotalAmount).Title("金额").Centered()
                     .Format("{0:0.00}")
                     .RightAlign();
-                columns.Bound(x => x.TotalDecShareAmount).Centered();
-                columns.Bound(x => x.TotalFreezeAmount).Centered();
-                columns.Bound(x => x.TotalLuckyAmount).Centered();
-                columns.Bound(x => x.TotalPushAmount).Centered();
-                columns.Bound(x => x.TotalStoreShareAmount).Centered();
-                columns.Bound(x => x.UpdateTime);
-                columns.Bound(x => x.IsCount)
-                    .Template(item => @Html.SymbolForBool(item.IsCount))
-                    .Centered();
+                columns.Bound(x => x.TotalDecShareAmount).Title("业绩分红").Centered();
+                columns.Bound(x => x.TotalFreezeAmount).Title("冻结").Centered();
+                columns.Bound(x => x.TotalLuckyAmount).Title("红包收入").Centered();
+                columns.Bound(x => x.TotalPushAmount).Title("直推").Centered();
+                columns.Bound(x => x.TotalStoreShareAmount).Title("商城分红").Centered();
+                columns.Bound(x => x.UpdateTime).Title("更新时间").Centered();
+
             })
             .Sortable(x =>
             {

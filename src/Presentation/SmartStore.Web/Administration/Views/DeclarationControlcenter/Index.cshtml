@@ -2,13 +2,13 @@
 @using SmartStore.Core.Domain.Wallet;
 @using Telerik.Web.Mvc.UI;
 @{
-    ViewBag.Title = T("Admin.Dashboard").Text;
+    ViewBag.Title = T("操盘控制台").Text;
 }
 
 <div class="section-header">
     <div class="title">
         <i class="far fa-chart-bar"></i>
-        @T("Admin.Dashboard.StoreStatistics")
+        @T("操盘控制台")
     </div>
 </div>
 
@@ -41,25 +41,25 @@
             @*@{ Html.RenderAction("OrderAverageReport", "Order"); }*@
             <div class="row">
                 <div class="col-xl-6">
-                    @*@{ Html.RenderAction("BestsellersBriefReportByQuantity", "Order"); }*@
+                    @{ Html.RenderAction("BestsellersBriefReportByQuantity", "DeclarationFinOrder"); }
                 </div>
                 <div class="col-xl-6">
-                    @*@{ Html.RenderAction("BestsellersBriefReportByAmount", "Order"); }*@
+                    @{ Html.RenderAction("BestsellersBriefReportByAmount", "DeclarationFinOrder"); }
                 </div>
             </div>
             <div class="row">
                 <div class="col-xl-6">
-                    @*@{ Html.RenderAction("ReportRegisteredCustomers", "Customer"); }*@
+                    @{ Html.RenderAction("ReportRegisteredCustomers", "Customer"); }
                 </div>
                 <div class="col-xl-6">
-                    @*@{ Html.RenderAction("OrderIncompleteReport", "Order"); }*@
+                    @{ Html.RenderAction("OrderIncompleteReport", "DeclarationFinOrder"); }
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-3 col-xl-2">
-            @*@{ Html.RenderAction("MarketplaceFeed"); }*@
-        </div>
+        @*<div class="col-lg-3 col-xl-2">
+            @{ Html.RenderAction("MarketplaceFeed"); }
+        </div>*@
     </div>
 
     @{ Html.RenderWidget("admin_dashboard_bottom"); }

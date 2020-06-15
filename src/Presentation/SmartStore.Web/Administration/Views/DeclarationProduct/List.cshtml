@@ -143,7 +143,7 @@
 				x.AllowUnsort(true);
 				x.SortMode(GridSortMode.SingleColumn);
 			})
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("ProductList", "DeclarationProduct"))
 			.ClientEvents(events => events.OnDataBinding("productsGrid_onDataBinding").OnDataBound("productsGrid_onDataBound"))
 			.EnableCustomBinding(true)

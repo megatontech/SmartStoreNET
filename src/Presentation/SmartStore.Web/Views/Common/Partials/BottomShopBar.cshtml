@@ -1,0 +1,10 @@
+﻿@model ShopBarModel
+
+@using SmartStore.Web.Models.Common;
+
+<div class="shopbar">
+	<div class="shopbar-col-group shopbar-col-group-tools">
+		<!-- TOOLS -->
+		@{ Html.RenderPartial("BottomShopBar.Tools", Model); }
+	</div>
+</div>

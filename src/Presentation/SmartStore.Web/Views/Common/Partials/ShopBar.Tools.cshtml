@@ -39,7 +39,7 @@
 		</a>
 	</div>
 
-	@if (Model.CompareProductsEnabled)
+	@*@if (Model.CompareProductsEnabled)
 	{
 		<div class="shopbar-tool" id="shopbar-compare" data-target="#compare-tab">
 			<a href="@Url.Action("CompareProducts", "Catalog")"  class="shopbar-button navbar-toggler" data-toggle="offcanvas" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { compare = true })"
@@ -57,9 +57,9 @@
 				</span>
 			</a>
 		</div>
-	}
+	}*@
 
-	@if (Model.WishlistEnabled)
+	@*@if (Model.WishlistEnabled)
 	{
 		<div class="shopbar-tool" id="shopbar-wishlist" data-target="#wishlist-tab">
 			<a href="@Url.RouteUrl("Wishlist")" class="shopbar-button navbar-toggler" data-toggle="offcanvas" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { wishlist = true })"
@@ -77,7 +77,7 @@
 				</span>
 			</a>
 		</div>
-	}
+	}*@
 
 	@if (Model.ShoppingCartEnabled)
 	{

@@ -1,37 +1,192 @@
 ﻿@using Telerik.Web.Mvc.UI
 @using SmartStore.Admin.Models.Wallet;
 @{
-	ViewBag.Title = T("提现申请管理").Text;
+    ViewBag.Title = T("提现申请管理").Text;
 }
 <div class="section-header">
     <div class="title">
-		<i class="fa fa-shopping-cart"></i>
+        <i class="far fa-chart-bar"></i>
         @T("提现申请审核")
     </div>
-    <div class="options">
-		@*<a href="@Url.Action("Create")" class="btn btn-primary">
-			<i class="fa fa-plus"></i>
-			<span>@T("Admin.Common.AddNew")</span>
-		</a>*@
+    <div class="options d-flex">
+        @{ Html.RenderWidget("admin_button_toolbar_before"); }
+
+        <div class="input-group d-inline-flex mr-3" style="width: 400px">
+            @*@Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("按订单编号查找") })*@
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-secondary" id="go-to-order-by-number" name="go-to-order-by-number" value="go-to-order-by-number" title="@T("Admin.Orders.List.GoDirectlyToNumber.Hint")">
+                    <i class="fa fa-search"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-toggle-filter" data-toggle="button" aria-pressed="false">
+                    <i class="fa fa-filter"></i>
+                    <span>@T("Common.Filter")</span>
+                    <i class="fa fa-angle-double-down"></i>
+                </button>
+            </div>
+        </div>
+
+        @{ Html.RenderWidget("admin_button_toolbar_after"); }
+    </div>
+</div>
+
+<div class="row mt-3 grid-filter" style="display: none">
+    @*<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.SmartLabelFor(model => model.StartDate)
+        @Html.EditorFor(model => Model.StartDate)
+    </div>
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.SmartLabelFor(model => model.EndDate)
+        @Html.EditorFor(model => Model.EndDate)
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.SmartLabelFor(model => model.OrderNumber)
+        @Html.EditorFor(model => Model.OrderNumber)
+    </div>
+
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.Label("订单审核状态")
+        @Html.DropDownList("PaymentStatusIds", Model.AvailablePaymentStatuses, null, new { multiple = "multiple", @class = "form-control" })
+    </div>
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.Label("姓名")
+        @Html.EditorFor(model => Model.CustomerName)
+    </div>
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.Label("账号")
+        @Html.EditorFor(model => Model.OrderNumber)
+    </div>
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @Html.Label("手机")
+        @Html.EditorFor(model => Model.OrderNumber)
+    </div>*@
+
+    <div class="col-sm-6 col-lg-4 col-xl-3 form-group ml-auto">
+        @Html.SmartLabel(string.Empty, string.Empty)
+        <button type="submit" id="btnSearch" class="btn btn-warning btn-block">
+            <span>@T("搜索")</span>
+        </button>
     </div>
 </div>
 
 <div>
-	@(Html.Telerik().Grid<DeclarationFinwithdraladuitModel>()
-		.Name("stores-grid")
-		.Columns(columns =>
-		{
-			columns.Bound(x => x.CustomerID);
-			columns.Bound(x => x.Amount)
-				.ClientTemplate("<a href=\"<#= Url #>\" target=\"_blank\"><#= Url #></a>");
-			columns.Bound(x => x.WithdrawType);
-			columns.Bound(x => x.WithdrawStatus);
-			columns.Bound(x => x.WithdrawTime)
-				.ClientTemplate("<a href=\"<#= ContentDeliveryNetwork #>\" target=\"_blank\"><#= ContentDeliveryNetwork #></a>");
-			columns.Bound(x => x.WithdrawAuditTime)
-				.Centered();
-		})
-		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "DeclarationFinwithdraladuit"))
-		.EnableCustomBinding(true))
+    @(Html.Telerik().Grid<DeclarationFinwithdraladuitModel>()
+        .Name("stores-grid")
+        .Columns(columns =>
+        {
+            columns.Bound(x => x.CustomerID).Title(T("申请人账号")).Centered();
+            columns.Bound(x => x.CustomerID).Title(T("申请人名字")).Centered();
+            columns.Bound(x => x.CustomerID).Title(T("申请人手机号")).Centered();
+            columns.Bound(x => x.Amount).Title(T("提现申请金额")).Centered();
+            columns.Bound(x => x.WithdrawType).Title(T("提现申请类型")).Centered();
+            columns.Bound(x => x.WithdrawStatus).Title(T("状态")).Centered();
+            columns.Bound(x => x.WithdrawTime).Title(T("申请时间")).Centered();
+            columns.Bound(x => x.WithdrawAuditTime).Title(T("审核时间"))
+                .Centered();
+            columns.Bound(x => x.Id)
+                     .Width(200)
+                     .RightAlign()
+                     .ClientTemplate(
+                    "<a href='/Admin/DeclarationFinwithdraladuit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;" +
+                    "<a href='/Admin/DeclarationFinwithdraladuit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
+                    "<a href='/Admin/DeclarationFinwithdraladuit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
+                    ).Title("操作");
+        })
+        .Pageable(settings => settings.PageSize(20).Position(GridPagerPosition.Bottom))
+            .DataBinding(dataBinding => dataBinding.Ajax().Select("List", "DeclarationFinwithdraladuit"))
+            .PreserveGridState()
+            .EnableCustomBinding(true))
 </div>
 
+
+<script type="text/javascript">
+		var selectedIds = [];
+		var reportAggregates = "";
+
+		$(document).ready(function () {
+
+			$('.btn-toggle-filter').on('click', function (e) {
+				$('.grid-filter').slideToggle({ duration: 200, easing: 'ease-in-out' });
+			});
+
+			//search button
+			$('#btnSearch').click(function () {
+				//search
+				var grid = $('#orders-grid').data('tGrid');
+				grid.currentPage = 1; //new search. Set page size to 1
+				grid.ajaxRequest();
+				//clear selected checkboxes
+				$('.checkboxGroups').attr('checked', false).change();
+				selectedIds = [];
+				return false;
+			});
+
+
+			$('#mastercheckbox').click(function () {
+				$('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
+			});
+
+			//wire up checkboxes.
+			$(document).on('change', '#orders-grid input[type=checkbox][id!=mastercheckbox]', function (e) {
+				var $check = $(this);
+				if ($check.is(":checked") == true) {
+					var checked = jQuery.inArray($check.val(), selectedIds);
+					if (checked == -1) {
+						//add id to selectedIds.
+						selectedIds.push($check.val());
+					}
+				}
+				else {
+					var checked = jQuery.inArray($check.val(), selectedIds);
+					if (checked > -1) {
+						//remove id from selectedIds.
+						selectedIds = $.grep(selectedIds, function (item, index) {
+							return item != $check.val();
+						});
+					}
+				}
+				updateMasterCheckbox();
+			});
+		});
+
+		function onDataBinding(e) {
+			var searchModel = {
+				@*StartDate: $('#@Html.FieldIdFor(model => model.StartDate)').val(),
+				EndDate: $('#@Html.FieldIdFor(model => model.EndDate)').val(),
+				OrderStatusIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.OrderStatusIds)').val()).join(),
+				PaymentStatusIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.PaymentStatusIds)').val()).join(),
+                OrderNumber: $('#@Html.FieldIdFor(model => model.OrderNumber)').val(),
+                PaymentMethods: jQuery.makeArray($('#@Html.FieldIdFor(model => model.PaymentMethods)').val()).join(),*@
+			};
+			e.data = searchModel;
+		}
+
+		function onDataBound(e) {
+
+			$('#orders-grid input[type=checkbox][id!=mastercheckbox]').each(function () {
+				var currentId = $(this).val();
+				var checked = jQuery.inArray(currentId, selectedIds);
+				//set checked based on if current checkbox's value is in selectedIds.
+				$(this).attr('checked', checked > -1);
+			});
+
+			updateMasterCheckbox();
+
+		}
+
+		function onComplete(e) {
+			var result = e.response;
+			if (result) {
+				reportAggregates = e.response["aggregates"];
+			}
+		}
+
+		function updateMasterCheckbox() {
+			var numChkBoxes = $('#orders-grid input[type=checkbox][id!=mastercheckbox]').length;
+			var numChkBoxesChecked = $('#orders-grid input[type=checkbox][checked][id!=mastercheckbox]').length;
+			$('#mastercheckbox').attr('checked', numChkBoxes == numChkBoxesChecked && numChkBoxes > 0);
+		}
+</script>   

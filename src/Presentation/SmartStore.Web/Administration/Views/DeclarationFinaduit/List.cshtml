@@ -3,8 +3,7 @@
 @{
 	var hideProfitReport = false;
 	var allString = T("Admin.Common.All").Text;
-
-	ViewBag.Title = T("Admin.Orders").Text;
+	ViewBag.Title = T("报单订单").Text;
 }
 
 @using (Html.BeginForm())
@@ -12,13 +11,13 @@
     <div class="section-header">
         <div class="title">
             <i class="far fa-chart-bar"></i>
-            @T("报单订单")
+            @T("报单订单审核")
         </div>
         <div class="options d-flex">
 			@{ Html.RenderWidget("admin_button_toolbar_before"); }
 
 			<div class="input-group d-inline-flex mr-3" style="width: 400px">
-				@Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("Admin.Orders.List.GoDirectlyToNumber") })
+				@Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("按订单编号查找") })
 				<div class="input-group-append">
 					<button type="submit" class="btn btn-secondary" id="go-to-order-by-number" name="go-to-order-by-number" value="go-to-order-by-number" title="@T("Admin.Orders.List.GoDirectlyToNumber.Hint")">
 						<i class="fa fa-search"></i>
@@ -31,127 +30,101 @@
 				</div>
 			</div>	
 
-			@*<div class="dropdown dropdown-menu-right mx-1">
-				<a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">
-					@T("Admin.Common.Export.PDF")
-				</a>
-				<div class="dropdown-menu dropdown-menu-right">
-					<a href="javascript:void(0)" class="pdf-export-button dropdown-item" data-url="@Url.Action("ExportPdf", new { all = false })">
-						<i class="far fa-fw fa-file-pdf"></i>&nbsp;@T("Admin.Common.ExportToPdf.Selected")
-					</a>
-					<a href="javascript:void(0)" class="pdf-export-button dropdown-item" data-url="@Url.Action("ExportPdf", new { all = true })">
-						<i class="far fa-fw fa-file-pdf"></i>&nbsp;@T("Admin.Common.ExportToPdf.All")
-					</a>
-				</div>
-			</div>*@
-
 			@{ Html.RenderWidget("admin_button_toolbar_after"); }
         </div>
     </div>
 
-	<div class="row mt-3 grid-filter" style="display: none">
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.StartDate)
-			@Html.EditorFor(model => Model.StartDate)
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.EndDate)
-			@Html.EditorFor(model => Model.EndDate)
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.CustomerName)
-			@Html.EditorFor(model => Model.CustomerName)
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.CustomerEmail)
-			@Html.EditorFor(model => Model.CustomerEmail)
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.OrderGuid)
-			@Html.EditorFor(model => Model.OrderGuid)
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.OrderNumber)
-			@Html.EditorFor(model => Model.OrderNumber)
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.PaymentMethods)
-			@Html.DropDownList("PaymentMethods", Model.AvailablePaymentMethods, null, new { multiple = "multiple", @class = "form-control" })
-		</div>
-		@if (Model.AvailableStores.Count > 1)
-		{
-			<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-				@Html.SmartLabelFor(model => model.StoreId)
-				@Html.DropDownListFor(model => model.StoreId, Model.AvailableStores, allString, new { @class = "form-control" })
-			</div>
-		}
-		else
-		{
-			<div class="col-xl-3"></div>
-		}
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.OrderStatusIds)
-			@Html.DropDownList("OrderStatusIds", Model.AvailableOrderStatuses, null, new { multiple = "multiple", @class = "form-control" })
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.PaymentStatusIds)
-			@Html.DropDownList("PaymentStatusIds", Model.AvailablePaymentStatuses, null, new { multiple = "multiple", @class = "form-control" })
-		</div>
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-			@Html.SmartLabelFor(model => model.ShippingStatusIds)
-			@Html.DropDownList("ShippingStatusIds", Model.AvailableShippingStatuses, null, new { multiple = "multiple", @class = "form-control" })
-		</div>
+    <div class="row mt-3 grid-filter" style="display: none">
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @Html.SmartLabelFor(model => model.StartDate)
+            @Html.EditorFor(model => Model.StartDate)
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @Html.SmartLabelFor(model => model.EndDate)
+            @Html.EditorFor(model => Model.EndDate)
+        </div>
 
-		<div class="col-sm-6 col-lg-4 col-xl-3 form-group ml-auto">
-			@Html.SmartLabel(string.Empty, string.Empty)
-			<button type="submit" id="btnSearch" class="btn btn-warning btn-block">
-				<span>@T("Admin.Common.ApplyFilter")</span>
-			</button>
-		</div>
-	</div>
 
-	<div>
-		@(Html.Telerik().Grid<OrderModel>()
-			.Name("orders-grid")
-			.TableHtmlAttributes(new { @class = "multiline-grid" })
-			.ClientEvents(events => events
-				.OnDataBinding("onDataBinding")
-				.OnDataBound("onDataBound")
-				.OnComplete("onComplete"))
-			.Columns(columns =>
-			{
-				columns.Bound(x => x.Id)
-					.ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
-					.Title("<input id='mastercheckbox' type='checkbox'/>")
-					.Width(50)
-					.HtmlAttributes(new { style = "text-align:center" })
-					.HeaderHtmlAttributes(new { style = "text-align:center" });
-				@*TODO: number of products, product summary?*@
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @Html.SmartLabelFor(model => model.OrderNumber)
+            @Html.EditorFor(model => Model.OrderNumber)
+        </div>
+
+
+
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @*@Html.SmartLabelFor(model => model.PaymentStatusIds)*@
+            @Html.Label("订单审核状态")
+            @Html.DropDownList("PaymentStatusIds", Model.AvailablePaymentStatuses, null, new { multiple = "multiple", @class = "form-control" })
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @Html.Label("姓名")
+            @Html.EditorFor(model => Model.CustomerName)
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @*@Html.SmartLabelFor(model => model.OrderNumber)*@
+			@Html.Label("账号")
+            @Html.EditorFor(model => Model.OrderNumber)
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @Html.Label("手机")
+            @Html.EditorFor(model => Model.OrderNumber)
+        </div>
+        @*<div class="col-xl-3"></div>*@
+
+        <div class="col-sm-6 col-lg-4 col-xl-3 form-group ml-auto">
+            @Html.SmartLabel(string.Empty, string.Empty)
+            <button type="submit" id="btnSearch" class="btn btn-warning btn-block">
+                <span>@T("搜索")</span>
+            </button>
+        </div>
+    </div>
+
+    <div>
+        @(Html.Telerik().Grid<OrderModel>()
+            .Name("orders-grid")
+            .TableHtmlAttributes(new { @class = "multiline-grid" })
+            .ClientEvents(events => events
+                .OnDataBinding("onDataBinding")
+                .OnDataBound("onDataBound")
+                .OnComplete("onComplete"))
+            .Columns(columns =>
+            {
+                columns.Bound(x => x.Id)
+                    .ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
+                    .Title("<input id='mastercheckbox' type='checkbox'/>")
+                    .Width(50)
+                    .HtmlAttributes(new { style = "text-align:center" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center" });
                 columns.Bound(x => x.OrderNumber)
                     .Width(150)
-                    .Title(T("Admin.Order"))
-                    .ClientTemplate(@Html.LabeledOrderNumber());
+                    .Title(T("订单编号"))
+                    .ClientTemplate("<a href='/Admin/DeclarationFinaduit/View/<#= Id #>'><#= Id #></a>");
                 columns.Bound(x => x.CustomerName)
-                    //.Width(300)
-                    .Title(T("Admin.Orders.Fields.Customer"))
+                    .Title(T("客户账号"))
                     .ClientTemplate(
                         "<div><#= CustomerName #></div>" );
-                //columns.Bound(x => x.ShippingStatus)
-                //	.Title(T("Admin.Orders.Shipment"))
-                //	.ClientTemplate(
-                //		"<div><i class='<#= ShippingStatusLabelClass #>' title='<#= ShippingStatus #>'></i> " +
-                //		"<# if(IsShippable){ #><span><#= ShippingAddressString #></span><# } #>" +
-                //		"<# if(IsShippable){ #><div class='muted'><#= ViaShippingMethod #></div><# } #>" +
-                //		"<# if(!IsShippable){ #><span class='muted'><#= ShippingStatus #></span><# } #>" +
-                //		"</div>");
+                columns.Bound(x => x.CardName)
+                   .Title(T("客户姓名"))
+                   .ClientTemplate(
+                       "<div><#= CustomerName #></div>");
+                columns.Bound(x => x.CardNumber)
+                   .Title(T("客户手机"))
+                   .ClientTemplate(
+                       "<div><#= CustomerName #></div>");
                 columns.Bound(x => x.CreatedOn)
                     .Width(200)
-                    .Title(T("Order.OrderDate"))
+                    .Title(T("订单创建时间"))
                     .ClientTemplate(
                         "<div><#= CreatedOnString #></div>" );
+                columns.Bound(x => x.UpdatedOn)
+                    .Width(200)
+                    .Title(T("订单付款时间"))
+                    .ClientTemplate(
+                        "<div><#= CreatedOnString #></div>");
                 columns.Bound(x => x.OrderStatus)
                     .Width(100)
-                    .Title(T("Admin.Orders.Fields.OrderStatus"))
+                    .Title(T("订单审核状态"))
                     .ClientTemplate("<span class='<#= OrderStatusLabelClass #>'><#= OrderStatus #></span>");
                 columns.Bound(x => x.OrderTotal)
                     .Width(200)
@@ -164,23 +137,24 @@
                      .Width(200)
                      .RightAlign()
                      .ClientTemplate(
-                         "审核 驳回").Title("操作");
+                    "<a href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"+
+                    "<a href='/Admin/DeclarationFinaduit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
+                    "<a href='/Admin/DeclarationFinaduit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
+                    ).Title("操作");
 
             })
-            .Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+            .Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
             .DataBinding(dataBinding => dataBinding.Ajax().Select("OrderList", "DeclarationFinaduit"))
             .PreserveGridState()
             .EnableCustomBinding(true))
-	</div>
+    </div>
               
     <script type="text/javascript">
-		@*used by widget SmartStore.CommonExportProviders::ExportButtonsGeneral.cshtml*@
 		var selectedIds = [];
 		var reportAggregates = "";
 
 		$(document).ready(function () {
 
-			// Filter toggler
 			$('.btn-toggle-filter').on('click', function (e) {
 				$('.grid-filter').slideToggle({ duration: 200, easing: 'ease-in-out' });
 			});
@@ -197,21 +171,6 @@
 				return false;
 			});
 
-			// export products to pdf
-			$('a.pdf-export-button').click(function (e) {
-				e.preventDefault();
-
-				if (confirm(@T("Admin.Common.AskToProceed").JsText)) {
-					var form = '<form id="PdfExportForm" action="' + $(this).data('url') + '" method="post">';
-					form += '<input type="hidden" name="selectedIds" value="' + selectedIds.join(',') + '" />';
-					form += '</form>';
-
-					$('body').append(form);
-					$('#PdfExportForm').submit();
-				}
-
-				return false;
-			});
 
 			$('#mastercheckbox').click(function () {
 				$('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
@@ -244,13 +203,8 @@
 			var searchModel = {
 				StartDate: $('#@Html.FieldIdFor(model => model.StartDate)').val(),
 				EndDate: $('#@Html.FieldIdFor(model => model.EndDate)').val(),
-				CustomerEmail: $('#@Html.FieldIdFor(model => model.CustomerEmail)').val(),
-				CustomerName: $('#@Html.FieldIdFor(model => model.CustomerName)').val(),
 				OrderStatusIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.OrderStatusIds)').val()).join(),
 				PaymentStatusIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.PaymentStatusIds)').val()).join(),
-				ShippingStatusIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.ShippingStatusIds)').val()).join(),
-				StoreId: $('#@Html.FieldIdFor(model => model.StoreId)').val(),
-				OrderGuid: $('#@Html.FieldIdFor(model => model.OrderGuid)').val(),
                 OrderNumber: $('#@Html.FieldIdFor(model => model.OrderNumber)').val(),
                 PaymentMethods: jQuery.makeArray($('#@Html.FieldIdFor(model => model.PaymentMethods)').val()).join(),
 			};
@@ -268,30 +222,12 @@
 
 			updateMasterCheckbox();
 
-			reportLoaded(e);
 		}
 
 		function onComplete(e) {
 			var result = e.response;
 			if (result) {
 				reportAggregates = e.response["aggregates"];
-			}
-		}
-
-		function reportLoaded(e) {
-			if (reportAggregates != "") {
-				updateAggregates(reportAggregates);
-			}
-		}
-		function updateAggregates(aggs) {
-			for (var key in aggs) {
-
-				@if (!hideProfitReport)
-                {
-                <text>$('#aggregator-profit-block').text(aggs['aggregatorprofit']);</text>
-                }
-				$('#aggregator-tax-block').text(aggs['aggregatortax']);
-				$('#aggregator-total-block').text(aggs['aggregatortotal']);
 			}
 		}
 

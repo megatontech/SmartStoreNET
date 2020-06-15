@@ -3,6 +3,7 @@
 @using SmartStore.Core.Domain.Discounts;
 @using Telerik.Web.Mvc.UI;
 @using SmartStore.Web.Framework.UI;
+@using SmartStore.Utilities;
 @{
     Html.AddScriptParts(true, "~/Administration/Scripts/jquery.tmpl.min.js");
     Html.AddScriptParts(true, "~/Administration/Scripts/smartstore.discountrules.js");
@@ -10,118 +11,130 @@
 @Html.ValidationSummary(false)
 @Html.HiddenFor(model => model.Id)
 
+@using (Html.BeginForm())
+{
 
     <table class="adminContent">
         <tr>
-            <td class="adminTitle">
-                直推上级奖励百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL1Percent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                直推二级奖励百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL2Percent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                直推三级奖励百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL3Percent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                直推二级层数
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL2Count)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                直推三级层数
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardOneL3Count)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                商城分红百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardThreePercent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                贡献值点数分母
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardTwoPointPercent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                销售总额分红百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardTwoPercent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                是否平均分红包
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardFourEqual)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                红包占商城利润百分比
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CalcRewardFourPercent)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                是否启用
-            </td>
-            <td class="adminData">
-                @Html.CheckBoxFor(model => model.isUse)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                备注
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.Comment)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-               规则创建时间
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.CreateTime)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                最近更新时间
-            </td>
-            <td class="adminData">
-                @Html.DisplayTextFor(model => model.UpdateTime)
+            <td>
+                    <div class="table-responsive">
+                        <table class="table admin-table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="xt-header align-top text-center" scope="col">参数名称</th>
+                                    <th class="xt-header text-center" scope="col">参数值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        直推上级奖励百分比
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardOneL1Percent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        直推二级奖励百分比
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardOneL2Percent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        直推三级奖励百分比
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardOneL3Percent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        直推二级层数
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardOneL2Count)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        直推三级层数
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardOneL3Count)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        商城分红百分比
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardThreePercent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        贡献值点数分母
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardTwoPointPercent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        销售总额分红百分比
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardTwoPercent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        是否平均分红包
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardFourEqual)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        红包占商城利润百分比
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CalcRewardFourPercent)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">
+                                        备注
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.Comment)
+                                    </td>
+                                </tr>
+                                @*<tr>
+                                    <td class="text-center">
+                                        规则创建时间
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.CreateTime)
+                                    </td>
+                                </tr>*@
+                                <tr>
+                                    <td class="text-center">
+                                        最近更新时间
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.DisplayTextFor(model => model.UpdateTime)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
             </td>
         </tr>
     </table>
+}
+
