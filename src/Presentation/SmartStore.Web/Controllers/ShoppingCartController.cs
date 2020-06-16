@@ -2012,7 +2012,7 @@ namespace SmartStore.Web.Controllers
                 }
 
                 //shipping info
-                model.RequiresShipping = cart.RequiresShipping();
+                model.RequiresShipping =false;
                 if (model.RequiresShipping)
                 {
                     decimal? shoppingCartShippingBase = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart);

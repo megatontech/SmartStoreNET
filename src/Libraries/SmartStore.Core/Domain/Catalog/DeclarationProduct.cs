@@ -43,13 +43,13 @@ namespace SmartStore.Core.Domain.Catalog
 
         #endregion static
 
-        //private ICollection<ProductCategory> _productCategories;
-        private ICollection<ProductPicture> _productPictures;
+        private ICollection<DeclarationProductCategory> _productCategories;
+        private ICollection<DeclarationProductPicture> _productPictures;
       //  private ICollection<ProductReview> _productReviews;
         //private ICollection<ProductSpecificationAttribute> _productSpecificationAttributes;
         //private ICollection<ProductVariantAttribute> _productVariantAttributes;
         //private ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
-        private ICollection<TierPrice> _tierPrices;
+        //private ICollection<TierPrice> _tierPrices;
 
         private int _stockQuantity;
         private int _backorderModeId;
@@ -1027,24 +1027,24 @@ namespace SmartStore.Core.Domain.Catalog
             }
         }
 
-        ///// <summary>
-        ///// Gets or sets the collection of ProductCategory
-        ///// </summary>
-        //[DataMember]
-        //public virtual ICollection<ProductCategory> ProductCategories
-        //{
-        //    get { return _productCategories ?? (_productCategories = new HashSet<ProductCategory>()); }
-        //    protected set { _productCategories = value; }
-        //}
+        /// <summary>
+        /// Gets or sets the collection of ProductCategory
+        /// </summary>
+        [DataMember]
+        public virtual ICollection<DeclarationProductCategory> ProductCategories
+        {
+            get { return _productCategories ?? (_productCategories = new HashSet<DeclarationProductCategory>()); }
+            protected set { _productCategories = value; }
+        }
 
-       
+
         /// <summary>
         /// Gets or sets the collection of ProductPicture
         /// </summary>
-		[DataMember]
-        public virtual ICollection<ProductPicture> ProductPictures
+        [DataMember]
+        public virtual ICollection<DeclarationProductPicture> ProductPictures
         {
-            get { return _productPictures ?? (_productPictures = new List<ProductPicture>()); }
+            get { return _productPictures ?? (_productPictures = new List<DeclarationProductPicture>()); }
             protected set { _productPictures = value; }
         }
 
@@ -1091,12 +1091,12 @@ namespace SmartStore.Core.Domain.Catalog
         /// <summary>
         /// Gets or sets the tier prices
         /// </summary>
-        [DataMember]
-        public virtual ICollection<TierPrice> TierPrices
-        {
-            get { return _tierPrices ?? (_tierPrices = new HashSet<TierPrice>()); }
-            protected set { _tierPrices = value; }
-        }
+        //[DataMember]
+        //public virtual ICollection<TierPrice> TierPrices
+        //{
+        //    get { return _tierPrices ?? (_tierPrices = new HashSet<TierPrice>()); }
+        //    protected set { _tierPrices = value; }
+        //}
 
 
     }

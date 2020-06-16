@@ -453,7 +453,7 @@ namespace SmartStore.Web.Controllers
 				}
             }
 
-            return RedirectToAction("BillingAddress");
+            return RedirectToAction("ShippingAddress");
         }
 
 

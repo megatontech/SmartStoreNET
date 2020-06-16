@@ -1875,6 +1875,17 @@
     <Content Include="Views\DeclarationOrder\ShippingMethod.cshtml" />
     <Content Include="Views\Common\Partials\BottomShopBar.cshtml" />
     <Content Include="Views\Common\Partials\BottomShopBar.Tools.cshtml" />
+    <Content Include="Views\Catalog\Partials\DHomepageProducts.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Item.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Item.Price.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.FilterSort.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Item.Brand.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Item.Buttons.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Item.Rating.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Item.Variants.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.Pager.cshtml" />
+    <Content Include="Views\Shared\Partials\DProduct.List.ViewMode.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

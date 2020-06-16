@@ -2067,10 +2067,33 @@
           <Property Name="HasPreviewPicture" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="CountryOfOrigin" Relationship="Self.DeclarationProduct_CountryOfOrigin" FromRole="DeclarationProduct_CountryOfOrigin_Source" ToRole="DeclarationProduct_CountryOfOrigin_Target" />
           <NavigationProperty Name="DeliveryTime" Relationship="Self.DeclarationProduct_DeliveryTime" FromRole="DeclarationProduct_DeliveryTime_Source" ToRole="DeclarationProduct_DeliveryTime_Target" />
-          <NavigationProperty Name="ProductPictures" Relationship="Self.DeclarationProduct_ProductPictures" FromRole="DeclarationProduct_ProductPictures_Source" ToRole="DeclarationProduct_ProductPictures_Target" />
+          <NavigationProperty Name="ProductCategories" Relationship="Self.DeclarationProductCategory_Product" FromRole="DeclarationProductCategory_Product_Target" ToRole="DeclarationProductCategory_Product_Source" />
+          <NavigationProperty Name="ProductPictures" Relationship="Self.DeclarationProductPicture_Product" FromRole="DeclarationProductPicture_Product_Target" ToRole="DeclarationProductPicture_Product_Source" />
           <NavigationProperty Name="QuantityUnit" Relationship="Self.DeclarationProduct_QuantityUnit" FromRole="DeclarationProduct_QuantityUnit_Source" ToRole="DeclarationProduct_QuantityUnit_Target" />
           <NavigationProperty Name="SampleDownload" Relationship="Self.DeclarationProduct_SampleDownload" FromRole="DeclarationProduct_SampleDownload_Source" ToRole="DeclarationProduct_SampleDownload_Target" />
-          <NavigationProperty Name="TierPrices" Relationship="Self.DeclarationProduct_TierPrices" FromRole="DeclarationProduct_TierPrices_Source" ToRole="DeclarationProduct_TierPrices_Target" />
+        </EntityType>
+        <EntityType Name="DeclarationProductCategory" customannotation:ClrType="SmartStore.Core.Domain.Catalog.DeclarationProductCategory, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="CategoryId" Type="Int32" Nullable="false" />
+          <Property Name="IsFeaturedProduct" Type="Boolean" Nullable="false" />
+          <Property Name="DisplayOrder" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Category" Relationship="Self.DeclarationProductCategory_Category" FromRole="DeclarationProductCategory_Category_Source" ToRole="DeclarationProductCategory_Category_Target" />
+          <NavigationProperty Name="Product" Relationship="Self.DeclarationProductCategory_Product" FromRole="DeclarationProductCategory_Product_Source" ToRole="DeclarationProductCategory_Product_Target" />
+        </EntityType>
+        <EntityType Name="DeclarationProductPicture" customannotation:ClrType="SmartStore.Core.Domain.Catalog.DeclarationProductPicture, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="PictureId" Type="Int32" Nullable="false" />
+          <Property Name="DisplayOrder" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Picture" Relationship="Self.DeclarationProductPicture_Picture" FromRole="DeclarationProductPicture_Picture_Source" ToRole="DeclarationProductPicture_Picture_Target" />
+          <NavigationProperty Name="Product" Relationship="Self.DeclarationProductPicture_Product" FromRole="DeclarationProductPicture_Product_Source" ToRole="DeclarationProductPicture_Product_Target" />
         </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:ClrType="SmartStore.Core.Domain.Declaration.DeclarationCapRule, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
@@ -3578,9 +3601,61 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="DeclarationProduct_ProductPictures">
-          <End Role="DeclarationProduct_ProductPictures_Source" Type="Self.DeclarationProduct" Multiplicity="0..1" />
-          <End Role="DeclarationProduct_ProductPictures_Target" Type="Self.ProductPicture" Multiplicity="*" />
+        <Association Name="DeclarationProductCategory_Category">
+          <End Role="DeclarationProductCategory_Category_Source" Type="Self.DeclarationProductCategory" Multiplicity="*" />
+          <End Role="DeclarationProductCategory_Category_Target" Type="Self.Category" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="DeclarationProductCategory_Category_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductCategory_Category_Source">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DeclarationProductCategory_Product">
+          <End Role="DeclarationProductCategory_Product_Source" Type="Self.DeclarationProductCategory" Multiplicity="*" />
+          <End Role="DeclarationProductCategory_Product_Target" Type="Self.DeclarationProduct" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="DeclarationProductCategory_Product_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductCategory_Product_Source">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DeclarationProductPicture_Picture">
+          <End Role="DeclarationProductPicture_Picture_Source" Type="Self.DeclarationProductPicture" Multiplicity="*" />
+          <End Role="DeclarationProductPicture_Picture_Target" Type="Self.Picture" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="DeclarationProductPicture_Picture_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductPicture_Picture_Source">
+              <PropertyRef Name="PictureId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DeclarationProductPicture_Product">
+          <End Role="DeclarationProductPicture_Product_Source" Type="Self.DeclarationProductPicture" Multiplicity="*" />
+          <End Role="DeclarationProductPicture_Product_Target" Type="Self.DeclarationProduct" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="DeclarationProductPicture_Product_Target">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductPicture_Product_Source">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <Association Name="DeclarationProduct_QuantityUnit">
           <End Role="DeclarationProduct_QuantityUnit_Source" Type="Self.DeclarationProduct" Multiplicity="*" />
@@ -3605,10 +3680,6 @@
               <PropertyRef Name="SampleDownloadId" />
             </Dependent>
           </ReferentialConstraint>
-        </Association>
-        <Association Name="DeclarationProduct_TierPrices">
-          <End Role="DeclarationProduct_TierPrices_Source" Type="Self.DeclarationProduct" Multiplicity="0..1" />
-          <End Role="DeclarationProduct_TierPrices_Target" Type="Self.TierPrice" Multiplicity="*" />
         </Association>
         <Association Name="BackInStockSubscription_Customer">
           <End Role="BackInStockSubscription_Customer_Source" Type="Self.BackInStockSubscription" Multiplicity="*" />
@@ -3758,6 +3829,8 @@
           <EntitySet Name="ExportDeployments" EntityType="Self.ExportDeployment" />
           <EntitySet Name="ExportProfiles" EntityType="Self.ExportProfile" />
           <EntitySet Name="DeclarationProducts" EntityType="Self.DeclarationProduct" />
+          <EntitySet Name="DeclarationProductCategories" EntityType="Self.DeclarationProductCategory" />
+          <EntitySet Name="DeclarationProductPictures" EntityType="Self.DeclarationProductPicture" />
           <EntitySet Name="DeclarationCapRules" EntityType="Self.DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscriptions" EntityType="Self.BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplates" EntityType="Self.ManufacturerTemplate" />
@@ -4195,9 +4268,21 @@
             <End Role="DeclarationProduct_DeliveryTime_Source" EntitySet="DeclarationProducts" />
             <End Role="DeclarationProduct_DeliveryTime_Target" EntitySet="DeliveryTimes" />
           </AssociationSet>
-          <AssociationSet Name="DeclarationProduct_ProductPictures" Association="Self.DeclarationProduct_ProductPictures">
-            <End Role="DeclarationProduct_ProductPictures_Source" EntitySet="DeclarationProducts" />
-            <End Role="DeclarationProduct_ProductPictures_Target" EntitySet="ProductPictures" />
+          <AssociationSet Name="DeclarationProductCategory_Category" Association="Self.DeclarationProductCategory_Category">
+            <End Role="DeclarationProductCategory_Category_Source" EntitySet="DeclarationProductCategories" />
+            <End Role="DeclarationProductCategory_Category_Target" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="DeclarationProductCategory_Product" Association="Self.DeclarationProductCategory_Product">
+            <End Role="DeclarationProductCategory_Product_Source" EntitySet="DeclarationProductCategories" />
+            <End Role="DeclarationProductCategory_Product_Target" EntitySet="DeclarationProducts" />
+          </AssociationSet>
+          <AssociationSet Name="DeclarationProductPicture_Picture" Association="Self.DeclarationProductPicture_Picture">
+            <End Role="DeclarationProductPicture_Picture_Source" EntitySet="DeclarationProductPictures" />
+            <End Role="DeclarationProductPicture_Picture_Target" EntitySet="Pictures" />
+          </AssociationSet>
+          <AssociationSet Name="DeclarationProductPicture_Product" Association="Self.DeclarationProductPicture_Product">
+            <End Role="DeclarationProductPicture_Product_Source" EntitySet="DeclarationProductPictures" />
+            <End Role="DeclarationProductPicture_Product_Target" EntitySet="DeclarationProducts" />
           </AssociationSet>
           <AssociationSet Name="DeclarationProduct_QuantityUnit" Association="Self.DeclarationProduct_QuantityUnit">
             <End Role="DeclarationProduct_QuantityUnit_Source" EntitySet="DeclarationProducts" />
@@ -4206,10 +4291,6 @@
           <AssociationSet Name="DeclarationProduct_SampleDownload" Association="Self.DeclarationProduct_SampleDownload">
             <End Role="DeclarationProduct_SampleDownload_Source" EntitySet="DeclarationProducts" />
             <End Role="DeclarationProduct_SampleDownload_Target" EntitySet="Downloads" />
-          </AssociationSet>
-          <AssociationSet Name="DeclarationProduct_TierPrices" Association="Self.DeclarationProduct_TierPrices">
-            <End Role="DeclarationProduct_TierPrices_Source" EntitySet="DeclarationProducts" />
-            <End Role="DeclarationProduct_TierPrices_Target" EntitySet="TierPrices" />
           </AssociationSet>
           <AssociationSet Name="BackInStockSubscription_Customer" Association="Self.BackInStockSubscription_Customer">
             <End Role="BackInStockSubscription_Customer_Source" EntitySet="BackInStockSubscriptions" />
@@ -6255,6 +6336,27 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="DeclarationProductCategories">
+            <EntityTypeMapping TypeName="SmartStore.Data.DeclarationProductCategory">
+              <MappingFragment StoreEntitySet="DeclarationProductCategory">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
+                <ScalarProperty Name="IsFeaturedProduct" ColumnName="IsFeaturedProduct" />
+                <ScalarProperty Name="DisplayOrder" ColumnName="DisplayOrder" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DeclarationProductPictures">
+            <EntityTypeMapping TypeName="SmartStore.Data.DeclarationProductPicture">
+              <MappingFragment StoreEntitySet="DeclarationProductPicture">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="PictureId" ColumnName="PictureId" />
+                <ScalarProperty Name="DisplayOrder" ColumnName="DisplayOrder" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="DeclarationCapRules">
             <EntityTypeMapping TypeName="SmartStore.Data.DeclarationCapRule">
               <MappingFragment StoreEntitySet="DeclarationCapRule">
@@ -6447,24 +6549,6 @@
               <ScalarProperty Name="Id" ColumnName="Id" />
             </EndProperty>
             <Condition IsNull="false" ColumnName="ShippingAddress_Id" />
-          </AssociationSetMapping>
-          <AssociationSetMapping Name="DeclarationProduct_ProductPictures" TypeName="SmartStore.Data.DeclarationProduct_ProductPictures" StoreEntitySet="ProductPicture">
-            <EndProperty Name="DeclarationProduct_ProductPictures_Source">
-              <ScalarProperty Name="Id" ColumnName="DeclarationProduct_Id" />
-            </EndProperty>
-            <EndProperty Name="DeclarationProduct_ProductPictures_Target">
-              <ScalarProperty Name="Id" ColumnName="Id" />
-            </EndProperty>
-            <Condition IsNull="false" ColumnName="DeclarationProduct_Id" />
-          </AssociationSetMapping>
-          <AssociationSetMapping Name="DeclarationProduct_TierPrices" TypeName="SmartStore.Data.DeclarationProduct_TierPrices" StoreEntitySet="TierPrice">
-            <EndProperty Name="DeclarationProduct_TierPrices_Source">
-              <ScalarProperty Name="Id" ColumnName="DeclarationProduct_Id" />
-            </EndProperty>
-            <EndProperty Name="DeclarationProduct_TierPrices_Target">
-              <ScalarProperty Name="Id" ColumnName="Id" />
-            </EndProperty>
-            <Condition IsNull="false" ColumnName="DeclarationProduct_Id" />
           </AssociationSetMapping>
         </EntityContainerMapping>
       </Mapping>
@@ -6918,7 +7002,6 @@
           <Property Name="ProductId" Type="int" customannotation:Index="{ Name: IX_ProductId, Order: 0 }" Nullable="false" />
           <Property Name="PictureId" Type="int" customannotation:Index="{ Name: IX_PictureId, Order: 0 }" Nullable="false" />
           <Property Name="DisplayOrder" Type="int" Nullable="false" />
-          <Property Name="DeclarationProduct_Id" Type="int" customannotation:Index="{ Name: IX_DeclarationProduct_Id, Order: 0 }" Nullable="true" />
         </EntityType>
         <EntityType Name="Manufacturer" customannotation:Index="{ }">
           <Key>
@@ -7202,7 +7285,6 @@
           <Property Name="Quantity" Type="int" Nullable="false" />
           <Property Name="Price" Type="decimal" Precision="18" Scale="4" Nullable="false" />
           <Property Name="CalculationMethod" Type="int" Nullable="false" />
-          <Property Name="DeclarationProduct_Id" Type="int" customannotation:Index="{ Name: IX_DeclarationProduct_Id, Order: 0 }" Nullable="true" />
         </EntityType>
         <EntityType Name="ForumPost" customannotation:Index="{ }">
           <Key>
@@ -8350,6 +8432,25 @@
           <Property Name="BundlePerItemShoppingCart" Type="bit" Nullable="false" />
           <Property Name="MainPictureId" Type="int" Nullable="true" />
           <Property Name="HasPreviewPicture" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DeclarationProductCategory" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductId" Type="int" customannotation:Index="{ Name: IX_ProductId, Order: 0 }" Nullable="false" />
+          <Property Name="CategoryId" Type="int" customannotation:Index="{ Name: IX_CategoryId, Order: 0 }" Nullable="false" />
+          <Property Name="IsFeaturedProduct" Type="bit" customannotation:Index="{ }" Nullable="false" />
+          <Property Name="DisplayOrder" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DeclarationProductPicture" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductId" Type="int" customannotation:Index="{ Name: IX_ProductId, Order: 0 }" Nullable="false" />
+          <Property Name="PictureId" Type="int" customannotation:Index="{ Name: IX_PictureId, Order: 0 }" Nullable="false" />
+          <Property Name="DisplayOrder" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:Index="{ }">
           <Key>
@@ -10002,15 +10103,59 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="DeclarationProduct_ProductPictures">
-          <End Role="DeclarationProduct" Type="Self.DeclarationProduct" Multiplicity="0..1" />
-          <End Role="ProductPicture" Type="Self.ProductPicture" Multiplicity="*" />
+        <Association Name="DeclarationProductCategory_Category">
+          <End Role="Category" Type="Self.Category" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="DeclarationProductCategory" Type="Self.DeclarationProductCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductCategory">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DeclarationProductCategory_Product">
+          <End Role="DeclarationProduct" Type="Self.DeclarationProduct" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="DeclarationProductCategory" Type="Self.DeclarationProductCategory" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="DeclarationProduct">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ProductPicture">
-              <PropertyRef Name="DeclarationProduct_Id" />
+            <Dependent Role="DeclarationProductCategory">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DeclarationProductPicture_Picture">
+          <End Role="Picture" Type="Self.Picture" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="DeclarationProductPicture" Type="Self.DeclarationProductPicture" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Picture">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductPicture">
+              <PropertyRef Name="PictureId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DeclarationProductPicture_Product">
+          <End Role="DeclarationProduct" Type="Self.DeclarationProduct" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="DeclarationProductPicture" Type="Self.DeclarationProductPicture" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DeclarationProduct">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DeclarationProductPicture">
+              <PropertyRef Name="ProductId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -10035,18 +10180,6 @@
             </Principal>
             <Dependent Role="DeclarationProduct">
               <PropertyRef Name="SampleDownloadId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="DeclarationProduct_TierPrices">
-          <End Role="DeclarationProduct" Type="Self.DeclarationProduct" Multiplicity="0..1" />
-          <End Role="TierPrice" Type="Self.TierPrice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="DeclarationProduct">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="TierPrice">
-              <PropertyRef Name="DeclarationProduct_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -10352,6 +10485,8 @@
           <EntitySet Name="ExportDeployment" EntityType="Self.ExportDeployment" Schema="dbo" Table="ExportDeployment" />
           <EntitySet Name="ExportProfile" EntityType="Self.ExportProfile" Schema="dbo" Table="ExportProfile" />
           <EntitySet Name="DeclarationProduct" EntityType="Self.DeclarationProduct" Schema="dbo" Table="DeclarationProduct" />
+          <EntitySet Name="DeclarationProductCategory" EntityType="Self.DeclarationProductCategory" Schema="dbo" Table="DeclarationProduct_Category_Mapping" />
+          <EntitySet Name="DeclarationProductPicture" EntityType="Self.DeclarationProductPicture" Schema="dbo" Table="DeclarationProduct_Picture_Mapping" />
           <EntitySet Name="DeclarationCapRule" EntityType="Self.DeclarationCapRule" Schema="dbo" Table="DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscription" EntityType="Self.BackInStockSubscription" Schema="dbo" Table="BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplate" EntityType="Self.ManufacturerTemplate" Schema="dbo" Table="ManufacturerTemplate" />
@@ -10806,9 +10941,21 @@
             <End Role="DeliveryTime" EntitySet="DeliveryTime" />
             <End Role="DeclarationProduct" EntitySet="DeclarationProduct" />
           </AssociationSet>
-          <AssociationSet Name="DeclarationProduct_ProductPictures" Association="Self.DeclarationProduct_ProductPictures">
+          <AssociationSet Name="DeclarationProductCategory_Category" Association="Self.DeclarationProductCategory_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="DeclarationProductCategory" EntitySet="DeclarationProductCategory" />
+          </AssociationSet>
+          <AssociationSet Name="DeclarationProductCategory_Product" Association="Self.DeclarationProductCategory_Product">
             <End Role="DeclarationProduct" EntitySet="DeclarationProduct" />
-            <End Role="ProductPicture" EntitySet="ProductPicture" />
+            <End Role="DeclarationProductCategory" EntitySet="DeclarationProductCategory" />
+          </AssociationSet>
+          <AssociationSet Name="DeclarationProductPicture_Picture" Association="Self.DeclarationProductPicture_Picture">
+            <End Role="Picture" EntitySet="Picture" />
+            <End Role="DeclarationProductPicture" EntitySet="DeclarationProductPicture" />
+          </AssociationSet>
+          <AssociationSet Name="DeclarationProductPicture_Product" Association="Self.DeclarationProductPicture_Product">
+            <End Role="DeclarationProduct" EntitySet="DeclarationProduct" />
+            <End Role="DeclarationProductPicture" EntitySet="DeclarationProductPicture" />
           </AssociationSet>
           <AssociationSet Name="DeclarationProduct_QuantityUnit" Association="Self.DeclarationProduct_QuantityUnit">
             <End Role="QuantityUnit" EntitySet="QuantityUnit" />
@@ -10817,10 +10964,6 @@
           <AssociationSet Name="DeclarationProduct_SampleDownload" Association="Self.DeclarationProduct_SampleDownload">
             <End Role="Download" EntitySet="Download" />
             <End Role="DeclarationProduct" EntitySet="DeclarationProduct" />
-          </AssociationSet>
-          <AssociationSet Name="DeclarationProduct_TierPrices" Association="Self.DeclarationProduct_TierPrices">
-            <End Role="DeclarationProduct" EntitySet="DeclarationProduct" />
-            <End Role="TierPrice" EntitySet="TierPrice" />
           </AssociationSet>
           <AssociationSet Name="BackInStockSubscription_Customer" Association="Self.BackInStockSubscription_Customer">
             <End Role="Customer" EntitySet="Customer" />

@@ -1721,7 +1721,7 @@ namespace SmartStore.Admin.Controllers
             if (product == null)
                 throw new ArgumentException(T("Products.NotFound", productId));
 
-            var productPicture = new ProductPicture
+            var productPicture = new DeclarationProductPicture
             {
                 PictureId = pictureId,
                 ProductId = productId,
@@ -2255,163 +2255,163 @@ namespace SmartStore.Admin.Controllers
 
         #region Tier prices
 
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult TierPriceDelete(int id, GridCommand command)
-        {
-            var tierPrice = _productService.GetTierPriceById(id);
-            var productId = tierPrice.ProductId;
+        //[GridAction(EnableCustomBinding = true)]
+        //public ActionResult TierPriceDelete(int id, GridCommand command)
+        //{
+        //    var tierPrice = _productService.GetTierPriceById(id);
+        //    var productId = tierPrice.ProductId;
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                var product = _productService.GetProductById(productId);
+        //    if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+        //    {
+        //        var product = _productService.GetProductById(productId);
 
-                _productService.DeleteTierPrice(tierPrice);
+        //        _productService.DeleteTierPrice(tierPrice);
 
-                //update "HasTierPrices" property
-                _productService.UpdateHasTierPricesProperty(product);
-            }
+        //        //update "HasTierPrices" property
+        //        _productService.UpdateHasTierPricesProperty(product);
+        //    }
 
-            return TierPriceList(command, productId);
-        }
+        //    return TierPriceList(command, productId);
+        //}
 
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult TierPriceInsert(GridCommand command, DeclarationProductModel.TierPriceModel model)
-        {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                var product = _productService.GetProductById(model.ProductId);
+        //[GridAction(EnableCustomBinding = true)]
+        //public ActionResult TierPriceInsert(GridCommand command, DeclarationProductModel.TierPriceModel model)
+        //{
+        //    if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+        //    {
+        //        var product = _productService.GetProductById(model.ProductId);
 
-                var tierPrice = new TierPrice
-                {
-                    ProductId = model.ProductId,
-                    // use Store property (not Store propertyId) because appropriate property is stored in it
-                    StoreId = model.Store.ToInt(),
-                    // use CustomerRole property (not CustomerRoleId) because appropriate property is stored in it
-                    CustomerRoleId = model.CustomerRole.IsNumeric() && Int32.Parse(model.CustomerRole) != 0 ? Int32.Parse(model.CustomerRole) : (int?)null,
-                    Quantity = model.Quantity,
-                    Price = model.Price1,
-                    CalculationMethod = model.CalculationMethod == null ? TierPriceCalculationMethod.Fixed : (TierPriceCalculationMethod)(Int32.Parse(model.CalculationMethod))
-                };
+        //        var tierPrice = new TierPrice
+        //        {
+        //            ProductId = model.ProductId,
+        //            // use Store property (not Store propertyId) because appropriate property is stored in it
+        //            StoreId = model.Store.ToInt(),
+        //            // use CustomerRole property (not CustomerRoleId) because appropriate property is stored in it
+        //            CustomerRoleId = model.CustomerRole.IsNumeric() && Int32.Parse(model.CustomerRole) != 0 ? Int32.Parse(model.CustomerRole) : (int?)null,
+        //            Quantity = model.Quantity,
+        //            Price = model.Price1,
+        //            CalculationMethod = model.CalculationMethod == null ? TierPriceCalculationMethod.Fixed : (TierPriceCalculationMethod)(Int32.Parse(model.CalculationMethod))
+        //        };
 
-                _productService.InsertTierPrice(tierPrice);
+        //        _productService.InsertTierPrice(tierPrice);
 
-                //update "HasTierPrices" property
-                _productService.UpdateHasTierPricesProperty(product);
-            }
+        //        //update "HasTierPrices" property
+        //        _productService.UpdateHasTierPricesProperty(product);
+        //    }
 
-            return TierPriceList(command, model.ProductId);
-        }
+        //    return TierPriceList(command, model.ProductId);
+        //}
 
-        [HttpPost, GridAction(EnableCustomBinding = true)]
-        public ActionResult TierPriceList(GridCommand command, int productId)
-        {
-            var model = new GridModel<DeclarationProductModel.TierPriceModel>();
+        //[HttpPost, GridAction(EnableCustomBinding = true)]
+        //public ActionResult TierPriceList(GridCommand command, int productId)
+        //{
+        //    var model = new GridModel<DeclarationProductModel.TierPriceModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                var product = _productService.GetProductById(productId);
+        //    if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+        //    {
+        //        var product = _productService.GetProductById(productId);
 
-                var allStores = _services.StoreService.GetAllStores();
-                var allCustomerRoles = _customerService.GetAllCustomerRoles(true);
-                string allRolesString = T("Admin.Catalog.Products.TierPrices.Fields.CustomerRole.AllRoles");
-                string allStoresString = T("Admin.Common.StoresAll");
-                string deletedString = "[{0}]".FormatInvariant(T("Admin.Common.Deleted"));
+        //        var allStores = _services.StoreService.GetAllStores();
+        //        var allCustomerRoles = _customerService.GetAllCustomerRoles(true);
+        //        string allRolesString = T("Admin.Catalog.Products.TierPrices.Fields.CustomerRole.AllRoles");
+        //        string allStoresString = T("Admin.Common.StoresAll");
+        //        string deletedString = "[{0}]".FormatInvariant(T("Admin.Common.Deleted"));
 
-                var tierPricesModel = product.TierPrices
-                    .OrderBy(x => x.StoreId)
-                    .ThenBy(x => x.Quantity)
-                    .ThenBy(x => x.CustomerRoleId)
-                    .Select(x =>
-                    {
-                        var tierPriceModel = new DeclarationProductModel.TierPriceModel
-                        {
-                            Id = x.Id,
-                            StoreId = x.StoreId,
-                            CustomerRoleId = x.CustomerRoleId ?? 0,
-                            ProductId = x.ProductId,
-                            Quantity = x.Quantity,
-                            CalculationMethodId = (int)x.CalculationMethod,
-                            Price1 = x.Price
-                        };
+        //        var tierPricesModel = product.TierPrices
+        //            .OrderBy(x => x.StoreId)
+        //            .ThenBy(x => x.Quantity)
+        //            .ThenBy(x => x.CustomerRoleId)
+        //            .Select(x =>
+        //            {
+        //                var tierPriceModel = new DeclarationProductModel.TierPriceModel
+        //                {
+        //                    Id = x.Id,
+        //                    StoreId = x.StoreId,
+        //                    CustomerRoleId = x.CustomerRoleId ?? 0,
+        //                    ProductId = x.ProductId,
+        //                    Quantity = x.Quantity,
+        //                    CalculationMethodId = (int)x.CalculationMethod,
+        //                    Price1 = x.Price
+        //                };
 
-                        switch (x.CalculationMethod)
-                        {
-                            case TierPriceCalculationMethod.Fixed:
-                                tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Fixed").Text;
-                                break;
+        //                switch (x.CalculationMethod)
+        //                {
+        //                    case TierPriceCalculationMethod.Fixed:
+        //                        tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Fixed").Text;
+        //                        break;
 
-                            case TierPriceCalculationMethod.Adjustment:
-                                tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Adjustment").Text;
-                                break;
+        //                    case TierPriceCalculationMethod.Adjustment:
+        //                        tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Adjustment").Text;
+        //                        break;
 
-                            case TierPriceCalculationMethod.Percental:
-                                tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Percental").Text;
-                                break;
+        //                    case TierPriceCalculationMethod.Percental:
+        //                        tierPriceModel.CalculationMethod = T("Admin.DeclarationProduct.Price.Tierprices.Percental").Text;
+        //                        break;
 
-                            default:
-                                tierPriceModel.CalculationMethod = x.CalculationMethod.ToString();
-                                break;
-                        }
+        //                    default:
+        //                        tierPriceModel.CalculationMethod = x.CalculationMethod.ToString();
+        //                        break;
+        //                }
 
-                        if (x.CustomerRoleId.HasValue)
-                        {
-                            var role = allCustomerRoles.FirstOrDefault(r => r.Id == x.CustomerRoleId.Value);
-                            tierPriceModel.CustomerRole = (role == null ? allRolesString : role.Name);
-                        }
-                        else
-                        {
-                            tierPriceModel.CustomerRole = allRolesString;
-                        }
+        //                if (x.CustomerRoleId.HasValue)
+        //                {
+        //                    var role = allCustomerRoles.FirstOrDefault(r => r.Id == x.CustomerRoleId.Value);
+        //                    tierPriceModel.CustomerRole = (role == null ? allRolesString : role.Name);
+        //                }
+        //                else
+        //                {
+        //                    tierPriceModel.CustomerRole = allRolesString;
+        //                }
 
-                        if (x.StoreId > 0)
-                        {
-                            var store = allStores.FirstOrDefault(s => s.Id == x.StoreId);
-                            tierPriceModel.Store = (store == null ? deletedString : store.Name);
-                        }
-                        else
-                        {
-                            tierPriceModel.Store = allStoresString;
-                        }
+        //                if (x.StoreId > 0)
+        //                {
+        //                    var store = allStores.FirstOrDefault(s => s.Id == x.StoreId);
+        //                    tierPriceModel.Store = (store == null ? deletedString : store.Name);
+        //                }
+        //                else
+        //                {
+        //                    tierPriceModel.Store = allStoresString;
+        //                }
 
-                        return tierPriceModel;
-                    })
-                    .ToList();
+        //                return tierPriceModel;
+        //            })
+        //            .ToList();
 
-                model.Data = tierPricesModel;
-                model.Total = tierPricesModel.Count();
-            }
-            else
-            {
-                model.Data = Enumerable.Empty<DeclarationProductModel.TierPriceModel>();
+        //        model.Data = tierPricesModel;
+        //        model.Total = tierPricesModel.Count();
+        //    }
+        //    else
+        //    {
+        //        model.Data = Enumerable.Empty<DeclarationProductModel.TierPriceModel>();
 
-                NotifyAccessDenied();
-            }
+        //        NotifyAccessDenied();
+        //    }
 
-            return new JsonResult
-            {
-                Data = model
-            };
-        }
+        //    return new JsonResult
+        //    {
+        //        Data = model
+        //    };
+        //}
 
-        [GridAction(EnableCustomBinding = true)]
-        public ActionResult TierPriceUpdate(GridCommand command, DeclarationProductModel.TierPriceModel model)
-        {
-            var tierPrice = _productService.GetTierPriceById(model.Id);
+        //[GridAction(EnableCustomBinding = true)]
+        //public ActionResult TierPriceUpdate(GridCommand command, DeclarationProductModel.TierPriceModel model)
+        //{
+        //    var tierPrice = _productService.GetTierPriceById(model.Id);
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                //use Store property (not Store propertyId) because appropriate property is stored in it
-                tierPrice.StoreId = model.Store.ToInt();
-                //use CustomerRole property (not CustomerRoleId) because appropriate property is stored in it
-                tierPrice.CustomerRoleId = model.CustomerRole.IsNumeric() && Int32.Parse(model.CustomerRole) != 0 ? Int32.Parse(model.CustomerRole) : (int?)null;
-                tierPrice.Quantity = model.Quantity;
-                tierPrice.Price = model.Price1;
-                tierPrice.CalculationMethod = model.CalculationMethod == null ? TierPriceCalculationMethod.Fixed : (TierPriceCalculationMethod)(Int32.Parse(model.CalculationMethod));
-                _productService.UpdateTierPrice(tierPrice);
-            }
+        //    if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+        //    {
+        //        //use Store property (not Store propertyId) because appropriate property is stored in it
+        //        tierPrice.StoreId = model.Store.ToInt();
+        //        //use CustomerRole property (not CustomerRoleId) because appropriate property is stored in it
+        //        tierPrice.CustomerRoleId = model.CustomerRole.IsNumeric() && Int32.Parse(model.CustomerRole) != 0 ? Int32.Parse(model.CustomerRole) : (int?)null;
+        //        tierPrice.Quantity = model.Quantity;
+        //        tierPrice.Price = model.Price1;
+        //        tierPrice.CalculationMethod = model.CalculationMethod == null ? TierPriceCalculationMethod.Fixed : (TierPriceCalculationMethod)(Int32.Parse(model.CalculationMethod));
+        //        _productService.UpdateTierPrice(tierPrice);
+        //    }
 
-            return TierPriceList(command, tierPrice.ProductId);
-        }
+        //    return TierPriceList(command, tierPrice.ProductId);
+        //}
 
         #endregion Tier prices
 

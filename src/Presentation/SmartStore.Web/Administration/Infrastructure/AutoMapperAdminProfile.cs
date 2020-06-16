@@ -323,7 +323,7 @@ namespace SmartStore.Admin.Infrastructure
                 .ForMember(dest => dest.RecurringCyclePeriod, mo => mo.Ignore())
                 //.ForMember(dest => dest.ProductVariantAttributes, mo => mo.Ignore())
                 //.ForMember(dest => dest.ProductVariantAttributeCombinations, mo => mo.Ignore())
-                .ForMember(dest => dest.TierPrices, mo => mo.Ignore())
+                //.ForMember(dest => dest.TierPrices, mo => mo.Ignore())
                 .ForMember(dest => dest.CreatedOnUtc, mo => mo.Ignore())
                 .ForMember(dest => dest.UpdatedOnUtc, mo => mo.Ignore())
                 .ForMember(dest => dest.Deleted, mo => mo.Ignore())

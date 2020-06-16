@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Description;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Common;
@@ -359,62 +360,64 @@ namespace SmartStore.Services.Shipping
                 throw new ArgumentNullException("cart");
 
             var result = new GetShippingOptionResponse();
-            
-            //create a package
-            var getShippingOptionRequest = CreateShippingOptionRequest(cart, shippingAddress, storeId);
 
-            var shippingRateComputationMethods = LoadActiveShippingRateComputationMethods(storeId)
-                .Where(srcm => 
-                    String.IsNullOrWhiteSpace(allowedShippingRateComputationMethodSystemName) || 
-                    allowedShippingRateComputationMethodSystemName.Equals(srcm.Metadata.SystemName, StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
+			//create a package
+			//var getShippingOptionRequest = CreateShippingOptionRequest(cart, shippingAddress, storeId);
 
-            if (shippingRateComputationMethods.Count == 0)
-                throw new SmartException(T("Shipping.CouldNotLoadMethod"));
+			//         var shippingRateComputationMethods = LoadActiveShippingRateComputationMethods(storeId)
+			//             .Where(srcm => 
+			//                 String.IsNullOrWhiteSpace(allowedShippingRateComputationMethodSystemName) || 
+			//                 allowedShippingRateComputationMethodSystemName.Equals(srcm.Metadata.SystemName, StringComparison.InvariantCultureIgnoreCase))
+			//             .ToList();
 
-            //get shipping options
-            foreach (var srcm in shippingRateComputationMethods)
-            {
-                var getShippingOptionResponse = srcm.Value.GetShippingOptions(getShippingOptionRequest);
-                foreach (var so2 in getShippingOptionResponse.ShippingOptions)
-                {
-                    //system name
-                    so2.ShippingRateComputationMethodSystemName = srcm.Metadata.SystemName;
-                    so2.Rate = so2.Rate.RoundIfEnabledFor(_services.WorkContext.WorkingCurrency);
+			//         if (shippingRateComputationMethods.Count == 0)
+			//             throw new SmartException(T("Shipping.CouldNotLoadMethod"));
 
-                    result.ShippingOptions.Add(so2);
-                }
+			//         //get shipping options
+			//         foreach (var srcm in shippingRateComputationMethods)
+			//         {
+			//             var getShippingOptionResponse = srcm.Value.GetShippingOptions(getShippingOptionRequest);
+			//             foreach (var so2 in getShippingOptionResponse.ShippingOptions)
+			//             {
+			//                 //system name
+			//                 so2.ShippingRateComputationMethodSystemName = srcm.Metadata.SystemName;
+			//                 so2.Rate = so2.Rate.RoundIfEnabledFor(_services.WorkContext.WorkingCurrency);
 
-                //log errors
-                if (!getShippingOptionResponse.Success)
-                {
-					var hasItemsToShip = getShippingOptionRequest.Items != null && getShippingOptionRequest.Items.Count > 0;
+			//                 result.ShippingOptions.Add(so2);
+			//             }
 
-					foreach (string error in getShippingOptionResponse.Errors)
-                    {
-                        result.AddError(error);
-						if (hasItemsToShip)
-						{
-							Logger.Warn(error);
-						}
-                    }
-                }
-            }
+			//             //log errors
+			//             if (!getShippingOptionResponse.Success)
+			//             {
+			//		var hasItemsToShip = getShippingOptionRequest.Items != null && getShippingOptionRequest.Items.Count > 0;
 
-            if (_shippingSettings.ReturnValidOptionsIfThereAreAny)
-            {
-                //return valid options if there are any (no matter of the errors returned by other shipping rate compuation methods).
-                if (result.ShippingOptions.Count > 0 && result.Errors.Count > 0)
-                    result.Errors.Clear();
-            }
+			//		foreach (string error in getShippingOptionResponse.Errors)
+			//                 {
+			//                     result.AddError(error);
+			//			if (hasItemsToShip)
+			//			{
+			//				Logger.Warn(error);
+			//			}
+			//                 }
+			//             }
+			//         }
 
-			//no shipping options loaded
-			if (result.ShippingOptions.Count == 0 && result.Errors.Count == 0)
-			{
-				result.Errors.Add(T("Checkout.ShippingOptionCouldNotBeLoaded"));
-			}
-            
-            return result;
+			//         if (_shippingSettings.ReturnValidOptionsIfThereAreAny)
+			//         {
+			//             //return valid options if there are any (no matter of the errors returned by other shipping rate compuation methods).
+			//             if (result.ShippingOptions.Count > 0 && result.Errors.Count > 0)
+			//                 result.Errors.Clear();
+			//         }
+
+			////no shipping options loaded
+			//if (result.ShippingOptions.Count == 0 && result.Errors.Count == 0)
+			//{
+			//	result.Errors.Add(T("Checkout.ShippingOptionCouldNotBeLoaded"));
+			//}
+			result.ShippingOptions = new List<ShippingOption>();
+
+			result.ShippingOptions.Add(new ShippingOption {  Name="商城负责运输", Description= "商城负责运输", Rate=0M, ShippingMethodId=0, ShippingRateComputationMethodSystemName= "商城负责运输" });
+			return result;
         }
 
 		public virtual IList<IShippingMethodFilter> GetAllShippingMethodFilters()

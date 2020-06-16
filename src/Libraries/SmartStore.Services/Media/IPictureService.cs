@@ -80,6 +80,7 @@ namespace SmartStore.Services.Media
         /// <param name="fallbackType"></param>
         /// <returns></returns>
         IDictionary<int, PictureInfo> GetPictureInfos(IEnumerable<int> pictureIds);
+        IDictionary<int, PictureInfo> GetDPictureInfos(IEnumerable<int> pictureIds);
 
         /// <summary>
         /// Gets a collection of pictures

@@ -25,7 +25,7 @@
 				$.ajax({
 					cache:false,
 					type: "POST",
-					url: "@(Url.Action("GetBasePrice", "Product"))",
+					url: "@(Url.Action("GetBasePrice", "DeclarationProduct"))",
 					data: {
 						"productId" : @Model.Id,
 						"basePriceMeasureUnit": fieldBasePriceMeasureUnit.val(),
@@ -67,15 +67,6 @@
         </div>
         <div class="adminRow">
             <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.ProductCost)
-            </div>
-            <div class="adminData">
-                @Html.EditorFor(model => model.ProductCost, new { postfix = Model.PrimaryStoreCurrencyCode })
-                @Html.ValidationMessageFor(model => model.ProductCost)
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
                 @Html.SmartLabelFor(model => model.SpecialPrice)
             </div>
             <div class="adminData">
@@ -99,42 +90,6 @@
             <div class="adminData">
                 @Html.EditorFor(model => model.SpecialPriceEndDateTimeUtc, new { pickTime = true })
                 @Html.ValidationMessageFor(model => model.SpecialPriceEndDateTimeUtc)
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.DisableBuyButton)
-            </div>
-            <div class="adminData">
-                @Html.EditorFor(model => model.DisableBuyButton)
-                @Html.ValidationMessageFor(model => model.DisableBuyButton)
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.DisableWishlistButton)
-            </div>
-            <div class="adminData">
-                @Html.EditorFor(model => model.DisableWishlistButton)
-                @Html.ValidationMessageFor(model => model.DisableWishlistButton)
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.AvailableForPreOrder)
-            </div>
-            <div class="adminData">
-                @Html.EditorFor(model => model.AvailableForPreOrder)
-                @Html.ValidationMessageFor(model => model.AvailableForPreOrder)
-            </div>
-        </div>
-        <div class="adminRow">
-            <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.CallForPrice)
-            </div>
-            <div class="adminData">
-                @Html.EditorFor(model => model.CallForPrice)
-                @Html.ValidationMessageFor(model => model.CallForPrice)
             </div>
         </div>
         <div class="adminRow">
@@ -169,55 +124,10 @@
         <div class="adminSeparator">
 			<hr />
         </div>
-        <!-- PAnGV -->
-        <div class="adminRow">
-            <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.BasePriceEnabled)
-            </div>
-            <div class="adminData">
-                @Html.CheckBoxFor(model => model.BasePriceEnabled, new { data_toggler_for = "#pnlBasePriceEnabled" })
-                @Html.ValidationMessageFor(model => model.BasePriceEnabled)
-            </div>
-        </div>
-		<div id="pnlBasePriceEnabled">
-			<div class="adminRow">
-				<div class="adminTitle">
-					@Html.SmartLabelFor(model => model.BasePriceBaseAmount)
-				</div>
-				<div class="adminData">
-					<div class="form-row">
-						<div class="col">
-							@Html.EditorFor(model => model.BasePriceBaseAmount)
-						</div>
-						<div class="col-auto" style="width: 120px">
-							@Html.DropDownListFor(model => model.BasePriceMeasureUnit, Model.AvailableMeasureUnits)
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="adminRow">
-				<div class="adminTitle">
-					@Html.SmartLabelFor(model => model.BasePriceAmount)
-				</div>
-				<div class="adminData">
-					@Html.EditorFor(model => model.BasePriceAmount)
-					<span id="BasePriceAmountInfo" class="d-inline-block text-muted pt-2">@*@T("Admin.Catalog.Products.Fields.BasePriceInfo")*@</span>
-				</div>
-			</div>
-			<div class="adminRow">
-				<div class="adminTitle">
-					&nbsp;
-				</div>
-				<div class="adminData">
-					<div class="alert alert-info">
-						@T("Admin.Products.BasePrice.Hint")
-					</div>
-				</div>
-			</div>
-		</div>   
+        
     </div>
 
-    <div id="TierPriceContainer">
+    @*<div id="TierPriceContainer">
         <h4 class="mb-4">@T("Admin.Catalog.Products.TierPrices")</h4>
 
         @if (Model.Id > 0)
@@ -247,42 +157,42 @@
             </script>
 			
 			@(Html.Telerik().Grid<ProductModel.TierPriceModel>()
-				.Name("tierprices-grid")
-				.DataKeys(keys =>
-				{
-					keys.Add(x => x.Id);
-				})
-				.DataBinding(dataBinding =>
-				{
-					dataBinding.Ajax()
-						.Select("TierPriceList", "Product", new { productId = Model.Id })
-						.Insert("TierPriceInsert", "Product", new { productId = Model.Id })
-						.Update("TierPriceUpdate", "Product")
-						.Delete("TierPriceDelete", "Product");
-				})
-				.Columns(columns =>
-				{
-					columns.Bound(x => x.Quantity)
-						.Centered()
-						.Width(80);
-					columns.Bound(x => x.Price1)
-						.Format("{0:0.00}")
-						.Width(120)
-						.RightAlign();
-					columns.Bound(x => x.CalculationMethod).Width("20%");
-					columns.Bound(x => x.Store).Width("25%");
-					columns.Bound(x => x.CustomerRole).Width("20%");
-					columns.Command(commands =>
-					{
-						commands.Edit().Localize(T);
-						commands.Delete().Localize(T);
-					})
-					//.Width(180)
-					.HtmlAttributes(new { align = "right" });
-				})
-				.ToolBar(commands => commands.Insert())
-				.ClientEvents(events => events.OnEdit("onTierPriceEdit"))
-				.EnableCustomBinding(true))
+                .Name("tierprices-grid")
+                .DataKeys(keys =>
+                {
+                    keys.Add(x => x.Id);
+                })
+                .DataBinding(dataBinding =>
+                {
+                    //dataBinding.Ajax()
+                    //	.Select("TierPriceList", "Product", new { productId = Model.Id })
+                    //	.Insert("TierPriceInsert", "Product", new { productId = Model.Id })
+                    //	.Update("TierPriceUpdate", "Product")
+                    //	.Delete("TierPriceDelete", "Product");
+                })
+                .Columns(columns =>
+                {
+                    columns.Bound(x => x.Quantity)
+                        .Centered()
+                        .Width(80);
+                    columns.Bound(x => x.Price1)
+                        .Format("{0:0.00}")
+                        .Width(120)
+                        .RightAlign();
+                    columns.Bound(x => x.CalculationMethod).Width("20%");
+                    columns.Bound(x => x.Store).Width("25%");
+                    columns.Bound(x => x.CustomerRole).Width("20%");
+                    columns.Command(commands =>
+                    {
+                        commands.Edit().Localize(T);
+                        commands.Delete().Localize(T);
+                    })
+                    //.Width(180)
+                    .HtmlAttributes(new { align = "right" });
+                })
+                .ToolBar(commands => commands.Insert())
+                .ClientEvents(events => events.OnEdit("onTierPriceEdit"))
+                .EnableCustomBinding(true))
         }
         else
         {
@@ -290,5 +200,5 @@
                 @T("Admin.Catalog.Products.TierPrices.SaveBeforeEdit")
             </div>
         }
-    </div>
+    </div>*@
 </div>

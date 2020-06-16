@@ -14,14 +14,14 @@
 			var selectedManageInventoryMethodId = $("#@Html.FieldIdFor(model => model.ManageInventoryMethodId)").val();
 
 			if (selectedManageInventoryMethodId == '@((int)ManageInventoryMethod.DontManageStock)') {
-				$('#pnlStockQuantity').hide();
-				$('#pnlDisplayStockAvailability').hide();
-				$('#pnlDisplayStockQuantity').hide();
-				$('#pnlMinStockQuantity').hide();
-				$('#pnlLowStockActivity').hide();
-				$('#pnlNotifyForQuantityBelow').hide();
-				$('#pnlAllowBackInStockSubscriptions').hide();
-				$('#pnlBackorders').hide();
+                $('#pnlStockQuantity').show();
+                $('#pnlDisplayStockAvailability').show();
+                $('#pnlDisplayStockQuantity').show();
+                $('#pnlMinStockQuantity').show();
+                $('#pnlLowStockActivity').show();
+                $('#pnlNotifyForQuantityBelow').show();
+                $('#pnlAllowBackInStockSubscriptions').show();
+                $('#pnlBackorders').show();
 			}
 			else if (selectedManageInventoryMethodId == '@((int)ManageInventoryMethod.ManageStock)') {
 				$('#pnlStockQuantity').show();
@@ -79,7 +79,7 @@
 </script>
 
 <table class="adminContent">
-	<tr>
+	@*<tr>
 		<td class="adminTitle">
 			@Html.SmartLabelFor(model => model.ManageInventoryMethodId)
 		</td>
@@ -87,7 +87,7 @@
 			@Html.DropDownListFor(model => model.ManageInventoryMethodId, Model.AvailableManageInventoryMethods)
 			@Html.ValidationMessageFor(model => model.ManageInventoryMethodId)
 		</td>
-	</tr>
+	</tr>*@
 	<tr id="pnlStockQuantity">
 		<td class="adminTitle">
 			@Html.SmartLabelFor(model => model.StockQuantity)
@@ -179,7 +179,7 @@
 		</td>
 	</tr>
 
-    <tr>
+    @*<tr>
         <td class="adminTitle">
             @Html.SmartLabelFor(model => model.QuantityStep)
         </td>
@@ -187,8 +187,8 @@
             @Html.EditorFor(model => model.QuantityStep)
             @Html.ValidationMessageFor(model => model.QuantityStep)
         </td>
-    </tr>
-    <tr>
+    </tr>*@
+    @*<tr>
         <td class="adminTitle">
             @Html.SmartLabelFor(model => model.HideQuantityControl)
         </td>
@@ -196,7 +196,7 @@
             @Html.EditorFor(model => model.HideQuantityControl)
             @Html.ValidationMessageFor(model => model.HideQuantityControl)
         </td>
-    </tr>
+    </tr>*@
 
     @* TODO: display when dropdown was implemented *@
     @* Can be hidden if HideQuantityControl == true *@

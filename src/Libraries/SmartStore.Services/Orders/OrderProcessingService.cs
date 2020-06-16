@@ -544,24 +544,24 @@ namespace SmartStore.Services.Orders
                     return warnings;
                 }
 
-                // Total validations.
-                var orderShippingTotalInclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, true, out var orderShippingTaxRate, out var shippingTotalDiscount);
-                var orderShippingTotalExclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, false);
+                //// Total validations.
+                //var orderShippingTotalInclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, true, out var orderShippingTaxRate, out var shippingTotalDiscount);
+                //var orderShippingTotalExclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, false);
 
-                if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
-                {
-                    warnings.Add(T("Order.CannotCalculateShippingTotal"));
-                    return warnings;
-                }
+                //if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
+                //{
+                //    warnings.Add(T("Order.CannotCalculateShippingTotal"));
+                //    return warnings;
+                //}
 
-                var cartTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart);
-                if (!cartTotal.TotalAmount.HasValue)
-                {
-                    warnings.Add(T("Order.CannotCalculateOrderTotal"));
-                    return warnings;
-                }
+                //var cartTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart);
+                //if (!cartTotal.TotalAmount.HasValue)
+                //{
+                //    warnings.Add(T("Order.CannotCalculateOrderTotal"));
+                //    return warnings;
+                //}
 
-                skipPaymentWorkflow = cartTotal.TotalAmount.Value == decimal.Zero;
+                //skipPaymentWorkflow = cartTotal.TotalAmount.Value == decimal.Zero;
 
                 // Address validations.
                 if (customer.BillingAddress == null)
@@ -948,7 +948,7 @@ namespace SmartStore.Services.Orders
                     cartTotal = new ShoppingCartTotal(initialOrder.OrderTotal);
                     cartTotal.DiscountAmount = initialOrder.OrderDiscount;
                 }
-
+                cartTotal = new ShoppingCartTotal(0M);
                 processPaymentRequest.OrderTotal = cartTotal.TotalAmount.Value;
 
                 #endregion
@@ -1119,8 +1119,8 @@ namespace SmartStore.Services.Orders
                             OrderSubtotalExclTax = orderSubTotalExclTax,
                             OrderSubTotalDiscountInclTax = orderSubTotalDiscountInclTax,
                             OrderSubTotalDiscountExclTax = orderSubTotalDiscountExclTax,
-                            OrderShippingInclTax = orderShippingTotalInclTax.Value,
-                            OrderShippingExclTax = orderShippingTotalExclTax.Value,
+                            OrderShippingInclTax = 0M,
+                            OrderShippingExclTax = 0M,
 							OrderShippingTaxRate = orderShippingTaxRate,
                             PaymentMethodAdditionalFeeInclTax = paymentAdditionalFeeInclTax,
                             PaymentMethodAdditionalFeeExclTax = paymentAdditionalFeeExclTax,

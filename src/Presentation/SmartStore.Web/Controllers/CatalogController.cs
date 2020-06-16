@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Web.Mvc;
+using SmartStore.Core;
 using SmartStore.Core.Caching;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Customers;
@@ -36,6 +37,7 @@ namespace SmartStore.Web.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IManufacturerService _manufacturerService;
         private readonly IProductService _productService;
+        private readonly IDeclarationProductService _dproductService;
         private readonly ICategoryTemplateService _categoryTemplateService;
         private readonly IManufacturerTemplateService _manufacturerTemplateService;
         private readonly IPictureService _pictureService;
@@ -58,6 +60,7 @@ namespace SmartStore.Web.Controllers
             ICategoryService categoryService,
             IManufacturerService manufacturerService, 
 			IProductService productService,
+			IDeclarationProductService dproductService,
             ICategoryTemplateService categoryTemplateService,
             IManufacturerTemplateService manufacturerTemplateService,
 			IOrderReportService orderReportService,
@@ -94,7 +97,9 @@ namespace SmartStore.Web.Controllers
             _catalogSettings = catalogSettings;
             _helper = helper;
 			_breadcrumb = breadcrumb;
-        }
+			_dproductService = dproductService;
+
+		}
 
         #region Categories
 
@@ -426,23 +431,44 @@ namespace SmartStore.Web.Controllers
 
 			return PartialView(model);
 		}
-
 		[ChildActionOnly]
 		public ActionResult HomepageProducts(int? productThumbPictureSize)
 		{
 			var products = _productService.GetAllProductsDisplayedOnHomePage();
 
+            //ACL and store mapping
+
+            products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+
+            var viewMode = _catalogSettings.UseSmallProductBoxOnHomePage ? ProductSummaryViewMode.Mini : ProductSummaryViewMode.Grid;
+
+			var settings = _helper.GetBestFitProductSummaryMappingSettings(viewMode, x =>
+			{
+				x.ThumbnailSize = productThumbPictureSize;
+			});
+            
+            var model = _helper.MapProductSummaryModel(products, settings);
+			model.GridColumnSpan = GridColumnSpan.Max6Cols;
+
+			return PartialView(model);
+		}
+		
+		[ChildActionOnly]
+		public ActionResult DHomepageProducts(int? productThumbPictureSize)
+		{
+			var products = _dproductService.GetAllProductsDisplayedOnHomePage();
+
 			// ACL and store mapping
-			products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+			//products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
 
 			var viewMode = _catalogSettings.UseSmallProductBoxOnHomePage ? ProductSummaryViewMode.Mini : ProductSummaryViewMode.Grid;
 
 			var settings = _helper.GetBestFitProductSummaryMappingSettings(viewMode, x => 
 			{
 				x.ThumbnailSize = productThumbPictureSize;
-			});			
-
+			});
 			var model = _helper.MapProductSummaryModel(products, settings);
+			//DeclarationProductSummaryModel model = new DeclarationProductSummaryModel(new PagedList<DeclarationProduct>(products, 0, int.MaxValue));
 			model.GridColumnSpan = GridColumnSpan.Max6Cols;
 
 			return PartialView(model);

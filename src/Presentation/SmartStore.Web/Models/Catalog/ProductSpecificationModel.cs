@@ -9,4 +9,11 @@ namespace SmartStore.Web.Models.Catalog
         public LocalizedValue<string> SpecificationAttributeName { get; set; }
         public LocalizedValue<string> SpecificationAttributeOption { get; set; }
     }
+    public partial class DeclarationProductSpecificationModel : ModelBase
+    {
+        public int SpecificationAttributeId { get; set; }
+        public LocalizedValue<string> SpecificationAttributeName { get; set; }
+        public LocalizedValue<string> SpecificationAttributeOption { get; set; }
+    }
+    
 }

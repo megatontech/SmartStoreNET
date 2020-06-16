@@ -151,6 +151,199 @@ namespace SmartStore.Web.Controllers
 
 			return MapProductSummaryModel(new PagedList<Product>(products, 0, int.MaxValue), settings);
 		}
+		public virtual DeclarationProductSummaryModel MapProductSummaryModel(IList<DeclarationProduct> products, ProductSummaryMappingSettings settings)
+		{
+			Guard.NotNull(products, nameof(products));
+
+			return MapProductSummaryModel(new PagedList<DeclarationProduct>(products, 0, int.MaxValue), settings);
+		}
+
+		public virtual DeclarationProductSummaryModel MapProductSummaryModel(IPagedList<DeclarationProduct> products, ProductSummaryMappingSettings settings)
+		{
+			Guard.NotNull(products, nameof(products));
+
+			if (settings == null)
+			{
+				settings = new ProductSummaryMappingSettings();
+			}
+
+			using (_services.Chronometer.Step("MapProductSummaryModel"))
+			{
+				var model = new DeclarationProductSummaryModel(products)
+				{
+					ViewMode = settings.ViewMode,
+					GridColumnSpan = _catalogSettings.GridStyleListColumnSpan,
+					ShowSku = _catalogSettings.ShowProductSku,
+					ShowWeight = _catalogSettings.ShowWeight,
+					ShowDimensions = settings.MapDimensions,
+					ShowLegalInfo = settings.MapLegalInfo,
+					ShowDescription = settings.MapShortDescription,
+					ShowFullDescription = settings.MapFullDescription,
+					ShowRatings = settings.MapReviews,
+					ShowDeliveryTimes = settings.MapDeliveryTimes,
+					ShowPrice = settings.MapPrices,
+					ShowBasePrice = settings.MapPrices && _catalogSettings.ShowBasePriceInProductLists && settings.ViewMode != ProductSummaryViewMode.Mini,
+					ShowShippingSurcharge = settings.MapPrices && settings.ViewMode != ProductSummaryViewMode.Mini,
+					ShowButtons = settings.ViewMode != ProductSummaryViewMode.Mini,
+					ShowBrand = settings.MapManufacturers,
+					ForceRedirectionAfterAddingToCart = settings.ForceRedirectionAfterAddingToCart,
+					CompareEnabled = _catalogSettings.CompareProductsEnabled,
+					WishlistEnabled = _permissionService.Value.Authorize(StandardPermissionProvider.EnableWishlist),
+					BuyEnabled = !_catalogSettings.HideBuyButtonInLists,
+					ThumbSize = settings.ThumbnailSize,
+					ShowDiscountBadge = _catalogSettings.ShowDiscountSign,
+					ShowNewBadge = _catalogSettings.LabelAsNewForMaxDays.HasValue
+				};
+
+				if (products.Count == 0)
+				{
+					// No products, stop here.
+					return model;
+				}
+
+				// PERF!!
+				var store = _services.StoreContext.CurrentStore;
+				var customer = _services.WorkContext.CurrentCustomer;
+				var currency = _services.WorkContext.WorkingCurrency;
+				var language = _services.WorkContext.WorkingLanguage;
+				var allowPrices = _services.Permissions.Authorize(StandardPermissionProvider.DisplayPrices);
+				var allowShoppingCart = _services.Permissions.Authorize(StandardPermissionProvider.EnableShoppingCart);
+				var allowWishlist = _services.Permissions.Authorize(StandardPermissionProvider.EnableWishlist);
+				var taxDisplayType = _services.WorkContext.GetTaxDisplayTypeFor(customer, store.Id);
+				var cachedManufacturerModels = new Dictionary<int, ManufacturerOverviewModel>();
+				var prefetchTranslations = settings.PrefetchTranslations == true || (settings.PrefetchTranslations == null && _performanceSettings.AlwaysPrefetchTranslations);
+				var prefetchSlugs = settings.PrefetchUrlSlugs == true || (settings.PrefetchUrlSlugs == null && _performanceSettings.AlwaysPrefetchUrlSlugs);
+				var allProductIds = prefetchSlugs || prefetchTranslations ? products.Select(x => x.Id).ToArray() : new int[0];
+
+				//var productIds = products.Select(x => x.Id).ToArray();
+
+				string taxInfo = T(taxDisplayType == TaxDisplayType.IncludingTax ? "Tax.InclVAT" : "Tax.ExclVAT");
+				var legalInfo = "";
+
+				var res = new Dictionary<string, LocalizedString>(StringComparer.OrdinalIgnoreCase)
+				{
+					{ "Products.CallForPrice", T("Products.CallForPrice") },
+					{ "Products.PriceRangeFrom", T("Products.PriceRangeFrom") },
+					{ "Media.Product.ImageLinkTitleFormat", T("Media.Product.ImageLinkTitleFormat") },
+					{ "Media.Product.ImageAlternateTextFormat", T("Media.Product.ImageAlternateTextFormat") },
+					{ "Products.DimensionsValue", T("Products.DimensionsValue") },
+					{ "Common.AdditionalShippingSurcharge", T("Common.AdditionalShippingSurcharge") }
+				};
+
+				if (settings.MapLegalInfo)
+				{
+					var shippingInfoUrl = _urlHelper.Topic("shippinginfo").ToString();
+					legalInfo = shippingInfoUrl.HasValue()
+						? T("Tax.LegalInfoShort").Text.FormatInvariant(taxInfo, shippingInfoUrl)
+						: T("Tax.LegalInfoShort2").Text.FormatInvariant(taxInfo);
+				}
+
+				if (prefetchSlugs)
+				{
+					_urlRecordService.PrefetchUrlRecords(nameof(Product), new[] { language.Id, 0 }, allProductIds);
+				}
+
+				if (prefetchTranslations)
+				{
+					// Prefetch all delivery time translations
+					_localizedEntityService.PrefetchLocalizedProperties(nameof(DeliveryTime), language.Id, null);
+				}
+
+				using (var scope = new DbContextScope(ctx: _services.DbContext, autoCommit: false, validateOnSave: false))
+				{
+					// Run in uncommitting scope, because pictures could be updated (IsNew property) 
+					//var batchContext = _dataExporter.Value.CreateProductExportContext(products, customer, null, 1, false);
+
+					//if (settings.MapPrices)
+					//{
+					//	batchContext.AppliedDiscounts.LoadAll();
+					//	batchContext.TierPrices.LoadAll();
+					//}
+
+					//if (settings.MapAttributes || settings.MapColorAttributes)
+					//{
+					//	batchContext.Attributes.LoadAll();
+
+					//	if (prefetchTranslations)
+					//	{
+					//		// Prefetch all product attribute translations
+					//		PrefetchTranslations(
+					//			nameof(ProductAttribute),
+					//			language.Id,
+					//			batchContext.Attributes.SelectMany(x => x.Value).Select(x => x.ProductAttribute));
+
+					//		// Prefetch all variant attribute value translations
+					//		PrefetchTranslations(
+					//			nameof(ProductVariantAttributeValue),
+					//			language.Id,
+					//			batchContext.Attributes.SelectMany(x => x.Value).SelectMany(x => x.ProductVariantAttributeValues));
+					//	}
+					//}
+
+					//if (settings.MapManufacturers)
+					//{
+					//	batchContext.ProductManufacturers.LoadAll();
+					//}
+
+					//if (settings.MapSpecificationAttributes)
+					//{
+					//	batchContext.SpecificationAttributes.LoadAll();
+
+					//	if (prefetchTranslations)
+					//	{
+					//		// Prefetch all spec attribute option translations
+					//		PrefetchTranslations(
+					//			nameof(SpecificationAttributeOption),
+					//			language.Id,
+					//			batchContext.SpecificationAttributes.SelectMany(x => x.Value).Select(x => x.SpecificationAttributeOption));
+
+					//		// Prefetch all spec attribute translations
+					//		PrefetchTranslations(
+					//			nameof(SpecificationAttribute),
+					//			language.Id,
+					//			batchContext.SpecificationAttributes.SelectMany(x => x.Value).Select(x => x.SpecificationAttributeOption.SpecificationAttribute));
+					//	}
+					//}
+
+					// If a size has been set in the view, we use it in priority
+					int thumbSize = model.ThumbSize ?? _mediaSettings.ProductThumbPictureSize;
+					var mapItemContext = new MapDeclarationProductSummaryItemContext
+					{
+                        //BatchContext = batchContext,
+                        CachedManufacturerModels = cachedManufacturerModels,
+                        PictureInfos = _pictureService.GetDPictureInfos(products.Select(x=>x.ProductPictures.Any()? x.ProductPictures.FirstOrDefault().PictureId :0)),
+                        Currency = currency,
+                        LegalInfo = legalInfo,
+                        Model = model,
+                        Resources = res,
+                        Settings = settings,
+                        Customer = customer,
+                        Store = store,
+                        AllowPrices = allowPrices,
+                        AllowShoppingCart = allowShoppingCart,
+                        AllowWishlist = allowWishlist,
+                        TaxDisplayType = taxDisplayType
+                    };
+					foreach (var product in products)
+                    {
+						product.MainPictureId = product.ProductPictures.Any() ? product.ProductPictures.FirstOrDefault().PictureId : 0;
+						MapProductSummaryItem(product, mapItemContext);
+                    }
+
+                    _services.DisplayControl.AnnounceRange(products);
+
+					scope.Commit();
+
+					//batchContext.Clear();
+
+					// don't show stuff without data at all
+					model.ShowDescription = model.ShowDescription && model.Items.Any(x => x.ShortDescription?.Value?.HasValue() == true);
+					model.ShowBrand = model.ShowBrand && model.Items.Any(x => x.Manufacturer != null);
+
+					return model;
+				}
+			}
+		}
 
 		public virtual ProductSummaryModel MapProductSummaryModel(IPagedList<Product> products, ProductSummaryMappingSettings settings)
 		{
@@ -346,6 +539,248 @@ namespace SmartStore.Web.Controllers
 			{
 				_localizedEntityService.PrefetchLocalizedProperties(keyGroup, languageId, entities.Select(x => x.Id).Distinct().ToArray());
 			}	
+		}
+
+		private void MapProductSummaryItem(DeclarationProduct product, MapDeclarationProductSummaryItemContext ctx)
+		{
+			var contextProduct = product;
+			var finalPrice = decimal.Zero;
+			var model = ctx.Model;
+			var settings = ctx.Settings;
+			var item = new DeclarationProductSummaryModel.SummaryItem(ctx.Model)
+			{
+				Id = product.Id,
+				Name = product.GetLocalized(x => x.Name),
+				SeName = product.GetSeName()
+			};
+
+			if (model.ShowDescription)
+			{
+				item.ShortDescription = product.GetLocalized(x => x.ShortDescription);
+			}
+
+			if (settings.MapFullDescription)
+			{
+				item.FullDescription = product.GetLocalized(x => x.FullDescription, detectEmptyHtml: true);
+			}
+
+			// Price
+			if (settings.MapPrices)
+			{
+				//finalPrice = MapSummaryItemPrice(product, ref contextProduct, item, ctx);
+			}
+
+			// (Color) Attributes
+			if (settings.MapColorAttributes || settings.MapAttributes)
+			{
+				#region Map (color) attributes
+
+				var attributes = ctx.BatchContext.Attributes.GetOrLoad(contextProduct.Id);
+
+				var cachedAttributeNames = new Dictionary<int, LocalizedValue<string>>();
+
+				// Color squares
+				if (attributes.Any() && settings.MapColorAttributes)
+				{
+					var colorAttributes = attributes
+						.Where(x => x.IsListTypeAttribute())
+						.SelectMany(x => x.ProductVariantAttributeValues)
+						.Where(x => x.Color.HasValue() && !x.Color.IsCaseInsensitiveEqual("transparent"))
+						.Distinct()
+						.Take(20) // limit results
+						.Select(x =>
+						{
+							var attr = x.ProductVariantAttribute.ProductAttribute;
+							var attrName = cachedAttributeNames.Get(attr.Id) ?? (cachedAttributeNames[attr.Id] = attr.GetLocalized(l => l.Name));
+
+							return new ProductSummaryModel.ColorAttributeValue
+							{
+								Id = x.Id,
+								Color = x.Color,
+								Alias = x.Alias,
+								FriendlyName = x.GetLocalized(l => l.Name),
+								AttributeId = x.ProductVariantAttributeId,
+								AttributeName = attrName,
+								ProductAttributeId = attr.Id,
+								ProductUrl = _productUrlHelper.GetProductUrl(product.Id, item.SeName, 0, x)
+							};
+						})
+						.ToList();
+
+					//item.ColorAttributes = colorAttributes;
+
+					// TODO: (mc) Resolve attribute value images also
+				}
+
+				// Variant Attributes
+				//if (attributes.Any() && settings.MapAttributes)
+				//{
+				//	if (item.ColorAttributes != null && item.ColorAttributes.Any())
+				//	{
+				//		var processedIds = item.ColorAttributes.Select(x => x.AttributeId).Distinct().ToArray();
+				//		attributes = attributes.Where(x => !processedIds.Contains(x.Id)).ToList();
+				//	}
+
+				//	//foreach (var attr in attributes)
+				//	//{
+				//	//	var pa = attr.ProductAttribute;
+				//	//	item.Attributes.Add(new ProductSummaryModel.Attribute
+				//	//	{
+				//	//		Id = attr.Id,
+				//	//		Alias = pa.Alias,
+				//	//		Name = cachedAttributeNames.Get(pa.Id) ?? (cachedAttributeNames[pa.Id] = pa.GetLocalized(l => l.Name))
+				//	//	});
+				//	//}
+				//}
+
+				#endregion
+			}
+
+			// Picture
+			if (settings.MapPictures)
+			{
+				#region Map product picture
+
+				var pictureInfo = ctx.PictureInfos.Get(product.MainPictureId.GetValueOrDefault());
+				var fallbackType = _catalogSettings.HideProductDefaultPictures ? FallbackPictureType.NoFallback : FallbackPictureType.Entity;
+				var thumbSize = model.ThumbSize ?? _mediaSettings.ProductThumbPictureSize;
+
+				item.Picture = new PictureModel
+				{
+					PictureId = pictureInfo?.Id ?? 0,
+					Size = thumbSize,
+					ImageUrl = _pictureService.GetUrl(pictureInfo, thumbSize, fallbackType),
+					FullSizeImageUrl = _pictureService.GetUrl(pictureInfo, 0, FallbackPictureType.NoFallback),
+					FullSizeImageWidth = pictureInfo?.Width,
+					FullSizeImageHeight = pictureInfo?.Height,
+					Title = string.Format(ctx.Resources["Media.Product.ImageLinkTitleFormat"], item.Name),
+					AlternateText = string.Format(ctx.Resources["Media.Product.ImageAlternateTextFormat"], item.Name),
+				};
+
+				#endregion
+			}
+
+			// Manufacturers
+			if (settings.MapManufacturers)
+			{
+				item.Manufacturer = PrepareManufacturersOverviewModel(
+					ctx.BatchContext.ProductManufacturers.GetOrLoad(product.Id),
+					ctx.CachedManufacturerModels,
+					_catalogSettings.ShowManufacturerLogoInLists && settings.ViewMode == ProductSummaryViewMode.List).FirstOrDefault();
+			}
+
+			// Spec Attributes
+			//if (settings.MapSpecificationAttributes)
+			//{
+			//	item.SpecificationAttributes.AddRange(MapProductSpecificationModels(ctx.BatchContext.SpecificationAttributes.GetOrLoad(product.Id)));
+			//}
+
+			item.MinPriceProductId = contextProduct.Id;
+			item.Sku = contextProduct.Sku;
+
+			// Measure Dimensions
+			if (model.ShowDimensions && (contextProduct.Width != 0 || contextProduct.Height != 0 || contextProduct.Length != 0))
+			{
+				item.Dimensions = ctx.Resources["Products.DimensionsValue"].Text.FormatCurrent(
+					contextProduct.Width.ToString("N2"),
+					contextProduct.Height.ToString("N2"),
+					contextProduct.Length.ToString("N2")
+				);
+				item.DimensionMeasureUnit = _measureService.GetMeasureDimensionById(_measureSettings.BaseDimensionId).SystemKeyword;
+			}
+
+			// Delivery Times
+			item.HideDeliveryTime = (product.ProductType == ProductType.GroupedProduct);
+			if (model.ShowDeliveryTimes && !item.HideDeliveryTime)
+			{
+				#region Delivery Time
+
+				// We cannot include ManageInventoryMethod.ManageStockByAttributes because it's only functional with MergeWithCombination.
+				//item.StockAvailablity = contextProduct.FormatStockMessage(_localizationService);
+				//item.DisplayDeliveryTimeAccordingToStock = contextProduct.DisplayDeliveryTimeAccordingToStock(_catalogSettings);
+
+				//var deliveryTime = _deliveryTimeService.GetDeliveryTime(contextProduct);
+				//if (deliveryTime != null)
+				//{
+				//	item.DeliveryTimeName = deliveryTime.GetLocalized(x => x.Name);
+				//	item.DeliveryTimeHexValue = deliveryTime.ColorHexValue;
+				//}
+
+				var deliveryTimeId = product.DeliveryTimeId ?? 0;
+				if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock && product.StockQuantity <= 0 && _catalogSettings.DeliveryTimeIdForEmptyStock.HasValue)
+				{
+					deliveryTimeId = _catalogSettings.DeliveryTimeIdForEmptyStock.Value;
+				}
+
+				var deliveryTime = _deliveryTimeService.GetDeliveryTimeById(deliveryTimeId);
+				if (deliveryTime != null)
+				{
+					item.DeliveryTimeName = deliveryTime.GetLocalized(x => x.Name);
+					item.DeliveryTimeHexValue = deliveryTime.ColorHexValue;
+				}
+
+				item.DisplayDeliveryTimeAccordingToStock = product.ManageInventoryMethod == ManageInventoryMethod.ManageStock
+					? product.StockQuantity > 0 || (product.StockQuantity <= 0 && _catalogSettings.DeliveryTimeIdForEmptyStock.HasValue)
+					: true;
+
+				if (product.DisplayStockAvailability && product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
+				{
+					if (product.StockQuantity > 0)
+					{
+						item.StockAvailablity = product.DisplayStockQuantity
+							? T("Products.Availability.InStockWithQuantity", product.StockQuantity)
+							: T("Products.Availability.InStock");
+					}
+					else
+					{
+						item.StockAvailablity = product.BackorderMode == BackorderMode.NoBackorders || product.BackorderMode == BackorderMode.AllowQtyBelow0
+							? T("Products.Availability.OutOfStock")
+							: T("Products.Availability.Backordering");
+					}
+				}
+
+				#endregion
+			}
+
+			item.LegalInfo = ctx.LegalInfo;
+			item.RatingSum = product.ApprovedRatingSum;
+			item.TotalReviews = product.ApprovedTotalReviews;
+			item.IsShippingEnabled = contextProduct.IsShipEnabled;
+
+			if (finalPrice != decimal.Zero && model.ShowBasePrice)
+			{
+				item.BasePriceInfo = "";
+			}
+
+			if (settings.MapPrices)
+			{
+				var addShippingPrice = _currencyService.ConvertCurrency(contextProduct.AdditionalShippingCharge, ctx.Store.PrimaryStoreCurrency, ctx.Currency);
+
+				if (addShippingPrice > 0)
+				{
+					item.TransportSurcharge = ctx.Resources["Common.AdditionalShippingSurcharge"].Text.FormatCurrent(_priceFormatter.FormatPrice(addShippingPrice, true, false));
+				}
+
+				item.PriceDisplayStyle = _catalogSettings.PriceDisplayStyle;
+				item.DisplayTextForZeroPrices = _catalogSettings.DisplayTextForZeroPrices;
+			}
+
+			if (model.ShowWeight && contextProduct.Weight > 0)
+			{
+				item.Weight = "{0} {1}".FormatCurrent(contextProduct.Weight.ToString("N2"), _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).Name);
+			}
+
+			// New Badge
+			//if (product.IsNew(_catalogSettings))
+			//{
+			//	item.Badges.Add(new ProductSummaryModel.Badge
+			//	{
+			//		Label = T("Common.New"),
+			//		Style = BadgeStyle.Success
+			//	});
+			//}
+
+			model.Items.Add(item);
 		}
 
 		private void MapProductSummaryItem(Product product, MapProductSummaryItemContext ctx)
@@ -780,7 +1215,26 @@ namespace SmartStore.Web.Controllers
 				return model;
 			});
 		}
+		private class MapDeclarationProductSummaryItemContext
+		{
+			public DeclarationProductSummaryModel Model { get; set; }
+			public ProductSummaryMappingSettings Settings { get; set; }
+			public ProductExportContext BatchContext { get; set; }
+			public ProductExportContext AssociatedProductBatchContext { get; set; }
+			public Multimap<int, Product> GroupedProducts { get; set; }
+			public Dictionary<int, ManufacturerOverviewModel> CachedManufacturerModels { get; set; }
+			public IDictionary<int, PictureInfo> PictureInfos { get; set; }
+			public Dictionary<string, LocalizedString> Resources { get; set; }
+			public string LegalInfo { get; set; }
+			public Customer Customer { get; set; }
+			public Store Store { get; set; }
+			public Currency Currency { get; set; }
 
+			public bool AllowPrices { get; set; }
+			public bool AllowShoppingCart { get; set; }
+			public bool AllowWishlist { get; set; }
+			public TaxDisplayType TaxDisplayType { get; set; }
+		}
 		private class MapProductSummaryItemContext
 		{
 			public ProductSummaryModel Model { get; set; }

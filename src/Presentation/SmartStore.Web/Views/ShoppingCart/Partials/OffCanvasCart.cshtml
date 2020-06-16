@@ -18,7 +18,7 @@
             </li>
         }
 
-        @if (Model.WishlistEnabled)
+        @*@if (Model.WishlistEnabled)
         {
             <li class="nav-item col">
                 <a id="wishlist-tab" class="nav-link" data-toggle="tab" href="#occ-wishlist" role="tab" data-url="@Url.Action("OffCanvasWishlist", "ShoppingCart")">
@@ -26,7 +26,7 @@
                     <span class="badge badge-pill label-cart-amount badge-@labelStyle" data-bind-to="WishlistItemsCount" style="@(Model.WishlistItemsCount > 0 ? "" : "display:none")">@Model.WishlistItemsCount</span>
                 </a>
             </li>
-        }
+        }*@
 
         @if (Model.CompareProductsEnabled)
         {

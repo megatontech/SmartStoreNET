@@ -51,7 +51,7 @@
     //    }
     //}
 
-    
+
     x.Add().Text(T("Admin.Catalog.Products.Price").Text)
             .Icon("fa fa-euro-sign fa-lg fa-fw")
             .LinkHtmlAttributes(new { data_tab_name = "Price" })
@@ -70,11 +70,11 @@
         .LinkHtmlAttributes(new { data_tab_name = "Pictures" })
         .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Pictures" })
         .Ajax();
-    x.Add().Text(T("Admin.Catalog.Products.Categories").Text)
-        .Icon("fa fa-sitemap fa-lg fa-fw")
-        .LinkHtmlAttributes(new { data_tab_name = "Categories" })
-        .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Categories" })
-        .Ajax();
+    //x.Add().Text(T("产品类别设置").Text)
+    //    .Icon("fa fa-sitemap fa-lg fa-fw")
+    //    .LinkHtmlAttributes(new { data_tab_name = "Categories" })
+    //    .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Categories" })
+    //    .Ajax();
     //x.Add().Text(T("Admin.Catalog.Products.Manufacturers").Text)
     //    .Icon("far fa-building fa-lg fa-fw")
     //    .LinkHtmlAttributes(new { data_tab_name = "Manufacturers" })
@@ -104,20 +104,20 @@
     //    .Icon("fa fa-search fa-lg fa-fw")
     //    .LinkHtmlAttributes(new { data_tab_name = "SEO" })
     //    .Content(Html.Partial("_CreateOrUpdate.SEO", Model).ToHtmlString());
-    x.Add().Text(T("产品可见性").Text)
-        .Icon("fa fa-users fa-lg fa-fw")
-        .LinkHtmlAttributes(new { data_tab_name = "Acl" })
-        .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Acl" })
-        .Ajax();
+    //x.Add().Text(T("产品可见性").Text)
+    //    .Icon("fa fa-users fa-lg fa-fw")
+    //    .LinkHtmlAttributes(new { data_tab_name = "Acl" })
+    //    .Action("LoadEditTab", "DeclarationProduct", new { id = Model.Id, tabName = "Acl" })
+    //    .Ajax();
     //x.Add().Text(T("Admin.Common.Stores").Text)
     //    .Icon("fa fa-globe fa-lg fa-fw")
     //    .LinkHtmlAttributes(new { data_tab_name = "Stores" })
     //    .Action("LoadEditTab", "Product", new { id = Model.Id, tabName = "Stores" })
     //    .Ajax();
-    //x.Add().Text(T("Common.Downloads").Text)
-    //    .Icon("fa fa-download fa-lg fa-fw")
-    //    .LinkHtmlAttributes(new { data_tab_name = "Downloads" })
-    //    .Content(Html.Partial("_CreateOrUpdate.Downloads", Model).ToHtmlString());
+    x.Add().Text(T("Common.Downloads").Text).Visible(false)
+        .Icon("fa fa-download fa-lg fa-fw")
+        .LinkHtmlAttributes(new { data_tab_name = "Downloads" })
+        .Content(Html.Partial("_CreateOrUpdate.Downloads", Model).ToHtmlString());
 
     // generate an event
     EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "product-edit", this.Html, this.Model));

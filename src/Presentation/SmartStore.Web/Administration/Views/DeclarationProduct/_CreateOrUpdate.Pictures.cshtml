@@ -17,7 +17,7 @@
                 $.ajax({
                     cache:false,
                     type: "POST",
-                    url: "@(Url.Action("ProductPictureAdd", "Product"))",
+                    url: "@(Url.Action("ProductPictureAdd", "DeclarationProduct"))",
                     data: { "pictureId": pictureId, "displayOrder": displayOrder, "productId": @Model.Id },
                     success: function (data) {
                          var productpicturesGrid = $("#productpictures-grid");
@@ -55,7 +55,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="admin-config-group">
-					<div class="head">@T("Admin.Catalog.Products.Pictures.AddNew")</div>
+					<div class="head">@T("为产品添加新图片")</div>
 				</div>
 			</td>
 		</tr>
@@ -84,7 +84,7 @@
 			<td class="adminData">
 				<button type="button" name="add-product-picture" id="add-product-picture" class="btn btn-primary" disabled>
 					<i class="fa fa-plus"></i>
-					<span>@T("Admin.Catalog.Products.Pictures.AddButton")</span>
+					<span>@T("保存此图片")</span>
 				</button>
 			</td>
 		</tr>
@@ -118,9 +118,9 @@
 			})
 			.DataBinding(dataBinding =>
 			{
-				dataBinding.Ajax().Select("ProductPictureList", "Product", new { productId = Model.Id })
-					.Update("ProductPictureUpdate", "Product", new { productId = Model.Id })
-					.Delete("ProductPictureDelete", "Product", new { productId = Model.Id });
+				dataBinding.Ajax().Select("ProductPictureList", "DeclarationProduct", new { productId = Model.Id })
+					.Update("ProductPictureUpdate", "DeclarationProduct", new { productId = Model.Id })
+					.Delete("ProductPictureDelete", "DeclarationProduct", new { productId = Model.Id });
 			})
 			.EnableCustomBinding(true))
     </div>

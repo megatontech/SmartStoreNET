@@ -19,4 +19,20 @@ namespace SmartStore.Data.Mapping.Catalog
                 .HasForeignKey(pc => pc.ProductId);
         }
     }
+    public partial class DeclarationProductCategoryMap : EntityTypeConfiguration<DeclarationProductCategory>
+    {
+        public DeclarationProductCategoryMap()
+        {
+            this.ToTable("DeclarationProduct_Category_Mapping");
+            this.HasKey(pc => pc.Id);
+
+            this.HasRequired(pc => pc.Category)
+                .WithMany()
+                .HasForeignKey(pc => pc.CategoryId);
+
+            this.HasRequired(pc => pc.Product)
+                .WithMany(p => p.ProductCategories)
+                .HasForeignKey(pc => pc.ProductId);
+        }
+    }
 }

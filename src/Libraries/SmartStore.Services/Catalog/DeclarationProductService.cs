@@ -27,7 +27,7 @@ namespace SmartStore.Services.Catalog
 
         private readonly IProductAttributeService _productAttributeService;
 
-        private readonly IRepository<ProductPicture> _productPictureRepository;
+        private readonly IRepository<DeclarationProductPicture> _productPictureRepository;
 
         private readonly IRepository<DeclarationProduct> _productRepository;
 
@@ -46,7 +46,7 @@ namespace SmartStore.Services.Catalog
         public DeclarationProductService(
             IRepository<DeclarationProduct> productRepository,
             IRepository<TierPrice> tierPriceRepository,
-            IRepository<ProductPicture> productPictureRepository,
+            IRepository<DeclarationProductPicture> productPictureRepository,
             IRepository<ProductVariantAttributeCombination> productVariantAttributeCombinationRepository,
             IRepository<ShoppingCartItem> shoppingCartItemRepository,
             IProductAttributeService productAttributeService,
@@ -235,7 +235,7 @@ namespace SmartStore.Services.Catalog
             }
         }
 
-        public virtual void DeleteProductPicture(ProductPicture productPicture)
+        public virtual void DeleteProductPicture(DeclarationProductPicture productPicture)
         {
             Guard.NotNull(productPicture, nameof(productPicture));
 
@@ -370,7 +370,7 @@ namespace SmartStore.Services.Catalog
             return product;
         }
 
-        public virtual ProductPicture GetProductPictureById(int productPictureId)
+        public virtual DeclarationProductPicture GetProductPictureById(int productPictureId)
         {
             if (productPictureId == 0)
                 return null;
@@ -379,7 +379,7 @@ namespace SmartStore.Services.Catalog
             return pp;
         }
 
-        public virtual IList<ProductPicture> GetProductPicturesByProductId(int productId)
+        public virtual IList<DeclarationProductPicture> GetProductPicturesByProductId(int productId)
         {
             var query = from pp in _productPictureRepository.Table
                         where pp.ProductId == productId
@@ -389,13 +389,13 @@ namespace SmartStore.Services.Catalog
             return productPictures;
         }
 
-        public virtual Multimap<int, ProductPicture> GetProductPicturesByProductIds(int[] productIds, bool onlyFirstPicture = false)
+        public virtual Multimap<int, DeclarationProductPicture> GetProductPicturesByProductIds(int[] productIds, bool onlyFirstPicture = false)
         {
             Guard.NotNull(productIds, nameof(productIds));
 
             if (!productIds.Any())
             {
-                return new Multimap<int, ProductPicture>();
+                return new Multimap<int, DeclarationProductPicture>();
             }
 
             var query =
@@ -491,7 +491,7 @@ namespace SmartStore.Services.Catalog
             _productRepository.Insert(product);
         }
 
-        public virtual void InsertProductPicture(ProductPicture productPicture)
+        public virtual void InsertProductPicture(DeclarationProductPicture productPicture)
         {
             Guard.NotNull(productPicture, nameof(productPicture));
 
@@ -509,16 +509,16 @@ namespace SmartStore.Services.Catalog
         //    result.AddRange(products1);
         //    result.AddRange(products2);
         //    return result;
-        //}
-        public virtual void UpdateHasTierPricesProperty(DeclarationProduct product)
-        {
-            Guard.NotNull(product, nameof(product));
+        ////}
+        //public virtual void UpdateHasTierPricesProperty(DeclarationProduct product)
+        //{
+        //    Guard.NotNull(product, nameof(product));
 
-            var prevValue = product.HasTierPrices;
-            product.HasTierPrices = product.TierPrices.Count > 0;
-            if (prevValue != product.HasTierPrices)
-                UpdateProduct(product);
-        }
+        //    var prevValue = product.HasTierPrices;
+        //    product.HasTierPrices = product.TierPrices.Count > 0;
+        //    if (prevValue != product.HasTierPrices)
+        //        UpdateProduct(product);
+        //}
 
         //    // only distinct products (group by ID)
         //    // if we use standard Distinct() method, then all fields will be compared (low performance)
@@ -550,7 +550,7 @@ namespace SmartStore.Services.Catalog
         /// Updates a product picture
         /// </summary>
         /// <param name="productPicture">Product picture</param>
-        public virtual void UpdateProductPicture(ProductPicture productPicture)
+        public virtual void UpdateProductPicture(DeclarationProductPicture productPicture)
         {
             Guard.NotNull(productPicture, nameof(productPicture));
 
@@ -687,7 +687,7 @@ namespace SmartStore.Services.Catalog
         //                    p.MinStockQuantity >= p.StockQuantity
         //                 select p;
         //    var products1 = query1.ToList();
-        private void UnassignDeletedPictureFromVariantCombinations(ProductPicture productPicture)
+        private void UnassignDeletedPictureFromVariantCombinations(DeclarationProductPicture productPicture)
         {
             var picId = productPicture.Id;
             bool touched = false;

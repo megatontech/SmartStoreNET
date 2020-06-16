@@ -265,6 +265,47 @@ namespace SmartStore.Services.Media
             return info;
         }
 
+        public IDictionary<int, PictureInfo> GetDPictureInfos(IEnumerable<int> pictureIds)
+        {
+            Guard.NotNull(pictureIds, nameof(pictureIds));
+
+            var allRequestedInfos = (from id in pictureIds.Distinct().Where(x => x > 0)
+                                     let cacheKey = MEDIACACHE_LOOKUP_KEY.FormatInvariant(id)
+                                     select new
+                                     {
+                                         PictureId = id,
+                                         CacheKey = cacheKey,
+                                         Info = _cacheManager.Contains(cacheKey) ? _cacheManager.Get<PictureInfo>(cacheKey, independent: true) : (PictureInfo)null
+                                     }).ToList();
+
+            var result = new Dictionary<int, PictureInfo>(allRequestedInfos.Count);
+            var uncachedPictureIds = allRequestedInfos.Where(x => x.Info == null).Select(x => x.PictureId).ToArray();
+            var uncachedPictures = new Dictionary<int, Picture>();
+
+            if (uncachedPictureIds.Length > 0)
+            {
+                uncachedPictures = GetPicturesByIds(uncachedPictureIds, false).ToDictionary(x => x.Id);
+            }
+
+            foreach (var info in allRequestedInfos)
+            {
+                if (info.Info != null)
+                {
+                    result.Add(info.PictureId, info.Info);
+                }
+                else
+                {
+                    // TBD: (mc) Does this need a locking strategy? Apparently yes. But it is hard to accomplish for a random sequence
+                    // without locking the whole thing and loosing performance. Better no lock (?)
+                    var newInfo = CreatePictureInfo(uncachedPictures.Get(info.PictureId));
+                    result.Add(info.PictureId, newInfo);
+                    _cacheManager.Put(info.CacheKey, newInfo);
+                }
+            }
+
+            return result;
+        }
+
         public IDictionary<int, PictureInfo> GetPictureInfos(IEnumerable<int> pictureIds)
         {
             Guard.NotNull(pictureIds, nameof(pictureIds));

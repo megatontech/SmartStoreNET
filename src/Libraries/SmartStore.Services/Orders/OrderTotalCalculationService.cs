@@ -797,19 +797,19 @@ namespace SmartStore.Services.Orders
 			var customer = cart.GetCustomer();
 			var currency = _workContext.WorkingCurrency;
 
-			var shippingTotal = GetAdjustedShippingTotal(cart, out appliedDiscount);
+			//var shippingTotal = GetAdjustedShippingTotal(cart, out appliedDiscount);
+			var shippingTotal = decimal.Zero;
 
-			if (!shippingTotal.HasValue)
-				return null;
+    //        if (!shippingTotal.HasValue)
+				//return null;
 
-			if (shippingTotal.Value < decimal.Zero)
-			{
-				shippingTotal = decimal.Zero;
-			}
+			//if (shippingTotal.Value < decimal.Zero)
+			//{
+			//	shippingTotal = decimal.Zero;
+			//}
 
-            shippingTotal = shippingTotal.Value.RoundIfEnabledFor(currency);
-
-			PrepareAuxiliaryServicesTaxingInfos(cart);
+            shippingTotal =0M;
+            PrepareAuxiliaryServicesTaxingInfos(cart);
 
 			// commented out cause requires several plugins to be updated and migration of Order.OrderShippingTaxRate and Order.PaymentMethodAdditionalFeeTaxRate
 			//if (_taxSettings.AuxiliaryServicesTaxingType == AuxiliaryServicesTaxType.ProRata)
@@ -854,8 +854,8 @@ namespace SmartStore.Services.Orders
 				taxCategoryId = _taxSettings.ShippingTaxClassId;
 			}
 
-			shippingTotalTaxed = _taxService.GetShippingPrice(shippingTotal.Value, includingTax, customer, taxCategoryId, out taxRate);
-            shippingTotalTaxed = shippingTotalTaxed.Value.RoundIfEnabledFor(currency);
+			//shippingTotalTaxed = _taxService.GetShippingPrice(shippingTotal.Value, includingTax, customer, taxCategoryId, out taxRate);
+            //shippingTotalTaxed = shippingTotalTaxed.Value.RoundIfEnabledFor(currency);
 
 			return shippingTotalTaxed;
         }
@@ -1136,30 +1136,30 @@ namespace SmartStore.Services.Orders
             decimal? shoppingCartShipping = GetShoppingCartShippingTotal(cart, false);
 
             // Payment method additional fee without tax
-            var paymentMethodAdditionalFeeWithoutTax = decimal.Zero;
-            if (usePaymentMethodAdditionalFee && !string.IsNullOrEmpty(paymentMethodSystemName))
-            {
-                var provider = _providerManager.GetProvider<IPaymentMethod>(paymentMethodSystemName);
-                var paymentMethodAdditionalFee = (provider != null ? provider.Value.GetAdditionalHandlingFee(cart) : decimal.Zero);
+            //var paymentMethodAdditionalFeeWithoutTax = decimal.Zero;
+            //if (usePaymentMethodAdditionalFee && !string.IsNullOrEmpty(paymentMethodSystemName))
+            //{
+            //    var provider = _providerManager.GetProvider<IPaymentMethod>(paymentMethodSystemName);
+            //    var paymentMethodAdditionalFee = (provider != null ? provider.Value.GetAdditionalHandlingFee(cart) : decimal.Zero);
 
-                paymentMethodAdditionalFee = paymentMethodAdditionalFee.RoundIfEnabledFor(currency);
-                paymentMethodAdditionalFeeWithoutTax = _taxService.GetPaymentMethodAdditionalFee(paymentMethodAdditionalFee, false, customer);
-            }
+            //    paymentMethodAdditionalFee = paymentMethodAdditionalFee.RoundIfEnabledFor(currency);
+            //    paymentMethodAdditionalFeeWithoutTax = _taxService.GetPaymentMethodAdditionalFee(paymentMethodAdditionalFee, false, customer);
+            //}
 
-            // Tax
-            var shoppingCartTax = GetTaxTotal(cart, usePaymentMethodAdditionalFee);
+            //// Tax
+            //var shoppingCartTax = GetTaxTotal(cart, usePaymentMethodAdditionalFee);
 
-            // Order total
+            //// Order total
             var resultTemp = decimal.Zero;
-            resultTemp += subtotalBase;
-            if (shoppingCartShipping.HasValue)
-            {
-                resultTemp += shoppingCartShipping.Value;
-            }
+            //resultTemp += subtotalBase;
+            //if (shoppingCartShipping.HasValue)
+            //{
+            //    resultTemp += shoppingCartShipping.Value;
+            //}
 
-            resultTemp += paymentMethodAdditionalFeeWithoutTax;
-            resultTemp += shoppingCartTax;
-            resultTemp = resultTemp.RoundIfEnabledFor(currency);
+            //resultTemp += paymentMethodAdditionalFeeWithoutTax;
+            //resultTemp += shoppingCartTax;
+            //resultTemp = resultTemp.RoundIfEnabledFor(currency);
 
             #region Order total discount
 
