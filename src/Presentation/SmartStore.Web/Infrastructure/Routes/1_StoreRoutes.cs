@@ -179,11 +179,15 @@ namespace SmartStore.Web.Infrastructure
                 new { controller = "Checkout", action = "Index" },
                 new[] { "SmartStore.Web.Controllers" });
 
+			routes.MapLocalizedRoute("DeclarationCheckout",
+				"Declarationcheckout/",
+				new { controller = "DeclarationCheckout", action = "Index" },
+				new[] { "SmartStore.Web.Controllers" });
 
 			/* Newsletter
 			----------------------------------------*/
 
-            routes.MapLocalizedRoute("NewsletterActivation",
+			routes.MapLocalizedRoute("NewsletterActivation",
                 "newsletter/subscriptionactivation/{token}/{active}",
                 new { controller = "Newsletter", action = "SubscriptionActivation" },
                 new { token = new GuidConstraint(false) },

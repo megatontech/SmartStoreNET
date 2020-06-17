@@ -278,9 +278,49 @@ namespace SmartStore.Web.Controllers
             }
         }
 
-        #endregion
+		public void GetCategoryBreadcrumbD(IBreadcrumb breadcrumb, ControllerContext context, DeclarationProduct product = null)
+		{
+			var menu = _menuService.GetMenu("Main");
+			var currentNode = menu.ResolveCurrentNode(context);
 
-        public ProductDetailsModel PrepareProductDetailsPageModel(
+			if (currentNode != null)
+			{
+				currentNode.Trail.Where(x => !x.IsRoot).Each(x => breadcrumb.Track(x.Value));
+			}
+
+			// Add trail of parent product if product has no category assigned.
+			if (product != null && !(breadcrumb.Trail?.Any() ?? false))
+			{
+				var parentProduct = _productService.GetProductById(product.ParentGroupedProductId);
+				if (parentProduct != null)
+				{
+					var fc = new FakeController();
+					var rd = new RouteData();
+					rd.Values.Add("currentProductId", parentProduct.Id);
+					var fcc = new ControllerContext(new RequestContext(context.HttpContext, rd), fc);
+					fc.ControllerContext = fcc;
+
+					currentNode = menu.ResolveCurrentNode(fcc);
+					if (currentNode != null)
+					{
+						currentNode.Trail.Where(x => !x.IsRoot).Each(x => breadcrumb.Track(x.Value));
+						var parentName = parentProduct.GetLocalized(x => x.Name);
+
+						breadcrumb.Track(new MenuItem
+						{
+							Text = parentName,
+							Rtl = parentName.CurrentLanguage.Rtl,
+							EntityId = parentProduct.Id,
+							Url = _urlHelper.RouteUrl("Product", new { SeName = parentProduct.GetSeName() })
+						});
+					}
+				}
+			}
+		}
+
+		#endregion
+
+		public ProductDetailsModel PrepareProductDetailsPageModel(
 			Product product,
 			ProductVariantQuery query,
 			bool isAssociatedProduct = false,
@@ -516,6 +556,242 @@ namespace SmartStore.Web.Controllers
 			}
 		}
 
+		public ProductDetailsModel PrepareProductDetailsPageModel(
+			DeclarationProduct product,
+			ProductVariantQuery query,
+			bool isAssociatedProduct = false,
+			ProductBundleItemData productBundleItem = null,
+			IList<ProductBundleItemData> productBundleItems = null)
+		{
+			Guard.NotNull(product, nameof(product));
+
+			var customer = _services.WorkContext.CurrentCustomer;
+			var store = _services.StoreContext.CurrentStore;
+
+			using (_services.Chronometer.Step("PrepareProductDetailsPageModel"))
+			{
+				var model = new ProductDetailsModel
+				{
+					Id = product.Id,
+					Name = product.GetLocalized(x => x.Name),
+					ShortDescription = product.GetLocalized(x => x.ShortDescription),
+					FullDescription = product.GetLocalized(x => x.FullDescription, detectEmptyHtml: true),
+					MetaKeywords = product.GetLocalized(x => x.MetaKeywords),
+					MetaDescription = product.GetLocalized(x => x.MetaDescription),
+					MetaTitle = product.GetLocalized(x => x.MetaTitle),
+					SeName = product.GetSeName(),
+					ProductType = product.ProductType,
+					VisibleIndividually = product.VisibleIndividually,
+					Manufacturers = _catalogSettings.ShowManufacturerInProductDetail
+						? PrepareManufacturersOverviewModel(_manufacturerService.GetProductManufacturersByProductId(product.Id), null, _catalogSettings.ShowManufacturerPicturesInProductDetail)
+						: null,
+					ReviewCount = product.ApprovedTotalReviews,
+					DisplayAdminLink = _services.Permissions.Authorize(StandardPermissionProvider.AccessAdminPanel, customer),
+					ShowSku = _catalogSettings.ShowProductSku,
+					Sku = product.Sku,
+					ShowManufacturerPartNumber = _catalogSettings.ShowManufacturerPartNumber,
+					DisplayProductReviews = _catalogSettings.ShowProductReviewsInProductDetail && product.AllowCustomerReviews,
+					ManufacturerPartNumber = product.ManufacturerPartNumber,
+					ShowGtin = _catalogSettings.ShowGtin,
+					Gtin = product.Gtin,
+					//StockAvailability = product.FormatStockMessage(_localizationService),
+					HasSampleDownload = product.IsDownload && product.HasSampleDownload,
+					IsCurrentCustomerRegistered = customer.IsRegistered(),
+					IsAssociatedProduct = isAssociatedProduct,
+					CompareEnabled = !isAssociatedProduct && _catalogSettings.CompareProductsEnabled,
+					TellAFriendEnabled = !isAssociatedProduct && _catalogSettings.EmailAFriendEnabled,
+					AskQuestionEnabled = !isAssociatedProduct && _catalogSettings.AskQuestionEnabled,
+					PriceDisplayStyle = _catalogSettings.PriceDisplayStyle,
+					DisplayTextForZeroPrices = _catalogSettings.DisplayTextForZeroPrices
+				};
+
+				// Social share code
+				if (_catalogSettings.ShowShareButton && _catalogSettings.PageShareCode.HasValue())
+				{
+					var shareCode = _catalogSettings.PageShareCode;
+					if (_services.WebHelper.IsCurrentConnectionSecured())
+					{
+						// Need to change the addthis link to be https linked when the page is, so that the page doesn't ask about mixed mode when viewed in https...
+						shareCode = shareCode.Replace("http://", "https://");
+					}
+
+					model.ProductShareCode = shareCode;
+				}
+
+				// Get gift card values from query string.
+				if (product.IsGiftCard)
+				{
+					model.GiftCard.RecipientName = query.GetGiftCardValue(product.Id, 0, "RecipientName");
+					model.GiftCard.RecipientEmail = query.GetGiftCardValue(product.Id, 0, "RecipientEmail");
+					model.GiftCard.SenderName = query.GetGiftCardValue(product.Id, 0, "SenderName");
+					model.GiftCard.SenderEmail = query.GetGiftCardValue(product.Id, 0, "SenderEmail");
+					model.GiftCard.Message = query.GetGiftCardValue(product.Id, 0, "Message");
+				}
+
+				// Back in stock subscriptions
+				if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
+					 product.BackorderMode == BackorderMode.NoBackorders &&
+					 product.AllowBackInStockSubscriptions &&
+					 product.StockQuantity <= 0)
+				{
+					//out of stock
+					model.DisplayBackInStockSubscription = true;
+					model.BackInStockAlreadySubscribed = _backInStockSubscriptionService.FindSubscription(customer.Id, product.Id, store.Id) != null;
+				}
+
+				// template
+				var templateCacheKey = string.Format(ModelCacheEventConsumer.PRODUCT_TEMPLATE_MODEL_KEY, product.ProductTemplateId);
+				model.ProductTemplateViewPath = _services.Cache.Get(templateCacheKey, () =>
+				{
+					var template = _productTemplateService.GetProductTemplateById(product.ProductTemplateId);
+					if (template == null)
+						template = _productTemplateService.GetAllProductTemplates().FirstOrDefault();
+					return template.ViewPath;
+				});
+
+				IList<ProductBundleItemData> bundleItems = null;
+				ProductVariantAttributeCombination combination = null;
+
+				if (product.ProductType == ProductType.GroupedProduct && !isAssociatedProduct)
+				{
+					// associated products
+					var searchQuery = new CatalogSearchQuery()
+						.VisibleOnly(customer)
+						.HasStoreId(store.Id)
+						.HasParentGroupedProduct(product.Id);
+
+					var associatedProducts = _catalogSearchService.Search(searchQuery).Hits;
+
+					foreach (var associatedProduct in associatedProducts)
+					{
+						var assciatedProductModel = PrepareProductDetailsPageModel(associatedProduct, query, true, null, null);
+						model.AssociatedProducts.Add(assciatedProductModel);
+					}
+				}
+				else if (product.ProductType == ProductType.BundledProduct && productBundleItem == null)
+				{
+					// bundled items
+					bundleItems = _productService.GetBundleItems(product.Id);
+
+					foreach (var itemData in bundleItems.Where(x => x.Item.Product.CanBeBundleItem()))
+					{
+						var item = itemData.Item;
+						var bundledProductModel = PrepareProductDetailsPageModel(item.Product, query, false, itemData, null);
+
+						bundledProductModel.ShowLegalInfo = false;
+						bundledProductModel.DisplayDeliveryTime = false;
+
+						bundledProductModel.BundleItem.Id = item.Id;
+						bundledProductModel.BundleItem.Quantity = item.Quantity;
+						bundledProductModel.BundleItem.HideThumbnail = item.HideThumbnail;
+						bundledProductModel.BundleItem.Visible = item.Visible;
+						bundledProductModel.BundleItem.IsBundleItemPricing = item.BundleProduct.BundlePerItemPricing;
+
+						var bundleItemName = item.GetLocalized(x => x.Name);
+						if (bundleItemName.Value.HasValue())
+							bundledProductModel.Name = bundleItemName;
+
+						var bundleItemShortDescription = item.GetLocalized(x => x.ShortDescription);
+						if (bundleItemShortDescription.Value.HasValue())
+							bundledProductModel.ShortDescription = bundleItemShortDescription;
+
+						model.BundledItems.Add(bundledProductModel);
+					}
+				}
+
+				model = PrepareProductDetailModel(model, product, query, isAssociatedProduct, productBundleItem, bundleItems);
+
+				// Action items
+				{
+					if (model.HasSampleDownload)
+					{
+						model.ActionItems["sample"] = new ProductDetailsModel.ActionItemModel
+						{
+							Key = "sample",
+							Title = T("Products.DownloadSample"),
+							CssClass = "action-download-sample",
+							IconCssClass = "fa fa-download",
+							Href = _urlHelper.Action("Sample", "Download", new { productId = model.Id }),
+							IsPrimary = true,
+							PrimaryActionColor = "danger"
+						};
+					}
+
+					if (!model.AddToCart.DisableWishlistButton && model.ProductType != ProductType.GroupedProduct)
+					{
+						model.ActionItems["wishlist"] = new ProductDetailsModel.ActionItemModel
+						{
+							Key = "wishlist",
+							Title = T("ShoppingCart.AddToWishlist.Short"),
+							Tooltip = T("ShoppingCart.AddToWishlist"),
+							CssClass = "ajax-cart-link action-add-to-wishlist",
+							IconCssClass = "icm icm-heart",
+							Href = _urlHelper.Action("AddProduct", "ShoppingCart", new { productId = model.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist })
+						};
+					}
+
+					if (model.CompareEnabled)
+					{
+						model.ActionItems["compare"] = new ProductDetailsModel.ActionItemModel
+						{
+							Key = "compare",
+							Title = T("Common.Shopbar.Compare"),
+							Tooltip = T("Products.Compare.AddToCompareList"),
+							CssClass = "action-compare ajax-cart-link",
+							IconCssClass = "icm icm-repeat",
+							Href = _urlHelper.Action("AddProductToCompare", "Catalog", new { id = model.Id })
+						};
+					}
+
+					if (model.AskQuestionEnabled && !model.ProductPrice.CallForPrice)
+					{
+						model.ActionItems["ask"] = new ProductDetailsModel.ActionItemModel
+						{
+							Key = "ask",
+							Title = T("Products.AskQuestion.Short"),
+							Tooltip = T("Products.AskQuestion"),
+							CssClass = "action-ask-question",
+							IconCssClass = "icm icm-envelope",
+							Href = _urlHelper.Action("AskQuestion", new { id = model.Id })
+						};
+					}
+
+					if (model.TellAFriendEnabled)
+					{
+						model.ActionItems["tell"] = new ProductDetailsModel.ActionItemModel
+						{
+							Key = "tell",
+							Title = T("Products.EmailAFriend"),
+							CssClass = "action-bullhorn",
+							IconCssClass = "icm icm-bullhorn",
+							Href = _urlHelper.Action("EmailAFriend", new { id = model.Id })
+						};
+					}
+				}
+
+				IList<int> combinationPictureIds = null;
+
+				if (productBundleItem == null)
+				{
+					combinationPictureIds = _productAttributeService.GetAllProductVariantAttributeCombinationPictureIds(product.Id);
+					if (combination == null && model.SelectedCombination != null)
+						combination = model.SelectedCombination;
+				}
+
+				// pictures
+				var pictures = _pictureService.GetPicturesByProductId(product.Id);
+
+				if (product.HasPreviewPicture && pictures.Count > 1)
+				{
+					pictures.RemoveAt(0);
+				}
+
+				PrepareProductDetailsPictureModel(model.DetailsPictureModel, pictures, model.Name, combinationPictureIds, isAssociatedProduct, productBundleItem, combination);
+
+				return model;
+			}
+		}
+
 		public void PrepareProductReviewsModel(ProductReviewsModel model, Product product, int take = int.MaxValue)
 		{
 			Guard.NotNull(product, nameof(product));
@@ -739,6 +1015,654 @@ namespace SmartStore.Web.Controllers
 			IList<ProductBundleItemData> productBundleItems = null,
 			int selectedQuantity = 1)
 		{
+			Guard.NotNull(model, nameof(model));
+			Guard.NotNull(product, nameof(product));
+
+			var store = _services.StoreContext.CurrentStore;
+			var customer = _services.WorkContext.CurrentCustomer;
+			var currency = _services.WorkContext.WorkingCurrency;
+
+			var preSelectedPriceAdjustmentBase = decimal.Zero;
+			var preSelectedWeightAdjustment = decimal.Zero;
+			var displayPrices = _services.Permissions.Authorize(StandardPermissionProvider.DisplayPrices);
+			var isBundle = product.ProductType == ProductType.BundledProduct;
+			var isBundleItemPricing = productBundleItem != null && productBundleItem.Item.BundleProduct.BundlePerItemPricing;
+			var isBundlePricing = productBundleItem != null && !productBundleItem.Item.BundleProduct.BundlePerItemPricing;
+			var bundleItemId = productBundleItem == null ? 0 : productBundleItem.Item.Id;
+
+			var hasSelectedAttributesValues = false;
+			var hasSelectedAttributes = query.Variants.Count > 0;
+			List<ProductVariantAttributeValue> selectedAttributeValues = null;
+			var variantAttributes = isBundle ? new List<ProductVariantAttribute>() : _productAttributeService.GetProductVariantAttributesByProductId(product.Id);
+
+			model.IsBundlePart = product.ProductType != ProductType.BundledProduct && productBundleItem != null;
+			model.ProductPrice.DynamicPriceUpdate = _catalogSettings.EnableDynamicPriceUpdate;
+			model.ProductPrice.BundleItemShowBasePrice = _catalogSettings.BundleItemShowBasePrice;
+
+			if (!model.ProductPrice.DynamicPriceUpdate)
+			{
+				selectedQuantity = 1;
+			}
+
+			#region Product attributes
+
+			// Bundles doesn't have attributes.
+			if (!isBundle)
+			{
+				foreach (var attribute in variantAttributes)
+				{
+					var pvaModel = new ProductDetailsModel.ProductVariantAttributeModel
+					{
+						Id = attribute.Id,
+						ProductId = attribute.ProductId,
+						BundleItemId = bundleItemId,
+						ProductAttributeId = attribute.ProductAttributeId,
+						Alias = attribute.ProductAttribute.Alias,
+						Name = attribute.ProductAttribute.GetLocalized(x => x.Name),
+						Description = attribute.ProductAttribute.GetLocalized(x => x.Description),
+						TextPrompt = attribute.TextPrompt,
+						IsRequired = attribute.IsRequired,
+						AttributeControlType = attribute.AttributeControlType,
+						AllowedFileExtensions = _catalogSettings.FileUploadAllowedExtensions
+					};
+
+					if (hasSelectedAttributes)
+					{
+						var selectedVariant = query.Variants.FirstOrDefault(x =>
+							x.ProductId == product.Id &&
+							x.BundleItemId == bundleItemId &&
+							x.AttributeId == attribute.ProductAttributeId &&
+							x.VariantAttributeId == attribute.Id);
+
+						if (selectedVariant != null)
+						{
+							switch (attribute.AttributeControlType)
+							{
+								case AttributeControlType.Datepicker:
+									if (selectedVariant.Date.HasValue)
+									{
+										pvaModel.SelectedDay = selectedVariant.Date.Value.Day;
+										pvaModel.SelectedMonth = selectedVariant.Date.Value.Month;
+										pvaModel.SelectedYear = selectedVariant.Date.Value.Year;
+									}
+									break;
+								case AttributeControlType.FileUpload:
+									pvaModel.UploadedFileGuid = selectedVariant.Value;
+
+									Guid guid;
+									if (selectedVariant.Value.HasValue() && Guid.TryParse(selectedVariant.Value, out guid))
+									{
+										var download = _downloadService.GetDownloadByGuid(guid);
+										if (download != null)
+										{
+											pvaModel.UploadedFileName = string.Concat(download.Filename ?? download.DownloadGuid.ToString(), download.Extension);
+										}
+									}
+									break;
+								case AttributeControlType.TextBox:
+								case AttributeControlType.MultilineTextbox:
+									pvaModel.TextValue = selectedVariant.Value;
+									break;
+							}
+						}
+					}
+
+					// TODO: obsolete? Alias field is not used for custom values anymore, only for URL as URL variant alias.
+					if (attribute.AttributeControlType == AttributeControlType.Datepicker && pvaModel.Alias.HasValue() && RegularExpressions.IsYearRange.IsMatch(pvaModel.Alias))
+					{
+						var match = RegularExpressions.IsYearRange.Match(pvaModel.Alias);
+						pvaModel.BeginYear = match.Groups[1].Value.ToInt();
+						pvaModel.EndYear = match.Groups[2].Value.ToInt();
+					}
+
+					var preSelectedValueId = 0;
+					var pvaValues = attribute.ShouldHaveValues()
+						? _productAttributeService.GetProductVariantAttributeValues(attribute.Id)
+						: new List<ProductVariantAttributeValue>();
+
+					foreach (var pvaValue in pvaValues)
+					{
+						ProductBundleItemAttributeFilter attributeFilter = null;
+
+						if (productBundleItem?.Item?.FilterOut(pvaValue, out attributeFilter) ?? false)
+							continue;
+
+						if (preSelectedValueId == 0 && attributeFilter != null && attributeFilter.IsPreSelected)
+							preSelectedValueId = attributeFilter.AttributeValueId;
+
+						var linkedProduct = _productService.GetProductById(pvaValue.LinkedProductId);
+
+						var pvaValueModel = new ProductDetailsModel.ProductVariantAttributeValueModel();
+						pvaValueModel.PriceAdjustment = string.Empty;
+						pvaValueModel.Id = pvaValue.Id;
+						pvaValueModel.Name = pvaValue.GetLocalized(x => x.Name);
+						pvaValueModel.Alias = pvaValue.Alias;
+						pvaValueModel.Color = pvaValue.Color; // used with "Boxes" attribute type
+						pvaValueModel.IsPreSelected = pvaValue.IsPreSelected;
+
+						if (linkedProduct != null && linkedProduct.VisibleIndividually)
+							pvaValueModel.SeName = linkedProduct.GetSeName();
+
+						// Explicitly selected always discards pre-selected by merchant.
+						if (hasSelectedAttributes)
+							pvaValueModel.IsPreSelected = false;
+
+						// Display price if allowed.
+						if (displayPrices && !isBundlePricing)
+						{
+							decimal taxRate = decimal.Zero;
+							decimal attributeValuePriceAdjustment = _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(pvaValue,
+								product, _services.WorkContext.CurrentCustomer, null, selectedQuantity);
+							decimal priceAdjustmentBase = _taxService.GetProductPrice(product, attributeValuePriceAdjustment, out taxRate);
+							decimal priceAdjustment = _currencyService.ConvertFromPrimaryStoreCurrency(priceAdjustmentBase, currency);
+
+							if (_catalogSettings.ShowVariantCombinationPriceAdjustment)
+							{
+								if (priceAdjustmentBase > decimal.Zero)
+									pvaValueModel.PriceAdjustment = "+" + _priceFormatter.FormatPrice(priceAdjustment, true, false);
+								else if (priceAdjustmentBase < decimal.Zero)
+									pvaValueModel.PriceAdjustment = "-" + _priceFormatter.FormatPrice(-priceAdjustment, true, false);
+							}
+
+							if (pvaValueModel.IsPreSelected)
+							{
+								preSelectedPriceAdjustmentBase = decimal.Add(preSelectedPriceAdjustmentBase, priceAdjustmentBase);
+								preSelectedWeightAdjustment = decimal.Add(preSelectedWeightAdjustment, pvaValue.WeightAdjustment);
+							}
+
+							if (_catalogSettings.ShowLinkedAttributeValueQuantity && pvaValue.ValueType == ProductVariantAttributeValueType.ProductLinkage)
+							{
+								pvaValueModel.QuantityInfo = pvaValue.Quantity;
+							}
+
+							pvaValueModel.PriceAdjustmentValue = priceAdjustment;
+						}
+
+						if (_catalogSettings.ShowLinkedAttributeValueImage && pvaValue.ValueType == ProductVariantAttributeValueType.ProductLinkage)
+						{
+							var linkagePicture = _pictureService.GetPicturesByProductId(pvaValue.LinkedProductId, 1).FirstOrDefault();
+							if (linkagePicture != null)
+								pvaValueModel.ImageUrl = _pictureService.GetUrl(linkagePicture, _mediaSettings.VariantValueThumbPictureSize, false);
+						}
+						else if (pvaValue.PictureId != 0)
+						{
+							pvaValueModel.ImageUrl = _pictureService.GetUrl(pvaValue.PictureId, _mediaSettings.VariantValueThumbPictureSize, false);
+						}
+
+						pvaModel.Values.Add(pvaValueModel);
+					}
+
+					// We need selected attributes to get initially displayed combination images.
+					if (!hasSelectedAttributes)
+					{
+						ProductDetailsModel.ProductVariantAttributeValueModel defaultValue = null;
+
+						// Value pre-selected by a bundle item filter discards the default pre-selection.
+						if (preSelectedValueId != 0)
+						{
+							pvaModel.Values.Each(x => x.IsPreSelected = false);
+
+							if ((defaultValue = pvaModel.Values.OfType<ProductDetailsModel.ProductVariantAttributeValueModel>().FirstOrDefault(v => v.Id == preSelectedValueId)) != null)
+							{
+								defaultValue.IsPreSelected = true;
+								query.AddVariant(new ProductVariantQueryItem(defaultValue.Id.ToString())
+								{
+									ProductId = product.Id,
+									BundleItemId = bundleItemId,
+									AttributeId = attribute.ProductAttributeId,
+									VariantAttributeId = attribute.Id,
+									Alias = attribute.ProductAttribute.Alias,
+									ValueAlias = defaultValue.Alias
+								});
+							}
+						}
+
+						if (defaultValue == null)
+						{
+							foreach (var value in pvaModel.Values.Where(x => x.IsPreSelected))
+							{
+								query.AddVariant(new ProductVariantQueryItem(value.Id.ToString())
+								{
+									ProductId = product.Id,
+									BundleItemId = bundleItemId,
+									AttributeId = attribute.ProductAttributeId,
+									VariantAttributeId = attribute.Id,
+									Alias = attribute.ProductAttribute.Alias,
+									ValueAlias = value.Alias
+								});
+							}
+						}
+					}
+
+					model.ProductVariantAttributes.Add(pvaModel);
+				}
+			}
+
+			#endregion
+
+			#region Attribute combinations
+
+			if (!isBundle)
+			{
+				if (query.Variants.Count > 0)
+				{
+					// Merge with combination data if there's a match.
+					var warnings = new List<string>();
+					var attributeXml = query.CreateSelectedAttributesXml(product.Id, bundleItemId, variantAttributes, _productAttributeParser, _localizationService,
+						_downloadService, _catalogSettings, _httpRequest, warnings);
+
+					selectedAttributeValues = _productAttributeParser.ParseProductVariantAttributeValues(attributeXml).ToList();
+					hasSelectedAttributesValues = (selectedAttributeValues.Count > 0);
+
+					if (isBundlePricing)
+					{
+						model.AttributeInfo = _productAttributeFormatter.FormatAttributes(
+							product,
+							attributeXml,
+							customer,
+							serapator: ", ",
+							renderPrices: false,
+							renderGiftCardAttributes: false,
+							allowHyperlinks: false);
+					}
+
+					model.SelectedCombination = _productAttributeParser.FindProductVariantAttributeCombination(product.Id, attributeXml);
+
+					if (model.SelectedCombination != null && model.SelectedCombination.IsActive == false)
+					{
+						model.IsAvailable = false;
+						model.StockAvailability = T("Products.Availability.IsNotActive");
+					}
+
+					product.MergeWithCombination(model.SelectedCombination);
+
+					// Mark explicitly selected as pre-selected.
+					foreach (var attribute in model.ProductVariantAttributes)
+					{
+						foreach (var value in attribute.Values)
+						{
+							if (selectedAttributeValues.FirstOrDefault(v => v.Id == value.Id) != null)
+								value.IsPreSelected = true;
+
+							if (!_catalogSettings.ShowVariantCombinationPriceAdjustment)
+								value.PriceAdjustment = "";
+						}
+					}
+				}
+			}
+
+			#endregion
+
+			#region Properties
+
+			if ((productBundleItem != null && !productBundleItem.Item.BundleProduct.BundlePerItemShoppingCart) ||
+				(product.ManageInventoryMethod == ManageInventoryMethod.ManageStockByAttributes && !hasSelectedAttributesValues))
+			{
+				// Cases where stock inventory is not functional. Determined by what ShoppingCartService.GetStandardWarnings and ProductService.AdjustInventory is not handling.
+				model.IsAvailable = true;
+				var hasAttributeCombinations = _services.DbContext.QueryForCollection(product, (Product p) => p.ProductVariantAttributeCombinations).Any();
+				model.StockAvailability = !hasAttributeCombinations ? product.FormatStockMessage(_localizationService) : "";
+			}
+			else if (model.IsAvailable)
+			{
+				model.IsAvailable = product.IsAvailableByStock();
+				model.StockAvailability = product.FormatStockMessage(_localizationService);
+			}
+
+			model.Id = product.Id;
+			model.Name = product.GetLocalized(x => x.Name);
+			model.ShowSku = _catalogSettings.ShowProductSku;
+			model.Sku = product.Sku;
+			model.ShortDescription = product.GetLocalized(x => x.ShortDescription);
+			model.FullDescription = product.GetLocalized(x => x.FullDescription, detectEmptyHtml: true);
+			model.MetaKeywords = product.GetLocalized(x => x.MetaKeywords);
+			model.MetaDescription = product.GetLocalized(x => x.MetaDescription);
+			model.MetaTitle = product.GetLocalized(x => x.MetaTitle);
+			model.SeName = product.GetSeName();
+			model.ShowManufacturerPartNumber = _catalogSettings.ShowManufacturerPartNumber;
+			model.ManufacturerPartNumber = product.ManufacturerPartNumber;
+			model.ShowDimensions = _catalogSettings.ShowDimensions;
+			model.ShowWeight = _catalogSettings.ShowWeight;
+			model.ShowGtin = _catalogSettings.ShowGtin;
+			model.Gtin = product.Gtin;
+			model.HasSampleDownload = product.IsDownload && product.HasSampleDownload;
+			model.IsCurrentCustomerRegistered = customer.IsRegistered();
+			model.IsBasePriceEnabled = product.BasePriceEnabled && !(isBundle && product.BundlePerItemPricing);
+			model.BasePriceInfo = product.GetBasePriceInfo(_localizationService, _priceFormatter, _currencyService, _taxService, _priceCalculationService, customer, currency);
+			model.ShowLegalInfo = !model.IsBundlePart && _taxSettings.ShowLegalHintsInProductDetails;
+			model.BundleTitleText = product.GetLocalized(x => x.BundleTitleText);
+			model.BundlePerItemPricing = product.BundlePerItemPricing;
+			model.BundlePerItemShipping = product.BundlePerItemShipping;
+			model.BundlePerItemShoppingCart = product.BundlePerItemShoppingCart;
+
+			//_taxSettings.TaxDisplayType == TaxDisplayType.ExcludingTax;
+
+			var taxDisplayType = _services.WorkContext.GetTaxDisplayTypeFor(customer, store.Id);
+			string taxInfo = T(taxDisplayType == TaxDisplayType.IncludingTax ? "Tax.InclVAT" : "Tax.ExclVAT");
+
+			var defaultTaxRate = string.Empty;
+			if (_taxSettings.DisplayTaxRates)
+			{
+				var taxRate = _taxService.GetTaxRate(product, customer);
+				if (taxRate != decimal.Zero)
+				{
+					var formattedTaxRate = _priceFormatter.FormatTaxRate(taxRate);
+					defaultTaxRate = $"({formattedTaxRate}%)";
+				}
+			}
+
+			var additionalShippingCosts = string.Empty;
+			var addShippingPrice = _currencyService.ConvertFromPrimaryStoreCurrency(product.AdditionalShippingCharge, currency);
+
+			if (addShippingPrice > 0)
+			{
+				additionalShippingCosts = T("Common.AdditionalShippingSurcharge").Text.FormatInvariant(_priceFormatter.FormatPrice(addShippingPrice, true, false)) + ", ";
+			}
+
+			if (!product.IsShipEnabled || (addShippingPrice == 0 && product.IsFreeShipping))
+			{
+				model.LegalInfo += "{0} {1}, {2}".FormatInvariant(
+					product.IsTaxExempt ? "" : taxInfo,
+					product.IsTaxExempt ? "" : defaultTaxRate,
+					T("Common.FreeShipping"));
+			}
+			else
+			{
+				var shippingInfoUrl = _urlHelper.Topic("ShippingInfo").ToString();
+
+				if (shippingInfoUrl.IsEmpty())
+				{
+					model.LegalInfo = T("Tax.LegalInfoProductDetail2",
+						product.IsTaxExempt ? "" : taxInfo,
+						product.IsTaxExempt ? "" : defaultTaxRate,
+						additionalShippingCosts);
+				}
+				else
+				{
+					model.LegalInfo = T("Tax.LegalInfoProductDetail",
+						product.IsTaxExempt ? "" : taxInfo,
+						product.IsTaxExempt ? "" : defaultTaxRate,
+						additionalShippingCosts,
+						shippingInfoUrl);
+				}
+			}
+
+			var dimension = _measureService.GetMeasureDimensionById(_measureSettings.BaseDimensionId)?.SystemKeyword ?? string.Empty;
+
+			model.WeightValue = product.Weight;
+			if (!isBundle)
+			{
+				if (selectedAttributeValues != null)
+				{
+					foreach (var attributeValue in selectedAttributeValues)
+						model.WeightValue = decimal.Add(model.WeightValue, attributeValue.WeightAdjustment);
+				}
+				else
+				{
+					model.WeightValue = decimal.Add(model.WeightValue, preSelectedWeightAdjustment);
+				}
+			}
+
+			model.Weight = (model.WeightValue > 0) ? "{0} {1}".FormatCurrent(model.WeightValue.ToString("N2"), _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId).SystemKeyword) : "";
+			model.Height = (product.Height > 0) ? "{0} {1}".FormatCurrent(product.Height.ToString("N2"), dimension) : "";
+			model.Length = (product.Length > 0) ? "{0} {1}".FormatCurrent(product.Length.ToString("N2"), dimension) : "";
+			model.Width = (product.Width > 0) ? "{0} {1}".FormatCurrent(product.Width.ToString("N2"), dimension) : "";
+
+			if (productBundleItem != null)
+				model.ThumbDimensions = _mediaSettings.BundledProductPictureSize;
+			else if (isAssociatedProduct)
+				model.ThumbDimensions = _mediaSettings.AssociatedProductPictureSize;
+
+			if (model.IsAvailable)
+			{
+				var deliveryTime = _deliveryTimeService.GetDeliveryTime(product);
+				if (deliveryTime != null)
+				{
+					model.DeliveryTimeName = deliveryTime.GetLocalized(x => x.Name);
+					model.DeliveryTimeHexValue = deliveryTime.ColorHexValue;
+				}
+			}
+
+			model.DisplayDeliveryTime = _catalogSettings.ShowDeliveryTimesInProductDetail;
+			model.IsShipEnabled = product.IsShipEnabled;
+			model.DisplayDeliveryTimeAccordingToStock = product.DisplayDeliveryTimeAccordingToStock(_catalogSettings);
+
+			if (model.DeliveryTimeName.IsEmpty() && model.DisplayDeliveryTime)
+			{
+				model.DeliveryTimeName = T("ShoppingCart.NotAvailable");
+			}
+
+			var quantityUnit = _quantityUnitService.GetQuantityUnit(product);
+			if (quantityUnit != null)
+			{
+				model.QuantityUnitName = quantityUnit.GetLocalized(x => x.Name);
+			}
+
+			//back in stock subscriptions)
+			if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
+				product.BackorderMode == BackorderMode.NoBackorders &&
+				product.AllowBackInStockSubscriptions &&
+				product.StockQuantity <= 0)
+			{
+				//out of stock
+				model.DisplayBackInStockSubscription = true;
+				model.BackInStockAlreadySubscribed = _backInStockSubscriptionService.FindSubscription(customer.Id, product.Id, store.Id) != null;
+			}
+
+			#endregion
+
+			#region Product price
+
+			model.ProductPrice.ProductId = product.Id;
+			model.ProductPrice.HidePrices = !displayPrices;
+			model.ProductPrice.ShowLoginNote = !displayPrices && productBundleItem == null && _catalogSettings.ShowLoginForPriceNote;
+
+			if (displayPrices)
+			{
+				if (product.CustomerEntersPrice && !isBundleItemPricing)
+				{
+					model.ProductPrice.CustomerEntersPrice = true;
+				}
+				else
+				{
+					if (product.CallForPrice && !isBundleItemPricing)
+					{
+						model.ProductPrice.CallForPrice = true;
+					}
+					else
+					{
+						var taxRate = decimal.Zero;
+						var oldPrice = decimal.Zero;
+						var finalPriceWithoutDiscountBase = decimal.Zero;
+						var finalPriceWithDiscountBase = decimal.Zero;
+						var attributesTotalPriceBase = decimal.Zero;
+						var attributesTotalPriceBaseOrig = decimal.Zero;
+						var finalPriceWithoutDiscount = decimal.Zero;
+						var finalPriceWithDiscount = decimal.Zero;
+						var oldPriceBase = _taxService.GetProductPrice(product, product.OldPrice, out taxRate);
+
+						if (model.ProductPrice.DynamicPriceUpdate && !isBundlePricing)
+						{
+							if (selectedAttributeValues != null)
+							{
+								selectedAttributeValues.Each(x => attributesTotalPriceBase += _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(x,
+									product, customer, null, selectedQuantity));
+
+								selectedAttributeValues.Each(x => attributesTotalPriceBaseOrig += _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(x,
+									product, customer, null, 1));
+							}
+							else
+							{
+								attributesTotalPriceBase = preSelectedPriceAdjustmentBase;
+							}
+						}
+
+						if (productBundleItem != null)
+						{
+							productBundleItem.AdditionalCharge = attributesTotalPriceBase;
+						}
+
+						finalPriceWithoutDiscountBase = _priceCalculationService.GetFinalPrice(product, productBundleItems,
+							customer, attributesTotalPriceBaseOrig, false, selectedQuantity, productBundleItem);
+
+						finalPriceWithDiscountBase = _priceCalculationService.GetFinalPrice(product, productBundleItems,
+							customer, attributesTotalPriceBase, true, selectedQuantity, productBundleItem);
+
+						var basePriceAdjustment = finalPriceWithDiscountBase - finalPriceWithoutDiscountBase;
+
+						finalPriceWithoutDiscountBase = _taxService.GetProductPrice(product, finalPriceWithoutDiscountBase, out taxRate);
+						finalPriceWithDiscountBase = _taxService.GetProductPrice(product, finalPriceWithDiscountBase, out taxRate);
+
+						oldPrice = _currencyService.ConvertFromPrimaryStoreCurrency(oldPriceBase, currency);
+
+						finalPriceWithoutDiscount = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceWithoutDiscountBase, currency);
+						finalPriceWithDiscount = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceWithDiscountBase, currency);
+
+						if (productBundleItem == null || isBundleItemPricing)
+						{
+							if (oldPriceBase > decimal.Zero && oldPriceBase > finalPriceWithoutDiscountBase)
+							{
+								model.ProductPrice.OldPriceValue = oldPrice;
+								model.ProductPrice.OldPrice = _priceFormatter.FormatPrice(oldPrice);
+							}
+
+							model.ProductPrice.Price = _priceFormatter.FormatPrice(finalPriceWithoutDiscount);
+
+							if (finalPriceWithoutDiscountBase != finalPriceWithDiscountBase)
+							{
+								model.ProductPrice.PriceWithDiscount = _priceFormatter.FormatPrice(finalPriceWithDiscount);
+							}
+						}
+
+						model.ProductPrice.PriceValue = finalPriceWithoutDiscount;
+						model.ProductPrice.PriceWithDiscountValue = finalPriceWithDiscount;
+						model.BasePriceInfo = product.GetBasePriceInfo(
+							_localizationService,
+							_priceFormatter,
+							_currencyService,
+							_taxService,
+							_priceCalculationService,
+							customer,
+							currency,
+							attributesTotalPriceBase);
+
+						if (!string.IsNullOrWhiteSpace(model.ProductPrice.OldPrice) || !string.IsNullOrWhiteSpace(model.ProductPrice.PriceWithDiscount))
+						{
+							model.ProductPrice.NoteWithoutDiscount = T(isBundle && product.BundlePerItemPricing ? "Products.Bundle.PriceWithoutDiscount.Note" : "Products.Price");
+						}
+
+						if ((isBundle && product.BundlePerItemPricing && !string.IsNullOrWhiteSpace(model.ProductPrice.PriceWithDiscount)) || product.HasTierPrices)
+						{
+							if (!product.HasTierPrices)
+							{
+								model.ProductPrice.NoteWithDiscount = T("Products.Bundle.PriceWithDiscount.Note");
+							}
+
+							model.BasePriceInfo = product.GetBasePriceInfo(
+								_localizationService,
+								_priceFormatter,
+								_currencyService,
+								_taxService,
+								_priceCalculationService,
+								customer,
+								currency,
+								basePriceAdjustment);
+						}
+
+						// Calculate saving.
+						// Discounted price has priority over the old price (avoids differing percentage discount in product lists and detail page).
+						//var regularPrice = Math.Max(finalPriceWithoutDiscount, oldPrice);
+						var regularPrice = finalPriceWithDiscount < finalPriceWithoutDiscount
+							? finalPriceWithoutDiscount
+							: oldPrice;
+
+						if (regularPrice > 0 && regularPrice > finalPriceWithDiscount)
+						{
+							model.ProductPrice.SavingPercent = (float)((regularPrice - finalPriceWithDiscount) / regularPrice) * 100;
+							model.ProductPrice.SavingAmount = _priceFormatter.FormatPrice(regularPrice - finalPriceWithDiscount, true, false);
+						}
+					}
+				}
+			}
+			else
+			{
+				model.ProductPrice.OldPrice = null;
+				model.ProductPrice.Price = null;
+			}
+
+			#endregion
+
+			#region 'Add to cart' model
+
+			model.AddToCart.ProductId = product.Id;
+			model.AddToCart.EnteredQuantity = product.OrderMinimumQuantity > selectedQuantity ? product.OrderMinimumQuantity : selectedQuantity;
+			model.AddToCart.MinOrderAmount = product.OrderMinimumQuantity;
+			model.AddToCart.MaxOrderAmount = product.OrderMaximumQuantity;
+			model.AddToCart.QuantityUnitName = model.QuantityUnitName; // TODO: (mc) remove 'QuantityUnitName' from parent model later
+			model.AddToCart.QuantityStep = product.QuantityStep > 0 ? product.QuantityStep : 1;
+			model.AddToCart.HideQuantityControl = product.HideQuantityControl;
+			model.AddToCart.QuantiyControlType = product.QuantiyControlType;
+			model.AddToCart.AvailableForPreOrder = product.AvailableForPreOrder;
+
+			// 'add to cart', 'add to wishlist' buttons.
+			model.AddToCart.DisableBuyButton = !displayPrices || product.DisableBuyButton ||
+				!_services.Permissions.Authorize(StandardPermissionProvider.EnableShoppingCart);
+
+			model.AddToCart.DisableWishlistButton = !displayPrices || product.DisableWishlistButton
+				|| product.ProductType == ProductType.GroupedProduct
+				|| !_services.Permissions.Authorize(StandardPermissionProvider.EnableWishlist);
+
+			model.AddToCart.CustomerEntersPrice = product.CustomerEntersPrice;
+			if (model.AddToCart.CustomerEntersPrice)
+			{
+				var minimumCustomerEnteredPrice = _currencyService.ConvertFromPrimaryStoreCurrency(product.MinimumCustomerEnteredPrice, currency);
+				var maximumCustomerEnteredPrice = _currencyService.ConvertFromPrimaryStoreCurrency(product.MaximumCustomerEnteredPrice, currency);
+
+				model.AddToCart.CustomerEnteredPrice = minimumCustomerEnteredPrice;
+
+				model.AddToCart.CustomerEnteredPriceRange = string.Format(T("Products.EnterProductPrice.Range"),
+					_priceFormatter.FormatPrice(minimumCustomerEnteredPrice, true, false),
+					_priceFormatter.FormatPrice(maximumCustomerEnteredPrice, true, false));
+			}
+
+			var allowedQuantities = product.ParseAllowedQuatities();
+			foreach (var qty in allowedQuantities)
+			{
+				model.AddToCart.AllowedQuantities.Add(new SelectListItem
+				{
+					Text = qty.ToString(),
+					Value = qty.ToString()
+				});
+			}
+
+			#endregion
+
+			#region Gift card
+
+			model.GiftCard.IsGiftCard = product.IsGiftCard;
+			if (model.GiftCard.IsGiftCard)
+			{
+				model.GiftCard.GiftCardType = product.GiftCardType;
+				model.GiftCard.SenderName = customer.GetFullName();
+				model.GiftCard.SenderEmail = customer.Email;
+			}
+
+			#endregion
+
+			_services.DisplayControl.Announce(product);
+
+			return model;
+		}
+
+		public ProductDetailsModel PrepareProductDetailModel(
+			ProductDetailsModel model,
+			DeclarationProduct product,
+			ProductVariantQuery query,
+			bool isAssociatedProduct = false,
+			ProductBundleItemData productBundleItem = null,
+			IList<ProductBundleItemData> productBundleItems = null,
+			int selectedQuantity = 1)
+		{
             Guard.NotNull(model, nameof(model));
             Guard.NotNull(product, nameof(product));
 
@@ -875,9 +1799,8 @@ namespace SmartStore.Web.Controllers
 						if (displayPrices && !isBundlePricing)
 						{
 							decimal taxRate = decimal.Zero;
-							decimal attributeValuePriceAdjustment = _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(pvaValue, 
-                                product, _services.WorkContext.CurrentCustomer, null, selectedQuantity);
-							decimal priceAdjustmentBase = _taxService.GetProductPrice(product, attributeValuePriceAdjustment, out taxRate);
+							decimal attributeValuePriceAdjustment = 0M;
+							decimal priceAdjustmentBase = 0M;
 							decimal priceAdjustment = _currencyService.ConvertFromPrimaryStoreCurrency(priceAdjustmentBase, currency);
 
 							if (_catalogSettings.ShowVariantCombinationPriceAdjustment)
@@ -966,54 +1889,54 @@ namespace SmartStore.Web.Controllers
 
 			#region Attribute combinations
 
-			if (!isBundle)
-			{
-				if (query.Variants.Count > 0)
-				{
-					// Merge with combination data if there's a match.
-					var warnings = new List<string>();
-					var attributeXml = query.CreateSelectedAttributesXml(product.Id, bundleItemId, variantAttributes, _productAttributeParser, _localizationService,
-						_downloadService, _catalogSettings, _httpRequest, warnings);
+			//if (!isBundle)
+			//{
+			//	if (query.Variants.Count > 0)
+			//	{
+			//		// Merge with combination data if there's a match.
+			//		var warnings = new List<string>();
+			//		var attributeXml = query.CreateSelectedAttributesXml(product.Id, bundleItemId, variantAttributes, _productAttributeParser, _localizationService,
+			//			_downloadService, _catalogSettings, _httpRequest, warnings);
 
-					selectedAttributeValues = _productAttributeParser.ParseProductVariantAttributeValues(attributeXml).ToList();
-					hasSelectedAttributesValues = (selectedAttributeValues.Count > 0);
+			//		selectedAttributeValues = _productAttributeParser.ParseProductVariantAttributeValues(attributeXml).ToList();
+			//		hasSelectedAttributesValues = (selectedAttributeValues.Count > 0);
 
-					if (isBundlePricing)
-					{
-						model.AttributeInfo = _productAttributeFormatter.FormatAttributes(
-							product, 
-							attributeXml, 
-							customer,
-							serapator: ", ",
-							renderPrices: false, 
-							renderGiftCardAttributes: false, 
-							allowHyperlinks: false);
-					}
+			//		if (isBundlePricing)
+			//		{
+			//			model.AttributeInfo = _productAttributeFormatter.FormatAttributes(
+			//				product, 
+			//				attributeXml, 
+			//				customer,
+			//				serapator: ", ",
+			//				renderPrices: false, 
+			//				renderGiftCardAttributes: false, 
+			//				allowHyperlinks: false);
+			//		}
 
-					model.SelectedCombination = _productAttributeParser.FindProductVariantAttributeCombination(product.Id, attributeXml);
+			//		model.SelectedCombination = _productAttributeParser.FindProductVariantAttributeCombination(product.Id, attributeXml);
 
-					if (model.SelectedCombination != null && model.SelectedCombination.IsActive == false)
-					{
-						model.IsAvailable = false;
-                        model.StockAvailability = T("Products.Availability.IsNotActive");
-					}
+			//		if (model.SelectedCombination != null && model.SelectedCombination.IsActive == false)
+			//		{
+			//			model.IsAvailable = false;
+   //                     model.StockAvailability = T("Products.Availability.IsNotActive");
+			//		}
 
-					product.MergeWithCombination(model.SelectedCombination);
+			//		product.MergeWithCombination(model.SelectedCombination);
 
-					// Mark explicitly selected as pre-selected.
-					foreach (var attribute in model.ProductVariantAttributes)
-					{
-						foreach (var value in attribute.Values)
-						{
-							if (selectedAttributeValues.FirstOrDefault(v => v.Id == value.Id) != null)
-								value.IsPreSelected = true;
+			//		// Mark explicitly selected as pre-selected.
+			//		foreach (var attribute in model.ProductVariantAttributes)
+			//		{
+			//			foreach (var value in attribute.Values)
+			//			{
+			//				if (selectedAttributeValues.FirstOrDefault(v => v.Id == value.Id) != null)
+			//					value.IsPreSelected = true;
 
-							if (!_catalogSettings.ShowVariantCombinationPriceAdjustment)
-								value.PriceAdjustment = "";
-						}
-					}
-				}
-			}
+			//				if (!_catalogSettings.ShowVariantCombinationPriceAdjustment)
+			//					value.PriceAdjustment = "";
+			//			}
+			//		}
+			//	}
+			//}
 
 			#endregion
 
@@ -1024,13 +1947,13 @@ namespace SmartStore.Web.Controllers
 			{
 				// Cases where stock inventory is not functional. Determined by what ShoppingCartService.GetStandardWarnings and ProductService.AdjustInventory is not handling.
 				model.IsAvailable = true;
-				var hasAttributeCombinations = _services.DbContext.QueryForCollection(product, (Product p) => p.ProductVariantAttributeCombinations).Any();
-                model.StockAvailability = !hasAttributeCombinations ? product.FormatStockMessage(_localizationService) : "";
+				//var hasAttributeCombinations = _services.DbContext.QueryForCollection(product, (Product p) => p.ProductVariantAttributeCombinations).Any();
+                model.StockAvailability =  "";
             }
 			else if (model.IsAvailable)
 			{
-				model.IsAvailable = product.IsAvailableByStock();
-				model.StockAvailability = product.FormatStockMessage(_localizationService);
+				model.IsAvailable =true;
+				model.StockAvailability = "";
 			}
 
 			model.Id = product.Id;
@@ -1052,7 +1975,7 @@ namespace SmartStore.Web.Controllers
 			model.HasSampleDownload = product.IsDownload && product.HasSampleDownload;
 			model.IsCurrentCustomerRegistered = customer.IsRegistered();
 			model.IsBasePriceEnabled = product.BasePriceEnabled && !(isBundle && product.BundlePerItemPricing);
-            model.BasePriceInfo = product.GetBasePriceInfo(_localizationService, _priceFormatter, _currencyService, _taxService, _priceCalculationService, customer, currency);
+            model.BasePriceInfo = "";
 			model.ShowLegalInfo = !model.IsBundlePart && _taxSettings.ShowLegalHintsInProductDetails;
 			model.BundleTitleText = product.GetLocalized(x => x.BundleTitleText);
 			model.BundlePerItemPricing = product.BundlePerItemPricing;
@@ -1067,7 +1990,7 @@ namespace SmartStore.Web.Controllers
 			var defaultTaxRate = string.Empty;
 			if (_taxSettings.DisplayTaxRates)
 			{
-				var taxRate = _taxService.GetTaxRate(product, customer);
+				var taxRate = 0M;
 				if (taxRate != decimal.Zero)
 				{
 					var formattedTaxRate = _priceFormatter.FormatTaxRate(taxRate);
@@ -1137,29 +2060,29 @@ namespace SmartStore.Web.Controllers
 			else if (isAssociatedProduct)
 				model.ThumbDimensions = _mediaSettings.AssociatedProductPictureSize;
 
-			if (model.IsAvailable)
-			{
-				var deliveryTime = _deliveryTimeService.GetDeliveryTime(product);
-				if (deliveryTime != null)
-				{
-					model.DeliveryTimeName = deliveryTime.GetLocalized(x => x.Name);
-					model.DeliveryTimeHexValue = deliveryTime.ColorHexValue;
-				}
-			}
+			//if (model.IsAvailable)
+			//{
+			//	var deliveryTime = _deliveryTimeService.GetDeliveryTime(product);
+			//	if (deliveryTime != null)
+			//	{
+			//		model.DeliveryTimeName = deliveryTime.GetLocalized(x => x.Name);
+			//		model.DeliveryTimeHexValue = deliveryTime.ColorHexValue;
+			//	}
+			//}
 
 			model.DisplayDeliveryTime = _catalogSettings.ShowDeliveryTimesInProductDetail;
 			model.IsShipEnabled = product.IsShipEnabled;
-			model.DisplayDeliveryTimeAccordingToStock = product.DisplayDeliveryTimeAccordingToStock(_catalogSettings);
+			model.DisplayDeliveryTimeAccordingToStock = false;
 
 			if (model.DeliveryTimeName.IsEmpty() && model.DisplayDeliveryTime)
 			{
 				model.DeliveryTimeName = T("ShoppingCart.NotAvailable");
 			}
 
-            var quantityUnit = _quantityUnitService.GetQuantityUnit(product);
-            if (quantityUnit != null)
+            //var quantityUnit = _quantityUnitService.GetQuantityUnit(product);
+            //if (quantityUnit != null)
             {
-                model.QuantityUnitName = quantityUnit.GetLocalized(x => x.Name);
+                //model.QuantityUnitName ="件";
             }
 
 			//back in stock subscriptions)
@@ -1203,17 +2126,17 @@ namespace SmartStore.Web.Controllers
                         var attributesTotalPriceBaseOrig = decimal.Zero;
                         var finalPriceWithoutDiscount = decimal.Zero;
                         var finalPriceWithDiscount = decimal.Zero;
-                        var oldPriceBase = _taxService.GetProductPrice(product, product.OldPrice, out taxRate);
+                        //var oldPriceBase = _taxService.GetProductPrice(product, product.OldPrice, out taxRate);
 
 						if (model.ProductPrice.DynamicPriceUpdate && !isBundlePricing)
 						{
 							if (selectedAttributeValues != null)
 							{
-								selectedAttributeValues.Each(x => attributesTotalPriceBase += _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(x, 
-                                    product, customer, null, selectedQuantity));
+								//selectedAttributeValues.Each(x => attributesTotalPriceBase += _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(x, 
+        //                            product, customer, null, selectedQuantity));
 
-                                selectedAttributeValues.Each(x => attributesTotalPriceBaseOrig += _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(x,
-                                    product, customer, null, 1));
+        //                        selectedAttributeValues.Each(x => attributesTotalPriceBaseOrig += _priceCalculationService.GetProductVariantAttributeValuePriceAdjustment(x,
+        //                            product, customer, null, 1));
                             }
 							else
 							{
@@ -1226,29 +2149,29 @@ namespace SmartStore.Web.Controllers
 							productBundleItem.AdditionalCharge = attributesTotalPriceBase;
 						}
 
-						finalPriceWithoutDiscountBase = _priceCalculationService.GetFinalPrice(product, productBundleItems,
-							customer, attributesTotalPriceBaseOrig, false, selectedQuantity, productBundleItem);
+						//finalPriceWithoutDiscountBase = _priceCalculationService.GetFinalPrice(product, productBundleItems,
+						//	customer, attributesTotalPriceBaseOrig, false, selectedQuantity, productBundleItem);
                         
-						finalPriceWithDiscountBase = _priceCalculationService.GetFinalPrice(product, productBundleItems,
-							customer, attributesTotalPriceBase, true, selectedQuantity, productBundleItem);
+						//finalPriceWithDiscountBase = _priceCalculationService.GetFinalPrice(product, productBundleItems,
+						//	customer, attributesTotalPriceBase, true, selectedQuantity, productBundleItem);
 
                         var basePriceAdjustment = finalPriceWithDiscountBase - finalPriceWithoutDiscountBase;
 
-                        finalPriceWithoutDiscountBase = _taxService.GetProductPrice(product, finalPriceWithoutDiscountBase, out taxRate);
-						finalPriceWithDiscountBase = _taxService.GetProductPrice(product, finalPriceWithDiscountBase, out taxRate);
+      //                  finalPriceWithoutDiscountBase = _taxService.GetProductPrice(product, finalPriceWithoutDiscountBase, out taxRate);
+						//finalPriceWithDiscountBase = _taxService.GetProductPrice(product, finalPriceWithDiscountBase, out taxRate);
 
-						oldPrice = _currencyService.ConvertFromPrimaryStoreCurrency(oldPriceBase, currency);
+						//oldPrice = _currencyService.ConvertFromPrimaryStoreCurrency(oldPriceBase, currency);
 
 						finalPriceWithoutDiscount = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceWithoutDiscountBase, currency);
 						finalPriceWithDiscount = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceWithDiscountBase, currency);
 
 						if (productBundleItem == null || isBundleItemPricing)
 						{
-							if (oldPriceBase > decimal.Zero && oldPriceBase > finalPriceWithoutDiscountBase)
-							{
-								model.ProductPrice.OldPriceValue = oldPrice;
-								model.ProductPrice.OldPrice = _priceFormatter.FormatPrice(oldPrice);
-							}		
+							//if (oldPriceBase > decimal.Zero && oldPriceBase > finalPriceWithoutDiscountBase)
+							//{
+							//	model.ProductPrice.OldPriceValue = oldPrice;
+							//	model.ProductPrice.OldPrice = _priceFormatter.FormatPrice(oldPrice);
+							//}		
 
 							model.ProductPrice.Price = _priceFormatter.FormatPrice(finalPriceWithoutDiscount);
 
@@ -1260,15 +2183,15 @@ namespace SmartStore.Web.Controllers
 
 						model.ProductPrice.PriceValue = finalPriceWithoutDiscount;
 						model.ProductPrice.PriceWithDiscountValue = finalPriceWithDiscount;
-                        model.BasePriceInfo = product.GetBasePriceInfo(
-                            _localizationService, 
-                            _priceFormatter, 
-                            _currencyService, 
-                            _taxService, 
-                            _priceCalculationService,
-							customer,
-                            currency, 
-                            attributesTotalPriceBase);
+       //                 model.BasePriceInfo = product.GetBasePriceInfo(
+       //                     _localizationService, 
+       //                     _priceFormatter, 
+       //                     _currencyService, 
+       //                     _taxService, 
+       //                     _priceCalculationService,
+							//customer,
+       //                     currency, 
+       //                     attributesTotalPriceBase);
 
 						if (!string.IsNullOrWhiteSpace(model.ProductPrice.OldPrice) || !string.IsNullOrWhiteSpace(model.ProductPrice.PriceWithDiscount))
 						{
@@ -1282,15 +2205,15 @@ namespace SmartStore.Web.Controllers
                                 model.ProductPrice.NoteWithDiscount = T("Products.Bundle.PriceWithDiscount.Note");
                             }
 
-                            model.BasePriceInfo = product.GetBasePriceInfo(
-                                _localizationService, 
-                                _priceFormatter, 
-                                _currencyService,
-                                _taxService, 
-                                _priceCalculationService,
-								customer,
-                                currency,
-                                basePriceAdjustment);
+        //                    model.BasePriceInfo = product.GetBasePriceInfo(
+        //                        _localizationService, 
+        //                        _priceFormatter, 
+        //                        _currencyService,
+        //                        _taxService, 
+        //                        _priceCalculationService,
+								//customer,
+        //                        currency,
+        //                        basePriceAdjustment);
 						}
 
 						// Calculate saving.
@@ -1349,15 +2272,15 @@ namespace SmartStore.Web.Controllers
 					_priceFormatter.FormatPrice(maximumCustomerEnteredPrice, true, false));
 			}
 
-			var allowedQuantities = product.ParseAllowedQuatities();
-			foreach (var qty in allowedQuantities)
-			{
-				model.AddToCart.AllowedQuantities.Add(new SelectListItem
-				{
-					Text = qty.ToString(),
-					Value = qty.ToString()
-				});
-			}
+			//var allowedQuantities = product.ParseAllowedQuatities();
+			//foreach (var qty in allowedQuantities)
+			//{
+			//	model.AddToCart.AllowedQuantities.Add(new SelectListItem
+			//	{
+			//		Text = qty.ToString(),
+			//		Value = qty.ToString()
+			//	});
+			//}
 
 			#endregion
 

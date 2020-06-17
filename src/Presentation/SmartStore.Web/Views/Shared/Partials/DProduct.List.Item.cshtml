@@ -4,7 +4,7 @@
 @using SmartStore.Web.Models.Catalog;
 
 @{ 
-    var artDetailUrl = Url.RouteUrl("Product", new RouteValueDictionary { { "SeName", Model.Id } });
+    var artDetailUrl = Url.RouteUrl("DeclarationProduct", new RouteValueDictionary { { "SeName", Model.Id } });
     var list = Model.Parent;
     var picture = Model.Picture;
 
@@ -23,7 +23,7 @@
 	<div class="art-picture-block">
 		@if (picture.Title.HasValue())
 		{
-			<a class='art-picture img-center-container@(addPictureClass)' href="/DeclarationProduct/@Model.Id" title="@picture.Title" @Html.Attr("data-content", T("Common.NoImageAvail"), picture.PictureId == 0)>
+			<a class='art-picture img-center-container@(addPictureClass)' href="DeclarationProduct/ProductDetails/?productId=@Model.Id" title="@picture.Title" @Html.Attr("data-content", T("Common.NoImageAvail"), picture.PictureId == 0)>
 				<img src="@picture.ImageUrl" alt="@picture.AlternateText" title="@picture.Title" />
 			</a>
 		}
@@ -63,7 +63,7 @@
     }
 
     <h3 @Html.LanguageAttributes(Model.Name) class="art-name">
-        <a href="/DeclarationProduct/@Model.Id" title="@Model.Name.ToString()">
+        <a href="DeclarationProduct/ProductDetails/?productId=@Model.Id" title="@Model.Name.ToString()">
             <span>@Model.Name</span>
         </a>
     </h3>

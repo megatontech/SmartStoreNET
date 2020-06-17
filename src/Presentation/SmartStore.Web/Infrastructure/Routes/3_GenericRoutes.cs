@@ -23,7 +23,7 @@ namespace SmartStore.Web.Infrastructure
                 new[] { "SmartStore.Web.Controllers" });
             routes.MapLocalizedRoute("DeclarationProduct",
                 "{SeName}",
-                new { controller = "DeclarationProduct", action = "Product" },
+                new { controller = "DeclarationProduct", action = "DeclarationProduct" },
                 new[] { "SmartStore.Web.Controllers" });
             routes.MapLocalizedRoute("Category",
                 "{SeName}",
