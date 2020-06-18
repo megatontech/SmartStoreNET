@@ -81,12 +81,12 @@
 						@{ Html.RenderPartial("Product.Info", Model); }
 
 						<!-- Bundle Items -->
-						@if (Model.ProductType == ProductType.BundledProduct)
+						@*@if (Model.ProductType == ProductType.BundledProduct)
 						{
 							<div class="pd-bundle-container pd-group card shadow-sm">
 								@{ Html.RenderPartial("Product.Bundle", Model); }
 							</div>
-						}
+						}*@
 
 						@if (Model.ProductType != ProductType.GroupedProduct)
                         {
@@ -101,51 +101,30 @@
 							Html.RenderPartial("Product.Offer", Model);
 						}
 
-						@if (Model.ProductType == ProductType.GroupedProduct)
+						@*@if (Model.ProductType == ProductType.GroupedProduct)
 						{
 							Html.RenderPartial("Product.Offer.Actions.Misc", Model);
-						}
+						}*@
 
 						<!-- social share -->
-						@if (Model.ProductShareCode.HasValue())
+						@*@if (Model.ProductShareCode.HasValue())
 						{
 							<div class="pd-share d-flex justify-content-@(Model.ProductType == ProductType.GroupedProduct ? "start mt-4" : "center mt-3")">
 								@Html.Raw(Model.ProductShareCode)
 							</div>
-						}
+						}*@
 
-						@if (Model.DisplayAdminLink)
+						@*@if (Model.DisplayAdminLink)
 						{
 							<a class="btn btn-secondary btn-flat btn-edit-product" href="@Url.Action("Edit", "Product", new { id = Model.Id, area = "admin" })" target="admin-product" rel="nofollow">
 								<i class="fa fa-cog"></i>
 								<span>@T("Common.Catalog.EditProduct")</span>
 							</a>
-						}
+						}*@
 
                         @{ Html.RenderWidget("productdetails_info_bottom"); }
 					</aside>
 				</section>
-
-				if (Model.ProductType == ProductType.GroupedProduct)
-				{
-					<section class="pd-section pd-section-variants">
-						@if (Model.AssociatedProducts.Count == 0)
-						{
-							<div class="pd-no-associated-products alert alert-warning">
-								@T("Products.NoAssociatedProducts")
-							</div>
-						}
-						else
-						{
-							foreach (var product in Model.AssociatedProducts)
-							{
-								var dataDictProduct = new ViewDataDictionary();
-								dataDictProduct.TemplateInfo.HtmlFieldPrefix = string.Format("product_{0}", product.Id);
-								Html.RenderPartial("Product.AssociatedProduct", product, dataDictProduct);
-							}
-						}
-					</section>
-				}
 			}
 		</div>
 
@@ -160,10 +139,6 @@
                 //Html.RenderAction("ProductTags", new { productId = Model.Id });
                 Html.RenderWidget("productdetail_tags_after");
 
-                <!-- Related products -->
-                Html.RenderAction("RelatedProducts", new { productId = Model.Id });
-                Html.RenderWidget("productdetail_related_products_after");
-
                 <!-- Products also purchased -->
                 Html.RenderAction("ProductsAlsoPurchased", new { productId = Model.Id });
                 Html.RenderWidget("productdetail_also_purchased_after");
@@ -174,7 +149,7 @@
 	@{ Html.RenderWidget("productdetails_bottom"); }
 
 	@* TODO: (mc) find more intelligent way of rendering RecentlyViewedProductsBlock globally *@
-	@{ Html.RenderAction("RecentlyViewedProductsBlock", "Catalog", new { area = "" }); }
+	@*@{ Html.RenderAction("RecentlyViewedProductsBlock", "Catalog", new { area = "" }); }*@
 </div>
 
 <script>

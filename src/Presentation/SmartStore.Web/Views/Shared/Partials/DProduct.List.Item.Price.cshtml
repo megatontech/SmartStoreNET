@@ -53,48 +53,48 @@
 @if (list.ShowPrice)
 {
 
-	<div class="art-price-block">
-		<span class="@artPriceClasses">
-            @(Model.Price.SavingAmount.HasValue() ? "% " : "")@Model.Price.Price
-		</span>
-		@if (Model.Price.RegularPrice.HasValue())
-		{
-			if (list.ViewMode == ProductSummaryViewMode.List)
-			{
-				<div class="art-info-group">
-					<div>
-						<span>@T("Products.Price.OldPrice"):</span>
-						<span class="art-oldprice">@Model.Price.RegularPrice</span>
-					</div>
-					@if (Model.Price.SavingAmount.HasValue())
-					{
-						<div class="d-flex">
-							<span>@T("ShoppingCart.ItemYouSave"):</span>
-							<span class="pl-2">@Model.Price.SavingAmount <span class="lrm">(@Model.Price.SavingPercent.ToString("N0") %)</span></span>
-						</div>
-					}
-				</div>
-			}
-			else
-			{
-				<span class="art-oldprice">@Model.Price.RegularPrice</span>
-			}
-		}
+<div class="art-price-block">
+    @*<span class="@artPriceClasses">
+        @(Model.Price.SavingAmount.HasValue() ? "% " : "")@Model.Price.Price
+    </span>
+    @if (Model.Price.RegularPrice.HasValue())
+    {
+        if (list.ViewMode == ProductSummaryViewMode.List)
+        {
+            <div class="art-info-group">
+                <div>
+                    <span>@T("Products.Price.OldPrice"):</span>
+                    <span class="art-oldprice">@Model.Price.RegularPrice</span>
+                </div>
+                @if (Model.Price.SavingAmount.HasValue())
+                {
+                    <div class="d-flex">
+                        <span>@T("ShoppingCart.ItemYouSave"):</span>
+                        <span class="pl-2">@Model.Price.SavingAmount <span class="lrm">(@Model.Price.SavingPercent.ToString("N0") %)</span></span>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <span class="art-price badge badge-success">@Model.Price.RegularPrice</span>
+        }
+    }*@
+    <span class="art-price badge badge-success">@Model.Price.RegularPrice</span>
+    @if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
+    {
+        <div class="art-shipsurcharge">
+            @Html.Raw(Model.TransportSurcharge)
+        </div>
+    }
 
-		@if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
-		{
-			<div class="art-shipsurcharge">
-				@Html.Raw(Model.TransportSurcharge)
-			</div>
-		}
-
-		@if (list.ShowBasePrice && Model.BasePriceInfo.HasValue())
-		{
-			<div class="art-pangv" @Html.Attr("title", Model.BasePriceInfo, Model.BasePriceInfo.HasValue())>
-				@Html.Raw(LocalizedValue.FixBrackets(Model.BasePriceInfo, WorkContext.WorkingLanguage) ?? "&nbsp;")
-			</div>
-		}
-	</div>
+    @if (list.ShowBasePrice && Model.BasePriceInfo.HasValue())
+    {
+        <div class="art-pangv" @Html.Attr("title", Model.BasePriceInfo, Model.BasePriceInfo.HasValue())>
+            @Html.Raw(LocalizedValue.FixBrackets(Model.BasePriceInfo, WorkContext.WorkingLanguage) ?? "&nbsp;")
+        </div>
+    }
+</div>
 
     Html.RenderWidget("productbox_add_info"); 
 }

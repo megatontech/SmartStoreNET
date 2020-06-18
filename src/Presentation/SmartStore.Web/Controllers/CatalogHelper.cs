@@ -606,38 +606,38 @@ namespace SmartStore.Web.Controllers
 				};
 
 				// Social share code
-				if (_catalogSettings.ShowShareButton && _catalogSettings.PageShareCode.HasValue())
-				{
-					var shareCode = _catalogSettings.PageShareCode;
-					if (_services.WebHelper.IsCurrentConnectionSecured())
-					{
-						// Need to change the addthis link to be https linked when the page is, so that the page doesn't ask about mixed mode when viewed in https...
-						shareCode = shareCode.Replace("http://", "https://");
-					}
+				//if (_catalogSettings.ShowShareButton && _catalogSettings.PageShareCode.HasValue())
+				//{
+				//	var shareCode = _catalogSettings.PageShareCode;
+				//	if (_services.WebHelper.IsCurrentConnectionSecured())
+				//	{
+				//		// Need to change the addthis link to be https linked when the page is, so that the page doesn't ask about mixed mode when viewed in https...
+				//		shareCode = shareCode.Replace("http://", "https://");
+				//	}
 
-					model.ProductShareCode = shareCode;
-				}
+				//	model.ProductShareCode = shareCode;
+				//}
 
 				// Get gift card values from query string.
-				if (product.IsGiftCard)
-				{
-					model.GiftCard.RecipientName = query.GetGiftCardValue(product.Id, 0, "RecipientName");
-					model.GiftCard.RecipientEmail = query.GetGiftCardValue(product.Id, 0, "RecipientEmail");
-					model.GiftCard.SenderName = query.GetGiftCardValue(product.Id, 0, "SenderName");
-					model.GiftCard.SenderEmail = query.GetGiftCardValue(product.Id, 0, "SenderEmail");
-					model.GiftCard.Message = query.GetGiftCardValue(product.Id, 0, "Message");
-				}
+				//if (product.IsGiftCard)
+				//{
+				//	model.GiftCard.RecipientName = query.GetGiftCardValue(product.Id, 0, "RecipientName");
+				//	model.GiftCard.RecipientEmail = query.GetGiftCardValue(product.Id, 0, "RecipientEmail");
+				//	model.GiftCard.SenderName = query.GetGiftCardValue(product.Id, 0, "SenderName");
+				//	model.GiftCard.SenderEmail = query.GetGiftCardValue(product.Id, 0, "SenderEmail");
+				//	model.GiftCard.Message = query.GetGiftCardValue(product.Id, 0, "Message");
+				//}
 
 				// Back in stock subscriptions
-				if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
-					 product.BackorderMode == BackorderMode.NoBackorders &&
-					 product.AllowBackInStockSubscriptions &&
-					 product.StockQuantity <= 0)
-				{
-					//out of stock
-					model.DisplayBackInStockSubscription = true;
-					model.BackInStockAlreadySubscribed = _backInStockSubscriptionService.FindSubscription(customer.Id, product.Id, store.Id) != null;
-				}
+				//if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
+				//	 product.BackorderMode == BackorderMode.NoBackorders &&
+				//	 product.AllowBackInStockSubscriptions &&
+				//	 product.StockQuantity <= 0)
+				//{
+				//	//out of stock
+				//	model.DisplayBackInStockSubscription = true;
+				//	model.BackInStockAlreadySubscribed = _backInStockSubscriptionService.FindSubscription(customer.Id, product.Id, store.Id) != null;
+				//}
 
 				// template
 				var templateCacheKey = string.Format(ModelCacheEventConsumer.PRODUCT_TEMPLATE_MODEL_KEY, product.ProductTemplateId);
@@ -652,52 +652,52 @@ namespace SmartStore.Web.Controllers
 				IList<ProductBundleItemData> bundleItems = null;
 				ProductVariantAttributeCombination combination = null;
 
-				if (product.ProductType == ProductType.GroupedProduct && !isAssociatedProduct)
-				{
-					// associated products
-					var searchQuery = new CatalogSearchQuery()
-						.VisibleOnly(customer)
-						.HasStoreId(store.Id)
-						.HasParentGroupedProduct(product.Id);
+				//if (product.ProductType == ProductType.GroupedProduct && !isAssociatedProduct)
+				//{
+				//	// associated products
+				//	var searchQuery = new CatalogSearchQuery()
+				//		.VisibleOnly(customer)
+				//		.HasStoreId(store.Id)
+				//		.HasParentGroupedProduct(product.Id);
 
-					var associatedProducts = _catalogSearchService.Search(searchQuery).Hits;
+				//	var associatedProducts = _catalogSearchService.Search(searchQuery).Hits;
 
-					foreach (var associatedProduct in associatedProducts)
-					{
-						var assciatedProductModel = PrepareProductDetailsPageModel(associatedProduct, query, true, null, null);
-						model.AssociatedProducts.Add(assciatedProductModel);
-					}
-				}
-				else if (product.ProductType == ProductType.BundledProduct && productBundleItem == null)
-				{
-					// bundled items
-					bundleItems = _productService.GetBundleItems(product.Id);
+				//	foreach (var associatedProduct in associatedProducts)
+				//	{
+				//		var assciatedProductModel = PrepareProductDetailsPageModel(associatedProduct, query, true, null, null);
+				//		model.AssociatedProducts.Add(assciatedProductModel);
+				//	}
+				//}
+				//else if (product.ProductType == ProductType.BundledProduct && productBundleItem == null)
+				//{
+				//	// bundled items
+				//	bundleItems = _productService.GetBundleItems(product.Id);
 
-					foreach (var itemData in bundleItems.Where(x => x.Item.Product.CanBeBundleItem()))
-					{
-						var item = itemData.Item;
-						var bundledProductModel = PrepareProductDetailsPageModel(item.Product, query, false, itemData, null);
+				//	foreach (var itemData in bundleItems.Where(x => x.Item.Product.CanBeBundleItem()))
+				//	{
+				//		var item = itemData.Item;
+				//		var bundledProductModel = PrepareProductDetailsPageModel(item.Product, query, false, itemData, null);
 
-						bundledProductModel.ShowLegalInfo = false;
-						bundledProductModel.DisplayDeliveryTime = false;
+				//		bundledProductModel.ShowLegalInfo = false;
+				//		bundledProductModel.DisplayDeliveryTime = false;
 
-						bundledProductModel.BundleItem.Id = item.Id;
-						bundledProductModel.BundleItem.Quantity = item.Quantity;
-						bundledProductModel.BundleItem.HideThumbnail = item.HideThumbnail;
-						bundledProductModel.BundleItem.Visible = item.Visible;
-						bundledProductModel.BundleItem.IsBundleItemPricing = item.BundleProduct.BundlePerItemPricing;
+				//		bundledProductModel.BundleItem.Id = item.Id;
+				//		bundledProductModel.BundleItem.Quantity = item.Quantity;
+				//		bundledProductModel.BundleItem.HideThumbnail = item.HideThumbnail;
+				//		bundledProductModel.BundleItem.Visible = item.Visible;
+				//		bundledProductModel.BundleItem.IsBundleItemPricing = item.BundleProduct.BundlePerItemPricing;
 
-						var bundleItemName = item.GetLocalized(x => x.Name);
-						if (bundleItemName.Value.HasValue())
-							bundledProductModel.Name = bundleItemName;
+				//		var bundleItemName = item.GetLocalized(x => x.Name);
+				//		if (bundleItemName.Value.HasValue())
+				//			bundledProductModel.Name = bundleItemName;
 
-						var bundleItemShortDescription = item.GetLocalized(x => x.ShortDescription);
-						if (bundleItemShortDescription.Value.HasValue())
-							bundledProductModel.ShortDescription = bundleItemShortDescription;
+				//		var bundleItemShortDescription = item.GetLocalized(x => x.ShortDescription);
+				//		if (bundleItemShortDescription.Value.HasValue())
+				//			bundledProductModel.ShortDescription = bundleItemShortDescription;
 
-						model.BundledItems.Add(bundledProductModel);
-					}
-				}
+				//		model.BundledItems.Add(bundledProductModel);
+				//	}
+				//}
 
 				model = PrepareProductDetailModel(model, product, query, isAssociatedProduct, productBundleItem, bundleItems);
 
@@ -779,7 +779,7 @@ namespace SmartStore.Web.Controllers
 				}
 
 				// pictures
-				var pictures = _pictureService.GetPicturesByProductId(product.Id);
+				var pictures = _pictureService.GetPicturesByDProductId(product.Id);
 
 				if (product.HasPreviewPicture && pictures.Count > 1)
 				{
@@ -2236,7 +2236,8 @@ namespace SmartStore.Web.Controllers
                 model.ProductPrice.OldPrice = null;
 				model.ProductPrice.Price = null;
 			}
-
+			model.ProductPrice.PriceValue = product.Price;
+			model.ProductPrice.Price = product.Price.ToString("F2");
 			#endregion
 
 			#region 'Add to cart' model

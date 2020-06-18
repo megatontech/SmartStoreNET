@@ -551,7 +551,8 @@ namespace SmartStore.Web.Controllers
 			{
 				Id = product.Id,
 				Name = product.GetLocalized(x => x.Name),
-				SeName = product.GetSeName()
+				SeName = product.GetSeName(),
+				Price = new DeclarationProductSummaryModel.PriceModel() { PriceValue  = product.Price, RegularPrice = product.Price.ToString("F2") }
 			};
 
 			if (model.ShowDescription)

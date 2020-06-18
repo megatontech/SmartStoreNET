@@ -165,24 +165,24 @@ namespace SmartStore.Web.Controllers
 			model.CanonicalUrlsEnabled = _seoSettings.CanonicalUrlsEnabled;
 
 			// Save as recently viewed
-			_recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
+			//_recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
 			// Activity log
-			_services.CustomerActivity.InsertActivity("PublicStore.ViewProduct", T("ActivityLog.PublicStore.ViewProduct"), product.Name);
+			//_services.CustomerActivity.InsertActivity("PublicStore.ViewProduct", T("ActivityLog.PublicStore.ViewProduct"), product.Name);
 
 			// Breadcrumb
-			if (_catalogSettings.CategoryBreadcrumbEnabled)
-			{
-                _helper.GetCategoryBreadcrumbD(_breadcrumb, ControllerContext, product);
+			//if (_catalogSettings.CategoryBreadcrumbEnabled)
+			//{
+   //             _helper.GetCategoryBreadcrumbD(_breadcrumb, ControllerContext, product);
 
-				_breadcrumb.Track(new MenuItem
-				{
-					Text = model.Name,
-					Rtl = model.Name.CurrentLanguage.Rtl,
-					EntityId = product.Id,
-					Url = Url.RouteUrl("Product", new { model.SeName })
-				});
-			}
+			//	_breadcrumb.Track(new MenuItem
+			//	{
+			//		Text = model.Name,
+			//		Rtl = model.Name.CurrentLanguage.Rtl,
+			//		EntityId = product.Id,
+			//		Url = Url.RouteUrl("Product", new { model.SeName })
+			//	});
+			//}
 
 			return View(model.ProductTemplateViewPath, model);
 		}
