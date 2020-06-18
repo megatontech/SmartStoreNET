@@ -17,6 +17,7 @@ namespace SmartStore.Core.Domain.Orders
 		}
 
 		public ShoppingCartItem Item { get; private set; }
+		public DeclarationShoppingCartItem dItem { get;  set; }
 		public IList<OrganizedShoppingCartItem> ChildItems { get; set; }
 		public ProductBundleItemData BundleItemData { get; set; }
 

@@ -20,6 +20,7 @@ namespace SmartStore.Core.Domain.Customers
         private ICollection<CustomerContent> _customerContent;
         private ICollection<CustomerRole> _customerRoles;
         private ICollection<ShoppingCartItem> _shoppingCartItems;
+        private ICollection<DeclarationShoppingCartItem> _dshoppingCartItems;
         private ICollection<Order> _orders;
         private ICollection<RewardPointsHistory> _rewardPointsHistory;
         private ICollection<WalletHistory> _walletHistory;
@@ -361,6 +362,11 @@ namespace SmartStore.Core.Domain.Customers
         {
             get { return _shoppingCartItems ?? (_shoppingCartItems = new HashSet<ShoppingCartItem>()); }
             protected set { _shoppingCartItems = value; }
+        }
+        public virtual ICollection<DeclarationShoppingCartItem> dShoppingCartItems
+        {
+            get { return _dshoppingCartItems ?? (_dshoppingCartItems = new HashSet<DeclarationShoppingCartItem>()); }
+            protected set { _dshoppingCartItems = value; }
         }
 
         /// <summary>
