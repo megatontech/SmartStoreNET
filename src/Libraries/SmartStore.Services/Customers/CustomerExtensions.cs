@@ -278,7 +278,30 @@ namespace SmartStore.Services.Customers
 
             return new List<OrganizedShoppingCartItem>();
         }
+        public static List<OrganizedShoppingCartItem> GetdCartItems(this Customer customer)
+        {
+            if (customer != null)
+            {
+                var cartService = EngineContext.Current.Resolve<IDeclarationShoppingCartService>();
+                var items = cartService.GetCartItems(customer,  ShoppingCartType.ShoppingCart, 0);
 
+                return items;
+            }
+
+            return new List<OrganizedShoppingCartItem>();
+        }
+        public static List<OrganizedShoppingCartItem> GetdCartItems(this Customer customer, ShoppingCartType cartType, int? storeId = null)
+        {
+            if (customer != null)
+            {
+                var cartService = EngineContext.Current.Resolve<IDeclarationShoppingCartService>();
+                var items = cartService.GetCartItems(customer, cartType, storeId);
+
+                return items;
+            }
+
+            return new List<OrganizedShoppingCartItem>();
+        }
         public static string GetFullName(this Customer customer)
         {
             if (customer == null)

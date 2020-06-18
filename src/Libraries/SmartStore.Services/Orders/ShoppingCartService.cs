@@ -1182,7 +1182,7 @@ namespace SmartStore.Services.Orders
 
 			_customerService.ResetCheckoutData(customer, storeId);
 
-			if (ctx.VariantQuery != null)
+			if (ctx.VariantQuery != null&& ctx.Product!=null)
 			{
 				var attributes = _productAttributeService.GetProductVariantAttributesByProductId(ctx.Product.Id);
 
@@ -1211,7 +1211,7 @@ namespace SmartStore.Services.Orders
 				AddToCart(customer, ctx.Product, ctx.CartType, storeId,	ctx.AttributesXml, ctx.CustomerEnteredPrice, ctx.Quantity, ctx.AddRequiredProducts, ctx)
 			);
 
-			if (ctx.Product.ProductType == ProductType.BundledProduct && ctx.Warnings.Count <= 0 && ctx.BundleItem == null)
+			if (ctx.Product!=null&&ctx.Product.ProductType == ProductType.BundledProduct && ctx.Warnings.Count <= 0 && ctx.BundleItem == null)
 			{
 				foreach (var bundleItem in _productService.GetBundleItems(ctx.Product.Id).Select(x => x.Item))
 				{
@@ -1405,4 +1405,885 @@ namespace SmartStore.Services.Orders
             return _priceFormatter.FormatPrice(GetCurrentCartSubTotal(cart));
         }
     }
+	public partial class DeclarationShoppingCartService : IDeclarationShoppingCartService
+	{
+		// 0 = CustomerId, 1 = CartType, 2 = StoreId
+		const string CARTITEMS_KEY = "sm.dcartitems-{0}-{1}-{2}";
+		const string CARTITEMS_PATTERN_KEY = "sm.dcartitems-*";
+
+		private readonly IRepository<DeclarationShoppingCartItem> _sciRepository;
+		private readonly IWorkContext _workContext;
+		private readonly IStoreContext _storeContext;
+		private readonly ICurrencyService _currencyService;
+		private readonly IProductService _productService;
+		private readonly ILocalizationService _localizationService;
+		private readonly IProductAttributeParser _productAttributeParser;
+		private readonly IProductAttributeService _productAttributeService;
+		private readonly ICheckoutAttributeService _checkoutAttributeService;
+		private readonly ICheckoutAttributeParser _checkoutAttributeParser;
+		private readonly IPriceFormatter _priceFormatter;
+		private readonly ICustomerService _customerService;
+		private readonly ShoppingCartSettings _shoppingCartSettings;
+		private readonly IEventPublisher _eventPublisher;
+		private readonly IPermissionService _permissionService;
+		private readonly IAclService _aclService;
+		private readonly IStoreMappingService _storeMappingService;
+		private readonly IGenericAttributeService _genericAttributeService;
+		private readonly IDownloadService _downloadService;
+		private readonly CatalogSettings _catalogSettings;
+		private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+		private readonly IRequestCache _requestCache;
+
+		public DeclarationShoppingCartService(
+			IRepository<DeclarationShoppingCartItem> sciRepository,
+			IWorkContext workContext,
+			IStoreContext storeContext,
+			ICurrencyService currencyService,
+			IProductService productService, ILocalizationService localizationService,
+			IProductAttributeParser productAttributeParser,
+			IProductAttributeService productAttributeService,
+			ICheckoutAttributeService checkoutAttributeService,
+			ICheckoutAttributeParser checkoutAttributeParser,
+			IPriceFormatter priceFormatter,
+			ICustomerService customerService,
+			ShoppingCartSettings shoppingCartSettings,
+			IEventPublisher eventPublisher,
+			IPermissionService permissionService,
+			IAclService aclService,
+			IStoreMappingService storeMappingService,
+			IGenericAttributeService genericAttributeService,
+			IDownloadService downloadService,
+			CatalogSettings catalogSettings,
+			IOrderTotalCalculationService orderTotalCalculationService,
+			IRequestCache requestCache)
+		{
+			_sciRepository = sciRepository;
+			_workContext = workContext;
+			_storeContext = storeContext;
+			_currencyService = currencyService;
+			_productService = productService;
+			_localizationService = localizationService;
+			_productAttributeParser = productAttributeParser;
+			_productAttributeService = productAttributeService;
+			_checkoutAttributeService = checkoutAttributeService;
+			_checkoutAttributeParser = checkoutAttributeParser;
+			_priceFormatter = priceFormatter;
+			_customerService = customerService;
+			_shoppingCartSettings = shoppingCartSettings;
+			_eventPublisher = eventPublisher;
+			_permissionService = permissionService;
+			_aclService = aclService;
+			_storeMappingService = storeMappingService;
+			_genericAttributeService = genericAttributeService;
+			_downloadService = downloadService;
+			_catalogSettings = catalogSettings;
+			_orderTotalCalculationService = orderTotalCalculationService;
+			_requestCache = requestCache;
+
+			T = NullLocalizer.Instance;
+		}
+
+		public Localizer T { get; set; }
+
+		public virtual int CountItems(Customer customer, ShoppingCartType cartType, int? storeId = null)
+		{
+			Guard.NotNull(customer, nameof(customer));
+
+			var query = _sciRepository.Table.Where(x => x.ParentItemId == null && x.CustomerId == customer.Id && x.ShoppingCartTypeId == (int)cartType);
+			if (storeId.GetValueOrDefault() > 0)
+			{
+				query = query.Where(x => x.StoreId == storeId.Value);
+			}
+
+			return query.Sum(x => (int?)x.Quantity) ?? 0;
+		}
+
+		public virtual List<OrganizedShoppingCartItem> GetCartItems(Customer customer, ShoppingCartType cartType, int? storeId = null)
+		{
+			Guard.NotNull(customer, nameof(customer));
+
+			var cacheKey = CARTITEMS_KEY.FormatInvariant(customer.Id, (int)cartType, storeId.GetValueOrDefault());
+			var result = _requestCache.Get(cacheKey, () =>
+			{
+				var query = _sciRepository.Table
+					//.Expand(x => x.Product.ProductVariantAttributes)
+					.Where(x => x.CustomerId == customer.Id );
+
+				var items = query.OrderByDescending(x => x.Id).ToList();
+
+				// Perf: Prefetch (load) all attribute values in any of the attribute definitions across all cart items (including any bundle part)
+				//_productAttributeParser.PrefetchProductVariantAttributes(items.Select(x => x.AttributesXml));
+
+				return OrganizeCartItems(items);
+			});
+
+			return result;
+		}
+
+        protected virtual List<OrganizedShoppingCartItem> OrganizeCartItems(IEnumerable<DeclarationShoppingCartItem> cart)
+        {
+            var result = new List<OrganizedShoppingCartItem>();
+
+            if (cart == null || !cart.Any())
+                return result;
+
+            var parentItems = cart.Where(x => x.ParentItemId == null).ToArray();
+
+            foreach (var parent in cart)
+            {
+                var parentItem = new OrganizedShoppingCartItem(new ShoppingCartItem());
+				parentItem.dItem = parent;
+				result.Add(parentItem);
+            }
+
+            return result;
+        }
+
+        public virtual void DeleteShoppingCartItem(
+			DeclarationShoppingCartItem shoppingCartItem,
+			bool resetCheckoutData = true,
+			bool ensureOnlyActiveCheckoutAttributes = false,
+			bool deleteChildCartItems = true)
+		{
+			Guard.NotNull(shoppingCartItem, nameof(shoppingCartItem));
+
+			var customer = shoppingCartItem.Customer;
+			var storeId = shoppingCartItem.StoreId;
+			int cartItemId = shoppingCartItem.Id;
+
+			// reset checkout data
+			if (resetCheckoutData && customer != null)
+			{
+				_customerService.ResetCheckoutData(shoppingCartItem.Customer, shoppingCartItem.StoreId);
+			}
+
+			// delete item
+			_sciRepository.Delete(shoppingCartItem);
+
+			// cache busting
+			_requestCache.RemoveByPattern(CARTITEMS_PATTERN_KEY);
+
+			// validate checkout attributes
+			if (ensureOnlyActiveCheckoutAttributes && shoppingCartItem.ShoppingCartType == ShoppingCartType.ShoppingCart && customer != null)
+			{
+				var cart = GetCartItems(customer, ShoppingCartType.ShoppingCart, storeId);
+
+				var checkoutAttributesXml = customer.GetAttribute<string>(SystemCustomerAttributeNames.CheckoutAttributes, _genericAttributeService);
+				checkoutAttributesXml = _checkoutAttributeParser.EnsureOnlyActiveAttributes(checkoutAttributesXml, cart);
+				_genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CheckoutAttributes, checkoutAttributesXml);
+			}
+
+			// delete child items
+			if (deleteChildCartItems && customer != null)
+			{
+				var childCartItems = _sciRepository.Table
+					.Where(x => x.CustomerId == customer.Id && x.ParentItemId != null && x.ParentItemId.Value == cartItemId && x.Id != cartItemId)
+					.ToList();
+
+				foreach (var cartItem in childCartItems)
+				{
+					DeleteShoppingCartItem(cartItem, resetCheckoutData, ensureOnlyActiveCheckoutAttributes, false);
+				}
+			}
+		}
+
+		public virtual void DeleteShoppingCartItem(
+			int shoppingCartItemId,
+			bool resetCheckoutData = true,
+			bool ensureOnlyActiveCheckoutAttributes = false,
+			bool deleteChildCartItems = true)
+		{
+			if (shoppingCartItemId != 0)
+			{
+				var shoppingCartItem = _sciRepository.GetById(shoppingCartItemId);
+				DeleteShoppingCartItem(shoppingCartItem, resetCheckoutData, ensureOnlyActiveCheckoutAttributes, deleteChildCartItems);
+			}
+		}
+
+		public virtual int DeleteExpiredShoppingCartItems(DateTime olderThanUtc, int? customerId = null)
+		{
+			var query =
+				from sci in _sciRepository.Table
+				where sci.UpdatedOnUtc < olderThanUtc && sci.ParentItemId == null
+				select sci;
+
+			if (customerId.GetValueOrDefault() > 0)
+			{
+				query = query.Where(x => x.CustomerId == customerId.Value);
+			}
+
+			var cartItems = query.ToList();
+
+			foreach (var parentItem in cartItems)
+			{
+				var childItems = _sciRepository.Table.Where(x => x.ParentItemId == parentItem.Id && x.Id != parentItem.Id).ToList();
+
+				foreach (var childItem in childItems)
+				{
+					_sciRepository.Delete(childItem);
+				}
+
+				_sciRepository.Delete(parentItem);
+			}
+
+			return cartItems.Count;
+		}
+
+
+	
+		public virtual OrganizedShoppingCartItem FindShoppingCartItemInTheCart(
+			IList<OrganizedShoppingCartItem> shoppingCart,
+			ShoppingCartType shoppingCartType,
+			DeclarationProduct product,
+			string selectedAttributes = "",
+			decimal customerEnteredPrice = decimal.Zero)
+		{
+			Guard.NotNull(shoppingCart, nameof(shoppingCart));
+			Guard.NotNull(product, nameof(product));
+
+			if (product.ProductType == ProductType.BundledProduct && product.BundlePerItemPricing)
+				return null; // too complex
+
+			foreach (var sci in shoppingCart.Where(a => a.Item.ShoppingCartType == shoppingCartType && a.Item.ParentItemId == null).ToArray())
+			{
+				if (sci.Item.ProductId == product.Id && sci.Item.Product.ProductTypeId == product.ProductTypeId)
+				{
+					// attributes
+					bool attributesEqual = _productAttributeParser.AreProductAttributesEqual(sci.Item.AttributesXml, selectedAttributes);
+
+					// gift cards
+					var giftCardInfoSame = true;
+					if (sci.Item.Product.IsGiftCard)
+					{
+						string giftCardRecipientName1 = string.Empty;
+						string giftCardRecipientEmail1 = string.Empty;
+						string giftCardSenderName1 = string.Empty;
+						string giftCardSenderEmail1 = string.Empty;
+						string giftCardMessage1 = string.Empty;
+
+						_productAttributeParser.GetGiftCardAttribute(
+							selectedAttributes,
+							out giftCardRecipientName1,
+							out giftCardRecipientEmail1,
+							out giftCardSenderName1,
+							out giftCardSenderEmail1,
+							out giftCardMessage1);
+
+						string giftCardRecipientName2 = string.Empty;
+						string giftCardRecipientEmail2 = string.Empty;
+						string giftCardSenderName2 = string.Empty;
+						string giftCardSenderEmail2 = string.Empty;
+						string giftCardMessage2 = string.Empty;
+
+						_productAttributeParser.GetGiftCardAttribute(
+							sci.Item.AttributesXml,
+							out giftCardRecipientName2,
+							out giftCardRecipientEmail2,
+							out giftCardSenderName2,
+							out giftCardSenderEmail2,
+							out giftCardMessage2);
+
+
+						if (giftCardRecipientName1.ToLowerInvariant() != giftCardRecipientName2.ToLowerInvariant() ||
+							giftCardSenderName1.ToLowerInvariant() != giftCardSenderName2.ToLowerInvariant())
+						{
+							giftCardInfoSame = false;
+						}
+					}
+
+					// Products with CustomerEntersPrice are equal if the price is the same.
+					// But a system product may only be placed once in the shopping cart.
+					var customerEnteredPricesEqual = true;
+					if (sci.Item.Product.CustomerEntersPrice && !sci.Item.Product.IsSystemProduct)
+					{
+						customerEnteredPricesEqual = Math.Round(sci.Item.CustomerEnteredPrice, 2) == Math.Round(customerEnteredPrice, 2);
+					}
+
+					// found?
+					if (attributesEqual && giftCardInfoSame && customerEnteredPricesEqual)
+					{
+						return sci;
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public virtual OrganizedShoppingCartItem FindShoppingCartItemInTheCart(
+			IList<OrganizedShoppingCartItem> shoppingCart,
+			ShoppingCartType shoppingCartType,
+			Product product,
+			string selectedAttributes = "",
+			decimal customerEnteredPrice = decimal.Zero)
+		{
+			Guard.NotNull(shoppingCart, nameof(shoppingCart));
+			Guard.NotNull(product, nameof(product));
+
+			if (product.ProductType == ProductType.BundledProduct && product.BundlePerItemPricing)
+				return null; // too complex
+
+			foreach (var sci in shoppingCart.Where(a => a.Item.ShoppingCartType == shoppingCartType && a.Item.ParentItemId == null).ToArray())
+			{
+				if (sci.Item.ProductId == product.Id && sci.Item.Product.ProductTypeId == product.ProductTypeId)
+				{
+					// attributes
+					bool attributesEqual = _productAttributeParser.AreProductAttributesEqual(sci.Item.AttributesXml, selectedAttributes);
+
+					// gift cards
+					var giftCardInfoSame = true;
+					if (sci.Item.Product.IsGiftCard)
+					{
+						string giftCardRecipientName1 = string.Empty;
+						string giftCardRecipientEmail1 = string.Empty;
+						string giftCardSenderName1 = string.Empty;
+						string giftCardSenderEmail1 = string.Empty;
+						string giftCardMessage1 = string.Empty;
+
+						_productAttributeParser.GetGiftCardAttribute(
+							selectedAttributes,
+							out giftCardRecipientName1,
+							out giftCardRecipientEmail1,
+							out giftCardSenderName1,
+							out giftCardSenderEmail1,
+							out giftCardMessage1);
+
+						string giftCardRecipientName2 = string.Empty;
+						string giftCardRecipientEmail2 = string.Empty;
+						string giftCardSenderName2 = string.Empty;
+						string giftCardSenderEmail2 = string.Empty;
+						string giftCardMessage2 = string.Empty;
+
+						_productAttributeParser.GetGiftCardAttribute(
+							sci.Item.AttributesXml,
+							out giftCardRecipientName2,
+							out giftCardRecipientEmail2,
+							out giftCardSenderName2,
+							out giftCardSenderEmail2,
+							out giftCardMessage2);
+
+
+						if (giftCardRecipientName1.ToLowerInvariant() != giftCardRecipientName2.ToLowerInvariant() ||
+							giftCardSenderName1.ToLowerInvariant() != giftCardSenderName2.ToLowerInvariant())
+						{
+							giftCardInfoSame = false;
+						}
+					}
+
+					// Products with CustomerEntersPrice are equal if the price is the same.
+					// But a system product may only be placed once in the shopping cart.
+					var customerEnteredPricesEqual = true;
+					if (sci.Item.Product.CustomerEntersPrice && !sci.Item.Product.IsSystemProduct)
+					{
+						customerEnteredPricesEqual = Math.Round(sci.Item.CustomerEnteredPrice, 2) == Math.Round(customerEnteredPrice, 2);
+					}
+
+					// found?
+					if (attributesEqual && giftCardInfoSame && customerEnteredPricesEqual)
+					{
+						return sci;
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public virtual List<string> AddToCart(
+			Customer customer,
+			DeclarationProduct product,
+			ShoppingCartType cartType,
+			int storeId,
+			string selectedAttributes,
+			decimal customerEnteredPrice,
+			int quantity,
+			bool automaticallyAddRequiredProductsIfEnabled,
+			AddToCartContext ctx = null)
+		{
+			Guard.NotNull(customer, nameof(customer));
+			Guard.NotNull(product, nameof(product));
+
+			var warnings = new List<string>();
+			var bundleItem = (ctx == null ? null : ctx.BundleItem);
+
+			if (ctx != null && bundleItem != null && ctx.Warnings.Count > 0)
+				return ctx.Warnings;    // warnings while adding bundle items to cart -> no need for further processing
+
+			if (cartType == ShoppingCartType.ShoppingCart && !_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart, customer))
+			{
+				warnings.Add(T("ShoppingCart.IsDisabled"));
+				return warnings;
+			}
+			if (cartType == ShoppingCartType.Wishlist && !_permissionService.Authorize(StandardPermissionProvider.EnableWishlist, customer))
+			{
+				warnings.Add(T("Wishlist.IsDisabled"));
+				return warnings;
+			}
+
+			if (quantity <= 0)
+			{
+				warnings.Add(T("ShoppingCart.QuantityShouldPositive"));
+				return warnings;
+			}
+
+			//if (parentItemId.HasValue && (parentItemId.Value == 0 || bundleItem == null || bundleItem.Id == 0))
+			//{
+			//	warnings.Add(T("ShoppingCart.Bundle.BundleItemNotFound", bundleItem.GetLocalizedName()));
+			//	return warnings;
+			//}
+
+			// reset checkout info
+			_customerService.ResetCheckoutData(customer, storeId);
+
+			var cart = GetCartItems(customer, cartType, storeId);
+			OrganizedShoppingCartItem existingCartItem = null;
+
+			if (bundleItem == null)
+			{
+				existingCartItem = FindShoppingCartItemInTheCart(cart, cartType, product, selectedAttributes, customerEnteredPrice);
+			}
+
+			if (existingCartItem != null)
+			{
+				// update existing shopping cart item
+				int newQuantity = existingCartItem.Item.Quantity + quantity;
+
+				//warnings.AddRange(
+				//	GetShoppingCartItemWarnings(customer, cartType, product, storeId, selectedAttributes, customerEnteredPrice, newQuantity,
+				//		automaticallyAddRequiredProductsIfEnabled, bundleItem: bundleItem)
+				//);
+
+				if (warnings.Count == 0)
+				{
+					existingCartItem.Item.AttributesXml = selectedAttributes;
+					existingCartItem.Item.Quantity = newQuantity;
+					existingCartItem.Item.UpdatedOnUtc = DateTime.UtcNow;
+					_customerService.UpdateCustomer(customer);
+				}
+			}
+			else
+			{
+				// new shopping cart item
+				//warnings.AddRange(
+				//	GetShoppingCartItemWarnings(customer, cartType, product, storeId, selectedAttributes, customerEnteredPrice, quantity,
+				//		automaticallyAddRequiredProductsIfEnabled, bundleItem: bundleItem)
+				//);
+
+				if (warnings.Count == 0)
+				{
+					// maximum items validation
+					if (cartType == ShoppingCartType.ShoppingCart && cart.Count >= _shoppingCartSettings.MaximumShoppingCartItems)
+					{
+						warnings.Add(T("ShoppingCart.MaximumShoppingCartItems"));
+						return warnings;
+					}
+					else if (cartType == ShoppingCartType.Wishlist && cart.Count >= _shoppingCartSettings.MaximumWishlistItems)
+					{
+						warnings.Add(T("ShoppingCart.MaximumWishlistItems"));
+						return warnings;
+					}
+
+					var now = DateTime.UtcNow;
+					var cartItem = new DeclarationShoppingCartItem
+					{
+						ShoppingCartType = cartType,
+						StoreId = storeId,
+						Product = product,
+						AttributesXml = selectedAttributes,
+						CustomerEnteredPrice = customerEnteredPrice,
+						Quantity = quantity,
+						ParentItemId = null
+					};
+
+					if (bundleItem != null)
+					{
+						cartItem.BundleItemId = bundleItem.Id;
+					}
+
+					if (ctx == null)
+					{
+						customer.dShoppingCartItems.Add(cartItem);
+						_customerService.UpdateCustomer(customer);
+					}
+					else
+					{
+						if (bundleItem == null)
+						{
+							Debug.Assert(ctx.Item == null, "Add to cart item already specified");
+							ctx.dItem = cartItem;
+						}
+						else
+						{
+							ctx.dChildItems.Add(cartItem);
+						}
+					}
+				}
+			}
+
+			_requestCache.RemoveByPattern(CARTITEMS_PATTERN_KEY);
+
+			return warnings;
+		}
+
+		public virtual List<string> AddToCart(
+			Customer customer,
+			Product product,
+			ShoppingCartType cartType,
+			int storeId,
+			string selectedAttributes,
+			decimal customerEnteredPrice,
+			int quantity,
+			bool automaticallyAddRequiredProductsIfEnabled,
+			AddToCartContext ctx = null)
+		{
+			Guard.NotNull(customer, nameof(customer));
+			Guard.NotNull(product, nameof(product));
+
+			var warnings = new List<string>();
+			var bundleItem = (ctx == null ? null : ctx.BundleItem);
+
+			if (ctx != null && bundleItem != null && ctx.Warnings.Count > 0)
+				return ctx.Warnings;    // warnings while adding bundle items to cart -> no need for further processing
+
+			if (cartType == ShoppingCartType.ShoppingCart && !_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart, customer))
+			{
+				warnings.Add(T("ShoppingCart.IsDisabled"));
+				return warnings;
+			}
+			if (cartType == ShoppingCartType.Wishlist && !_permissionService.Authorize(StandardPermissionProvider.EnableWishlist, customer))
+			{
+				warnings.Add(T("Wishlist.IsDisabled"));
+				return warnings;
+			}
+
+			if (quantity <= 0)
+			{
+				warnings.Add(T("ShoppingCart.QuantityShouldPositive"));
+				return warnings;
+			}
+
+			//if (parentItemId.HasValue && (parentItemId.Value == 0 || bundleItem == null || bundleItem.Id == 0))
+			//{
+			//	warnings.Add(T("ShoppingCart.Bundle.BundleItemNotFound", bundleItem.GetLocalizedName()));
+			//	return warnings;
+			//}
+
+			// reset checkout info
+			_customerService.ResetCheckoutData(customer, storeId);
+
+			var cart = GetCartItems(customer, cartType, storeId);
+			OrganizedShoppingCartItem existingCartItem = null;
+
+			if (bundleItem == null)
+			{
+				existingCartItem = FindShoppingCartItemInTheCart(cart, cartType, product, selectedAttributes, customerEnteredPrice);
+			}
+
+			if (existingCartItem != null)
+			{
+				// update existing shopping cart item
+				int newQuantity = existingCartItem.Item.Quantity + quantity;
+
+				
+
+				if (warnings.Count == 0)
+				{
+					existingCartItem.Item.AttributesXml = selectedAttributes;
+					existingCartItem.Item.Quantity = newQuantity;
+					existingCartItem.Item.UpdatedOnUtc = DateTime.UtcNow;
+					_customerService.UpdateCustomer(customer);
+				}
+			}
+			else
+			{
+				// new shopping cart item
+				
+
+				if (warnings.Count == 0)
+				{
+					// maximum items validation
+					if (cartType == ShoppingCartType.ShoppingCart && cart.Count >= _shoppingCartSettings.MaximumShoppingCartItems)
+					{
+						warnings.Add(T("ShoppingCart.MaximumShoppingCartItems"));
+						return warnings;
+					}
+					else if (cartType == ShoppingCartType.Wishlist && cart.Count >= _shoppingCartSettings.MaximumWishlistItems)
+					{
+						warnings.Add(T("ShoppingCart.MaximumWishlistItems"));
+						return warnings;
+					}
+
+					var now = DateTime.UtcNow;
+					var cartItem = new ShoppingCartItem
+					{
+						ShoppingCartType = cartType,
+						StoreId = storeId,
+						Product = product,
+						AttributesXml = selectedAttributes,
+						CustomerEnteredPrice = customerEnteredPrice,
+						Quantity = quantity,
+						ParentItemId = null
+					};
+
+					if (bundleItem != null)
+					{
+						cartItem.BundleItemId = bundleItem.Id;
+					}
+
+					if (ctx == null)
+					{
+						customer.ShoppingCartItems.Add(cartItem);
+						_customerService.UpdateCustomer(customer);
+					}
+					else
+					{
+						if (bundleItem == null)
+						{
+							Debug.Assert(ctx.Item == null, "Add to cart item already specified");
+							ctx.Item = cartItem;
+						}
+						else
+						{
+							ctx.ChildItems.Add(cartItem);
+						}
+					}
+				}
+			}
+
+			_requestCache.RemoveByPattern(CARTITEMS_PATTERN_KEY);
+
+			return warnings;
+		}
+
+		public virtual void AddToCart(AddToCartContext ctx)
+		{
+			var customer = ctx.Customer ?? _workContext.CurrentCustomer;
+			var storeId = ctx.StoreId ?? _storeContext.CurrentStore.Id;
+			_sciRepository.DeleteAll(x => x.CustomerId == ctx.Customer.Id);
+			_sciRepository.Insert(new DeclarationShoppingCartItem() { CustomerEnteredPrice = ctx.CustomerEnteredPrice,  ProductId  = ctx.dProduct.Id, CustomerId = ctx.Customer.Id,Quantity = ctx.Quantity});
+			//_customerService.ResetCheckoutData(customer, storeId);
+
+			//if (ctx.VariantQuery != null && ctx.Product != null)
+			//{
+			//	//var attributes = _productAttributeService.GetProductVariantAttributesByProductId(ctx.Product.Id);
+
+			//	//ctx.AttributesXml = ctx.VariantQuery.CreateSelectedAttributesXml(ctx.Product.Id, ctx.BundleItemId, attributes, _productAttributeParser,
+			//	//	_localizationService, _downloadService, _catalogSettings, null, ctx.Warnings);
+
+			//	//if (ctx.Product.ProductType == ProductType.BundledProduct && ctx.AttributesXml.HasValue())
+			//	//{
+			//	//	ctx.Warnings.Add(T("ShoppingCart.Bundle.NoAttributes"));
+			//	//}
+
+			//	if (ctx.Product.IsGiftCard)
+			//	{
+			//		//ctx.Attributes = ctx.AttributeForm.AddGiftCardAttribute(ctx.Attributes, ctx.Product.Id, _productAttributeParser, ctx.BundleItemId);
+			//		ctx.AttributesXml = _productAttributeParser.AddGiftCardAttribute(
+			//			ctx.AttributesXml,
+			//			ctx.VariantQuery.GetGiftCardValue(ctx.Product.Id, ctx.BundleItemId, "RecipientName"),
+			//			ctx.VariantQuery.GetGiftCardValue(ctx.Product.Id, ctx.BundleItemId, "RecipientEmail"),
+			//			ctx.VariantQuery.GetGiftCardValue(ctx.Product.Id, ctx.BundleItemId, "SenderName"),
+			//			ctx.VariantQuery.GetGiftCardValue(ctx.Product.Id, ctx.BundleItemId, "SenderEmail"),
+			//			ctx.VariantQuery.GetGiftCardValue(ctx.Product.Id, ctx.BundleItemId, "Message"));
+			//	}
+			//}
+
+			//ctx.Warnings.AddRange(
+			//	AddToCart(customer, ctx.dProduct, ctx.CartType, storeId, ctx.AttributesXml, ctx.CustomerEnteredPrice, ctx.Quantity, ctx.AddRequiredProducts, ctx)
+			//);
+
+			//if (ctx.dProduct != null && ctx.dProduct.ProductType == ProductType.BundledProduct && ctx.Warnings.Count <= 0 && ctx.BundleItem == null)
+			//{
+			//	foreach (var bundleItem in _productService.GetBundleItems(ctx.Product.Id).Select(x => x.Item))
+			//	{
+			//		AddToCart(new AddToCartContext
+			//		{
+			//			BundleItem = bundleItem,
+			//			Warnings = ctx.Warnings,
+			//			Item = ctx.Item,
+			//			ChildItems = ctx.ChildItems,
+			//			Product = bundleItem.Product,
+			//			Customer = customer,
+			//			VariantQuery = ctx.VariantQuery,
+			//			CartType = ctx.CartType,
+			//			Quantity = bundleItem.Quantity,
+			//			AddRequiredProducts = ctx.AddRequiredProducts,
+			//			StoreId = storeId
+			//		});
+
+			//		if (ctx.Warnings.Count > 0)
+			//		{
+			//			ctx.ChildItems.Clear();
+			//			break;
+			//		}
+			//	}
+			//}
+
+			//if (ctx.BundleItem == null)
+			//{
+			//	AddToCartStoring(ctx);
+			//}
+		}
+
+		public virtual void AddToCartStoring(AddToCartContext ctx)
+		{
+			if (ctx.Warnings.Count == 0 && ctx.Item != null)
+			{
+				var customer = ctx.Customer ?? _workContext.CurrentCustomer;
+
+				customer.ShoppingCartItems.Add(ctx.Item);
+				_customerService.UpdateCustomer(customer);
+
+				foreach (var childItem in ctx.ChildItems)
+				{
+					childItem.ParentItemId = ctx.Item.Id;
+
+					customer.ShoppingCartItems.Add(childItem);
+					_customerService.UpdateCustomer(customer);
+				}
+			}
+		}
+
+		public virtual IList<string> UpdateShoppingCartItem(Customer customer, int shoppingCartItemId, int newQuantity, bool resetCheckoutData)
+		{
+			Guard.NotNull(customer, nameof(customer));
+
+			var warnings = new List<string>();
+
+			var shoppingCartItem = customer.dShoppingCartItems.FirstOrDefault(sci => sci.Id == shoppingCartItemId && sci.ParentItemId == null);
+			if (shoppingCartItem != null)
+			{
+				if (resetCheckoutData)
+				{
+					// reset checkout data
+					_customerService.ResetCheckoutData(customer, shoppingCartItem.StoreId);
+				}
+				if (newQuantity > 0)
+				{
+					// check warnings
+					//warnings.AddRange(GetShoppingCartItemWarnings(customer, shoppingCartItem.ShoppingCartType, shoppingCartItem.Product, shoppingCartItem.StoreId,
+					//	shoppingCartItem.AttributesXml, shoppingCartItem.CustomerEnteredPrice, newQuantity, false));
+
+					if (warnings.Count == 0)
+					{
+						// if everything is OK, then update a shopping cart item
+						shoppingCartItem.Quantity = newQuantity;
+						shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
+						_customerService.UpdateCustomer(customer);
+					}
+				}
+				else
+				{
+					// delete a shopping cart item
+					DeleteShoppingCartItem(shoppingCartItem, resetCheckoutData, true);
+				}
+			}
+
+			_requestCache.RemoveByPattern(CARTITEMS_PATTERN_KEY);
+
+			return warnings;
+		}
+
+		public virtual void MigrateShoppingCart(Customer fromCustomer, Customer toCustomer)
+		{
+			Guard.NotNull(fromCustomer, nameof(fromCustomer));
+			Guard.NotNull(toCustomer, nameof(toCustomer));
+
+			if (fromCustomer.Id == toCustomer.Id)
+				return;
+
+			int storeId = 0;
+			var cartItems = OrganizeCartItems(fromCustomer.dShoppingCartItems);
+
+			if (cartItems.Count <= 0)
+				return;
+
+			foreach (var cartItem in cartItems)
+			{
+				if (storeId == 0)
+					storeId = cartItem.Item.StoreId;
+
+				Copy(cartItem, toCustomer, cartItem.Item.ShoppingCartType, cartItem.Item.StoreId, false);
+			}
+
+			_eventPublisher.PublishMigrateShoppingCart(fromCustomer, toCustomer, storeId);
+
+			foreach (var cartItem in cartItems)
+			{
+				DeleteShoppingCartItem(cartItem.dItem);
+			}
+		}
+
+		public virtual IList<string> Copy(OrganizedShoppingCartItem sci, Customer customer, ShoppingCartType cartType, int storeId, bool addRequiredProductsIfEnabled)
+		{
+			Guard.NotNull(customer, nameof(customer));
+			Guard.NotNull(sci, nameof(sci));
+
+			var addToCartContext = new AddToCartContext
+			{
+				Customer = customer
+			};
+
+			addToCartContext.Warnings = AddToCart(customer, sci.Item.Product, cartType, storeId, sci.Item.AttributesXml, sci.Item.CustomerEnteredPrice,
+				sci.Item.Quantity, addRequiredProductsIfEnabled, addToCartContext);
+
+			if (addToCartContext.Warnings.Count == 0 && sci.ChildItems != null)
+			{
+				foreach (var childItem in sci.ChildItems)
+				{
+					addToCartContext.BundleItem = childItem.Item.BundleItem;
+
+					addToCartContext.Warnings = AddToCart(customer, childItem.Item.Product, cartType, storeId, childItem.Item.AttributesXml, childItem.Item.CustomerEnteredPrice,
+						childItem.Item.Quantity, false, addToCartContext);
+				}
+			}
+
+			AddToCartStoring(addToCartContext);
+
+			_requestCache.RemoveByPattern(CARTITEMS_PATTERN_KEY);
+
+			return addToCartContext.Warnings;
+		}
+
+		public virtual decimal GetCurrentCartSubTotal()
+		{
+			var cart = GetCartItems(_workContext.CurrentCustomer, ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+			return GetCurrentCartSubTotal(cart);
+		}
+
+		public virtual decimal GetCurrentCartSubTotal(IList<OrganizedShoppingCartItem> cart)
+		{
+			decimal subtotal = 0;
+
+			if (cart.Count > 0)
+			{
+				decimal subtotalBase = decimal.Zero;
+				decimal orderSubTotalDiscountAmountBase = decimal.Zero;
+				Discount orderSubTotalAppliedDiscount = null;
+				decimal subTotalWithoutDiscountBase = decimal.Zero;
+				decimal subTotalWithDiscountBase = decimal.Zero;
+
+				_orderTotalCalculationService.GetShoppingCartSubTotal(cart,
+					out orderSubTotalDiscountAmountBase,
+					out orderSubTotalAppliedDiscount,
+					out subTotalWithoutDiscountBase,
+					out subTotalWithDiscountBase);
+
+				subtotalBase = subTotalWithoutDiscountBase;
+				subtotal = _currencyService.ConvertFromPrimaryStoreCurrency(subtotalBase, _workContext.WorkingCurrency);
+			}
+
+			return subtotal;
+		}
+
+		public virtual string GetFormattedCurrentCartSubTotal()
+		{
+			return _priceFormatter.FormatPrice(GetCurrentCartSubTotal());
+		}
+
+		public virtual string GetFormattedCurrentCartSubTotal(IList<OrganizedShoppingCartItem> cart)
+		{
+			return _priceFormatter.FormatPrice(GetCurrentCartSubTotal(cart));
+		}
+	}
 }

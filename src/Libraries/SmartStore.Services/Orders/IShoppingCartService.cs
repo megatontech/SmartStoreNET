@@ -285,4 +285,160 @@ namespace SmartStore.Services.Orders
         /// <returns>Formatted subtotal of cart items for the current user</returns>
         string GetFormattedCurrentCartSubTotal(IList<OrganizedShoppingCartItem> cart);
     }
+	/// <summary>
+	/// Shopping cart service
+	/// </summary>
+	public partial interface IDeclarationShoppingCartService
+	{
+		/// <summary>
+		/// Gets the shopping cart items count
+		/// </summary>
+		/// <param name="customer">Customer. Cannot be null.</param>
+		/// <param name="cartType">Type of cart to get items count for</param>
+		/// <param name="storeId">Store id</param>
+		/// <returns>Sum of all item quantities</returns>
+		int CountItems(Customer customer, ShoppingCartType cartType, int? storeId = null);
+
+		/// <summary>
+		/// Gets the shopping cart items
+		/// </summary>
+		/// <param name="customer">Customer. Cannot be null.</param>
+		/// <param name="cartType">Type of cart to get items for</param>
+		/// <param name="storeId">Store id</param>
+		/// <returns>All cart items</returns>
+		List<OrganizedShoppingCartItem> GetCartItems(Customer customer, ShoppingCartType cartType, int? storeId = null);
+
+		/// <summary>
+		/// Delete shopping cart item
+		/// </summary>
+		/// <param name="shoppingCartItem">Shopping cart item</param>
+		/// <param name="resetCheckoutData">A value indicating whether to reset checkout data</param>
+		/// <param name="ensureOnlyActiveCheckoutAttributes">A value indicating whether to ensure that only active checkout attributes are attached to the current customer</param>
+		/// <param name="deleteChildCartItems">A value indicating whether to delete child cart items</param>
+		void DeleteShoppingCartItem(
+			DeclarationShoppingCartItem shoppingCartItem,
+			bool resetCheckoutData = true,
+			bool ensureOnlyActiveCheckoutAttributes = false,
+			bool deleteChildCartItems = true);
+
+		void DeleteShoppingCartItem(
+			int shoppingCartItemId,
+			bool resetCheckoutData = true,
+			bool ensureOnlyActiveCheckoutAttributes = false,
+			bool deleteChildCartItems = true);
+
+		/// <summary>
+		/// Deletes expired shopping cart items
+		/// </summary>
+		/// <param name="olderThanUtc">Older than date and time</param>
+		/// <param name="customerId"><c>null</c> to delete ALL cart items, or a customer id to only delete items of a single customer.</param>
+		/// <returns>Number of deleted items</returns>
+		int DeleteExpiredShoppingCartItems(DateTime olderThanUtc, int? customerId = null);
+
+		
+		/// <summary>
+		/// Finds a shopping cart item in the cart
+		/// </summary>
+		/// <param name="shoppingCart">Shopping cart</param>
+		/// <param name="shoppingCartType">Shopping cart type</param>
+		/// <param name="product">Product</param>
+		/// <param name="selectedAttributes">Selected attributes</param>
+		/// <param name="customerEnteredPrice">Price entered by a customer</param>
+		/// <returns>Found shopping cart item</returns>
+		OrganizedShoppingCartItem FindShoppingCartItemInTheCart(
+			IList<OrganizedShoppingCartItem> shoppingCart,
+			ShoppingCartType shoppingCartType,
+			DeclarationProduct product,
+			string selectedAttributes = "",
+			decimal customerEnteredPrice = decimal.Zero);
+
+		/// <summary>
+		/// Add product to cart
+		/// </summary>
+		/// <param name="customer">The customer</param>
+		/// <param name="product">The product</param>
+		/// <param name="cartType">Cart type</param>
+		/// <param name="storeId">Store identifier</param>
+		/// <param name="selectedAttributes">Selected attributes</param>
+		/// <param name="customerEnteredPrice">Price entered by customer</param>
+		/// <param name="quantity">Quantity</param>
+		/// <param name="automaticallyAddRequiredProductsIfEnabled">Whether to add required products</param>
+		/// <param name="ctx">Add to cart context</param>
+		/// <returns>List with warnings</returns>
+		List<string> AddToCart(
+			Customer customer,
+			DeclarationProduct product,
+			ShoppingCartType cartType,
+			int storeId,
+			string selectedAttributes,
+			decimal customerEnteredPrice,
+			int quantity,
+			bool automaticallyAddRequiredProductsIfEnabled,
+			AddToCartContext ctx = null);
+
+		/// <summary>
+		/// Add product to cart
+		/// </summary>
+		/// <param name="ctx">Add to cart context</param>
+		void AddToCart(AddToCartContext ctx);
+
+		/// <summary>
+		/// Stores the shopping card items in the database
+		/// </summary>
+		/// <param name="ctx">Add to cart context</param>
+		void AddToCartStoring(AddToCartContext ctx);
+
+	
+		/// <summary>
+		/// Updates the shopping cart item
+		/// </summary>
+		/// <param name="customer">Customer</param>
+		/// <param name="shoppingCartItemId">Shopping cart item identifier</param>
+		/// <param name="newQuantity">New shopping cart item quantity</param>
+		/// <param name="resetCheckoutData">A value indicating whether to reset checkout data</param>
+		/// <returns>Warnings</returns>
+		IList<string> UpdateShoppingCartItem(Customer customer, int shoppingCartItemId, int newQuantity, bool resetCheckoutData);
+
+		/// <summary>
+		/// Migrate shopping cart
+		/// </summary>
+		/// <param name="fromCustomer">From customer</param>
+		/// <param name="toCustomer">To customer</param>
+		void MigrateShoppingCart(Customer fromCustomer, Customer toCustomer);
+
+		/// <summary>
+		/// Copies a shopping cart item.
+		/// </summary>
+		/// <param name="sci">Shopping cart item</param>
+		/// <param name="customer">The customer</param>
+		/// <param name="cartType">Shopping cart type</param>
+		/// <param name="storeId">Store Id</param>
+		/// <param name="addRequiredProductsIfEnabled">Add required products if enabled</param>
+		/// <returns>List with add-to-cart warnings.</returns>
+		IList<string> Copy(OrganizedShoppingCartItem sci, Customer customer, ShoppingCartType cartType, int storeId, bool addRequiredProductsIfEnabled);
+
+		/// <summary>
+		/// Gets the subtotal of cart items for the current user
+		/// </summary>
+		/// <returns>unformatted subtotal of cart items for the current user</returns>
+		decimal GetCurrentCartSubTotal();
+
+		/// <summary>
+		/// Gets the subtotal of cart items for the current user
+		/// </summary>
+		/// <returns>unformatted subtotal of cart items for the current user</returns>
+		decimal GetCurrentCartSubTotal(IList<OrganizedShoppingCartItem> cart);
+
+		/// <summary>
+		/// Gets the formatted subtotal of cart items for the current user
+		/// </summary>
+		/// <returns>Formatted subtotal of cart items for the current user</returns>
+		string GetFormattedCurrentCartSubTotal();
+
+		/// <summary>
+		/// Gets the formatted subtotal of cart items for the current user
+		/// </summary>
+		/// <returns>Formatted subtotal of cart items for the current user</returns>
+		string GetFormattedCurrentCartSubTotal(IList<OrganizedShoppingCartItem> cart);
+	}
 }

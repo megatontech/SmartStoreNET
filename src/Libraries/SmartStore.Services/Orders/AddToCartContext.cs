@@ -18,11 +18,14 @@ namespace SmartStore.Services.Orders
 		public List<string> Warnings { get; set; }
 
 		public ShoppingCartItem Item { get; set; }
+		public DeclarationShoppingCartItem dItem { get; set; }
 		public List<ShoppingCartItem> ChildItems { get; set; }
+		public List<DeclarationShoppingCartItem> dChildItems { get; set; }
 		public ProductBundleItem BundleItem { get; set; }
 
 		public Customer Customer { get; set; }
 		public Product Product { get; set; }
+		public DeclarationProduct dProduct { get; set; }
 		public ShoppingCartType CartType { get; set; }
 		public ProductVariantQuery VariantQuery { get; set; }
 		public string AttributesXml { get; set; }

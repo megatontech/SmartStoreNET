@@ -32,4 +32,27 @@ namespace SmartStore.Data.Mapping.Orders
 				.WillCascadeOnDelete(false);
         }
     }
+    public partial class DeclarationShoppingCartItemMap : EntityTypeConfiguration<DeclarationShoppingCartItem>
+    {
+        public DeclarationShoppingCartItemMap()
+        {
+            this.ToTable("DeclarationShoppingCartItem");
+            this.HasKey(sci => sci.Id);
+
+            this.Property(sci => sci.CustomerEnteredPrice).HasPrecision(18, 4);
+            this.Property(sci => sci.AttributesXml).IsMaxLength();
+
+            this.Ignore(sci => sci.ShoppingCartType);
+            this.Ignore(sci => sci.IsFreeShipping);
+            this.Ignore(sci => sci.IsShipEnabled);
+            this.Ignore(sci => sci.IsTaxExempt);
+
+           
+            this.HasRequired(sci => sci.Product)
+                .WithMany()
+                .HasForeignKey(sci => sci.ProductId);
+
+            
+        }
+    }
 }
