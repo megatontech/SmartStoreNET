@@ -1929,6 +1929,7 @@
     <Content Include="Views\Customer\Wallet.cshtml" />
     <Content Include="Views\Customer\LuckyMoney.cshtml" />
     <Content Include="Views\Shared\Menus\dListGroup.cshtml" />
+    <Content Include="Views\Shared\Layouts\_dMyAccount.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
