@@ -19,7 +19,7 @@
 }
 
 @section orderProgress{
-    @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Confirm }); }
+    @{ Html.RenderAction("CheckoutProgress", "DeclarationCheckout", new { step = CheckoutProgressStep.Confirm }); }
 }
 
 <div class="page checkout-confirm-page">
@@ -37,7 +37,7 @@
 
 			<input type="hidden" id="customercommenthidden" name="customercommenthidden" />
 
-			if (Model.TermsOfServiceEnabled ||
+			@*if (Model.TermsOfServiceEnabled ||
 				Model.NewsLetterSubscription != CheckoutNewsLetterSubscription.None ||
 				Model.ThirdPartyEmailHandOver != CheckoutThirdPartyEmailHandOver.None ||
 				consentZoneHasValue)
@@ -95,35 +95,23 @@
 						@Html.Raw(consentZoneContent)
 					</div>
 				</div>
-			}
+			}*@
 
-            <div id="confirm-warnings" class="confirm-order">
-                @if (Model.Warnings.Any())
-				{
-					<div class="alert alert-danger mb-3">
-						<ul>
-							@foreach (var warning in Model.Warnings)
-							{
-								<li>@Html.Raw(warning)</li>
-							}
-						</ul>
-					</div>
-				}
-            </div>  
+            
 		}
         
         @{ Html.RenderWidget("checkout_confirm_before_summary"); }
 
         <div class="order-summary-body mb-4">
-            @{ Html.RenderAction("OrderSummary", "ShoppingCart", new { prepareAndDisplayOrderReviewData = true }); }
+            @{ Html.RenderAction("dOrderSummary", "ShoppingCart", new { prepareAndDisplayOrderReviewData = true }); }
         </div>
 
-		@if (Model.MinOrderTotalWarning.HasValue())
+		@*@if (Model.MinOrderTotalWarning.HasValue())
 		{
 			<div class="alert alert-danger">
 				@Model.MinOrderTotalWarning
 			</div>
-		}
+		}*@
 
         <div class="cart-buttons my-4 row">
 			<div class="col-sm-6 col-lg-4 order-last order-sm-first mt-3 mt-sm-0">

@@ -37,7 +37,8 @@ namespace SmartStore.Web.Controllers
 
         private readonly IWorkContext _workContext;
 		private readonly IStoreContext _storeContext;
-        private readonly IShoppingCartService _shoppingCartService;
+        //private readonly IShoppingCartService _shoppingCartService;
+        private readonly IDeclarationShoppingCartService _dshoppingCartService;
         private readonly ILocalizationService _localizationService;
         private readonly ITaxService _taxService;
         private readonly ICurrencyService _currencyService;
@@ -64,9 +65,9 @@ namespace SmartStore.Web.Controllers
 		#region Constructors
 
 		public DeclarationCheckoutController(
-            IWorkContext workContext,
+            IWorkContext workContext, IDeclarationShoppingCartService dshoppingCartService,
             IStoreContext storeContext,
-            IShoppingCartService shoppingCartService, 
+            //IShoppingCartService shoppingCartService, 
             ILocalizationService localizationService, 
             ITaxService taxService, 
             ICurrencyService currencyService, 
@@ -88,9 +89,10 @@ namespace SmartStore.Web.Controllers
             ShippingSettings shippingSettings,
 			PluginMediator pluginMediator)
         {
+            _dshoppingCartService = dshoppingCartService;
             _workContext = workContext;
 			_storeContext = storeContext;
-            _shoppingCartService = shoppingCartService;
+            //_shoppingCartService = shoppingCartService;
             _localizationService = localizationService;
             _taxService = taxService;
             _currencyService = currencyService;
@@ -427,31 +429,31 @@ namespace SmartStore.Web.Controllers
 
             // Validate checkout attributes.
 			var checkoutAttributesXml = customer.GetAttribute<string>(SystemCustomerAttributeNames.CheckoutAttributes, _genericAttributeService);
-			var scWarnings = _shoppingCartService.GetShoppingCartWarnings(cart, checkoutAttributesXml, true);
-			if (scWarnings.Any())
-			{
-				NotifyError(string.Join(Environment.NewLine, scWarnings));
-				return RedirectToRoute("ShoppingCart");
-			}
+			//var scWarnings = _dshoppingCartService.GetShoppingCartWarnings(cart, checkoutAttributesXml, true);
+			//if (scWarnings.Any())
+			//{
+			//	NotifyError(string.Join(Environment.NewLine, scWarnings));
+			//	return RedirectToRoute("ShoppingCart");
+			//}
 
             // Valiadate each shopping cart item.
-            foreach (var sci in cart)
-            {
-                var sciWarnings = _shoppingCartService.GetShoppingCartItemWarnings(customer,
-                    sci.Item.ShoppingCartType,
-                    sci.Item.Product,
-					sci.Item.StoreId,
-                    sci.Item.AttributesXml,
-                    sci.Item.CustomerEnteredPrice,
-                    sci.Item.Quantity,
-                    false,
-					childItems: sci.ChildItems);
+    //        foreach (var sci in cart)
+    //        {
+    //            var sciWarnings = _dshoppingCartService.GetShoppingCartItemWarnings(customer,
+    //                sci.Item.ShoppingCartType,
+    //                sci.Item.Product,
+				//	sci.Item.StoreId,
+    //                sci.Item.AttributesXml,
+    //                sci.Item.CustomerEnteredPrice,
+    //                sci.Item.Quantity,
+    //                false,
+				//	childItems: sci.ChildItems);
 
-				if (sciWarnings.Any())
-				{
-					return RedirectToRoute("ShoppingCart");
-				}
-            }
+				//if (sciWarnings.Any())
+				//{
+				//	return RedirectToRoute("ShoppingCart");
+				//}
+    //        }
 
             return RedirectToAction("ShippingAddress");
         }
@@ -708,50 +710,49 @@ namespace SmartStore.Web.Controllers
         public ActionResult PaymentMethod()
         {
             //validation
-			var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+			var cart = _workContext.CurrentCustomer.GetdCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
-			if (cart.Count == 0)
-                return RedirectToRoute("ShoppingCart");
+			//if (cart.Count == 0)
+   //             return RedirectToRoute("ShoppingCart");
 
-            if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
-                return new HttpUnauthorizedResult();
+   //         if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
+   //             return new HttpUnauthorizedResult();
 
 			// Check whether payment workflow is required. We ignore reward points during cart total calculation.
-			decimal? shoppingCartTotalBase = _orderTotalCalculationService.GetShoppingCartTotal(cart, true);
-			var isPaymentWorkflowRequired = !(shoppingCartTotalBase.HasValue && shoppingCartTotalBase.Value == decimal.Zero);
+			//decimal? shoppingCartTotalBase = _orderTotalCalculationService.GetShoppingCartTotal(cart, true);
+			//var isPaymentWorkflowRequired = !(shoppingCartTotalBase.HasValue && shoppingCartTotalBase.Value == decimal.Zero);
 
 			var model = PreparePaymentMethodModel(cart);
-			var onlyOnePassiveMethod = model.PaymentMethods.Count == 1 && !model.PaymentMethods[0].RequiresInteraction;
+			//var onlyOnePassiveMethod = model.PaymentMethods.Count == 1 && !model.PaymentMethods[0].RequiresInteraction;
 
-            var checkoutState = _httpContext.GetCheckoutState();
-            if (checkoutState.CustomProperties.ContainsKey("HasOnlyOneActivePaymentMethod"))
-                checkoutState.CustomProperties["HasOnlyOneActivePaymentMethod"] = model.PaymentMethods.Count == 1;
-            else
-                checkoutState.CustomProperties.Add("HasOnlyOneActivePaymentMethod", model.PaymentMethods.Count == 1);
+   //         var checkoutState = _httpContext.GetCheckoutState();
+   //         if (checkoutState.CustomProperties.ContainsKey("HasOnlyOneActivePaymentMethod"))
+   //             checkoutState.CustomProperties["HasOnlyOneActivePaymentMethod"] = model.PaymentMethods.Count == 1;
+   //         else
+   //             checkoutState.CustomProperties.Add("HasOnlyOneActivePaymentMethod", model.PaymentMethods.Count == 1);
             
-            if (!isPaymentWorkflowRequired || (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne && onlyOnePassiveMethod))
-            {
-                // If there's nothing to pay for OR if we have only one passive payment method and reward points are disabled
-				// or the current customer doesn't have any reward points so customer doesn't have to choose a payment method.
+    //        if (!isPaymentWorkflowRequired || (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne && onlyOnePassiveMethod))
+    //        {
+    //            // If there's nothing to pay for OR if we have only one passive payment method and reward points are disabled
+				//// or the current customer doesn't have any reward points so customer doesn't have to choose a payment method.
 
-				_genericAttributeService.SaveAttribute<string>(
-					_workContext.CurrentCustomer,
-					SystemCustomerAttributeNames.SelectedPaymentMethod,
-					!model.PaymentMethods.Any() ? null : model.PaymentMethods[0].PaymentMethodSystemName,
-					_storeContext.CurrentStore.Id);
+				//_genericAttributeService.SaveAttribute<string>(
+				//	_workContext.CurrentCustomer,
+				//	SystemCustomerAttributeNames.SelectedPaymentMethod,
+				//	!model.PaymentMethods.Any() ? null : model.PaymentMethods[0].PaymentMethodSystemName,
+				//	_storeContext.CurrentStore.Id);
 
-                checkoutState.IsPaymentSelectionSkipped = true;
+    //            checkoutState.IsPaymentSelectionSkipped = true;
 
-				var referrer = Services.WebHelper.GetUrlReferrer();
-				if (referrer.EndsWith("/Confirm"))
-				{
-					return RedirectToAction("ShippingMethod");
-				}
+				//var referrer = Services.WebHelper.GetUrlReferrer();
+				//if (referrer.EndsWith("/Confirm"))
+				//{
+				//	return RedirectToAction("ShippingMethod");
+				//}
 
-				return RedirectToAction("Confirm");
-            }
+				//return RedirectToAction("Confirm");
+    //        }
 
-            checkoutState.IsPaymentSelectionSkipped = false;
 
             return View(model);
         }
@@ -815,19 +816,22 @@ namespace SmartStore.Web.Controllers
 
         public ActionResult Confirm()
         {
-            //validation
-			var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var model = new CheckoutConfirmModel();
+            model.TermsOfServiceEnabled = _orderSettings.TermsOfServiceEnabled;
+            model.ShowEsdRevocationWaiverBox = _shoppingCartSettings.ShowEsdRevocationWaiverBox;
+            model.BypassPaymentMethodInfo = _paymentSettings.BypassPaymentMethodInfo;
+            model.NewsLetterSubscription = _shoppingCartSettings.NewsLetterSubscription;
+            model.ThirdPartyEmailHandOver = _shoppingCartSettings.ThirdPartyEmailHandOver;
 
-			if (cart.Count == 0)
-                return RedirectToRoute("ShoppingCart");
+            if (_shoppingCartSettings.ThirdPartyEmailHandOver != CheckoutThirdPartyEmailHandOver.None)
+            {
+                model.ThirdPartyEmailHandOverLabel = _shoppingCartSettings.GetLocalized(x => x.ThirdPartyEmailHandOverLabel, _workContext.WorkingLanguage, true, false);
 
-            if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
-                return new HttpUnauthorizedResult();
-
-            var model = PrepareConfirmOrderModel(cart);
-
-			//if (TempData["ConfirmOrderWarnings"] != null)
-			//	model.Warnings.AddRange(TempData["ConfirmOrderWarnings"] as IList<string>);
+                if (model.ThirdPartyEmailHandOverLabel.IsEmpty())
+                    model.ThirdPartyEmailHandOverLabel = T("Admin.Configuration.Settings.ShoppingCart.ThirdPartyEmailHandOverLabel.Default");
+            }
+            //if (TempData["ConfirmOrderWarnings"] != null)
+            //	model.Warnings.AddRange(TempData["ConfirmOrderWarnings"] as IList<string>);
 
             return View(model);
         }
@@ -837,100 +841,60 @@ namespace SmartStore.Web.Controllers
         {
 			var store = _storeContext.CurrentStore;
 			var customer = _workContext.CurrentCustomer;
-			var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
-
-            if (cart.Count == 0)
-            {
-                return RedirectToRoute("ShoppingCart");
-            }
-
-            if (customer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed)
-            {
-                return new HttpUnauthorizedResult();
-            }
-
+			//var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+            
             var model = new CheckoutConfirmModel();
 			PlaceOrderResult placeOrderResult = null;
 			PostProcessPaymentRequest postProcessPaymentRequest = null;
+            //try
+            //         {
+            //             var processPaymentRequest = _httpContext.Session["OrderPaymentInfo"] as ProcessPaymentRequest;
+            //             if (processPaymentRequest == null)
+            //             {
+            //                 // Check whether payment workflow is required.
+            //                 if (IsPaymentWorkflowRequired(cart))
+            //                 {
 
-			try
-            {
-                var processPaymentRequest = _httpContext.Session["OrderPaymentInfo"] as ProcessPaymentRequest;
-                if (processPaymentRequest == null)
-                {
-                    // Check whether payment workflow is required.
-                    if (IsPaymentWorkflowRequired(cart))
-                    {
-                        return RedirectToAction("PaymentMethod");
-                    }
+            //                     return RedirectToAction("PaymentMethod");
+            //                 }
 
-					processPaymentRequest = new ProcessPaymentRequest();
-                }
+            //		processPaymentRequest = new ProcessPaymentRequest();
+            //             }
 
-                // Prevent 2 orders being placed within an X seconds time frame.
-                if (!_orderProcessingService.IsMinimumOrderPlacementIntervalValid(customer, store))
-                {
-                    throw new Exception(T("Checkout.MinOrderPlacementInterval"));
-                }
+            //             // Prevent 2 orders being placed within an X seconds time frame.
+            //             if (!_orderProcessingService.IsMinimumOrderPlacementIntervalValid(customer, store))
+            //             {
+            //                 throw new Exception(T("Checkout.MinOrderPlacementInterval"));
+            //             }
 
-                // Place order.
-				processPaymentRequest.StoreId = store.Id;
-                processPaymentRequest.CustomerId = customer.Id;
-				processPaymentRequest.PaymentMethodSystemName = customer.GetAttribute<string>(SystemCustomerAttributeNames.SelectedPaymentMethod, _genericAttributeService, store.Id);
+            //             // Place order.
+            //	processPaymentRequest.StoreId = store.Id;
+            //             processPaymentRequest.CustomerId = customer.Id;
+            //	processPaymentRequest.PaymentMethodSystemName = customer.GetAttribute<string>(SystemCustomerAttributeNames.SelectedPaymentMethod, _genericAttributeService, store.Id);
 
-                var placeOrderExtraData = new Dictionary<string, string>();
-                placeOrderExtraData["CustomerComment"] = form["customercommenthidden"];
-				placeOrderExtraData["SubscribeToNewsLetter"] = form["SubscribeToNewsLetter"];
-				placeOrderExtraData["AcceptThirdPartyEmailHandOver"] = form["AcceptThirdPartyEmailHandOver"];
+            //             var placeOrderExtraData = new Dictionary<string, string>();
+            //             placeOrderExtraData["CustomerComment"] = form["customercommenthidden"];
+            //	placeOrderExtraData["SubscribeToNewsLetter"] = form["SubscribeToNewsLetter"];
+            //	placeOrderExtraData["AcceptThirdPartyEmailHandOver"] = form["AcceptThirdPartyEmailHandOver"];
 
-				placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest, placeOrderExtraData);
+            //	placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest, placeOrderExtraData);
 
-                if (!placeOrderResult.Success)
-                {
-					model.Warnings.AddRange(placeOrderResult.Errors.Select(x => HtmlUtils.ConvertPlainTextToHtml(x)));
-                }
-            }
-            catch (Exception ex)
-            {
-				Logger.Warn(ex, ex.Message);
+            //             if (!placeOrderResult.Success)
+            //             {
+            //		model.Warnings.AddRange(placeOrderResult.Errors.Select(x => HtmlUtils.ConvertPlainTextToHtml(x)));
+            //             }
+            //         }
+            //         catch (Exception ex)
+            //         {
+            //	Logger.Warn(ex, ex.Message);
 
-				if (!model.Warnings.Any(x => x == ex.Message))
-				{
-					model.Warnings.Add(ex.Message);
-				}
-            }
-
-			if (placeOrderResult == null || !placeOrderResult.Success || model.Warnings.Any())
-			{
-				return View(model);
-			}
-
-			try
-			{
-				postProcessPaymentRequest = new PostProcessPaymentRequest
-				{
-					Order = placeOrderResult.PlacedOrder
-				};
-
-				_paymentService.PostProcessPayment(postProcessPaymentRequest);
-			}
-			catch (Exception ex)
-			{
-				NotifyError(ex);
-			}
-			finally
-			{
-				_httpContext.Session["OrderPaymentInfo"] = null;
-				_httpContext.RemoveCheckoutState();
-			}
-
-			if (postProcessPaymentRequest != null && postProcessPaymentRequest.RedirectUrl.HasValue())
-			{
-				return Redirect(postProcessPaymentRequest.RedirectUrl);
-			}
-
-			return RedirectToAction("Completed");
-		}
+            //	if (!model.Warnings.Any(x => x == ex.Message))
+            //	{
+            //		model.Warnings.Add(ex.Message);
+            //	}
+            //         }
+            return View(model);
+        }
 
 
         public ActionResult Completed()

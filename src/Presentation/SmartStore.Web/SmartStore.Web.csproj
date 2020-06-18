@@ -1930,6 +1930,8 @@
     <Content Include="Views\Customer\LuckyMoney.cshtml" />
     <Content Include="Views\Shared\Menus\dListGroup.cshtml" />
     <Content Include="Views\Shared\Layouts\_dMyAccount.cshtml" />
+    <Content Include="Views\ShoppingCart\Partials\dOrderSummary.cshtml" />
+    <Content Include="Views\ShoppingCart\Partials\dOrderTotals.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
