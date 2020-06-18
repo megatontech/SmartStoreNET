@@ -79,7 +79,8 @@ namespace SmartStore.Services.Media
         private readonly IRepository<Picture> _pictureRepository;
 
         private readonly IRepository<ProductPicture> _productPictureRepository;
-
+        private readonly IRepository<DeclarationProductPicture> _dproductPictureRepository;
+        
         private readonly ISettingService _settingService;
 
         private readonly Provider<IMediaStorageProvider> _storageProvider;
@@ -97,6 +98,7 @@ namespace SmartStore.Services.Media
         public PictureService(
             IRepository<Picture> pictureRepository,
             IRepository<ProductPicture> productPictureRepository,
+            IRepository<DeclarationProductPicture> dproductPictureRepository,
             ISettingService settingService,
             IEventPublisher eventPublisher,
             MediaSettings mediaSettings,
@@ -109,6 +111,7 @@ namespace SmartStore.Services.Media
         {
             _pictureRepository = pictureRepository;
             _productPictureRepository = productPictureRepository;
+            _dproductPictureRepository = dproductPictureRepository;
             _settingService = settingService;
             _eventPublisher = eventPublisher;
             _mediaSettings = mediaSettings;
@@ -389,7 +392,24 @@ namespace SmartStore.Services.Media
             var pics = query.ToList();
             return pics;
         }
+        public virtual IList<Picture> GetPicturesByDProductId(int productId, int recordsToReturn = 0)
+        {
+            if (productId == 0)
+                return new List<Picture>();
 
+            var query = from p in _pictureRepository.Table
+                        join pp in _dproductPictureRepository.Table on p.Id equals pp.PictureId
+                        orderby pp.DisplayOrder
+                        where pp.ProductId == productId
+                        select p;
+
+            if (recordsToReturn > 0)
+                query = query.Take(() => recordsToReturn);
+
+            var pics = query.ToList();
+            return pics;
+        }
+        
         public virtual Multimap<int, Picture> GetPicturesByProductIds(int[] productIds, int? maxPicturesPerProduct = null, bool withBlobs = false)
         {
             Guard.NotNull(productIds, nameof(productIds));

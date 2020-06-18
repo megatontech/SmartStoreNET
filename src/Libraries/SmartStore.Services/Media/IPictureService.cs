@@ -105,6 +105,7 @@ namespace SmartStore.Services.Media
         /// <param name="recordsToReturn">Number of records to return. 0 if you want to get all items</param>
         /// <returns>Pictures</returns>
         IList<Picture> GetPicturesByProductId(int productId, int recordsToReturn = 0);
+        IList<Picture> GetPicturesByDProductId(int productId, int recordsToReturn = 0);
 
         /// <summary>
         /// Gets a pictures map by product identifiers
