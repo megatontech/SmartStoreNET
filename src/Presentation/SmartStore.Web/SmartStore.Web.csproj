@@ -344,6 +344,7 @@
     <Compile Include="Models\Catalog\ProductAskQuestionModel.cs" />
     <Compile Include="Models\Catalog\ProductSummaryModel.cs" />
     <Compile Include="Models\Catalog\ManufacturerOverviewModel.cs" />
+    <Compile Include="Models\Customer\CustomerWalletModel.cs" />
     <Compile Include="Models\Search\SearchBoxModel.cs" />
     <Compile Include="Models\Catalog\ProductsByTagModel.cs" />
     <Compile Include="Models\Catalog\PopularProductTagsModel.cs" />
@@ -1924,6 +1925,10 @@
     <Content Include="Views\DeclarationProduct\Partials\Product.Variants.cshtml" />
     <Content Include="Views\DeclarationProduct\Product.cshtml" />
     <Content Include="Views\DeclarationProduct\Reviews.cshtml" />
+    <Content Include="Views\Customer\dOrders.cshtml" />
+    <Content Include="Views\Customer\Wallet.cshtml" />
+    <Content Include="Views\Customer\LuckyMoney.cshtml" />
+    <Content Include="Views\Shared\Menus\dListGroup.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

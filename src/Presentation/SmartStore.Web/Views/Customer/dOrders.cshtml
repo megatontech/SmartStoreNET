@@ -1,11 +1,11 @@
 ﻿@using SmartStore.Web.Models.Customer;
 @model CustomerOrderListModel
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+	Html.AddTitleParts(T("PageTitle.Account").Text);
 
-    Layout = "_dMyAccount";
-    ViewBag.PageClassToken = "orders";
-    ViewBag.PageTitle = T("Account.CustomerOrders").Text;
+	Layout = "_dMyAccount";
+	ViewBag.PageClassToken = "orders";
+	ViewBag.PageTitle = T("Account.CustomerOrders").Text;
 }
 
 @if (Model.RecurringOrders.Count > 0)

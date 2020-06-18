@@ -28,6 +28,7 @@ using SmartStore.Services.Orders;
 using SmartStore.Services.Payments;
 using SmartStore.Services.Seo;
 using SmartStore.Services.Tax;
+using SmartStore.Services.Wallet;
 using SmartStore.Utilities;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
@@ -64,6 +65,7 @@ namespace SmartStore.Web.Controllers
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly IOrderProcessingService _orderProcessingService;
         private readonly IOrderService _orderService;
+        private readonly IDeclarationOrderService _dorderService;
         private readonly ICurrencyService _currencyService;
         private readonly IPaymentService _paymentService;
         private readonly IPriceFormatter _priceFormatter;
@@ -82,12 +84,13 @@ namespace SmartStore.Web.Controllers
         private readonly CaptchaSettings _captchaSettings;
         private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
 		private readonly PluginMediator _pluginMediator;
+        private readonly IWithdrawalDetailService _detailrule;
+        private readonly IWithdrawalTotalService _total;
+        #endregion
 
-		#endregion
+        #region Ctor
 
-		#region Ctor
-
-		public CustomerController(
+        public CustomerController(
             IAuthenticationService authenticationService,
             IDateTimeHelper dateTimeHelper,
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
@@ -101,7 +104,7 @@ namespace SmartStore.Web.Controllers
             OrderSettings orderSettings, IAddressService addressService,
             ICountryService countryService, IStateProvinceService stateProvinceService,
             IOrderTotalCalculationService orderTotalCalculationService,
-            IOrderProcessingService orderProcessingService, IOrderService orderService,
+            IOrderProcessingService orderProcessingService, IOrderService orderService, IDeclarationOrderService dorderService,
             ICurrencyService currencyService,
             IPaymentService paymentService,
             IPriceFormatter priceFormatter,
@@ -115,7 +118,9 @@ namespace SmartStore.Web.Controllers
 			MediaSettings mediaSettings,
             LocalizationSettings localizationSettings,
             CaptchaSettings captchaSettings, ExternalAuthenticationSettings externalAuthenticationSettings,
-			PluginMediator pluginMediator)
+			PluginMediator pluginMediator,
+            IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
+            )
         {
             _authenticationService = authenticationService;
             _dateTimeHelper = dateTimeHelper;
@@ -157,7 +162,11 @@ namespace SmartStore.Web.Controllers
             _captchaSettings = captchaSettings;
             _externalAuthenticationSettings = externalAuthenticationSettings;
 			_pluginMediator = pluginMediator;
-		}
+            _dorderService = dorderService;
+            _detailrule = detailService;
+            _total = totalService;
+
+        }
 
         #endregion
 
@@ -345,7 +354,63 @@ namespace SmartStore.Web.Controllers
                 });
             }
         }
-        
+
+        [NonAction]
+        protected CustomerOrderListModel PrepareCustomerdOrderListModel(Customer customer, int pageIndex)
+        {
+            if (customer == null)
+                throw new ArgumentNullException("customer");
+
+            var roundingAmount = decimal.Zero;
+            var storeScope = _orderSettings.DisplayOrdersOfAllStores ? 0 : _storeContext.CurrentStore.Id;
+            var model = new CustomerOrderListModel();
+
+            var orders = _dorderService.SearchOrders(storeScope, customer.Id, null, null, null, null, null, null, null, null, pageIndex, _orderSettings.OrderListPageSize);
+
+            var orderModels = orders
+                .Select(x =>
+                {
+                    var orderModel = new CustomerOrderListModel.OrderDetailsModel
+                    {
+                        Id = x.Id,
+                        OrderNumber = x.Id.ToString(),
+                        CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
+                        OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
+                        IsReturnRequestAllowed = false
+                    };
+
+                    var orderTotal = x.OrderTotal;
+                    orderModel.OrderTotal = _priceFormatter.FormatPrice(orderTotal, true, x.CustomerCurrencyCode, false, _workContext.WorkingLanguage);
+
+                    return orderModel;
+                })
+                .ToList();
+
+            model.Orders = new PagedList<CustomerOrderListModel.OrderDetailsModel>(orderModels, orders.PageIndex, orders.PageSize, orders.TotalCount);
+
+
+            var recurringPayments = _orderService.SearchRecurringPayments(_storeContext.CurrentStore.Id, customer.Id, 0, null);
+
+            foreach (var recurringPayment in recurringPayments)
+            {
+                var recurringPaymentModel = new CustomerOrderListModel.RecurringOrderModel
+                {
+                    Id = recurringPayment.Id,
+                    StartDate = _dateTimeHelper.ConvertToUserTime(recurringPayment.StartDateUtc, DateTimeKind.Utc).ToString(),
+                    CycleInfo = string.Format("{0} {1}", recurringPayment.CycleLength, recurringPayment.CyclePeriod.GetLocalizedEnum(_localizationService, _workContext)),
+                    NextPayment = recurringPayment.NextPaymentDate.HasValue ? _dateTimeHelper.ConvertToUserTime(recurringPayment.NextPaymentDate.Value, DateTimeKind.Utc).ToString() : "",
+                    TotalCycles = recurringPayment.TotalCycles,
+                    CyclesRemaining = recurringPayment.CyclesRemaining,
+                    InitialOrderId = recurringPayment.InitialOrder.Id,
+                    CanCancel = _orderProcessingService.CanCancelRecurringPayment(customer, recurringPayment),
+                };
+
+                model.RecurringOrders.Add(recurringPaymentModel);
+            }
+
+            return model;
+        }
+
         [NonAction]
         protected CustomerOrderListModel PrepareCustomerOrderListModel(Customer customer, int pageIndex)
         {
@@ -1291,11 +1356,21 @@ namespace SmartStore.Web.Controllers
             model.Address.PrepareModel(address, true, _addressSettings, _localizationService, _stateProvinceService, () => _countryService.GetAllCountries());
             return View(model);
         }
-           
+
         #endregion
 
         #region Orders
+        
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult dOrders(int? page)
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
 
+            var model = PrepareCustomerdOrderListModel(_workContext.CurrentCustomer, Math.Max((page ?? 0) - 1, 0));
+
+            return View(model);
+        }
         [RewriteUrl(SslRequirement.Yes)]
         public ActionResult Orders(int? page)
         {
@@ -1470,7 +1545,73 @@ namespace SmartStore.Web.Controllers
         }
 
         #endregion
+        #region LuckyMoney
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult LuckyMoney()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
 
+            if (!_rewardPointsSettings.Enabled)
+                return RedirectToAction("Info");
+
+            var customer = _workContext.CurrentCustomer;
+
+            var model = new CustomerRewardPointsModel();
+            foreach (var rph in customer.RewardPointsHistory.OrderByDescending(rph => rph.CreatedOnUtc).ThenByDescending(rph => rph.Id))
+            {
+                model.RewardPoints.Add(new CustomerRewardPointsModel.RewardPointsHistoryModel()
+                {
+                    Points = rph.Points,
+                    PointsBalance = rph.PointsBalance,
+                    Message = rph.Message,
+                    CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.CreatedOnUtc, DateTimeKind.Utc)
+                });
+            }
+            int rewardPointsBalance = customer.GetRewardPointsBalance();
+            decimal rewardPointsAmountBase = _orderTotalCalculationService.ConvertRewardPointsToAmount(rewardPointsBalance);
+            decimal rewardPointsAmount = _currencyService.ConvertFromPrimaryStoreCurrency(rewardPointsAmountBase, _workContext.WorkingCurrency);
+            model.RewardPointsBalance = string.Format(_localizationService.GetResource("RewardPoints.CurrentBalance"), rewardPointsBalance, _priceFormatter.FormatPrice(rewardPointsAmount, true, false));
+
+            return View(model);
+        }
+        #endregion
+        #region Wallet
+
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult Wallet()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            if (!_rewardPointsSettings.Enabled)
+                return RedirectToAction("Info");
+
+            var customer = _workContext.CurrentCustomer;
+            var total = _total.Get(customer);
+            //钱包展示总额，可提现，冻结，以及最近入账
+            var model = new CustomerWalletModel();
+            var detail = _detailrule.Get3ByCustomId(customer.Id);
+            foreach (var rph in detail)
+            {
+                model.RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
+                {
+                    
+                    Points = rph.Amount,
+                    Message = rph.Comment,
+                    CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
+                });
+            }
+            model.Total = total.TotalAmount;
+            model.DecShare = total.TotalDecShareAmount;
+            model.Freeze = total.TotalFreezeAmount;
+            model.StoreShare = total.TotalStoreShareAmount;
+            model.Push = total.TotalPushAmount;
+            model.Luck = total.TotalLuckyAmount;
+            return View(model);
+        }
+
+        #endregion
         #region Reward points
 
         [RewriteUrl(SslRequirement.Yes)]

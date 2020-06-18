@@ -66,25 +66,30 @@
                 <span class="wishlist-qty badge badge-success @(Model.WishlistItems > 0 ? "label-success" : "d-none")">@Model.WishlistItems</span>
             </a>
         }*@
-        <a class="dropdown-item" href="dOrder">
-            <i class="fal fa-heart fa-fw"></i>
+        <a class="dropdown-item" href="~/Customer/dOrders">
+            <i class="fal fa-id-card  fa-fw"></i>
             <span>@T("报单订单")</span>
-            <span class="wishlist-qty badge badge-success @(Model.WishlistItems > 0 ? "label-success" : "d-none")">@Model.WishlistItems</span>
+            @*<span class="wishlist-qty badge badge-success ")">@Model.WishlistItems</span>*@
         </a>
-        <a class="dropdown-item" href="Order">
-            <i class="fal fa-heart fa-fw"></i>
+        <a class="dropdown-item" href="~/Customer/Orders">
+            <i class="fal fa-newspaper fa-fw"></i>
             <span>@T("商城订单")</span>
-            <span class="wishlist-qty badge badge-success @(Model.WishlistItems > 0 ? "label-success" : "d-none")">@Model.WishlistItems</span>
+            @*<span class="wishlist-qty badge badge-success">@Model.WishlistItems</span>*@
         </a>
-        <a class="dropdown-item" href="Wallet">
-            <i class="fal fa-heart fa-fw"></i>
+        <a class="dropdown-item" href="~/Customer/Wallet">
+            <i class="fal fa-money-bill-alt  fa-fw"></i>
             <span>@T("我的钱包")</span>
-            <span class="wishlist-qty badge badge-success @(Model.WishlistItems > 0 ? "label-success" : "d-none")">@Model.WishlistItems</span>
+            @*<span class="wishlist-qty badge badge-success">@Model.WishlistItems</span>*@
         </a>
-        <a class="dropdown-item" href="LuckyMoney">
-            <i class="fal fa-heart fa-fw"></i>
-            <span>@T("我的红包")</span>
-            <span class="wishlist-qty badge badge-success @(Model.WishlistItems > 0 ? "label-success" : "d-none")">@Model.WishlistItems</span>
+        <a class="dropdown-item" href="~/Customer/RewardPoints">
+            <i class="fal fa-money-bill-alt  fa-fw"></i>
+            <span>@T("我的积分")</span>
+            @*<span class="wishlist-qty badge badge-success">@Model.WishlistItems</span>*@
+        </a>
+        <a class="dropdown-item" href="~/Customer/LuckyMoney">
+            <i class="fal fa-surprise fa-fw"></i>
+            <span>@T("抢红包")</span>
+            <span class="wishlist-qty badge badge-success">@*@Model.WishlistItems*@</span>
         </a>
         @if (Model.ShoppingCartEnabled)
         {

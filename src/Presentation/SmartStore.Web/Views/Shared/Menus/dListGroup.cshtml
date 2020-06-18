@@ -1,0 +1,14 @@
+﻿@using SmartStore.Web.Framework.UI
+@model MenuModel
+@{
+    var root = Model.Root;
+    if (root == null)
+    {
+        return;
+    }
+
+    var hasIcons = root.Children.Any(x => x.Value.Icon.HasValue());
+    var hasImages = root.Children.Any(x => x.Value.ImageUrl.HasValue());
+    var headerText = root.GetItemText(T);
+    var rtl = WorkContext.WorkingLanguage.Rtl;
+}
