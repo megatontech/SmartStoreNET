@@ -78,18 +78,13 @@
         </a>
         <a class="dropdown-item" href="~/Customer/Wallet">
             <i class="fal fa-money-bill-alt  fa-fw"></i>
-            <span>@T("我的钱包")</span>
+            <span>@T("可提现额度")</span>
             @*<span class="wishlist-qty badge badge-success">@Model.WishlistItems</span>*@
         </a>
         <a class="dropdown-item" href="~/Customer/RewardPoints">
             <i class="fal fa-money-bill-alt  fa-fw"></i>
-            <span>@T("我的积分")</span>
+            <span>@T("购物积分")</span>
             @*<span class="wishlist-qty badge badge-success">@Model.WishlistItems</span>*@
-        </a>
-        <a class="dropdown-item" href="~/Customer/LuckyMoney">
-            <i class="fal fa-surprise fa-fw"></i>
-            <span>@T("抢红包")</span>
-            <span class="wishlist-qty badge badge-success">@*@Model.WishlistItems*@</span>
         </a>
         @if (Model.ShoppingCartEnabled)
         {

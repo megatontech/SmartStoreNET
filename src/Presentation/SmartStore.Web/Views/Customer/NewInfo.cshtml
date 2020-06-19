@@ -1,0 +1,21 @@
+﻿@model CustomerInfoModel
+
+@using SmartStore.Web.Models.Customer;
+
+@{
+	Html.AddTitleParts(T("PageTitle.Account").Text);
+
+	Layout = "_MyAccount";
+	ViewBag.PageClassToken = "info";
+	ViewBag.PageTitle = T("").Text;
+}
+<div style="height:130px;"></div>
+@using (Html.BeginForm("Wallet", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+
+    if (!ViewData.ModelState.IsValid)
+    {
+        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+    }
+}

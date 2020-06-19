@@ -26,11 +26,11 @@
 			</td>
 		</tr>
 	}
-	<tr class="cart-summary-subtotal">
+	@*<tr class="cart-summary-subtotal">
 		<td class="cart-summary-label">@T("ShoppingCart.Totals.SubTotal"):</td>
 		<td class="cart-summary-value">@Model.SubTotal</td>
-	</tr>
-    @if (Model.SubTotalDiscount.HasValue())
+	</tr>*@
+    @*@if (Model.SubTotalDiscount.HasValue())
     {
 		<tr class="cart-summary-subtotaldiscount cart-summary-pos">
 			<td class="cart-summary-label">
@@ -45,40 +45,12 @@
 							<i class="fa">×</i>
 						</button>
 					}
-					@T("ShoppingCart.Totals.SubTotalDiscount"):
+					@T("ShoppingCart.Totals.SubTotal"):
 				</span>
 			</td>
-			<td class="cart-summary-value">@Model.SubTotalDiscount</td>
+			<td class="cart-summary-value">@Model.SubTotal</td>
 		</tr>
-	}
-	<tr class="cart-summary-shipping">
-		<td class="cart-summary-label">
-			<span class="text-nowrap">@T("ShoppingCart.Totals.Shipping"):</span>
-			@if (Model.RequiresShipping && Model.SelectedShippingMethod.HasValue())
-			{
-				<span class="font-weight-medium">
-					@Model.SelectedShippingMethod
-				</span>
-			}
-		</td>
-		<td class="cart-summary-value">
-			@if (Model.RequiresShipping)
-			{
-				if (Model.Shipping.HasValue())
-				{
-					<span class="cart-summary-neg">@Model.Shipping</span>
-				}
-				else
-				{
-					<span class="text-muted text-wrap">@T("ShoppingCart.Totals.CalculatedDuringCheckout")</span>
-				}
-			}
-			else
-			{
-				<span class="text-muted text-wrap">@T("ShoppingCart.Totals.Shipping.NotRequired")</span>
-			}
-		</td>
-	</tr>
+	}*@
 
     @if (Model.PaymentMethodAdditionalFee.HasValue())
     {
@@ -183,7 +155,7 @@
 		<td class="cart-summary-value">
 			@if (Model.OrderTotal.HasValue())
 			{
-				<span>@Model.OrderTotal</span>
+				<span>@Model.SubTotal</span>
 			}
 			else
 			{

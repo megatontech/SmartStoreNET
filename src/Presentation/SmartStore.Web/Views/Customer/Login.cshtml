@@ -93,9 +93,9 @@
                             @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
                             <label for="@Html.IdFor(m => m.RememberMe)" class="form-check-label">@T("Account.Login.Fields.RememberMe")</label>
                         </div>
-                        <div class="forgot-password">
+                        @*<div class="forgot-password">
                             @Html.ActionLink(T("Account.Login.ForgotPassword").Text, "PasswordRecovery", "Customer")
-                        </div>
+                        </div>*@
                     </div>
 
                     @if (Model.DisplayCaptcha)

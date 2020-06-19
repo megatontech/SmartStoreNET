@@ -1034,6 +1034,19 @@ namespace SmartStore.Web.Controllers
         #endregion
 
         [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult NewInfo()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+
+            var model = new CustomerInfoModel();
+            //PrepareCustomerInfoModel(model, customer, false);
+
+            return View(model);
+        }
+        [RewriteUrl(SslRequirement.Yes)]
         public ActionResult Info()
         {
             if (!IsCurrentUserRegistered())

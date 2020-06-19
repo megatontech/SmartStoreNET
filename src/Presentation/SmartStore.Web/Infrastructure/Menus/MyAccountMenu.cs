@@ -108,125 +108,156 @@ namespace SmartStore.Web.Infrastructure
             {
                 Id = Name
             };
+         
+       
 
             root.Append(new MenuItem
             {
-                Id = "info",
-                Text = T("Account.CustomerInfo"),
+                Id = "Wallet",
+                Text = T("可提现额度"),
                 Icon = "fal fa-user",
-                Url = _urlHelper.Action("Info", "Customer", new { area = "" })
+                Url = _urlHelper.Action("Wallet", "Customer", new { area = "" })
             });
+            root.Append(new MenuItem
+            {
+                Id = "RewardPoints",
+                Text = T("购物积分"),
+                Icon = "fal fa-user",
+                Url = _urlHelper.Action("RewardPoints", "Customer", new { area = "" })
+            });
+            root.Append(new MenuItem
+            {
+                Id = "dOrders",
+                Text = T("报单订单"),
+                Icon = "fal fa-user",
+                Url = _urlHelper.Action("dOrders", "Customer", new { area = "" })
+            });
+            root.Append(new MenuItem
+            {
+                Id = "Orders",
+                Text = T("商城订单"),
+                Icon = "fal fa-user",
+                Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
+            });
+    
+            //root.Append(new MenuItem
+            //{
+            //    Id = "info",
+            //    Text = T("我的资料"),
+            //    Icon = "fal fa-user",
+            //    Url = _urlHelper.Action("Info", "Customer", new { area = "" })
+            //});
 
             root.Append(new MenuItem
             {
                 Id = "addresses",
-                Text = T("Account.CustomerAddresses"),
+                Text = T("收货地址"),
                 Icon = "fal fa-address-book",
                 Url = _urlHelper.Action("Addresses", "Customer", new { area = "" })
             });
 
-            root.Append(new MenuItem
-            {
-                Id = "orders",
-                Text = T("Account.CustomerOrders"),
-                Icon = "fal fa-file-invoice",
-                Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
-            });
+            //root.Append(new MenuItem
+            //{
+            //    Id = "orders",
+            //    Text = T("Account.CustomerOrders"),
+            //    Icon = "fal fa-file-invoice",
+            //    Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
+            //});
 
-            if (_orderSettings.ReturnRequestsEnabled && _orderService.Value.SearchReturnRequests(store.Id, customer.Id, 0, null, 0, 1).TotalCount > 0)
-            {
-                root.Append(new MenuItem
-                {
-                    Id = "returnrequests",
-                    Text = T("Account.CustomerReturnRequests"),
-                    Icon = "fal fa-truck",
-                    Url = _urlHelper.Action("ReturnRequests", "Customer", new { area = "" })
-                });
-            }
+            //if (_orderSettings.ReturnRequestsEnabled && _orderService.Value.SearchReturnRequests(store.Id, customer.Id, 0, null, 0, 1).TotalCount > 0)
+            //{
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "returnrequests",
+            //        Text = T("Account.CustomerReturnRequests"),
+            //        Icon = "fal fa-truck",
+            //        Url = _urlHelper.Action("ReturnRequests", "Customer", new { area = "" })
+            //    });
+            //}
 
-            if (!_customerSettings.HideDownloadableProductsTab)
-            {
-                root.Append(new MenuItem
-                {
-                    Id = "downloads",
-                    Text = T("Account.DownloadableProducts"),
-                    Icon = "fal fa-download",
-                    Url = _urlHelper.Action("DownloadableProducts", "Customer", new { area = "" })
-                });
-            }
+            //if (!_customerSettings.HideDownloadableProductsTab)
+            //{
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "downloads",
+            //        Text = T("Account.DownloadableProducts"),
+            //        Icon = "fal fa-download",
+            //        Url = _urlHelper.Action("DownloadableProducts", "Customer", new { area = "" })
+            //    });
+            //}
 
-            if (!_customerSettings.HideBackInStockSubscriptionsTab)
-            {
-                root.Append(new MenuItem
-                {
-                    Id = "backinstock",
-                    Text = T("Account.BackInStockSubscriptions"),
-                    Icon = "fal fa-truck-loading",
-                    Url = _urlHelper.Action("BackInStockSubscriptions", "Customer", new { area = "" })
-                });
-            }
+            //if (!_customerSettings.HideBackInStockSubscriptionsTab)
+            //{
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "backinstock",
+            //        Text = T("Account.BackInStockSubscriptions"),
+            //        Icon = "fal fa-truck-loading",
+            //        Url = _urlHelper.Action("BackInStockSubscriptions", "Customer", new { area = "" })
+            //    });
+            //}
 
-            if (_rewardPointsSettings.Enabled)
-            {
-                root.Append(new MenuItem
-                {
-                    Id = "rewardpoints",
-                    Text = T("Account.RewardPoints"),
-                    Icon = "fal fa-certificate",
-                    Url = _urlHelper.Action("RewardPoints", "Customer", new { area = "" })
-                });
-            }
+            //if (_rewardPointsSettings.Enabled)
+            //{
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "rewardpoints",
+            //        Text = T("Account.RewardPoints"),
+            //        Icon = "fal fa-certificate",
+            //        Url = _urlHelper.Action("RewardPoints", "Customer", new { area = "" })
+            //    });
+            //}
 
             root.Append(new MenuItem
             {
                 Id = "changepassword",
-                Text = T("Account.ChangePassword"),
+                Text = T("修改密码"),
                 Icon = "fal fa-unlock-alt",
                 Url = _urlHelper.Action("ChangePassword", "Customer", new { area = "" })
             });
 
-            if (_customerSettings.AllowCustomersToUploadAvatars)
-            {
-                root.Append(new MenuItem
-                {
-                    Id = "avatar",
-                    Text = T("Account.Avatar"),
-                    Icon = "fal fa-user-circle",
-                    Url = _urlHelper.Action("Avatar", "Customer", new { area = "" })
-                });
-            }
+            //if (_customerSettings.AllowCustomersToUploadAvatars)
+            //{
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "avatar",
+            //        Text = T("Account.Avatar"),
+            //        Icon = "fal fa-user-circle",
+            //        Url = _urlHelper.Action("Avatar", "Customer", new { area = "" })
+            //    });
+            //}
 
-            if (_forumSettings.ForumsEnabled && _forumSettings.AllowCustomersToManageSubscriptions)
-            {
-                root.Append(new MenuItem
-                {
-                    Id = "forumsubscriptions",
-                    Text = T("Account.ForumSubscriptions"),
-                    Icon = "fal fa-bell",
-                    Url = _urlHelper.Action("ForumSubscriptions", "Customer", new { area = "" })
-                });
-            }
+            //if (_forumSettings.ForumsEnabled && _forumSettings.AllowCustomersToManageSubscriptions)
+            //{
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "forumsubscriptions",
+            //        Text = T("Account.ForumSubscriptions"),
+            //        Icon = "fal fa-bell",
+            //        Url = _urlHelper.Action("ForumSubscriptions", "Customer", new { area = "" })
+            //    });
+            //}
 
-            if (_forumSettings.AllowPrivateMessages)
-            {
-                var numUnreadMessages = 0;
+            //if (_forumSettings.AllowPrivateMessages)
+            //{
+            //    var numUnreadMessages = 0;
 
-                if (_forumSettings.AllowPrivateMessages && !customer.IsGuest())
-                {
-                    var privateMessages = _forumService.Value.GetAllPrivateMessages(store.Id, 0, customer.Id, false, null, false, 0, 1);
-                    numUnreadMessages = privateMessages.TotalCount;
-                }
+            //    if (_forumSettings.AllowPrivateMessages && !customer.IsGuest())
+            //    {
+            //        var privateMessages = _forumService.Value.GetAllPrivateMessages(store.Id, 0, customer.Id, false, null, false, 0, 1);
+            //        numUnreadMessages = privateMessages.TotalCount;
+            //    }
 
-                root.Append(new MenuItem
-                {
-                    Id = "privatemessages",
-                    Text = T("PrivateMessages.Inbox"),
-                    Icon = "fal fa-envelope",
-                    Url = _urlHelper.RouteUrl("PrivateMessages", new { tab = "inbox" }),
-                    BadgeText = numUnreadMessages > 0 ? numUnreadMessages.ToString() : null,
-                    BadgeStyle = BadgeStyle.Warning
-                });
-            }
+            //    root.Append(new MenuItem
+            //    {
+            //        Id = "privatemessages",
+            //        Text = T("PrivateMessages.Inbox"),
+            //        Icon = "fal fa-envelope",
+            //        Url = _urlHelper.RouteUrl("PrivateMessages", new { tab = "inbox" }),
+            //        BadgeText = numUnreadMessages > 0 ? numUnreadMessages.ToString() : null,
+            //        BadgeStyle = BadgeStyle.Warning
+            //    });
+            //}
 
             return root;
         }

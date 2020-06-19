@@ -6,30 +6,30 @@
         
 		 // Confirm
         new {
-            Step = CheckoutProgressStep.Confirm,
+            Step = dCheckoutProgressStep.Confirm,
             StepName = "confirm",
             Label =  T("Checkout.Progress.Confirm").Text,
-            Visited = Model.CheckoutProgressStep > CheckoutProgressStep.Confirm,
-            Active = Model.CheckoutProgressStep == CheckoutProgressStep.Confirm,
+            Visited = Model.dCheckoutProgressStep > dCheckoutProgressStep.Confirm,
+            Active = Model.dCheckoutProgressStep == dCheckoutProgressStep.Confirm,
             Href = Url.Action("Confirm")
         },
         // Payment
         new {
-            Step = CheckoutProgressStep.Payment,
+            Step = dCheckoutProgressStep.Payment,
             StepName = "payment",
             Label =  T("Checkout.Progress.Payment").Text,
-            Visited = Model.CheckoutProgressStep > CheckoutProgressStep.Payment,
-            Active = Model.CheckoutProgressStep == CheckoutProgressStep.Payment,
+            Visited = Model.dCheckoutProgressStep > dCheckoutProgressStep.Payment,
+            Active = Model.dCheckoutProgressStep == dCheckoutProgressStep.Payment,
             Href = Url.Action("PaymentMethod")
         },
        
         // Complete
         new {
-            Step = CheckoutProgressStep.Complete,
+            Step = dCheckoutProgressStep.Complete,
             StepName = "complete",
             Label =  T("Checkout.Progress.Complete").Text,
-            Visited = Model.CheckoutProgressStep > CheckoutProgressStep.Complete,
-            Active = Model.CheckoutProgressStep == CheckoutProgressStep.Complete,
+            Visited = Model.dCheckoutProgressStep > dCheckoutProgressStep.Complete,
+            Active = Model.dCheckoutProgressStep == dCheckoutProgressStep.Complete,
             Href = "javascript:void(0)"
         }
     };

@@ -7,25 +7,30 @@
 
     Layout = "_dMyAccount";
     ViewBag.PageClassToken = "rewardpoints";
-    ViewBag.PageTitle = T("Account.RewardPoints").Text;
+    ViewBag.PageTitle = T("").Text;
     var nonFreeze = Model.Total - Model.Freeze;
 }
-
+<style>
+    .alert-info:after {
+        content: "";
+        color: #d7ecfa;
+    }
+</style>
     <div class="col-md-8 col-lg-9">
         <div class="page-title pt-4 pt-md-0">
-            <h1 class="h3">我的钱包</h1>
+            <h1 class="h3">可提现额度</h1>
         </div>
 
-        <div class="alert alert-info">
-            您的当前总额为 @Model.Total.ToString("F2")。
+        <div class="alert alert-info" style="">
+            您的当前总额为： @Model.Total.ToString("F2")。
         </div>
         <div class="alert alert-info">
-            您的不可用余额为 @Model.Freeze.ToString("F2")。
+            您的冻结额度为： @Model.Freeze.ToString("F2")。
         </div>
         <div class="alert alert-info">
-            您的可用余额为 @nonFreeze.ToString("F2")。
+            您的可提现额度为： @nonFreeze.ToString("F2")。
         </div>
-        <div class="alert alert-info">
+        @*<div class="alert alert-info">
             直推 @Model.Push.ToString("F2")。
         </div>
         <div class="alert alert-info">
@@ -36,16 +41,16 @@
         </div>
         <div class="alert alert-info">
             商城分红 @Model.StoreShare.ToString("F2")。
-        </div>
+        </div>*@
         <fieldset class="content-group mt-4">
-            <legend class="mb-0"><span>@T("最近交易")</span></legend>
+            <legend class="mb-0"><span>@T("流水明细")</span></legend>
             <div class="reward-points-history">
-                <div class="table-responsive">
+                <div class="table-responsive"  style="min-height:200px">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th class="border-top-0">
-                                    @T("金额")
+                                    @T("数额")
                                 </th>
                                 <th class="border-top-0">
                                     @T("详情")

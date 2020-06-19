@@ -1932,6 +1932,7 @@
     <Content Include="Views\Shared\Layouts\_dMyAccount.cshtml" />
     <Content Include="Views\ShoppingCart\Partials\dOrderSummary.cshtml" />
     <Content Include="Views\ShoppingCart\Partials\dOrderTotals.cshtml" />
+    <Content Include="Views\Customer\NewInfo.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -19,7 +19,7 @@
 }
 
 @section orderProgress{
-    @{ Html.RenderAction("CheckoutProgress", "DeclarationCheckout", new { step = CheckoutProgressStep.Confirm }); }
+    @{ Html.RenderAction("CheckoutProgress", "DeclarationCheckout", new { step = dCheckoutProgressStep.Confirm }); }
 }
 
 <div class="page checkout-confirm-page">
@@ -115,21 +115,20 @@
 
         <div class="cart-buttons my-4 row">
 			<div class="col-sm-6 col-lg-4 order-last order-sm-first mt-3 mt-sm-0">
-				<a class="btn btn-secondary btn-lg btn-block" href="@Url.Action("PaymentMethod")">
+				<a class="btn btn-secondary btn-lg btn-block" href="../">
 					<i class="fa fa-angle-left mr-3"></i>
 					<span>@T("Common.Back")</span>
 				</a>
 			</div>
 			
-			@if (!Model.MinOrderTotalWarning.HasValue())
-            {
+			
 				<div class="col-sm-6 col-lg-4 ml-lg-auto">
 					<button class="btn btn-danger btn-lg btn-block btn-buy" onclick="return false;">
 						<span>@T("Checkout.ConfirmButton")</span>
 						<i class="fa fa-angle-right ml-3"></i>
 					</button>
 				</div>
-            }
+            
         </div>
 
 		@{ Html.RenderWidget("checkout_confirm_bottom"); }
@@ -164,56 +163,14 @@
                 }
                 
 				// Terms of services.
-                @if (Model.TermsOfServiceEnabled)
-                {
-					<text>
-                    if (!$('#termsofservice').is(':checked')) {
-                        displayNotification(@T("Checkout.TermsOfService.PleaseAccept").JsText, "error");
-                        termOfServiceOk = false;
-                        $.scrollTo($('#termsofservice'), 800, { offset: -70 });
-                    }
-                    else {
-                        termOfServiceOk = true;
-                    }
-					</text>
-                }
+             
 
                 // Agree user agreement for downloadable products.
-                cartItems.find('input[name^=AgreeUserAgreement]').each(function () {
-                    if (_.isTrue(customerAgreed)) {
-                        $(this).prop('checked', true);
-                    }
-                    else if (!$(this).is(':checked')) {
-                        userAgreementsOk = false;
-                        displayNotification('@T("Checkout.DownloadUserAgreement.PleaseAgree").ToString().EncodeJsString('"', false)', 'error');
-                        if (termOfServiceOk) {
-                            $.scrollTo(cartItems, 800, { offset: -20 });
-                        }
-                        return false;
-                    }
-                });
+         
 
                 // Agree ESD revocation waiver.
-				@if(Model.ShowEsdRevocationWaiverBox)
-				{
-					<text>
-                    cartItems.find('input[name^=AgreeEsdRevocationWaiver]').each(function () {
-                        if (_.isTrue(customerAgreed)) {
-                            $(this).prop('checked', true);
-                        }
-                        else if (!$(this).is(':checked')) {
-                            esdRevocationWaiverOk = false;
-                            displayNotification('@T("Checkout.EsdRevocationWaiverConfirmation.PleaseAgree").ToString().EncodeJsString('"', false)', 'error');
-                            if (termOfServiceOk) {
-                            	$.scrollTo(cartItems, 800, { offset: -20 });
-                            }
-                            return false;
-                        }
-                    });
-                    </text>
-				}
-
-                if (termOfServiceOk && userAgreementsOk && esdRevocationWaiverOk) {
+				
+                if (true) {
                     var submitOrderEvent = jQuery.Event('submitOrder');
                     submitOrderEvent.isOrderValid = true;
                     submitOrderEvent.isMobile = false;

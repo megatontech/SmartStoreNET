@@ -7,7 +7,7 @@
 }
 
 @section orderProgress{
-    @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Complete }); }
+    @{ Html.RenderAction("CheckoutProgress", "DeclarationCheckout", new { step = dCheckoutProgressStep.Complete }); }
 }
 
 <div class="page checkout-completed-page">
@@ -29,10 +29,10 @@
                 </p>
             </div>
             <p class="pt-3 mb-5">
-				<a href="@Url.Action("Details", "Order", new { id = Model.OrderId })" class="btn btn-warning" rel="nofollow">
-					@*<i class="far fa-list-alt"></i>*@
+				@*<a href="@Url.Action("Details", "Order", new { id = Model.OrderId })" class="btn btn-warning" rel="nofollow">
+					<i class="far fa-list-alt"></i>
 					<span>@T("Checkout.PlacedOrderDetails")</span>
-				</a>
+				</a>*@
                 <a href="@Url.RouteUrl("HomePage")" class="btn btn-secondary order-completed-continue-button">
                     @*<i class="fa fa-home"></i>*@
                     <span>@T("Checkout.Continue")</span>
