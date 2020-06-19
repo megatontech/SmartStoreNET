@@ -50,6 +50,7 @@ namespace SmartStore.Admin.Controllers
                 var model = _withdrawalApplyService.GetByTableID(id);
                var customer = _customerService.GetCustomerById(model.Customer);
                var apply = _workContext.CurrentCustomer;
+                model.WithdrawStatus = WithdrawalApplyStatus.Complete;
                 _withdrawalApplyService.WithdrawalApplyAudit(model, customer, apply);
                 return RedirectToAction("Index");
             }
