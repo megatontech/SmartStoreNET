@@ -1,0 +1,22 @@
+﻿@model WithdrawalApply
+@using SmartStore.Core.Domain.Wallet
+@{
+    ViewBag.Title = T("提现审批").Text;
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            @T("返回") @Html.ActionLink("(" + T("提现审批列表") + ")", "List")
+        </div>
+        <div class="options">
+            <button type="submit" name="save" value="save" class="btn btn-primary">
+                <i class="fa fa-check"></i>
+                <span>@T("审批")</span>
+            </button>
+            
+        </div>
+    </div>
+
+    Html.RenderPartial("_CreateOrUpdate", Model);
+}

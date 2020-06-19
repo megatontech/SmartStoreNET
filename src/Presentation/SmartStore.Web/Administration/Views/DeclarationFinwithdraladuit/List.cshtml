@@ -11,8 +11,8 @@
     <div class="options d-flex">
         @{ Html.RenderWidget("admin_button_toolbar_before"); }
 
-        <div class="input-group d-inline-flex mr-3" style="width: 400px">
-            @*@Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("按订单编号查找") })*@
+        @*<div class="input-group d-inline-flex mr-3" style="width: 400px">
+            @Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("按订单编号查找") })
             <div class="input-group-append">
                 <button type="submit" class="btn btn-secondary" id="go-to-order-by-number" name="go-to-order-by-number" value="go-to-order-by-number" title="@T("Admin.Orders.List.GoDirectlyToNumber.Hint")">
                     <i class="fa fa-search"></i>
@@ -23,7 +23,7 @@
                     <i class="fa fa-angle-double-down"></i>
                 </button>
             </div>
-        </div>
+        </div>*@
 
         @{ Html.RenderWidget("admin_button_toolbar_after"); }
     </div>
@@ -77,9 +77,8 @@
         .Name("stores-grid")
         .Columns(columns =>
         {
-            columns.Bound(x => x.CustomerID).Title(T("申请人账号")).Centered();
+            columns.Bound(x => x.Customer).Title(T("申请人账号")).Centered();
             columns.Bound(x => x.CustomerID).Title(T("申请人名字")).Centered();
-            columns.Bound(x => x.CustomerID).Title(T("申请人手机号")).Centered();
             columns.Bound(x => x.Amount).Title(T("提现申请金额")).Centered();
             columns.Bound(x => x.WithdrawType).Title(T("提现申请类型")).Centered();
             columns.Bound(x => x.WithdrawStatus).Title(T("状态")).Centered();
@@ -90,9 +89,10 @@
                      .Width(200)
                      .RightAlign()
                      .ClientTemplate(
-                    "<a href='/Admin/DeclarationFinwithdraladuit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;" +
-                    "<a href='/Admin/DeclarationFinwithdraladuit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
-                    "<a href='/Admin/DeclarationFinwithdraladuit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
+                    "<a href='/Admin/DeclarationFinwithdraladuit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"
+                    //+
+                    //"<a href='/Admin/DeclarationFinwithdraladuit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
+                    //"<a href='/Admin/DeclarationFinwithdraladuit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
                     ).Title("操作");
         })
         .Pageable(settings => settings.PageSize(20).Position(GridPagerPosition.Bottom))

@@ -86,6 +86,8 @@ namespace SmartStore.Web.Controllers
 		private readonly PluginMediator _pluginMediator;
         private readonly IWithdrawalDetailService _detailrule;
         private readonly IWithdrawalTotalService _total;
+        private readonly IWithdrawalApplyService _apply;
+        
         #endregion
 
         #region Ctor
@@ -118,7 +120,7 @@ namespace SmartStore.Web.Controllers
 			MediaSettings mediaSettings,
             LocalizationSettings localizationSettings,
             CaptchaSettings captchaSettings, ExternalAuthenticationSettings externalAuthenticationSettings,
-			PluginMediator pluginMediator,
+			PluginMediator pluginMediator, IWithdrawalApplyService apply,
             IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
             )
         {
@@ -165,7 +167,7 @@ namespace SmartStore.Web.Controllers
             _dorderService = dorderService;
             _detailrule = detailService;
             _total = totalService;
-
+            _apply = apply;
         }
 
         #endregion
@@ -1658,7 +1660,49 @@ namespace SmartStore.Web.Controllers
         }
 
         #endregion
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult WithDrawApply()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
 
+            var model = new WithDrawApplyModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult WithDrawApply(WithDrawApplyModel applyModel)
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+            if (ModelState.IsValid)
+            {
+                _apply.WithdrawalApplyMethod(customer, applyModel.Amount);
+            }
+            var total = _total.Get(customer);
+            var model = new CustomerWalletModel();
+            var detail = _detailrule.Get3ByCustomId(customer.Id);
+            foreach (var rph in detail)
+            {
+                model.RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
+                {
+
+                    Points = rph.Amount,
+                    Message = rph.Comment,
+                    CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
+                });
+            }
+            model.Total = total.TotalAmount;
+            model.DecShare = total.TotalDecShareAmount;
+            model.Freeze = total.TotalFreezeAmount;
+            model.StoreShare = total.TotalStoreShareAmount;
+            model.Push = total.TotalPushAmount;
+            model.Luck = total.TotalLuckyAmount;
+            return View("Wallet", model);
+        }
         #region Change password
 
         [RewriteUrl(SslRequirement.Yes)]

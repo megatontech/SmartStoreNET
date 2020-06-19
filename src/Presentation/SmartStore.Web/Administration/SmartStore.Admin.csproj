@@ -709,7 +709,7 @@
     <Content Include="Views\DeclarationParamControl\Edit.cshtml" />
     <Content Include="Views\DeclarationParamControl\List.cshtml" />
     <Content Include="Views\DeclarationFinwithdraladuit\_CreateOrUpdate.cshtml" />
-    <Content Include="Views\DeclarationFinwithdraladuit\Create.cshtml" />
+    <Content Include="Views\DeclarationFinwithdraladuit\Audit.cshtml" />
     <Content Include="Views\DeclarationFinwithdraladuit\Edit.cshtml" />
     <Content Include="Views\DeclarationFinwithdraladuit\List.cshtml" />
     <Content Include="Views\DeclarationBalanceOverview\About.cshtml" />
@@ -761,6 +761,9 @@
     <Content Include="Views\DeclarationWalletOverview\List.cshtml" />
     <Content Include="Views\DeclarationWalletOverview\MainList.cshtml" />
     <Content Include="Views\DeclarationFinOrder\ReportRegisteredCustomers.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\Audit.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_AutoAuditOrderItem.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_Audit.Info.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />

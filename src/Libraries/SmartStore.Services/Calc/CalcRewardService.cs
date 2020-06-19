@@ -108,12 +108,23 @@ namespace SmartStore.Services.Calc
 
                 //封顶线数
                 item.CapLines = item.ActiveLines;
-
-                //封顶钱数
-                for (int i = 1; i <= item.CapLines; i++)
-                {
-                    item.CapLinesTotal += GetActiveLineCapValue(i);
+                //所有下级订单都为3980小单
+                
+                if (customers.Where(x => x.ParentID == item.Id).SelectMany(x => x.OrderList).All(y => y.OrderTotal == 3980M)) {
+                    //封顶钱数
+                    for (int i = 1; i <= item.CapLines; i++)
+                    {
+                        item.CapLinesTotal += GetActiveLineCapValueSpecial(i);
+                    }
                 }
+                else {
+                    //封顶钱数
+                    for (int i = 1; i <= item.CapLines; i++)
+                    {
+                        item.CapLinesTotal += GetActiveLineCapValue(i);
+                    }
+                }
+                
                 if (pair.Count() > 0)
                 {
                     pair.Remove(item.LineTotalpairs.FirstOrDefault(x => x.Value == item.LineTotalpairs.Values.Max()).Key);
@@ -204,9 +215,12 @@ namespace SmartStore.Services.Calc
             customers3 = customers3.Distinct().ToList();
 
             //保存佣金计算结果，分配钱到每个人的钱包
-            _walletService.SendRewardToWalletOne(new List<Customer> { customer1 }, reward01, order);
-            _walletService.SendRewardToWalletOne(customers2, reward02, order);
-            _walletService.SendRewardToWalletOne(customers3, reward03, order);
+            if (customer1 != null) { _walletService.SendRewardToWalletOne(new List<Customer> { customer1 }, reward01, order); }
+            if (customers2 != null) { _walletService.SendRewardToWalletOne(customers2, reward02, order); }
+            if (customers3 != null) { _walletService.SendRewardToWalletOne(customers3, reward03, order); }
+            
+            
+            
         }
 
         /// <summary>
@@ -342,10 +356,15 @@ namespace SmartStore.Services.Calc
         public decimal GetActiveLineCapValue(int line)
         {
             decimal result = 0.00M;
-            result = _rule.Any(x => x.LineCount == line) ? _rule.First(x => x.LineCount == line).RewardAmount : 0M;
+            result = _rule.Any(x => x.LineCount == line&&x.IsCount==true) ? _rule.First(x => x.LineCount == line && x.IsCount == true).RewardAmount : 0M;
             return result;
         }
-
+        public decimal GetActiveLineCapValueSpecial(int line)
+        {
+            decimal result = 0.00M;
+            result = _rule.Any(x => x.LineCount == line && x.IsCount == false) ? _rule.First(x => x.LineCount == line && x.IsCount == false).RewardAmount : 0M;
+            return result;
+        }
         /// <summary>
         /// 传入当前节点，查询上级N层节点
         /// </summary>

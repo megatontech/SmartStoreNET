@@ -1,0 +1,255 @@
+﻿@model OrderModel
+@using SmartStore.Core.Domain.Tax;
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        toggleOrderTotals(false);
+        toggleCC(false);
+		toggleDD(false);
+
+		$('#btnRefreshPage').click(function () {
+			location.reload();
+		});
+
+		$('input.ask-to-proceed, button.ask-to-proceed').click(function (e) {
+			if (confirm(@T("Admin.Common.AskToProceed").JsText)) {
+				return true;
+			}
+
+			e.preventDefault();
+			return false;
+		});
+    });
+    function changeVal() {
+        $("#isChangeVal").val("true");
+        $("#ChangedVal").val($("#OrderTotalValue").val());
+        
+    }
+    function toggleOrderTotals(editmode) {
+        if (editmode) {
+            $('#trEditOrderTotals').show();
+            $('#btnEditOrderTotals').hide();
+            $('#btnSaveOrderTotals').show();
+            $('#btnCancelOrderTotals').show();
+            $("#isChangeVal").val("false");
+        }
+        else {
+            $('#trEditOrderTotals').hide();
+            $('#btnEditOrderTotals').show();
+            $('#btnSaveOrderTotals').hide();
+            $('#btnCancelOrderTotals').hide();
+            $("#isChangeVal").val("false");
+        }
+    }
+
+    function toggleCC(editmode) {
+		if (editmode) {
+			$('.cc-control').parent().hide();
+			$('.cc-control').closest(".adminData").find("input").show();
+            $('#btnEditCC').hide();
+            $('#btnSaveCC').show();
+            $('#btnCancelCC').show();
+        }
+        else {
+			$('.cc-control').parent().show();
+			$('.cc-control').closest(".adminData").find("input").hide();
+            $('#btnEditCC').show();
+            $('#btnSaveCC').hide();
+            $('#btnCancelCC').hide();
+        }
+    }
+
+    function toggleDD(editmode) {
+		if (editmode) {
+			$('.dd-control').parent().hide();
+			$('.dd-control').closest(".adminData").find("input").show();
+            $('#btnEditDD').hide();
+            $('#btnSaveDD').show();
+            $('#btnCancelDD').show();
+        }
+        else {
+			$('.dd-control').parent().show();
+			$('.dd-control').closest(".adminData").find("input").hide();
+            $('#btnEditDD').show();
+            $('#btnSaveDD').hide();
+            $('#btnCancelDD').hide();
+        }
+    }
+    </script>
+
+@Html.Widget("order_edit_top")
+
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.OrderStatus)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Model.OrderStatus
+            </div>
+            @if (Model.CanCancelOrder || Model.CanCompleteOrder)
+            {
+                <div>
+                    @if (Model.CanCancelOrder)
+                    {
+                        <button type="submit" name="cancelorder" id="cancelorder" class="btn btn-sm btn-danger ask-to-proceed" value="@T("Admin.Orders.Fields.OrderStatus.Cancel")">
+                            <span>@T("Admin.Orders.Fields.OrderStatus.Cancel")</span>
+                        </button>
+                    }
+
+                    @if (Model.CanCompleteOrder)
+                    {
+                        <button type="submit" name="completeorder" id="completeorder" class="btn btn-sm btn-warning ask-to-proceed" value="@T("Enums.SmartStore.Core.Domain.Orders.OrderStatus.Complete")">
+                            <i class="fa fa-check"></i>
+                            <span>@T("Enums.SmartStore.Core.Domain.Orders.OrderStatus.Complete")</span>
+                        </button>
+                    }
+                </div>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.OrderNumber)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Model.OrderNumber
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.CustomerId)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Model.CustomerName
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.OrderTotal)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Model.OrderTotal
+            </div>
+        </td>
+    </tr>
+    <tr id="trEditOrderTotals">
+        <td>
+            <div class="card">
+                <table class="adminContent card-body">
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.SmartLabelFor(model => model.OrderTotalValue)
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(model => model.OrderTotalValue)
+                            <input type="hidden" value="false" id="isChangeVal" name="isChangeVal" />
+                            <input type="hidden" value="0" id="ChangedVal" name="ChangedVal" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button type="submit" name="btnEditOrderTotals" onclick="toggleOrderTotals(true);return false;" id="btnEditOrderTotals" class="btn btn-secondary">
+                <i class="far fa-edit"></i>
+                <span>@T("机动报单改价")</span>
+            </button>
+            <button type="submit" name="btnSaveOrderTotals" id="btnSaveOrderTotals" onclick="changeVal()" class="btn btn-warning ask-to-proceed" value="@T("Admin.Orders.Fields.SaveOrderTotals")">
+                <i class="fa fa-check"></i>
+                <span>@T("Admin.Orders.Fields.SaveOrderTotals")</span>
+            </button>
+            <button type="submit" name="btnCancelOrderTotals" onclick="toggleOrderTotals(false);return false;" id="btnCancelOrderTotals" class="btn btn-secondary">
+                <span>@T("Admin.Common.Cancel")</span>
+            </button>
+
+            @{ Html.RenderWidget("admin_order_total_edit_buttons_after"); }
+        </td>
+    </tr>
+
+
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="adminData">付款凭证</label>
+            </div>
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                <img alt="@Model.Id" style="width:400px;height:300px;" src="@Model.ShippingAddressGoogleMapsUrl" class=" adminContent" />
+                @*<div class='zoomable-thumb-container'>
+                        <img alt='@Model.Id' src='@Model.ShippingAddressGoogleMapsUrl' class='zoomable-thumb' />
+                    </div>*@
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.PaymentMethod)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                <span class="muted">转账</span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.PaymentStatus)
+        </td>
+        <td class="adminData wide">
+            <span class="pr-1 font-weight-medium form-control-plaintext d-inline-block" style="width: auto;">已付</span>
+            @{ Html.RenderWidget("admin_order_edit_payment_buttons_after"); }
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.CreatedOn)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Html.DisplayFor(model => model.CreatedOn)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.UpdatedOn)
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Html.DisplayFor(model => model.UpdatedOn)
+            </div>
+        </td>
+    </tr>
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            @if (Model.CustomerComment.HasValue())
+            {
+                <h4>@T("客户备注")</h4>
+                <div class="alert alert-info">
+                    @Model.CustomerComment
+                </div>
+            }
+        </td>
+    </tr>
+</table>

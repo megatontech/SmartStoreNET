@@ -99,11 +99,8 @@
                 columns.Bound(x => x.OrderNumber)
                     .Width(150)
                     .Title(T("订单编号"))
-                    .ClientTemplate("<a href='/Admin/DeclarationFinaduit/View/<#= Id #>'><#= Id #></a>");
-                columns.Bound(x => x.CustomerName)
-                    .Title(T("客户账号"))
-                    .ClientTemplate(
-                        "<div><#= CustomerName #></div>" );
+                    .ClientTemplate("<a href='#'><#= Id #></a>");
+                
                 columns.Bound(x => x.CardName)
                    .Title(T("客户姓名"))
                    .ClientTemplate(
@@ -122,7 +119,7 @@
                     .Title(T("订单付款时间"))
                     .ClientTemplate(
                         "<div><#= CreatedOnString #></div>");
-                columns.Bound(x => x.OrderStatus)
+                columns.Bound(x => x.StatusPayment)
                     .Width(100)
                     .Title(T("订单审核状态"))
                     .ClientTemplate("<span class='<#= OrderStatusLabelClass #>'><#= OrderStatus #></span>");
@@ -131,13 +128,16 @@
                     .RightAlign()
                     .ClientTemplate(
                         "<div class='pr-2'><big style='font-weight:600'><#= OrderTotal #></big> <i class='<#= PaymentStatusLabelClass #>' title='<#= PaymentStatus #>'></i></div>" +
-                        "<# if(HasPaymentMethod){ #><div class='muted pr-2'><#= WithPaymentMethod #></div><# } #>");
+                        "");
 
                 columns.Bound(x => x.Id)
                      .Width(200)
                      .RightAlign()
+                     //.Hidden(x=>x.OrderStatus > 10)
                      .ClientTemplate(
-                    "<a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"
+                    "<# if(StatusPayment==10){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a><# } #>"
+                    //+
+                    //"<a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"
                     //"<a class=\"t-button\" href='/Admin/DeclarationFinaduit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
                     //"<a class=\"t-button\" href='/Admin/DeclarationFinaduit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
                     ).Title("操作");

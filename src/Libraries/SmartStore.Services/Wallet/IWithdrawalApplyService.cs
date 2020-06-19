@@ -19,6 +19,8 @@ namespace SmartStore.Services.Wallet
         /// <param name="amount"></param>
         public void WithdrawalApplyAudit(WithdrawalApply withdrawal, Customer customer, Customer applier);
         public WithdrawalApply GetByID(int id);
+        public WithdrawalApply GetByTableID(int id);
+        
         public List<WithdrawalApply> GetList();
         public List<WithdrawalApply> GetListByID(int id);
         public void Insert(WithdrawalApply model);

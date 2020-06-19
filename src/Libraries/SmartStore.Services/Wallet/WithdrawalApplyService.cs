@@ -86,10 +86,13 @@ namespace SmartStore.Services.Wallet
             model.IsCount = false;
             _WithdrawalApplyRepository.Update(model);
         }
-
-        public WithdrawalApply GetByID(int id)
+        public WithdrawalApply GetByTableID(int id)
         {
-            return _WithdrawalApplyRepository.Table.FirstOrDefault(x => x.Customer == id);
+            return _WithdrawalApplyRepository.Table.FirstOrDefault(x => x.Id == id);
+        }
+        public WithdrawalApply GetByID(int customerid)
+        {
+            return _WithdrawalApplyRepository.Table.FirstOrDefault(x => x.Customer == customerid);
         }
 
         public List<WithdrawalApply> GetList()
@@ -167,12 +170,12 @@ namespace SmartStore.Services.Wallet
             total.TotalFreezeAmount += amount;
             total.UpdateTime = DateTime.UtcNow;
             _IWithdrawalTotalService.Update(total);
-            this._WithdrawalApplyRepository.Insert(new WithdrawalApply()
+            var model = new WithdrawalApply()
             {
                 Amount = amount,
                 ExpectAmount = amount * ((100 - _calcrule.WithDrawApplyFeePercent - _calcrule.WithDrawApplyToPointPercent) / 100),
-                 ToFeeAmount= amount * (_calcrule.WithDrawApplyFeePercent / 100), 
-                  ToPointAmount = amount * (_calcrule.WithDrawApplyToPointPercent / 100),
+                ToFeeAmount = amount * (_calcrule.WithDrawApplyFeePercent / 100),
+                ToPointAmount = amount * (_calcrule.WithDrawApplyToPointPercent / 100),
                 Comment = "",
                 Customer = customer.Id,
                 CustomerID = customer.CustomerGuid,
@@ -185,7 +188,8 @@ namespace SmartStore.Services.Wallet
                 WithdrawTime = DateTime.UtcNow,
                 WithdrawType = WithdrawalApplyType.Cash
 
-            }) ;
+            };
+            this._WithdrawalApplyRepository.Insert(model) ;
             
         }
 

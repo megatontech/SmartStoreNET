@@ -1,0 +1,70 @@
+﻿@model OrderModel
+@using Telerik.Web.Mvc.UI;
+@using SmartStore.Core.Domain.Tax;
+@using SmartStore.Core.Domain.Catalog;
+@{
+    ViewBag.Title = T("订单审批").Text;
+}
+@using (Html.BeginForm("AuditOper", null, FormMethod.Post, new { id = "AuditOper" }))
+{
+
+    <div class="section-header">
+        <div class="title">
+            @T("审批") - @Model.OrderNumber 
+			<a href='@Url.Action("List")'>(@T("Admin.Orders.BackToList"))</a>
+        </div>
+        <div class="options">
+            @{ Html.RenderWidget("admin_button_toolbar_before"); }
+            <button type="submit" id="AuditOper" class="btn btn-primary">
+                <i class="far fa-check"></i>
+                <span>@T("通过")</span>
+            </button>
+            <input type="submit" id="order-audit" name="btnRefreshPage" class="d-none" />
+            <input type="hidden" class="loaded-tab-name" name="id" value="@Model.Id" />
+            @{ Html.RenderWidget("admin_button_toolbar_after"); }
+        </div>
+    </div>
+
+    @Html.ValidationSummary(false)
+
+    @Html.SmartStore().TabStrip().Name("order-edit").Style(TabsStyle.Material).Items(x =>
+{
+    x.Add().Text(T("Admin.Orders.Info").Text).Content(TabInfo()).Selected(true);
+    //x.Add().Text(T("Admin.Orders.BillingAndShipment").Text).Content(TabBillingAndShipment());
+    //x.Add().Text(T("Admin.Orders.Products").Text).Content(TabProducts());
+    //x.Add().Text(T("Admin.Orders.OrderNotes").Text).Content(TabOrderNotes());
+    //x.Add().Text(T("Admin.Common.GenericAttributes").Text).Content(TabOrderAttributes());
+
+    //generate an event
+    //EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "order-edit", this.Html, this.Model));
+})
+}
+
+@*@Html.DeleteConfirmation("order-delete")*@
+
+@helper TabInfo()
+{
+	@Html.Partial("_Audit.Info")
+}
+
+@*@helper TabBillingAndShipment()
+{
+	@Html.Partial("_Edit.BillingAndShipment")
+}
+
+@helper TabProducts()
+{
+	@Html.Partial("_Edit.Products")
+}
+
+@helper TabOrderNotes()
+{
+	@Html.Partial("_Edit.OrderNotes")
+}
+
+@helper TabOrderAttributes()
+{
+    @Html.Action("GenericAttributes", "Common", new { entityName = "Order", entityId = Model.Id })
+}*@
+
+@*@{ Html.RenderPartial("_AutoAuditOrderItem", Model.AutoUpdateOrderItem); }*@

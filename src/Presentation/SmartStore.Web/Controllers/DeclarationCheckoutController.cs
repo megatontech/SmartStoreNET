@@ -770,6 +770,7 @@ namespace SmartStore.Web.Controllers
 			var customer = _workContext.CurrentCustomer;
 			var cart = customer.GetdCartItems(ShoppingCartType.ShoppingCart, storeId);
             string CustomerComment = model.CustomerComment;
+            var image = form["BrandUrl"];
             if ((customer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
                 return new HttpUnauthorizedResult();
             var subtotalBase = cart.Sum(x => x.dItem.CustomerEnteredPrice * x.dItem.Quantity);
@@ -838,8 +839,10 @@ namespace SmartStore.Web.Controllers
                 ShippingRateComputationMethodSystemName = string.Empty,
                 VatNumber = string.Empty,
                 CustomerOrderComment = CustomerComment,
+                
                 AcceptThirdPartyEmailHandOver = false
             };
+            order.PaymentMethodSystemName = image;
             order.PaidDateUtc = DateTime.UtcNow;
             order.OrderGuid = Guid.NewGuid();
             var no = _DeclarationOrderService.GetOrdersMaxNo();

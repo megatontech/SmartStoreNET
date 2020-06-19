@@ -25,7 +25,13 @@ namespace SmartStore.Web.Models.Customer
 
         public string Result { get; set; }
     }
+    public partial class WithDrawApplyModel : ModelBase
+    {
+        [DataType(DataType.Password)]
+        [SmartResourceDisplayName("金额")]
+        public decimal Amount { get; set; }
 
+    }
     public class ChangePasswordValidator : AbstractValidator<ChangePasswordModel>
     {
         public ChangePasswordValidator(Localizer T, CustomerSettings customerSettings)

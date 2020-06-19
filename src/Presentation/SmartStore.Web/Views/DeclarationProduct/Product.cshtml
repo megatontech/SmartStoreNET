@@ -57,7 +57,7 @@
 	@{ Html.RenderWidget("productdetails_top"); }
 
 	<article class="pd page-body" itemscope itemtype="http://schema.org/Product">
-		<div id="main-update-container" class="update-container" data-url="@updateUrl">
+		<div id="main-update-container" class="update-container" >
 			@using (Html.BeginRouteForm("Product", new { SeName = Model.SeName }, FormMethod.Post, new { id = "pd-form" }))
             {
 			<!-- Top Content: Picture, Description, Attrs, Variants, Bundle Items, Price etc. -->

@@ -13,6 +13,8 @@ using System;
 using System.Linq;
 using Telerik.Web.Mvc;
 using SmartStore.Services.Wallet;
+using SmartStore.Services.Customers;
+using SmartStore.Core;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -22,27 +24,33 @@ namespace SmartStore.Admin.Controllers
     public class DeclarationFinwithdraladuitController : AdminControllerBase
     {
         private IWithdrawalApplyService _withdrawalApplyService;
-
-        public DeclarationFinwithdraladuitController(IWithdrawalApplyService withdrawalApplyService)
+        private ICustomerService _customerService;
+        private readonly IWorkContext _workContext;
+        public DeclarationFinwithdraladuitController(ICustomerService customerService, IWithdrawalApplyService withdrawalApplyService, IWorkContext workContext)
         {
             _withdrawalApplyService = withdrawalApplyService;
+            _customerService = customerService; _workContext = workContext;
         }
         #region Public Methods
 
         // GET: DeclarationFinwithdraladuit/Create
-        public ActionResult Create()
+        public ActionResult Audit(int id)
         {
-            return View();
+            var model = _withdrawalApplyService.GetByTableID(id);
+            return View(model);
         }
 
         // POST: DeclarationFinwithdraladuit/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Audit(int id,FormCollection collection)
         {
             try
             {
                 // TODO: Add insert logic here
-
+                var model = _withdrawalApplyService.GetByTableID(id);
+               var customer = _customerService.GetCustomerById(model.Customer);
+               var apply = _workContext.CurrentCustomer;
+                _withdrawalApplyService.WithdrawalApplyAudit(model, customer, apply);
                 return RedirectToAction("Index");
             }
             catch

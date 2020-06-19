@@ -42,6 +42,7 @@ using SmartStore.Core.Domain.Topics;
 using SmartStore.Core.Plugins;
 using SmartStore.Services.Seo;
 using System.Linq;
+using SmartStore.Admin.Models.Wallet;
 
 namespace SmartStore.Admin.Infrastructure
 {
@@ -110,7 +111,9 @@ namespace SmartStore.Admin.Infrastructure
                 .ForMember(dest => dest.Country, mo => mo.Ignore())
                 .ForMember(dest => dest.StateProvince, mo => mo.Ignore())
                 .ForMember(dest => dest.Salutation, mo => mo.Ignore());
-
+                CreateMap<WithdrawalApply, DeclarationFinwithdraladuitModel>()
+                .ForMember(dest => dest.CustomProperties, mo => mo.Ignore())
+                .ForMember(dest => dest.CustomThreadProperties, mo => mo.Ignore());
             //countries
             CreateMap<CountryModel, Country>()
                 .ForMember(dest => dest.StateProvinces, mo => mo.Ignore());
