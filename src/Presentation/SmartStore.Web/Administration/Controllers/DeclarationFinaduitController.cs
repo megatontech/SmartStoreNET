@@ -1091,29 +1091,44 @@ namespace SmartStore.Admin.Controllers
 
         #region Payments and other order workflow
 
-        [HttpPost, ActionName("Edit")]
-        [FormValueRequired("cancelorder")]
-        public ActionResult CancelOrder(int id)
+        [HttpPost, ActionName("AuditOper")]
+        public ActionResult AuditOper(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
                 return AccessDeniedView();
 
-            var order = _orderService.GetOrderById(id);
+            var order = _DeclarationOrderService.GetOrderById(id);
             if (order == null)
                 return RedirectToAction("List");
 
             try
             {
-                _orderProcessingService.CancelOrder(order, true);
+                order.OrderStatus = OrderStatus.Complete;
+                order.PaymentStatus = PaymentStatus.Paid;
+                order.PaidDateUtc = DateTime.UtcNow;
+                _DeclarationOrderService.UpdateOrder(order);
             }
             catch (Exception exc)
             {
                 NotifyError(exc);
             }
 
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("List");
         }
+        public ActionResult Audit(int id)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+                return AccessDeniedView();
 
+            var order = _DeclarationOrderService.GetOrderById(id);
+            if (order == null || order.Deleted)
+                return RedirectToAction("List");
+
+            var model = new OrderModel();
+            PrepareOrderDetailsModel(model, order);
+
+            return View(model);
+        }
         [HttpPost, ActionName("Edit")]
         [FormValueRequired("captureorder")]
         public ActionResult CaptureOrder(int id)

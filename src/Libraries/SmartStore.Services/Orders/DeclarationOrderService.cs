@@ -241,7 +241,11 @@ namespace SmartStore.Services.Orders
 
             _orderRepository.Insert(order);
         }
-
+        public virtual int GetOrdersMaxNo()
+        {
+           return _orderRepository.Table.Max(x=>x.Id);
+        }
+        
         public virtual void UpdateOrder(DeclarationOrder order)
         {
             if (order == null)

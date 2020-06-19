@@ -10,7 +10,7 @@ namespace SmartStore.Web.Models.Checkout
         {
             PaymentMethods = new List<PaymentMethodModel>();
         }
-
+        public string CustomerComment { get; set; }
         public List<PaymentMethodModel> PaymentMethods { get; set; }
 
         public bool SkippedSelectShipping { get; set; }

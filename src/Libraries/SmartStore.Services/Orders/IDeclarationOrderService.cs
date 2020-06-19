@@ -142,7 +142,7 @@ namespace SmartStore.Services.Orders
         /// </summary>
         /// <param name="order">Order</param>
         void InsertOrder(DeclarationOrder order);
-
+        int GetOrdersMaxNo();
         /// <summary>
         /// Updates the order
         /// </summary>
