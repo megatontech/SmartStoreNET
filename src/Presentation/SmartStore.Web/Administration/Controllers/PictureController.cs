@@ -40,8 +40,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult AsyncUpload(bool isTransient = false, bool validate = true)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.UploadPictures))
-                return Json(new { success = false, error = T("Admin.AccessDenied.Description") });
+            //if (!_permissionService.Authorize(StandardPermissionProvider.UploadPictures))
+            //    return Json(new { success = false, error = T("Admin.AccessDenied.Description") });
 
             var postedFile = Request.ToPostedFileResult();
             if (postedFile == null)

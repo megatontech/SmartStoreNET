@@ -262,6 +262,7 @@
     <Compile Include="Controllers\CatalogController.cs" />
     <Compile Include="Controllers\CatalogHelper.cs" />
     <Compile Include="Controllers\CatalogHelper.MapProduct.cs" />
+    <Compile Include="Controllers\PictureController.cs" />
     <Compile Include="Controllers\DeclarationCheckoutController.cs" />
     <Compile Include="Controllers\DeclarationOrderController.cs" />
     <Compile Include="Controllers\CheckoutController.cs" />

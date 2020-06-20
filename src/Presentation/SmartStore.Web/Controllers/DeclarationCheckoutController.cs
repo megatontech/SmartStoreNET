@@ -894,6 +894,8 @@ namespace SmartStore.Web.Controllers
 
         public ActionResult Confirm()
         {
+            if ((_workContext.CurrentCustomer.IsGuest() ))
+                return new HttpUnauthorizedResult();
             var model = new CheckoutConfirmModel();
             model.TermsOfServiceEnabled = _orderSettings.TermsOfServiceEnabled;
             model.ShowEsdRevocationWaiverBox = _shoppingCartSettings.ShowEsdRevocationWaiverBox;
@@ -950,22 +952,22 @@ namespace SmartStore.Web.Controllers
             //model
             var model = new CheckoutCompletedModel();
 
-			var order = _orderService.SearchOrders(_storeContext.CurrentStore.Id, _workContext.CurrentCustomer.Id,
-				null, null, null, null, null, null, null, null, 0, 1).FirstOrDefault();
+			//var order = _orderService.SearchOrders(_storeContext.CurrentStore.Id, _workContext.CurrentCustomer.Id,
+			//	null, null, null, null, null, null, null, null, 0, 1).FirstOrDefault();
 
-			if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
-			{
-				return HttpNotFound();
-			}
+			//if (order == null || order.Deleted || _workContext.CurrentCustomer.Id != order.CustomerId)
+			//{
+			//	return HttpNotFound();
+			//}
 
-			//disable "order completed" page?
-			if (_orderSettings.DisableOrderCompletedPage)
-			{
-				return RedirectToAction("Details", "Order", new { id = order.Id });
-			}
+			////disable "order completed" page?
+			//if (_orderSettings.DisableOrderCompletedPage)
+			//{
+			//	return RedirectToAction("Details", "Order", new { id = order.Id });
+			//}
 
-			model.OrderId = order.Id;
-            model.OrderNumber = order.GetOrderNumber();
+			//model.OrderId = order.Id;
+   //         model.OrderNumber = order.GetOrderNumber();
 
             return View(model);
         }
