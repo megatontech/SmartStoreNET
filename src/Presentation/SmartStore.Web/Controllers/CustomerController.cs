@@ -1667,6 +1667,9 @@ namespace SmartStore.Web.Controllers
                 return new HttpUnauthorizedResult();
 
             var model = new WithDrawApplyModel();
+            var customer = _workContext.CurrentCustomer;
+            var total = _total.Get(customer);
+            model.TotalAmount = total.TotalAmount-total.TotalFreezeAmount;
             return View(model);
         }
 
@@ -1701,7 +1704,8 @@ namespace SmartStore.Web.Controllers
             model.StoreShare = total.TotalStoreShareAmount;
             model.Push = total.TotalPushAmount;
             model.Luck = total.TotalLuckyAmount;
-            return View("Wallet", model);
+            //return View("Wallet", model);
+            return RedirectToAction("Wallet");
         }
         #region Change password
 

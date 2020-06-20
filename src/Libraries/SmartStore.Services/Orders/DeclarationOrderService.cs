@@ -190,7 +190,7 @@ namespace SmartStore.Services.Orders
 			string billingEmail, string orderGuid, string orderNumber, int pageIndex, int pageSize, string billingName = null,
             string[] paymentMethods = null)
         {
-			var query = GetOrders(storeId, customerId, startTime, endTime, orderStatusIds, paymentStatusIds, shippingStatusIds,
+			var query = GetOrders(0, customerId, startTime, endTime, orderStatusIds, paymentStatusIds, shippingStatusIds,
 				billingEmail, orderNumber, billingName, paymentMethods);
 
 			query = query.OrderByDescending(x => x.CreatedOnUtc);

@@ -215,7 +215,14 @@ namespace SmartStore.Web.Infrastructure
                 Icon = "fal fa-unlock-alt",
                 Url = _urlHelper.Action("ChangePassword", "Customer", new { area = "" })
             });
-
+         
+            root.Append(new MenuItem
+            {
+                Id = "logout",
+                Text = T("注销"),
+                Icon = "fal fa-sign-out-alt fa-fw",
+                Url = _urlHelper.Action("logout", new { area = "" })
+            });
             //if (_customerSettings.AllowCustomersToUploadAvatars)
             //{
             //    root.Append(new MenuItem

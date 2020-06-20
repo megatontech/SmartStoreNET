@@ -125,6 +125,7 @@ namespace SmartStore.Services.Wallet
             //修改WithdrawalApply记录 减冻钱 扣手续费 加积分 写入日志详细
             this._WithdrawalApplyRepository.Update(withdrawal);
             var total = _IWithdrawalTotalService.Get(customer);
+            total.TotalAmount -= withdrawal.Amount;
             total.TotalFreezeAmount -= withdrawal.Amount;
             total.UpdateTime = DateTime.UtcNow;
             _IWithdrawalTotalService.Update(total);

@@ -27,10 +27,10 @@ namespace SmartStore.Web.Models.Customer
     }
     public partial class WithDrawApplyModel : ModelBase
     {
-        [DataType(DataType.Password)]
         [SmartResourceDisplayName("金额")]
         public decimal Amount { get; set; }
-
+        [SmartResourceDisplayName("可用余额")]
+        public decimal TotalAmount { get; set; }
     }
     public class ChangePasswordValidator : AbstractValidator<ChangePasswordModel>
     {
