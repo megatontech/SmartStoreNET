@@ -20,6 +20,21 @@ namespace SmartStore.Admin.Models.Wallet
         [AllowHtml]
         public int Customer { get; set; }
         /// <summary>
+        /// 客户
+        /// </summary>
+        [SmartResourceDisplayName("申请人名字")]
+        [AllowHtml]
+        public string CustomerName { get; set; }
+        [SmartResourceDisplayName("申请人账号")]
+        [AllowHtml]
+        public string CustomerLoginName { get; set; }
+        /// <summary>
+        /// 客户
+        /// </summary>
+        [SmartResourceDisplayName("操作人")]
+        [AllowHtml]
+        public string OperaterName { get; set; }
+        /// <summary>
         /// 操作人
         /// </summary>
         [SmartResourceDisplayName("操作人")]
@@ -85,6 +100,18 @@ namespace SmartStore.Admin.Models.Wallet
         [SmartResourceDisplayName("转账类型")]
         [AllowHtml]
         public int WithdrawType { get; set; }
+        /// <summary>
+        /// 转账状态
+        /// </summary>
+        [SmartResourceDisplayName("转账状态")]
+        [AllowHtml]
+        public string WithdrawStatusStr { get; set; }
+        /// <summary>
+        /// 转账类型
+        /// </summary>
+        [SmartResourceDisplayName("转账类型")]
+        [AllowHtml]
+        public string WithdrawTypeStr { get; set; }
         /// <summary>
         /// 转账状态
         /// </summary>

@@ -116,7 +116,7 @@ namespace SmartStore.Admin.Controllers
         public ActionResult List(GridCommand command)
         {
             var gridModel = new GridModel<DeclarationFinwithdraladuitModel>();
-
+            var customer = _customerService.BuildAllTreeWithoutOrder();
             if (Services.Permissions.Authorize(StandardPermissionProvider.ManageStores))
             {
                 var storeModels = _withdrawalApplyService.GetList()
@@ -124,6 +124,11 @@ namespace SmartStore.Admin.Controllers
                     {
                         var model = x.ToModel();
                         //PrepareStoreModel(model, x);
+                        model.WithdrawTypeStr = "转账";
+                        var custom = customer.FirstOrDefault(y=>y.Id==x.Customer);
+                        model.CustomerLoginName = custom.Username;
+                        model.CustomerName = custom.FullName;
+                        model.WithdrawStatusStr = model.WithdrawStatus==10?"申请中":"已完成";
                         return model;
                     })
                     .ToList();

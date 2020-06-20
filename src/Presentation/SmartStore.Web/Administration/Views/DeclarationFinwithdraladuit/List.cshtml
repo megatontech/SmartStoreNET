@@ -77,19 +77,19 @@
         .Name("stores-grid")
         .Columns(columns =>
         {
-            columns.Bound(x => x.Customer).Title(T("申请人账号")).Centered();
-            columns.Bound(x => x.CustomerID).Title(T("申请人名字")).Centered();
+            columns.Bound(x => x.CustomerLoginName).Title(T("申请人账号")).Centered();
+            //columns.Bound(x => x.CustomerName).Title(T("申请人名字")).Centered();
             columns.Bound(x => x.Amount).Title(T("提现申请金额")).Centered();
-            columns.Bound(x => x.WithdrawType).Title(T("提现申请类型")).Centered();
-            columns.Bound(x => x.WithdrawStatus).Title(T("状态")).Centered();
+            //columns.Bound(x => x.WithdrawTypeStr).Title(T("提现申请类型")).Centered();
+            columns.Bound(x => x.WithdrawStatusStr).Title(T("状态")).Centered();
             columns.Bound(x => x.WithdrawTime).Title(T("申请时间")).Centered();
-            columns.Bound(x => x.WithdrawAuditTime).Title(T("审核时间"))
-                .Centered();
+            //columns.Bound(x => x.WithdrawAuditTime).Title(T("审核时间"))
+             //   .Centered();
             columns.Bound(x => x.Id)
                      .Width(200)
                      .RightAlign()
                      .ClientTemplate(
-                    "<a href='/Admin/DeclarationFinwithdraladuit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"
+                "<# if(WithdrawStatus==10){ #><a href='/Admin/DeclarationFinwithdraladuit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a><# } #>"
                     //+
                     //"<a href='/Admin/DeclarationFinwithdraladuit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
                     //"<a href='/Admin/DeclarationFinwithdraladuit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
