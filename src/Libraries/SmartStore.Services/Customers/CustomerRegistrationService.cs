@@ -67,23 +67,23 @@ namespace SmartStore.Services.Customers
             Guard.NotNull(request, nameof(request));
 
             var result = new PasswordChangeResult();
-            if (!request.Email.HasValue())
-            {
-                result.AddError(T("Account.ChangePassword.Errors.EmailIsNotProvided"));
-                return result;
-            }
+            //if (!request.Email.HasValue())
+            //{
+            //    result.AddError(T("Account.ChangePassword.Errors.EmailIsNotProvided"));
+            //    return result;
+            //}
             if (!request.NewPassword.HasValue())
             {
                 result.AddError(T("Account.ChangePassword.Errors.PasswordIsNotProvided"));
                 return result;
             }
 
-            var customer = _customerService.GetCustomerByEmail(request.Email);
-            if (customer == null)
-            {
-                result.AddError(T("Account.ChangePassword.Errors.EmailNotFound"));
-                return result;
-            }
+            var customer = _customerService.GetCustomerByGuid(request.CustomerGuid);
+            //if (customer == null)
+            //{
+            //    result.AddError(T("Account.ChangePassword.Errors.EmailNotFound"));
+            //    return result;
+            //}
 
             var requestIsValid = false;
             if (request.ValidateRequest)

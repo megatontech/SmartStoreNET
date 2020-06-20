@@ -504,10 +504,10 @@ namespace SmartStore.Admin.Controllers
             }
 
             /// Validate unique user. <see cref="ICustomerRegistrationService.RegisterCustomer(CustomerRegistrationRequest)"/>
-            if (model.Email.HasValue() && _customerService.GetCustomerByEmail(model.Email) != null)
-            {
-                ModelState.AddModelError("", T("Account.Register.Errors.EmailAlreadyExists"));
-            }
+            //if (model.Email.HasValue() && _customerService.GetCustomerByEmail(model.Email) != null)
+            //{
+            //    ModelState.AddModelError("", T("Account.Register.Errors.EmailAlreadyExists"));
+            //}
 
             if (model.Username.HasValue() &&
                 _customerSettings.CustomerLoginType != CustomerLoginType.Email &&
@@ -622,6 +622,9 @@ namespace SmartStore.Admin.Controllers
                 if (model.Password.HasValue())
                 {
                     var changePassRequest = new ChangePasswordRequest(model.Email, false, _customerSettings.DefaultPasswordFormat, model.Password);
+                    changePassRequest.Id = model.Id;
+                    changePassRequest.CustomerGuid = customer.CustomerGuid;
+                    
                     var changePassResult = _customerRegistrationService.ChangePassword(changePassRequest);
                     if (!changePassResult.Success)
                     {

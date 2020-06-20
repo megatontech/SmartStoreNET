@@ -1,4 +1,5 @@
 ﻿using SmartStore.Core.Domain.Customers;
+using System;
 
 namespace SmartStore.Services.Customers
 {
@@ -21,7 +22,9 @@ namespace SmartStore.Services.Customers
 
 
         #region Public Properties
-
+        
+        public Guid CustomerGuid { get; set; }
+        public int Id { get; set; }
         public string Email { get; set; }
 
         public string NewPassword { get; set; }
