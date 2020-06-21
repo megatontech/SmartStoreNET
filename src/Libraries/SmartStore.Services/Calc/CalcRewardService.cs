@@ -461,7 +461,7 @@ namespace SmartStore.Services.Calc
             var yestoday = DateTime.UtcNow.Date.AddDays(-1);
             var today = DateTime.UtcNow.Date;
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus== Core.Domain.Payments.PaymentStatus.Paid
                          select d;
             todayAmount = dorder.ToList().Sum(x => x.OrderTotal);
 
@@ -472,8 +472,8 @@ namespace SmartStore.Services.Calc
             var yestoday = DateTime.UtcNow.Date.AddDays(-1);
             var today = DateTime.UtcNow.Date;
             var order = from d in _OrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
-                         select d;
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
+                        select d;
             todayAmount = order.ToList().Sum(x => x.OrderTotal);
             return todayAmount; 
         }

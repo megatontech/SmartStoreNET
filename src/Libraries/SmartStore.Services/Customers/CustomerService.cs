@@ -117,7 +117,7 @@ namespace SmartStore.Services.Customers
             var yestoday = DateTime.UtcNow.Date.AddDays(-1);
             var today = DateTime.UtcNow.Date;
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
                          select d;
             tree = query.ToList();
             foreach (var item in tree)
@@ -141,7 +141,7 @@ namespace SmartStore.Services.Customers
             var today = DateTime.UtcNow.Date;
             var tomorrow = DateTime.UtcNow.Date.AddDays(1);
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= tomorrow && d.PaidDateUtc.Value >= today
+                         where d.PaidDateUtc.Value <= tomorrow && d.PaidDateUtc.Value >= today && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
                          select d;
             tree = query.ToList();
             foreach (var item in tree)
@@ -165,7 +165,7 @@ namespace SmartStore.Services.Customers
             var yestoday = DateTime.UtcNow.Date.AddDays(-1);
             var today = DateTime.UtcNow.Date;
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
                          select d;
             tree = query.ToList();
             foreach (var item in tree)
