@@ -73,6 +73,7 @@ namespace SmartStore.Services.Customers
         /// <param name="email">Email</param>
         /// <returns>Customer</returns>
         Customer GetCustomerByEmail(string email);
+        //Customer GetCustomerByMobile(string mobile);
 
         /// <summary>
         /// Gets a customer by GUID

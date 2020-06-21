@@ -42,6 +42,8 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Telerik.Web.Mvc;
+using SmartStore.Services.Authentication;
+using System.ComponentModel.DataAnnotations;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -49,7 +51,7 @@ namespace SmartStore.Admin.Controllers
     public partial class CustomerController : AdminControllerBase
     {
         #region Fields
-
+        private readonly IAuthenticationService _authenticationService;
         private readonly IAddressService _addressService;
         private readonly AddressSettings _addressSettings;
         private readonly AdminAreaSettings _adminAreaSettings;
@@ -92,7 +94,7 @@ namespace SmartStore.Admin.Controllers
         #region Constructors
 
         public CustomerController(
-            ICustomerService customerService,
+            ICustomerService customerService, IAuthenticationService authenticationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
@@ -118,6 +120,7 @@ namespace SmartStore.Admin.Controllers
             IMessageModelProvider messageModelProvider,
             Lazy<IGdprTool> gdprTool)
         {
+            _authenticationService = authenticationService;
             _customerService = customerService;
             _newsLetterSubscriptionService = newsLetterSubscriptionService;
             _genericAttributeService = genericAttributeService;
@@ -158,6 +161,130 @@ namespace SmartStore.Admin.Controllers
         #endregion Constructors
 
         #region Utilities
+
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult Login(bool? checkoutAsGuest)
+        {
+            var model = new LoginModel();
+            model.CustomerLoginType = _customerSettings.CustomerLoginType;
+            model.CheckoutAsGuest = checkoutAsGuest ?? false;
+            model.DisplayCaptcha = false;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateCaptcha]
+        public ActionResult Login(LoginModel model, string returnUrl, bool captchaValid)
+        {
+            // Validate CAPTCHA.
+            //if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
+            //{
+            //    ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptcha"));
+            //}
+
+            if (ModelState.IsValid)
+            {
+                if (_customerSettings.CustomerLoginType == CustomerLoginType.Username && model.Username != null)
+                {
+                    model.Username = model.Username.Trim();
+                }
+
+                if (_customerSettings.CustomerLoginType == CustomerLoginType.UsernameOrEmail && model.UsernameOrEmail != null)
+                {
+                    model.UsernameOrEmail = model.UsernameOrEmail.Trim();
+                }
+                model.UsernameOrMobile = model.UsernameOrMobile.Trim();
+                var userNameOrEmail = String.Empty;
+                if (_customerSettings.CustomerLoginType == CustomerLoginType.Email)
+                {
+                    userNameOrEmail = model.Email;
+                }
+                else if (_customerSettings.CustomerLoginType == CustomerLoginType.Username)
+                {
+                    userNameOrEmail = model.Username;
+                }
+                else
+                {
+                    userNameOrEmail = model.UsernameOrEmail;
+                }
+                var UsernameOrMobile = String.Empty;
+                UsernameOrMobile = model.UsernameOrMobile;
+                if (_customerRegistrationService.ValidateCustomerBymobile(UsernameOrMobile, model.Password))
+                {
+                    Customer customer = null;
+                    {
+                        customer = _customerService.GetCustomerByMobile(UsernameOrMobile);
+                        if (customer == null)
+                            customer = _customerService.GetCustomerByUsername(UsernameOrMobile);
+                    }
+
+                    //_shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer);
+
+                    _authenticationService.SignIn(customer, model.RememberMe);
+
+                    _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+
+                    Services.EventPublisher.Publish(new CustomerLogedInEvent { Customer = customer });
+                    //if (!customer.IsCustomer) { return RedirectToRoute("admin"); }
+                    // Redirect home where redirect to referrer would be confusing.
+                    if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
+                    {
+                        return RedirectToRoute("HomePage");
+                    }
+
+                    return RedirectToReferrer(returnUrl);
+                }
+                else if (_customerRegistrationService.ValidateCustomer(userNameOrEmail, model.Password))
+                {
+                    {
+                        Customer customer = null;
+
+                        if (_customerSettings.CustomerLoginType == CustomerLoginType.Email)
+                        {
+                            customer = _customerService.GetCustomerByEmail(model.Email);
+                        }
+                        else if (_customerSettings.CustomerLoginType == CustomerLoginType.Username)
+                        {
+                            customer = _customerService.GetCustomerByUsername(model.Username);
+                        }
+                        else
+                        {
+                            customer = _customerService.GetCustomerByEmail(model.UsernameOrEmail);
+                            if (customer == null)
+                                customer = _customerService.GetCustomerByUsername(model.UsernameOrEmail);
+                        }
+
+                        //_shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer);
+
+                        //_authenticationService.SignIn(customer, model.RememberMe);
+
+                        //_customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+
+                        //Services.EventPublisher.Publish(new CustomerLogedInEvent { Customer = customer });
+                        // if (!customer.IsCustomer) { return RedirectToRoute("admin"); }
+                        // Redirect home where redirect to referrer would be confusing.
+                        if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
+                        {
+                            return RedirectToRoute("/");
+                        }
+
+                        return RedirectToReferrer(returnUrl);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials"));
+                }
+            }
+
+            // If we got this far, something failed, redisplay form.
+           // model.CustomerLoginType = _customerSettings.CustomerLoginType;
+           // model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage;
+
+            return View(model);
+        }
+
 
         [NonAction]
         protected IList<CustomerModel.AssociatedExternalAuthModel> GetAssociatedExternalAuthRecords(Customer customer)
@@ -387,12 +514,14 @@ namespace SmartStore.Admin.Controllers
                 FullName = customer.GetFullName(),
                 Company = customer.Company,
                 CustomerNumber = customer.CustomerNumber,
-                Phone = customer.GetAttribute<string>(SystemCustomerAttributeNames.Phone),
+                Phone = customer.Mobile,
                 ZipPostalCode = customer.GetAttribute<string>(SystemCustomerAttributeNames.ZipPostalCode),
                 CustomerRoleNames = GetCustomerRolesNames(customer.CustomerRoles.ToList()),
                 Active = customer.Active,
                 CreatedOn = _dateTimeHelper.ConvertToUserTime(customer.CreatedOnUtc, DateTimeKind.Utc),
                 LastActivityDate = _dateTimeHelper.ConvertToUserTime(customer.LastActivityDateUtc, DateTimeKind.Utc),
+                
+                ParentPhone = customer.ParentMobile
             };
         }
 
@@ -462,7 +591,7 @@ namespace SmartStore.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var changePassRequest = new ChangePasswordRequest(model.Email, false, _customerSettings.DefaultPasswordFormat, model.Password);
-                var changePassResult = _customerRegistrationService.ChangePassword(changePassRequest);
+                var changePassResult = _customerRegistrationService.ChangePassword(changePassRequest, model.Id);
 
                 if (changePassResult.Success)
                 {
@@ -1783,5 +1912,32 @@ namespace SmartStore.Admin.Controllers
         }
 
         #endregion GDPR
+    }
+    public partial class LoginModel : ModelBase
+    {
+        public bool CheckoutAsGuest { get; set; }
+
+        public CustomerLoginType CustomerLoginType { get; set; }
+
+        [SmartResourceDisplayName("Account.Login.Fields.Email")]
+        public string Email { get; set; }
+
+        [SmartResourceDisplayName("Account.Login.Fields.UserName")]
+        public string Username { get; set; }
+
+        [SmartResourceDisplayName("Account.Login.Fields.UsernameOrEmail")]
+        public string UsernameOrEmail { get; set; }
+        [SmartResourceDisplayName("用户名或手机号")]
+        public string UsernameOrMobile { get; set; }
+
+        [DataType(DataType.Password)]
+        [SmartResourceDisplayName("Account.Login.Fields.Password")]
+        public string Password { get; set; }
+
+        [SmartResourceDisplayName("Account.Login.Fields.RememberMe")]
+        public bool RememberMe { get; set; }
+
+        public bool DisplayCaptcha { get; set; }
+
     }
 }

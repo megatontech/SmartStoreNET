@@ -387,8 +387,8 @@ namespace SmartStore.Web.Controllers
                     };
 
                     var orderTotal = x.OrderTotal;
-                    orderModel.OrderTotal = _priceFormatter.FormatPrice(orderTotal, true, x.CustomerCurrencyCode, false, _workContext.WorkingLanguage);
-
+                    //orderModel.OrderTotal = _priceFormatter.FormatPrice(orderTotal, true, x.CustomerCurrencyCode, false, _workContext.WorkingLanguage);
+                    orderModel.OrderTotal = orderTotal.ToString("F2");
                     return orderModel;
                 })
                 .ToList();
@@ -498,7 +498,10 @@ namespace SmartStore.Web.Controllers
             {
                 ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptcha"));
             }
-
+            if (string.IsNullOrEmpty(model.UsernameOrMobile)) 
+            {
+                ModelState.AddModelError("", "手机号为必填");
+            }
             if (ModelState.IsValid)
             {
                 if (_customerSettings.CustomerLoginType == CustomerLoginType.Username && model.Username != null)
@@ -510,7 +513,7 @@ namespace SmartStore.Web.Controllers
                 {
                     model.UsernameOrEmail = model.UsernameOrEmail.Trim();
                 }
-
+                model.UsernameOrMobile = model.UsernameOrMobile.Trim();
                 var userNameOrEmail = String.Empty;
                 if (_customerSettings.CustomerLoginType == CustomerLoginType.Email)
                 {
@@ -524,41 +527,69 @@ namespace SmartStore.Web.Controllers
                 {
                     userNameOrEmail = model.UsernameOrEmail;
                 }
-
-                if (_customerRegistrationService.ValidateCustomer(userNameOrEmail, model.Password))
+                var UsernameOrMobile = String.Empty;
+                UsernameOrMobile = model.UsernameOrMobile;
+                if (_customerRegistrationService.ValidateCustomerBymobile(UsernameOrMobile, model.Password))
                 {
                     Customer customer = null;
-
-                    if (_customerSettings.CustomerLoginType == CustomerLoginType.Email)
                     {
-                        customer = _customerService.GetCustomerByEmail(model.Email);
-                    }
-                    else if (_customerSettings.CustomerLoginType == CustomerLoginType.Username)
-                    {
-                        customer = _customerService.GetCustomerByUsername(model.Username);
-                    }
-                    else
-                    {
-                        customer = _customerService.GetCustomerByEmail(model.UsernameOrEmail);
+                        customer = _customerService.GetCustomerByMobile(UsernameOrMobile);
                         if (customer == null)
-                            customer = _customerService.GetCustomerByUsername(model.UsernameOrEmail);
+                            customer = _customerService.GetCustomerByUsername(UsernameOrMobile);
                     }
 
-                    _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer);
+                    //_shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer);
 
                     _authenticationService.SignIn(customer, model.RememberMe);
 
                     _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
 
-					Services.EventPublisher.Publish(new CustomerLogedInEvent { Customer = customer });
+                    Services.EventPublisher.Publish(new CustomerLogedInEvent { Customer = customer });
+                    //if (!customer.IsCustomer) { return RedirectToRoute("admin"); }
+                    // Redirect home where redirect to referrer would be confusing.
+                    if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
+                    {
+                        return RedirectToRoute("HomePage");
+                    }
 
-					// Redirect home where redirect to referrer would be confusing.
-					if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
-					{
-						return RedirectToRoute("HomePage");
-					}
+                    return RedirectToReferrer(returnUrl);
+                }
+                else if (_customerRegistrationService.ValidateCustomer(userNameOrEmail, model.Password)) 
+                {
+                    {
+                        Customer customer = null;
 
-					return RedirectToReferrer(returnUrl);
+                        if (_customerSettings.CustomerLoginType == CustomerLoginType.Email)
+                        {
+                            customer = _customerService.GetCustomerByEmail(model.Email);
+                        }
+                        else if (_customerSettings.CustomerLoginType == CustomerLoginType.Username)
+                        {
+                            customer = _customerService.GetCustomerByUsername(model.Username);
+                        }
+                        else
+                        {
+                            customer = _customerService.GetCustomerByEmail(model.UsernameOrEmail);
+                            if (customer == null)
+                                customer = _customerService.GetCustomerByUsername(model.UsernameOrEmail);
+                        }
+
+                        _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer);
+
+                        _authenticationService.SignIn(customer, model.RememberMe);
+
+                        _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+
+                        Services.EventPublisher.Publish(new CustomerLogedInEvent { Customer = customer });
+                       // if (!customer.IsCustomer) { return RedirectToRoute("admin"); }
+                        // Redirect home where redirect to referrer would be confusing.
+                        if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
+                        {
+                            return RedirectToRoute("HomePage");
+                        }
+
+                        return RedirectToReferrer(returnUrl);
+                    }
                 }
                 else
                 {
@@ -606,7 +637,6 @@ namespace SmartStore.Web.Controllers
             model.StateProvinceEnabled = _customerSettings.StateProvinceEnabled;
             model.PhoneEnabled = _customerSettings.PhoneEnabled;
             model.PhoneRequired = _customerSettings.PhoneRequired;
-            model.FaxEnabled = _customerSettings.FaxEnabled;
             model.FaxRequired = _customerSettings.FaxRequired;
             model.NewsletterEnabled = _customerSettings.NewsletterEnabled;
             model.UsernamesEnabled = _customerSettings.CustomerLoginType != CustomerLoginType.Email;
@@ -674,11 +704,11 @@ namespace SmartStore.Web.Controllers
             
             if (ModelState.IsValid)
             {
-                if (_customerSettings.CustomerLoginType != CustomerLoginType.Email && model.Username != null)
-                {
-                    model.Username = model.Username.Trim();
-                }
-
+                //if (_customerSettings.CustomerLoginType != CustomerLoginType.Email && model.Username != null)
+                //{
+                //    model.Username = model.Username.Trim();
+                //}
+                model.Username = model.Mobile;
                 bool isApproved = _customerSettings.UserRegistrationType == UserRegistrationType.Standard;
                 var registrationRequest = new CustomerRegistrationRequest(customer, model.Email,
                     _customerSettings.CustomerLoginType != CustomerLoginType.Email ? model.Username : model.Email, model.Password, model.Mobile, model.ParentMobile, _customerSettings.DefaultPasswordFormat, isApproved);
@@ -894,7 +924,7 @@ namespace SmartStore.Web.Controllers
             model.UsernamesEnabled = _customerSettings.CustomerLoginType != CustomerLoginType.Email;
             model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
             model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnRegistrationPage;
-
+            //model
             if (_customerSettings.CountryEnabled)
             {
                 model.AvailableCountries.Add(new SelectListItem() { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });

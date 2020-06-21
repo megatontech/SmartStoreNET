@@ -26,7 +26,9 @@ namespace SmartStore.Admin.Models.Customers
 
         public bool AllowUsersToChangeUsernames { get; set; }
         public bool UsernamesEnabled { get; set; }
-
+        [SmartResourceDisplayName("Admin.Customers.Customers.Fields.Guid")]
+        [AllowHtml]
+        public Guid CustomerGuid { get; set; }
         [SmartResourceDisplayName("Admin.Customers.Customers.Fields.Username")]
         [AllowHtml]
         public string Username { get; set; }

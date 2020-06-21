@@ -150,6 +150,94 @@ namespace SmartStore.Services.Customers
             return result;
         }
 
+        public virtual PasswordChangeResult ChangePassword(ChangePasswordRequest request,int id)
+        {
+            Guard.NotNull(request, nameof(request));
+
+            var result = new PasswordChangeResult();
+            //if (!request.Email.HasValue())
+            //{
+            //    result.AddError(T("Account.ChangePassword.Errors.EmailIsNotProvided"));
+            //    return result;
+            //}
+            if (!request.NewPassword.HasValue())
+            {
+                result.AddError(T("Account.ChangePassword.Errors.PasswordIsNotProvided"));
+                return result;
+            }
+
+            var customer = _customerService.GetCustomerById(id);
+            //if (customer == null)
+            //{
+            //    result.AddError(T("Account.ChangePassword.Errors.EmailNotFound"));
+            //    return result;
+            //}
+
+            var requestIsValid = false;
+            if (request.ValidateRequest)
+            {
+                //password
+                string oldPwd = "";
+                switch (customer.PasswordFormat)
+                {
+                    case PasswordFormat.Encrypted:
+                        oldPwd = _encryptionService.EncryptText(request.OldPassword);
+                        break;
+
+                    case PasswordFormat.Hashed:
+                        oldPwd = _encryptionService.CreatePasswordHash(request.OldPassword, customer.PasswordSalt, _customerSettings.HashedPasswordFormat);
+                        break;
+
+                    default:
+                        oldPwd = request.OldPassword;
+                        break;
+                }
+
+                bool oldPasswordIsValid = oldPwd == customer.Password;
+                if (!oldPasswordIsValid)
+                    result.AddError(T("Account.ChangePassword.Errors.OldPasswordDoesntMatch"));
+
+                if (oldPasswordIsValid)
+                    requestIsValid = true;
+            }
+            else
+                requestIsValid = true;
+
+            //at this point request is valid
+            if (requestIsValid)
+            {
+                switch (request.NewPasswordFormat)
+                {
+                    case PasswordFormat.Clear:
+                        {
+                            customer.Password = request.NewPassword;
+                        }
+                        break;
+
+                    case PasswordFormat.Encrypted:
+                        {
+                            customer.Password = _encryptionService.EncryptText(request.NewPassword);
+                        }
+                        break;
+
+                    case PasswordFormat.Hashed:
+                        {
+                            string saltKey = _encryptionService.CreateSaltKey(5);
+                            customer.PasswordSalt = saltKey;
+                            customer.Password = _encryptionService.CreatePasswordHash(request.NewPassword, saltKey, _customerSettings.HashedPasswordFormat);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+                customer.PasswordFormat = request.NewPasswordFormat;
+                _customerService.UpdateCustomer(customer);
+            }
+
+            return result;
+        }
+
         public virtual CustomerRegistrationResult RegisterCustomer(CustomerRegistrationRequest request)
         {
             Guard.NotNull(request, nameof(request));
@@ -205,7 +293,21 @@ namespace SmartStore.Services.Customers
                 result.AddError(T("Account.Register.Errors.EmailAlreadyExists"));
                 return result;
             }
-
+            if (!request.ParentMobile.HasValue())
+            {
+                result.AddError(T("推荐人手机号必填"));
+                return result;
+            }
+            if (!request.Mobile.HasValue())
+            {
+                result.AddError(T("手机号必填"));
+                return result;
+            }
+            if (_customerService.GetCustomerByMobile(request.Mobile) != null)
+            {
+                result.AddError(T("手机号已注册"));
+                return result;
+            }
             if (_customerSettings.CustomerLoginType != CustomerLoginType.Email && _customerService.GetCustomerByUsername(request.Username) != null)
             {
                 result.AddError(T("Account.Register.Errors.UsernameAlreadyExists"));
@@ -349,6 +451,52 @@ namespace SmartStore.Services.Customers
 
             customer.Username = newUsername;
             _customerService.UpdateCustomer(customer);
+        }
+
+        public virtual bool ValidateCustomerBymobile(string usernameOrMobile, string password)
+        {
+            Customer customer = null;
+            customer = _customerService.GetCustomerByMobile(usernameOrMobile) ?? _customerService.GetCustomerByUsername(usernameOrMobile);
+
+            if (customer == null || customer.Deleted || !customer.Active)
+                return false;
+
+            //only registered can login
+            if (!customer.IsRegistered())
+                return false;
+
+            string pwd = "";
+            switch (customer.PasswordFormat)
+            {
+                case PasswordFormat.Encrypted:
+                    pwd = _encryptionService.EncryptText(password);
+                    break;
+
+                case PasswordFormat.Hashed:
+                    pwd = _encryptionService.CreatePasswordHash(password, customer.PasswordSalt, _customerSettings.HashedPasswordFormat);
+                    break;
+
+                default:
+                    pwd = password;
+                    break;
+            }
+
+            bool isValid = pwd == customer.Password;
+
+            //save last login date
+            if (isValid)
+            {
+                customer.LastLoginDateUtc = DateTime.UtcNow;
+                _customerService.UpdateCustomer(customer);
+            }
+
+            //else
+            //{
+            //    customer.FailedPasswordAttemptCount++;
+            //    UpdateCustomer(customer);
+            //}
+
+            return isValid;
         }
 
         public virtual bool ValidateCustomer(string usernameOrEmail, string password)

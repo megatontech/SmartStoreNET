@@ -41,6 +41,7 @@
                     @Html.SmartLabelFor(model => model.Id)
                 </td>
                 <td class="adminData">
+                    @Html.HiddenFor(model=>model.CustomerGuid)
                     @Html.TextBoxFor(model => model.Id, new { @readonly = "readonly", @class = "form-control-plaintext" })
                     @Html.ValidationMessageFor(model => model.Id)
                 </td>

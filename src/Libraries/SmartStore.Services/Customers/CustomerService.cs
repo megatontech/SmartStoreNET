@@ -386,7 +386,20 @@ namespace SmartStore.Services.Customers
             var customers = SearchCustomers(q);
             return customers;
         }
+        
+        //    public virtual Customer GetCustomerByMobile(string mobile)
+        //{
+        //    if (string.IsNullOrWhiteSpace(mobile))
+        //        return null;
 
+        //    var query = from c in IncludeShoppingCart(_customerRepository.Table)
+        //                orderby c.Id
+        //                where c.Mobile == mobile
+        //                select c;
+
+        //    var customer = query.FirstOrDefault();
+        //    return customer;
+        //}
         public virtual Customer GetCustomerByEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -692,7 +705,7 @@ namespace SmartStore.Services.Customers
             {
                 query = _customerRepository.Table;
             }
-
+            query = query.Where(x => !string.IsNullOrEmpty(x.Username));
             if (q.Email.HasValue())
             {
                 query = query.Where(c => c.Email.Contains(q.Email));

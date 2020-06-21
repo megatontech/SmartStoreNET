@@ -15,7 +15,8 @@ namespace SmartStore.Services.Customers
         /// <param name="request">Request</param>
         /// <returns>Result</returns>
         PasswordChangeResult ChangePassword(ChangePasswordRequest request);
-
+        PasswordChangeResult ChangePassword(ChangePasswordRequest request,int id);
+        
         /// <summary>
         /// Register customer
         /// </summary>
@@ -44,7 +45,8 @@ namespace SmartStore.Services.Customers
         /// <param name="password">Password</param>
         /// <returns>Result</returns>
         bool ValidateCustomer(string usernameOrEmail, string password);
-
+        bool ValidateCustomerBymobile(string usernameOrEmail, string password);
+        
         #endregion Public Methods
     }
 }

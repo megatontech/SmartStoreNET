@@ -1823,6 +1823,7 @@
           <Property Name="RewardPointsRemaining" Type="Int32" />
           <Property Name="HasNewPaymentNotification" Type="Boolean" Nullable="false" />
           <Property Name="AcceptThirdPartyEmailHandOver" Type="Boolean" Nullable="false" />
+          <Property Name="ProductID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Customer" Relationship="Self.DeclarationOrder_Customer" FromRole="DeclarationOrder_Customer_Source" ToRole="DeclarationOrder_Customer_Target" />
         </EntityType>
         <EntityType Name="CheckoutAttribute" customannotation:ClrType="SmartStore.Core.Domain.Orders.CheckoutAttribute, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
@@ -6154,6 +6155,7 @@
                 <ScalarProperty Name="RewardPointsRemaining" ColumnName="RewardPointsRemaining" />
                 <ScalarProperty Name="HasNewPaymentNotification" ColumnName="HasNewPaymentNotification" />
                 <ScalarProperty Name="AcceptThirdPartyEmailHandOver" ColumnName="AcceptThirdPartyEmailHandOver" />
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -8286,6 +8288,7 @@
           <Property Name="RewardPointsRemaining" Type="int" Nullable="true" />
           <Property Name="HasNewPaymentNotification" Type="bit" Nullable="false" />
           <Property Name="AcceptThirdPartyEmailHandOver" Type="bit" Nullable="false" />
+          <Property Name="ProductID" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="CheckoutAttribute" customannotation:Index="{ }">
           <Key>
