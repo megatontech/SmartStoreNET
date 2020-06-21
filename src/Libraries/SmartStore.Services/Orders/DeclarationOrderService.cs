@@ -243,7 +243,8 @@ namespace SmartStore.Services.Orders
         }
         public virtual int GetOrdersMaxNo()
         {
-           return _orderRepository.Table.Max(x=>x.Id)??0;
+            var temp = _orderRepository.Table.Any()? _orderRepository.Table.Max(x => x.Id):0;
+           return temp;
         }
         
         public virtual void UpdateOrder(DeclarationOrder order)
