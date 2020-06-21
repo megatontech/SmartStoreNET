@@ -47,7 +47,7 @@
                         }
                     </div>
                 </div>
-                <div class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
+                <div  class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
                     <div class="container shopbar-container">
                         @{
                             Html.RenderAction("ShopBar", "Common", new { area = "" });
@@ -127,7 +127,7 @@
             </footer>
         }
         <header id="header">
-            <div class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
+            <div  id="bottomNav" class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
                 <div class="container shopbar-container">
                     @{
                         Html.RenderAction("BottomShopBar", "Common", new { area = "" });

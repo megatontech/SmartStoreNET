@@ -21,6 +21,7 @@ namespace SmartStore.Web.Models.Customer
 
         public partial class OrderDetailsModel : EntityModelBase
         {
+            public string OrderProductName { get; set; }
             public string OrderNumber { get; set; }
             public string OrderTotal { get; set; }
             public bool IsReturnRequestAllowed { get; set; }

@@ -31,8 +31,21 @@ namespace SmartStore.Web.Models.Customer
 
 			[SmartResourceDisplayName("时间")]
             public DateTime CreatedOn { get; set; }
+            [SmartResourceDisplayName("时间")]
+            public string CreatedOnStr { get; set; }
         }
 
         #endregion
+    }
+    public partial class CustomerTeamModel : ModelBase
+    {
+        public CustomerTeamModel()
+        {
+            
+        }
+
+        public int Total { get; set; }
+        public List<SmartStore.Core.Domain.Customers.Customer> Team { get; set; }
+        public SmartStore.Core.Domain.Customers.Customer Self { get; set; }
     }
 }

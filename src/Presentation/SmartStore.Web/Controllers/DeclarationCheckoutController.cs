@@ -776,11 +776,11 @@ namespace SmartStore.Web.Controllers
             var subtotalBase = cart.Sum(x => x.dItem.CustomerEnteredPrice * x.dItem.Quantity);
             var product = _dproductService.GetProductById(cart.FirstOrDefault().dItem.Product.Id);
             var order = new DeclarationOrder
-            { 
+            {
                 StoreId = 0,
                 OrderGuid = Guid.NewGuid(),
                 CustomerId = customer.Id,
-                CustomerLanguageId = customer.GetLanguage().Id,
+                CustomerLanguageId = customer.GetLanguage().Id, ProductID = product.Id,
                 //CustomerTaxDisplayType = TaxDisplayType.ExcludingTax,
                 CustomerIp = _webHelper.GetCurrentIpAddress(),
                 OrderSubtotalInclTax = 0M,

@@ -594,7 +594,7 @@ namespace SmartStore.Core.Domain.Orders
                 this.PaymentStatusId = (int)value;
             }
         }
-        [NotMapped]
+        [DataMember]
         public int ProductID { get; set; }
         //      /// <summary>
         //      /// Gets or sets the shipping status

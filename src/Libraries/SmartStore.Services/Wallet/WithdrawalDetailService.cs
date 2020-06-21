@@ -36,14 +36,17 @@ namespace SmartStore.Services.Wallet
            return  _WithdrawalDetailRepository.Table.ToList();
         }
 
-        public List<WithdrawalDetail> Get3ByCustomId(int id)
+        public List<WithdrawalDetail> GetByCustomId(int id,int count)
         {
-            return _WithdrawalDetailRepository.Table.Where(x => x.Customer == id).Take(3).ToList();
+            return _WithdrawalDetailRepository.Table.Where(x => x.Customer == id && x.Amount != 0M).OrderByDescending(x => x.WithdrawTime).Take(count).ToList();
         }
-
+        public List<WithdrawalDetail> GetByCustomId(int id, int skip, int count)
+        {
+            return _WithdrawalDetailRepository.Table.Where(x => x.Customer == id && x.Amount != 0M).OrderByDescending(x => x.WithdrawTime).Skip(skip).Take(count).ToList();
+        }
         public List<WithdrawalDetail> GetByCustomId(int id)
         {
-            return _WithdrawalDetailRepository.Table.Where(x => x.Customer == id).ToList();
+            return _WithdrawalDetailRepository.Table.Where(x => x.Customer == id &&x.Amount!=0M).OrderByDescending(x=>x.WithdrawTime).ToList();
         }
 
         public WithdrawalDetail GetByid(int id)

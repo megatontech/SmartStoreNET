@@ -947,6 +947,8 @@
     <Content Include="Content\vendors\colorpicker\js\bootstrap-colorpicker.js" />
     <Content Include="Content\vendors\datetimepicker\js\tempusdominus-bootstrap-4.js" />
     <Content Include="Content\vendors\datetimepicker\js\tempusdominus-bootstrap-4.min.js" />
+    <Content Include="Content\vendors\jquery\jquery.jOrgChart.css" />
+    <Content Include="Content\vendors\jquery\jquery.jOrgChart.js" />
     <Content Include="Content\vendors\moment\locale\ar-dz.js" />
     <Content Include="Content\vendors\moment\locale\ar-kw.js" />
     <Content Include="Content\vendors\moment\locale\ar-ly.js" />
@@ -1935,6 +1937,7 @@
     <Content Include="Views\ShoppingCart\Partials\dOrderTotals.cshtml" />
     <Content Include="Views\Customer\NewInfo.cshtml" />
     <Content Include="Views\Customer\WithDrawApply.cshtml" />
+    <Content Include="Views\Customer\MyTeam.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

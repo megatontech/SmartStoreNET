@@ -2,9 +2,37 @@
 
 @using SmartStore.Web.Models.Common;
 
+<style type="text/css">
+    /*body {
+        background-image: url(text.txt);*/ /* for IE6 */
+    /*background-attachment: fixed;
+    }*/
+
+    #bottomNav {
+        
+        background: #444444;
+        width: 105%;
+        z-index: 999;
+        position: fixed;
+        bottom: 0;
+        left:0;
+        _position: absolute;
+        _top: expression(documentElement.scrollTop + documentElement.clientHeight-this.offsetHeight);
+        overflow: visible;
+    }
+</style>
+<script>
+
+    var wrapper = document.querySelector("#content-wrapper");
+    wrapper.style.height = (wrapper.offsetHeight + 65) + "px";
+    
+    var bottomNav = document.querySelector("#bottomNav");
+    bottomNav.style.width = (bottomNav.width + 20) + "px";
+</script>
+
 <div class="shopbar">
-	<div class="shopbar-col-group shopbar-col-group-tools">
-		<!-- TOOLS -->
-		@{ Html.RenderPartial("BottomShopBar.Tools", Model); }
-	</div>
+    <div class="shopbar-col-group shopbar-col-group-tools">
+        <!-- TOOLS -->
+        @{ Html.RenderPartial("BottomShopBar.Tools", Model); }
+    </div>
 </div>

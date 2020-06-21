@@ -16,6 +16,78 @@
         color: #d7ecfa;
     }
 </style>
+<script>
+    var currentpage = 1;
+          //获取滚动条当前的位置
+          function getScrollTop() {
+                  var scrollTop = 0;
+                  if (document.documentElement && document.documentElement.scrollTop) {
+                          scrollTop = document.documentElement.scrollTop;
+
+        } else if (document.body) {
+                            scrollTop = document.body.scrollTop;
+
+        }
+                 return scrollTop;
+
+    }
+
+          //获取当前可视范围的高度
+          function getClientHeight() {
+           var clientHeight = 0;
+           if (document.body.clientHeight && document.documentElement.clientHeight) {
+                   clientHeight = Math.min(document.body.clientHeight, document.documentElement.clientHeight);
+
+        } else {
+                         clientHeight = Math.max(document.body.clientHeight, document.documentElement.clientHeight);
+
+        }
+                return clientHeight;
+
+    }
+
+    //获取文档完整的高度
+    function getScrollHeight() {
+            return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+    }
+
+   //滚动事件触发
+   window.onscroll = function () {
+       if (getScrollTop() + getClientHeight() == getScrollHeight()) {
+           //
+           console.log(currentpage);
+           $.ajax({
+               cache: false,
+               type: 'POST',
+               global: false,
+               url: "GetWalletDetail?page=" + (currentpage+1),
+               //dataType: 'json',
+               success: function (data) {
+
+                   if (data.length>0) {
+                       $("#page-main").height += 350;
+                       $("#content-wrapper").css("height", document.documentElement.scrollHeight+50)
+                       currentpage++;
+                       data = data || [];
+                       $.each(data, function (i) {
+                           var tbody = $("#tbody");
+                           var row1 = $('<tr></tr>').appendTo(tbody);
+                           row1.append($('<td>' + data[i].Points + '</td>'));
+                           row1.append($('<td>' + data[i].Message + '</td>'));
+                           row1.append($('<td dir="auto">' + data[i].CreatedOnStr + '</td>'));
+                           tbody.append(row1);
+                       });
+                   }
+               },
+               error: function (xhr, ajaxOptions, thrownError) {
+                   console.error(thrownError);
+               }
+           });
+        }
+    }
+
+</script>
     <div class="col-md-8 col-lg-9">
         <div class="page-title pt-4 pt-md-0">
             <h1 class="h3">可提现额度</h1>
@@ -61,7 +133,7 @@
                                 
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbody">
                             @for (int i = 0; i < Model.RewardPoints.Count; i++)
                             {
                                 var item = Model.RewardPoints[i];
@@ -75,7 +147,6 @@
                                     </td>
                                     <td dir="auto">
                                         @item.CreatedOn.ToNativeString()
-                                        
                                     </td>
                                 </tr>
                             }

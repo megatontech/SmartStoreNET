@@ -115,31 +115,38 @@ namespace SmartStore.Web.Infrastructure
             {
                 Id = "Wallet",
                 Text = T("可提现额度"),
-                Icon = "fal fa-user",
+                Icon = "fal fa-money-bill-alt",
                 Url = _urlHelper.Action("Wallet", "Customer", new { area = "" })
             });
             root.Append(new MenuItem
             {
                 Id = "RewardPoints",
                 Text = T("购物积分"),
-                Icon = "fal fa-user",
+                Icon = "fal fa-heart",
                 Url = _urlHelper.Action("RewardPoints", "Customer", new { area = "" })
             });
             root.Append(new MenuItem
             {
                 Id = "dOrders",
                 Text = T("报单订单"),
-                Icon = "fal fa-user",
+                Icon = "fal fa-folder",
                 Url = _urlHelper.Action("dOrders", "Customer", new { area = "" })
             });
             root.Append(new MenuItem
             {
-                Id = "Orders",
-                Text = T("商城订单"),
-                Icon = "fal fa-user",
-                Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
+                Id = "dOrders",
+                Text = T("我的团队"),
+                Icon = "fal fa-handshake",
+                Url = _urlHelper.Action("MyTeam", "Customer", new { area = "" })
             });
-    
+            //root.Append(new MenuItem
+            //{
+            //    Id = "Orders",
+            //    Text = T("商城订单"),
+            //    Icon = "fal fa-user",
+            //    Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
+            //});
+
             //root.Append(new MenuItem
             //{
             //    Id = "info",
@@ -148,13 +155,13 @@ namespace SmartStore.Web.Infrastructure
             //    Url = _urlHelper.Action("Info", "Customer", new { area = "" })
             //});
 
-            root.Append(new MenuItem
-            {
-                Id = "addresses",
-                Text = T("收货地址"),
-                Icon = "fal fa-address-book",
-                Url = _urlHelper.Action("Addresses", "Customer", new { area = "" })
-            });
+            //root.Append(new MenuItem
+            //{
+            //    Id = "addresses",
+            //    Text = T("收货地址"),
+            //    Icon = "fal fa-address-book",
+            //    Url = _urlHelper.Action("Addresses", "Customer", new { area = "" })
+            //});
 
             //root.Append(new MenuItem
             //{

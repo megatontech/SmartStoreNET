@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -11,6 +12,7 @@ using SmartStore.Core.Domain.Media;
 using SmartStore.Core.Domain.Messages;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Tax;
+using SmartStore.Core.Domain.Wallet;
 using SmartStore.Core.Logging;
 using SmartStore.Services.Authentication;
 using SmartStore.Services.Authentication.External;
@@ -36,13 +38,14 @@ using SmartStore.Web.Framework.Plugins;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Models.Common;
 using SmartStore.Web.Models.Customer;
+using static SmartStore.Web.Models.Customer.CustomerRewardPointsModel;
 
 namespace SmartStore.Web.Controllers
 {
     public partial class CustomerController : PublicControllerBase
     {
         #region Fields
-
+        private readonly IDeclarationProductService _productService;
         private readonly IAuthenticationService _authenticationService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly DateTimeSettings _dateTimeSettings;
@@ -93,7 +96,7 @@ namespace SmartStore.Web.Controllers
         #region Ctor
 
         public CustomerController(
-            IAuthenticationService authenticationService,
+            IAuthenticationService authenticationService, IDeclarationProductService productService,
             IDateTimeHelper dateTimeHelper,
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
             ILocalizationService localizationService,
@@ -124,6 +127,7 @@ namespace SmartStore.Web.Controllers
             IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
             )
         {
+            _productService = productService;
             _authenticationService = authenticationService;
             _dateTimeHelper = dateTimeHelper;
             _dateTimeSettings = dateTimeSettings;
@@ -376,6 +380,7 @@ namespace SmartStore.Web.Controllers
                     {
                         Id = x.Id,
                         OrderNumber = x.Id.ToString(),
+                        OrderProductName = (x.ProductID==0?"失效产品": _productService.GetProductById(x.ProductID).Name),
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
                         OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
                         IsReturnRequestAllowed = false
@@ -1591,6 +1596,28 @@ namespace SmartStore.Web.Controllers
             return View(model);
         }
         #endregion
+        #region myteam
+
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult MyTeam()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+            var allcustomer =_customerService.BuildAllTreeWithoutOrder();
+            var total = _total.Get(customer);
+            //钱包展示总额，可提现，冻结，以及最近入账
+            var model = new CustomerTeamModel();
+            model.Self = customer;
+            model.Team = new System.Collections.Generic.List<Customer>();
+            model.Team.AddRange( allcustomer.Where(x=>x.ParentID==customer.Id).ToList());
+            model.Total = model.Team.Count;
+
+            return View(model);
+        }
+
+        #endregion
         #region Wallet
 
         [RewriteUrl(SslRequirement.Yes)]
@@ -1599,21 +1626,19 @@ namespace SmartStore.Web.Controllers
             if (!IsCurrentUserRegistered())
                 return new HttpUnauthorizedResult();
 
-            if (!_rewardPointsSettings.Enabled)
-                return RedirectToAction("Info");
 
             var customer = _workContext.CurrentCustomer;
             var total = _total.Get(customer);
             //钱包展示总额，可提现，冻结，以及最近入账
             var model = new CustomerWalletModel();
-            var detail = _detailrule.Get3ByCustomId(customer.Id);
+            var detail = _detailrule.GetByCustomId(customer.Id,5);
             foreach (var rph in detail)
             {
                 model.RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
                 {
                     
                     Points = rph.Amount,
-                    Message = rph.Comment,
+                    Message = GetWithInfo(rph),
                     CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
                 });
             }
@@ -1626,6 +1651,34 @@ namespace SmartStore.Web.Controllers
             return View(model);
         }
 
+        public ActionResult GetWalletDetail(int page) 
+        {
+            var customer = _workContext.CurrentCustomer;
+            var detail = _detailrule.GetByCustomId(customer.Id, ((page-1)*5),5);
+            List<CustomerWalletModel.RewardPointsHistoryModel> RewardPoints = new List<CustomerWalletModel.RewardPointsHistoryModel>();
+            foreach (var rph in detail)
+            {
+                RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
+                {
+                    Points = rph.Amount,
+                    Message = GetWithInfo(rph),
+                    CreatedOnStr = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc).ToNativeString()
+                });
+            }
+            return Json(RewardPoints);
+        }
+        public string GetWithInfo(WithdrawalDetail detail) 
+        {
+            string result = "";
+            if (detail.isOut) { result = "提现"; }
+            else {
+                if (detail.WithdrawType == 1) { result = "直推佣金"; }
+                else if (detail.WithdrawType == 2) { result = "业绩分红"; }
+                else if (detail.WithdrawType == 3) { result = "商城分红"; }
+                else if (detail.WithdrawType == 4) { result = "红包"; }
+            }
+            return result;
+        }
         #endregion
         #region Reward points
 
@@ -1685,25 +1738,25 @@ namespace SmartStore.Web.Controllers
             {
                 _apply.WithdrawalApplyMethod(customer, applyModel.Amount);
             }
-            var total = _total.Get(customer);
-            var model = new CustomerWalletModel();
-            var detail = _detailrule.Get3ByCustomId(customer.Id);
-            foreach (var rph in detail)
-            {
-                model.RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
-                {
+            //var total = _total.Get(customer);
+            //var model = new CustomerWalletModel();
+            ////var detail = _detailrule.Get3ByCustomId(customer.Id);
+            ////foreach (var rph in detail)
+            ////{
+            ////    model.RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
+            ////    {
 
-                    Points = rph.Amount,
-                    Message = rph.Comment,
-                    CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
-                });
-            }
-            model.Total = total.TotalAmount;
-            model.DecShare = total.TotalDecShareAmount;
-            model.Freeze = total.TotalFreezeAmount;
-            model.StoreShare = total.TotalStoreShareAmount;
-            model.Push = total.TotalPushAmount;
-            model.Luck = total.TotalLuckyAmount;
+            ////        Points = rph.Amount,
+            ////        Message = rph.Comment,
+            ////        CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
+            ////    });
+            ////}
+            //model.Total = total.TotalAmount;
+            //model.DecShare = total.TotalDecShareAmount;
+            //model.Freeze = total.TotalFreezeAmount;
+            //model.StoreShare = total.TotalStoreShareAmount;
+            //model.Push = total.TotalPushAmount;
+            //model.Luck = total.TotalLuckyAmount;
             //return View("Wallet", model);
             return RedirectToAction("Wallet");
         }
