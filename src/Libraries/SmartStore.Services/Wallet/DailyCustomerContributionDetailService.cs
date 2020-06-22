@@ -1,4 +1,5 @@
 ﻿using SmartStore.Core.Data;
+using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Wallet;
 using System;
 using System.Linq;
@@ -30,16 +31,26 @@ namespace SmartStore.Services.Wallet
         {
             _DailyCustomerContributionDetailRepository.Insert(entity);
         }
-
+        public DailyCustomerContributionDetail Get(Customer customer) 
+        {
+            return null;
+        }
+        /// <summary>
+        /// zuotiangongxianzhi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="guid"></param>
+        /// <returns></returns>
         public DailyCustomerContributionDetail Get(int id,Guid guid)
         {
-            var today = DateTime.UtcNow.Date;
-            if (!_DailyCustomerContributionDetailRepository.Table.Any(x => x.CreateTime >= today&&x.Customer==id))
+            var today = DateTime.Now.Date;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            if (!_DailyCustomerContributionDetailRepository.Table.Any(x => x.CreateTime <= today&&x.CreateTime>=yestoday&&x.Customer==id))
             {
                 DailyCustomerContributionDetail dailyTotalContribution = new DailyCustomerContributionDetail()
                 {
-                    CreateTime = today,
-                    ContributionTime = today,
+                    CreateTime = yestoday,
+                    ContributionTime = yestoday,
                      ActiveLine = 0,
                     CountTotalValue = 0M, 
                     Customer = id,
@@ -48,14 +59,14 @@ namespace SmartStore.Services.Wallet
                     TotalPointValue=0M,
                     CustomerID= guid,
                     TotalValue = 0M,
-                    UpdateTime = DateTime.UtcNow
+                    UpdateTime = DateTime.Now
                 };
                 _DailyCustomerContributionDetailRepository.Insert(dailyTotalContribution);
-                return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime >= today && x.Customer == id);
+                return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime <= today && x.CreateTime >= yestoday && x.Customer == id);
             }
             else
             {
-                return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime >= today && x.Customer == id);
+                return _DailyCustomerContributionDetailRepository.Table.FirstOrDefault(x => x.CreateTime <= today && x.CreateTime >= yestoday && x.Customer == id);
             }
         }
 

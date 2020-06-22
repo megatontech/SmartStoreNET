@@ -1349,7 +1349,7 @@ namespace SmartStore.Services.DataExchange.Export
                     if (product.SpecialPrice.HasValue && product.SpecialPriceEndDateTimeUtc.HasValue)
                     {
                         var endDate = DateTime.SpecifyKind(product.SpecialPriceEndDateTimeUtc.Value, DateTimeKind.Utc);
-                        if (endDate > DateTime.UtcNow)
+                        if (endDate > DateTime.Now)
                         {
                             dynObject._FutureSpecialPrice = ConvertPrice(ctx, product, product.SpecialPrice.Value);
                         }

@@ -89,7 +89,7 @@ namespace SmartStore.Web.Framework.Theming
 								// to enforece VPP to invalidate cache.
 								try
 								{
-									File.SetLastWriteTimeUtc(result.ResultPhysicalPath, DateTime.UtcNow);
+									File.SetLastWriteTimeUtc(result.ResultPhysicalPath, DateTime.Now);
 								}
 								catch { }
 							}

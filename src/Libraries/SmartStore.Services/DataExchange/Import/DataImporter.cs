@@ -180,7 +180,7 @@ namespace SmartStore.Services.DataExchange.Import
                 }
                 finally
                 {
-                    context.Result.EndDateUtc = DateTime.UtcNow;
+                    context.Result.EndDateUtc = DateTime.Now;
 
                     if (context.IsMaxFailures)
                     {
@@ -431,7 +431,7 @@ namespace SmartStore.Services.DataExchange.Import
             //	To = message.To.First().Address,
             //	Subject = message.Subject,
             //	Body = message.Body,
-            //	CreatedOnUtc = DateTime.UtcNow,
+            //	CreatedOnUtc = DateTime.Now,
             //	EmailAccountId = emailAccount.Id,
             //	SendManually = true
             //});

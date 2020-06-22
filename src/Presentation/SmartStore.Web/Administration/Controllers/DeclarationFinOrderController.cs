@@ -1725,7 +1725,7 @@ namespace SmartStore.Admin.Controllers
                             SenderEmail = senderEmail,
                             Message = giftCardMessage,
                             IsRecipientNotified = false,
-                            CreatedOnUtc = DateTime.UtcNow
+                            CreatedOnUtc = DateTime.Now
                         };
                         _giftCardService.InsertGiftCard(gc);
                     }
@@ -2559,7 +2559,7 @@ namespace SmartStore.Admin.Controllers
             {
                 DisplayToCustomer = displayToCustomer,
                 Note = message,
-                CreatedOnUtc = DateTime.UtcNow,
+                CreatedOnUtc = DateTime.Now,
             };
             order.OrderNotes.Add(orderNote);
             _orderService.UpdateOrder(order);
@@ -2675,6 +2675,10 @@ namespace SmartStore.Admin.Controllers
             //今日报单会员销售额前五
             var model = new List<OrderIncompleteReportLineModel>();
             var customer = _customerService.BuildCurrentTree();
+            foreach (var item in customer)
+            {
+                item.CurrentOrderSum = item.OrderList.Sum(x => x.OrderTotal);
+            }
             customer.OrderBy(x => x.CurrentOrderSum).Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
             {
                 Item = x.Username,
@@ -2873,6 +2877,10 @@ namespace SmartStore.Admin.Controllers
             //今日报单会员订单数前五
             var model = new List<OrderIncompleteReportLineModel>();
             var customer = _customerService.BuildCurrentTree();
+            foreach (var item in customer)
+            {
+                item.CurrentOrderSum = item.OrderList.Sum(x => x.OrderTotal);
+            }
             customer.OrderBy(x => x.OrderList.Count()).Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
             {
                 Item = x.Username,

@@ -290,7 +290,7 @@ namespace SmartStore.Services.Logging
             activity.ActivityLogTypeId = activityType.Id;
             activity.CustomerId = customer.Id;
             activity.Comment = comment;
-            activity.CreatedOnUtc = DateTime.UtcNow;
+            activity.CreatedOnUtc = DateTime.Now;
 
             _activityLogRepository.Insert(activity);
 

@@ -3773,7 +3773,7 @@ namespace SmartStore.Data.Setup
 				StateProvince = cCountry.StateProvinces.FirstOrDefault(),
 				Country = cCountry,
 				ZipPostalCode = "12212",
-				CreatedOnUtc = DateTime.UtcNow,
+				CreatedOnUtc = DateTime.Now,
 			};
 			this.Alter(entity);
 			return entity;
@@ -3790,8 +3790,8 @@ namespace SmartStore.Data.Setup
 				Active = true,
 				IsSystemAccount = true,
 				SystemName = SystemCustomerNames.SearchEngine,
-				CreatedOnUtc = DateTime.UtcNow,
-				LastActivityDateUtc = DateTime.UtcNow,
+				CreatedOnUtc = DateTime.Now,
+				LastActivityDateUtc = DateTime.Now,
 			};
 
 			this.Alter(entity);
@@ -3809,8 +3809,8 @@ namespace SmartStore.Data.Setup
 				Active = true,
 				IsSystemAccount = true,
 				SystemName = SystemCustomerNames.BackgroundTask,
-				CreatedOnUtc = DateTime.UtcNow,
-				LastActivityDateUtc = DateTime.UtcNow,
+				CreatedOnUtc = DateTime.Now,
+				LastActivityDateUtc = DateTime.Now,
 			};
 
 			this.Alter(entity);
@@ -3828,8 +3828,8 @@ namespace SmartStore.Data.Setup
 				Active = true,
 				IsSystemAccount = true,
 				SystemName = SystemCustomerNames.PdfConverter,
-				CreatedOnUtc = DateTime.UtcNow,
-				LastActivityDateUtc = DateTime.UtcNow,
+				CreatedOnUtc = DateTime.Now,
+				LastActivityDateUtc = DateTime.Now,
 			};
 
 			this.Alter(entity);
@@ -9732,7 +9732,7 @@ namespace SmartStore.Data.Setup
 			var productTemplateSimple = _ctx.Set<ProductTemplate>().First(x => x.ViewPath == "Product");
 			var firstDeliveryTime = _ctx.Set<DeliveryTime>().First(x => x.DisplayOrder == 0);
 			var fashionCategory = _ctx.Set<Category>().First(x => x.Alias == "Fashion");
-			var specialPriceEndDate = DateTime.UtcNow.AddMonths(1);
+			var specialPriceEndDate = DateTime.Now.AddMonths(1);
 			var specOptionCotton = _ctx.Set<SpecificationAttribute>().First(x => x.DisplayOrder == 8).SpecificationAttributeOptions.First(x => x.DisplayOrder == 9);
 
 			// Converse All Star
@@ -10250,7 +10250,7 @@ namespace SmartStore.Data.Setup
 
         public IList<Product> Products()
         {
-            var specialPriceEndDate = DateTime.UtcNow.AddMonths(1);
+            var specialPriceEndDate = DateTime.Now.AddMonths(1);
 
             var productTemplate = _ctx.Set<ProductTemplate>().First(x => x.ViewPath == "Product");
             var firstDeliveryTime = _ctx.Set<DeliveryTime>().First(x => x.DisplayOrder == 0);
@@ -12971,7 +12971,7 @@ namespace SmartStore.Data.Setup
 
 		public IList<ProductBundleItem> ProductBundleItems()
 		{
-            var utcNow = DateTime.UtcNow;
+            var utcNow = DateTime.Now;
 
             #region apple bundles
             var bundleAppleProHipster = _ctx.Set<Product>().First(x => x.Sku == "P-2005-Bundle");
@@ -13131,7 +13131,7 @@ namespace SmartStore.Data.Setup
                         Extension = ".mp3",
                         Filename = "beethoven-fur-elise.mp3",
                         IsNew = true,
-                        UpdatedOnUtc = DateTime.UtcNow
+                        UpdatedOnUtc = DateTime.Now
                     };
                 }
                 else if (product.Sku.IsCaseInsensitiveEqual("P-1016"))
@@ -13149,7 +13149,7 @@ namespace SmartStore.Data.Setup
                         Extension = ".mp3",
                         Filename = "vivaldi-four-seasons-spring",
                         IsNew = true,
-                        UpdatedOnUtc = DateTime.UtcNow
+                        UpdatedOnUtc = DateTime.Now
                     };
                 }
                 else if (product.Sku.IsCaseInsensitiveEqual("P-6001"))
@@ -13167,7 +13167,7 @@ namespace SmartStore.Data.Setup
                         Extension = ".pdf",
                         Filename = "Stone_of_the_wise_preview",
                         IsNew = true,
-                        UpdatedOnUtc = DateTime.UtcNow
+                        UpdatedOnUtc = DateTime.Now
                     };
                 }
             }
@@ -13364,7 +13364,7 @@ namespace SmartStore.Data.Setup
 				Title = "Online Discount Coupons",
 				Body = "<p>Online discount coupons enable access to great offers from some of the world&rsquo;s best sites for Internet shopping. The online coupons are designed to allow compulsive online shoppers to access massive discounts on a variety of products. The regular shopper accesses the coupons in bulk and avails of great festive offers and freebies thrown in from time to time.  The coupon code option is most commonly used when using a shopping cart. The coupon code is entered on the order page just before checking out. Every online shopping resource has a discount coupon submission option to confirm the coupon code. The dedicated web sites allow the shopper to check whether or not a discount is still applicable. If it is, the sites also enable the shopper to calculate the total cost after deducting the coupon amount like in the case of grocery coupons.  Online discount coupons are very convenient to use. They offer great deals and professionally negotiated rates if bought from special online coupon outlets. With a little research and at times, insider knowledge the online discount coupons are a real steal. They are designed to promote products by offering &lsquo;real value for money&rsquo; packages. The coupons are legitimate and help with budgeting, in the case of a compulsive shopper. They are available for special trade show promotions, nightlife, sporting events and dinner shows and just about anything that could be associated with the promotion of a product. The coupons enable the online shopper to optimize net access more effectively. Getting a &lsquo;big deal&rsquo; is not more utopian amidst rising prices. The online coupons offer internet access to the best and cheapest products displayed online. Big discounts are only a code away! By Gaynor Borade (buzzle.com)</p>",
 				Tags = "e-commerce, money",
-				CreatedOnUtc = DateTime.UtcNow,
+				CreatedOnUtc = DateTime.Now,
 			};
 			var blogPostCustomerService = new BlogPost()
 			{
@@ -13373,7 +13373,7 @@ namespace SmartStore.Data.Setup
 				Title = "Customer Service - Client Service",
 				Body = "<p>Managing online business requires different skills and abilities than managing a business in the &lsquo;real world.&rsquo; Customers can easily detect the size and determine the prestige of a business when they have the ability to walk in and take a look around. Not only do &lsquo;real-world&rsquo; furnishings and location tell the customer what level of professionalism to expect, but &quot;real world&quot; personal encounters allow first impressions to be determined by how the business approaches its customer service. When a customer walks into a retail business just about anywhere in the world, that customer expects prompt and personal service, especially with regards to questions that they may have about products they wish to purchase.<br /><br />Customer service or the client service is the service provided to the customer for his satisfaction during and after the purchase. It is necessary to every business organization to understand the customer needs for value added service. So customer data collection is essential. For this, a good customer service is important. The easiest way to lose a client is because of the poor customer service. The importance of customer service changes by product, industry and customer. Client service is an important part of every business organization. Each organization is different in its attitude towards customer service. Customer service requires a superior quality service through a careful design and execution of a series of activities which include people, technology and processes. Good customer service starts with the design and communication between the company and the staff.<br /><br />In some ways, the lack of a physical business location allows the online business some leeway that their &lsquo;real world&rsquo; counterparts do not enjoy. Location is not important, furnishings are not an issue, and most of the visual first impression is made through the professional design of the business website.<br /><br />However, one thing still remains true. Customers will make their first impressions on the customer service they encounter. Unfortunately, in online business there is no opportunity for front- line staff to make a good impression. Every interaction the customer has with the website will be their primary means of making their first impression towards the business and its client service. Good customer service in any online business is a direct result of good website design and planning.</p><p>By Jayashree Pakhare (buzzle.com)</p>",
 				Tags = "e-commerce, Smartstore.NET, asp.net, sample tag, money",
-				CreatedOnUtc = DateTime.UtcNow.AddSeconds(1),
+				CreatedOnUtc = DateTime.Now.AddSeconds(1),
 			};
 
 			var entities = new List<BlogPost>
@@ -13827,7 +13827,7 @@ namespace SmartStore.Data.Setup
 			var picture = _ctx.Set<Picture>().Create();
 			picture.MimeType = mimeType;
 			picture.SeoFilename = seoFilename;
-			picture.UpdatedOnUtc = DateTime.UtcNow;
+			picture.UpdatedOnUtc = DateTime.Now;
 			
 			picture.MediaStorage = new MediaStorage
 			{

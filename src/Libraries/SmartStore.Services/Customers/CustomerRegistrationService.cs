@@ -486,7 +486,7 @@ namespace SmartStore.Services.Customers
             //save last login date
             if (isValid)
             {
-                customer.LastLoginDateUtc = DateTime.UtcNow;
+                customer.LastLoginDateUtc = DateTime.Now;
                 _customerService.UpdateCustomer(customer);
             }
 
@@ -544,7 +544,7 @@ namespace SmartStore.Services.Customers
             //save last login date
             if (isValid)
             {
-                customer.LastLoginDateUtc = DateTime.UtcNow;
+                customer.LastLoginDateUtc = DateTime.Now;
                 _customerService.UpdateCustomer(customer);
             }
 

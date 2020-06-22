@@ -43,7 +43,7 @@ namespace SmartStore.Core.IO
 					return false;
 				}
 				
-				lockFile = new LockFile(_env.TenantFolder, path, DateTime.UtcNow.ToString("u"), _rwLock);
+				lockFile = new LockFile(_env.TenantFolder, path, DateTime.Now.ToString("u"), _rwLock);
 				return true;
 			}
 			catch
@@ -85,7 +85,7 @@ namespace SmartStore.Core.IO
 					// if expired the file is not removed
 					// it should be automatically as there is a finalizer in LockFile
 					// or the next taker can do it, unless it also fails, again
-					return creationUtc.ToUniversalTime().Add(Expiration) > DateTime.UtcNow;
+					return creationUtc.ToUniversalTime().Add(Expiration) > DateTime.Now;
 				}
 			}
 

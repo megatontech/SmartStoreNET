@@ -177,7 +177,7 @@ namespace SmartStore.Services.Common
         {
             Guard.NotNull(address, nameof(address));
 
-            address.CreatedOnUtc = DateTime.UtcNow;
+            address.CreatedOnUtc = DateTime.Now;
 
             //some validation
             if (address.CountryId == 0)

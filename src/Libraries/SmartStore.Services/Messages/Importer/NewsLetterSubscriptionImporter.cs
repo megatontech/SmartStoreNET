@@ -35,7 +35,7 @@ namespace SmartStore.Services.Messages.Importer
 
 		public void Execute(ImportExecuteContext context)
 		{
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 			var currentStoreId = context.Services.StoreContext.CurrentStore.Id;
 
 			using (var scope = new DbContextScope(ctx: context.Services.DbContext, hooksEnabled: false, autoDetectChanges: false, proxyCreation: false, validateOnSave: false, autoCommit: false))

@@ -178,7 +178,7 @@ namespace SmartStore.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTime.Now;
                 var forum = model.ToEntity();
 
                 _forumService.InsertForum(forum);

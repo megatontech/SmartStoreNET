@@ -261,7 +261,7 @@ namespace SmartStore.Services.DataExchange.Export
             }
             if (profile.FileNamePattern.Contains("%Timestamp%"))
             {
-                sb.Replace("%Timestamp%", DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture));
+                sb.Replace("%Timestamp%", DateTime.Now.ToString("s", CultureInfo.InvariantCulture));
             }
 
             var result = sb.ToString()

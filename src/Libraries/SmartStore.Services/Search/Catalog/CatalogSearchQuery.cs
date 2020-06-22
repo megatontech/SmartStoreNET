@@ -101,7 +101,7 @@ namespace SmartStore.Services.Search
 		/// <returns>Catalog search query</returns>
 		public CatalogSearchQuery VisibleOnly(params int[] allowedCustomerRoleIds)
 		{
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 
 			PublishedOnly(true);
 

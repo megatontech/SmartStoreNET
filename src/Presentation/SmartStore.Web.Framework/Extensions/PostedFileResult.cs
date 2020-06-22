@@ -24,7 +24,7 @@ namespace SmartStore
 
 			this._httpFile = httpFile;
 
-			this.TimeStamp = DateTime.UtcNow;
+			this.TimeStamp = DateTime.Now;
 			this.BatchId = Guid.NewGuid();
 		}
 

@@ -109,7 +109,7 @@ namespace SmartStore.Templating.Liquid
 				// Read from file, compile and put to cache with file dependeny
 				var source = ReadTemplateFileInternal(virtualPath);
 				cachedTemplate = Template.Parse(source);
-				var cacheDependency = _vpp.GetCacheDependency(virtualPath, DateTime.UtcNow);
+				var cacheDependency = _vpp.GetCacheDependency(virtualPath, DateTime.Now);
 				HttpRuntime.Cache.Insert(cacheKey, cachedTemplate, cacheDependency);
 			}
 

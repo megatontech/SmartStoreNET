@@ -28,7 +28,7 @@ namespace SmartStore.Services.Directory
 
             var result = new Dictionary<string, ExchangeRate>();
             var targetCurrency = exchangeRateCurrencyCode.ToUpper();
-            var updateDate = DateTime.UtcNow;
+            var updateDate = DateTime.Now;
 
             // old url still works too: http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml
             var request = WebRequest.Create("http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml") as HttpWebRequest;

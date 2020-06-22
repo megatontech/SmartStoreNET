@@ -116,7 +116,7 @@ namespace SmartStore.Admin.Controllers
                 {
                     var name = customer.FirstOrDefault(x => x.Id == item.Customer) == null ? "" : customer.FirstOrDefault(x => x.Id == item.Customer).Username;
                     item.CustomerName = name;
-                    modelList.Add(item.ToModel());
+                    if (item.Amount != 0M) { modelList.Add(item.ToModel()); }
                 }
                 var products = new PagedList<WithdrawalDetailModel>(modelList.AsEnumerable(), command.Page - 1, command.PageSize, detail.Count());
                 gridModel.Data = products;

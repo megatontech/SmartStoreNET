@@ -145,7 +145,7 @@ namespace SmartStore.Services.DataExchange
         {
             Guard.NotNull(mapping, nameof(mapping));
 
-            mapping.SyncedOnUtc = DateTime.UtcNow;
+            mapping.SyncedOnUtc = DateTime.Now;
             _syncMappingsRepository.Update(mapping);
         }
 

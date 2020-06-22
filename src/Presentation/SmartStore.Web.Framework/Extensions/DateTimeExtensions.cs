@@ -41,7 +41,7 @@ namespace SmartStore.Web.Framework
             string result = "";
 			Localizer T = EngineContext.Current.Resolve<IText>().Get;
             
-            var ts = new TimeSpan(DateTime.UtcNow.Ticks - source.Ticks);
+            var ts = new TimeSpan(DateTime.Now.Ticks - source.Ticks);
             double delta = ts.TotalSeconds;
 
             if (delta > 0)

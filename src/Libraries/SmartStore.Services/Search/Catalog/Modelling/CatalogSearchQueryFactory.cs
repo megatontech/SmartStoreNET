@@ -548,7 +548,7 @@ namespace SmartStore.Services.Search.Modelling
 			}
 
 			bool newArrivalsOnly;
-			var fromUtc = DateTime.UtcNow.Subtract(TimeSpan.FromDays(newForMaxDays));
+			var fromUtc = DateTime.Now.Subtract(TimeSpan.FromDays(newForMaxDays));
 
 			if (GetValueFor(query, "n", FacetGroupKind.NewArrivals, out newArrivalsOnly) && newArrivalsOnly)
 			{

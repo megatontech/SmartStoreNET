@@ -49,7 +49,7 @@ namespace SmartStore.Services.Directory
             DateTime lastUpdateTime = DateTime.FromBinary(lastUpdateTimeTicks);
             lastUpdateTime = DateTime.SpecifyKind(lastUpdateTime, DateTimeKind.Utc);
 
-            if (lastUpdateTime.AddHours(1) < DateTime.UtcNow)
+            if (lastUpdateTime.AddHours(1) < DateTime.Now)
             {
                 // update rates every hour
                 var exchangeRates = _currencyService.GetCurrencyLiveRates(_services.StoreContext.CurrentStore.PrimaryExchangeRateCurrency.CurrencyCode);
@@ -68,7 +68,7 @@ namespace SmartStore.Services.Directory
                 }
 
                 // save new update time value
-                _currencySettings.LastUpdateTime = DateTime.UtcNow.ToBinary();
+                _currencySettings.LastUpdateTime = DateTime.Now.ToBinary();
                 _services.Settings.SaveSetting(_currencySettings);
             }
         }

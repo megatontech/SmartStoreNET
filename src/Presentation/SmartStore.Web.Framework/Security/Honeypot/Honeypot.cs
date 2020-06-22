@@ -31,7 +31,7 @@ namespace SmartStore.Web.Framework.Security
 			return new HoneypotField
 			{
 				Name = fieldName,
-				CreatedOnUtc = DateTime.UtcNow
+				CreatedOnUtc = DateTime.Now
 			};
 		}
 
@@ -68,7 +68,7 @@ namespace SmartStore.Web.Framework.Security
 
 			var token = DeserializeToken(tokenString);
 			var trap = httpContext.Request.Form[token.Name];
-			var isBot = trap == null || trap.Length > 0 || (DateTime.UtcNow - token.CreatedOnUtc).TotalMilliseconds < 2000;
+			var isBot = trap == null || trap.Length > 0 || (DateTime.Now - token.CreatedOnUtc).TotalMilliseconds < 2000;
 
 			return isBot;
 		}

@@ -45,6 +45,8 @@ namespace SmartStore.Web.Controllers
     public partial class CustomerController : PublicControllerBase
     {
         #region Fields
+        
+        private readonly IDailyCustomerContributionDetailService _iDailyCustomerContributionDetailService;
         private readonly IDeclarationProductService _productService;
         private readonly IAuthenticationService _authenticationService;
         private readonly IDateTimeHelper _dateTimeHelper;
@@ -97,7 +99,7 @@ namespace SmartStore.Web.Controllers
 
         public CustomerController(
             IAuthenticationService authenticationService, IDeclarationProductService productService,
-            IDateTimeHelper dateTimeHelper,
+            IDateTimeHelper dateTimeHelper, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
             ILocalizationService localizationService,
 			IWorkContext workContext, IStoreContext storeContext,
@@ -127,6 +129,7 @@ namespace SmartStore.Web.Controllers
             IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
             )
         {
+            _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
             _productService = productService;
             _authenticationService = authenticationService;
             _dateTimeHelper = dateTimeHelper;
@@ -379,7 +382,7 @@ namespace SmartStore.Web.Controllers
                     var orderModel = new CustomerOrderListModel.OrderDetailsModel
                     {
                         Id = x.Id,
-                        OrderNumber = x.Id.ToString(),
+                        OrderNumber = x.OrderNumber.ToString(),
                         OrderProductName = (x.ProductID==0?"失效产品": _productService.GetProductById(x.ProductID).Name),
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
                         OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
@@ -801,7 +804,7 @@ namespace SmartStore.Web.Controllers
                                     NewsLetterSubscriptionGuid = Guid.NewGuid(),
                                     Email = model.Email,
                                     Active = true,
-                                    CreatedOnUtc = DateTime.UtcNow,
+                                    CreatedOnUtc = DateTime.Now,
 									StoreId = _storeContext.CurrentStore.Id,
                                     WorkingLanguageId = Services.WorkContext.WorkingLanguage.Id
                                 });
@@ -1341,7 +1344,7 @@ namespace SmartStore.Web.Controllers
             if (ModelState.IsValid)
             {
                 var address = model.Address.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
@@ -1658,6 +1661,7 @@ namespace SmartStore.Web.Controllers
 
 
             var customer = _workContext.CurrentCustomer;
+            var contribution = _iDailyCustomerContributionDetailService.Get(customer.Id,customer.CustomerGuid);
             var total = _total.Get(customer);
             //钱包展示总额，可提现，冻结，以及最近入账
             var model = new CustomerWalletModel();
@@ -1672,6 +1676,7 @@ namespace SmartStore.Web.Controllers
                     CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
                 });
             }
+            model.TotalPoints = contribution.TotalPoint;
             model.Total = total.TotalAmount;
             model.DecShare = total.TotalDecShareAmount;
             model.Freeze = total.TotalFreezeAmount;

@@ -786,7 +786,7 @@ namespace SmartStore.Admin.Controllers
                     var str = JsonConvert.SerializeObject(new LastResourcesImportInfo
                     {
                         TranslatedPercentage = availableResources.TranslatedPercentage,
-                        ImportedOn = DateTime.UtcNow
+                        ImportedOn = DateTime.Now
                     });
                     _genericAttributeService.SaveAttribute(language, "LastResourcesImportInfo", str);
 
@@ -911,7 +911,7 @@ namespace SmartStore.Admin.Controllers
                 var str = JsonConvert.SerializeObject(new LastResourcesImportInfo
                 {
                     TranslatedPercentage = resources.TranslatedPercentage,
-                    ImportedOn = DateTime.UtcNow
+                    ImportedOn = DateTime.Now
                 });
                 genericAttributeService.SaveAttribute(language, "LastResourcesImportInfo", str);
             }

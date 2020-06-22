@@ -494,7 +494,7 @@ namespace SmartStore.Core.Domain.Customers
                 PointsBalance = newPointsBalance,
                 UsedAmount = usedAmount,
                 Message = message,
-                CreatedOnUtc = DateTime.UtcNow
+                CreatedOnUtc = DateTime.Now
             };
 
             this.RewardPointsHistory.Add(rewardPointsHistory);

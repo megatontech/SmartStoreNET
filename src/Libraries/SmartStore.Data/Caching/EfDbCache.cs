@@ -101,7 +101,7 @@ namespace SmartStore.Data.Caching
 				Key = key,
 				Value = value,
 				EntitySets = dependentEntitySets,
-				CachedOnUtc = DateTime.UtcNow
+				CachedOnUtc = DateTime.Now
 			};
 
 			_requestCache.Value.Put(key, entry);
@@ -191,7 +191,7 @@ namespace SmartStore.Data.Caching
 			}
 
 			key = HashKey(key);
-			var now = DateTime.UtcNow;
+			var now = DateTime.Now;
 
 			var entry = _cache.Get<DbCacheEntry>(key, independent: true);
 
@@ -231,7 +231,7 @@ namespace SmartStore.Data.Caching
 					Key = key,
 					Value = value,
 					EntitySets = entitySets,
-					CachedOnUtc = DateTime.UtcNow,
+					CachedOnUtc = DateTime.Now,
 					Duration = duration
 				};
 

@@ -242,7 +242,7 @@ namespace SmartStore.Admin.Controllers
 
                 affiliate.Active = model.Active;
                 affiliate.Address = model.Address.ToEntity();
-                affiliate.Address.CreatedOnUtc = DateTime.UtcNow;
+                affiliate.Address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (affiliate.Address.CountryId == 0)
                     affiliate.Address.CountryId = null;

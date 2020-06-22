@@ -102,7 +102,7 @@ namespace SmartStore.Services.Tasks
 
         public async virtual Task<IList<ScheduleTask>> GetPendingTasksAsync()
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             var machineName = _env.MachineName;
 
             var query = (
@@ -259,7 +259,7 @@ namespace SmartStore.Services.Tasks
 				try
 				{
 					var localTimeZone = _dtHelper.DefaultStoreTimeZone;
-					var baseTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, localTimeZone);
+					var baseTime = TimeZoneInfo.ConvertTime(DateTime.Now, localTimeZone);
 					var next = CronExpression.GetNextSchedule(task.CronExpression, baseTime);
 					var utcTime = _dtHelper.ConvertToUtcTime(next, localTimeZone);
 
@@ -472,7 +472,7 @@ namespace SmartStore.Services.Tasks
 
             if (_commonSettings.Value.MaxScheduleHistoryAgeInDays > 0)
             {
-                var earliestDate = DateTime.UtcNow.AddDays(-1 * _commonSettings.Value.MaxScheduleHistoryAgeInDays);
+                var earliestDate = DateTime.Now.AddDays(-1 * _commonSettings.Value.MaxScheduleHistoryAgeInDays);
                 var ids = _taskHistoryRepository.TableUntracked
                     .Where(x => x.StartedOnUtc <= earliestDate && !x.IsRunning)
                     .Select(x => x.Id)

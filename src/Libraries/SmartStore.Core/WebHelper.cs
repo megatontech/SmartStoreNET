@@ -509,7 +509,7 @@ namespace SmartStore.Core
 
 				using (var stream = File.CreateText(Path.Combine(binMarker, "marker.txt")))
 				{
-					stream.WriteLine("Restart on '{0}'", DateTime.UtcNow);
+					stream.WriteLine("Restart on '{0}'", DateTime.Now);
 					stream.Flush();
 				}
 				return true;

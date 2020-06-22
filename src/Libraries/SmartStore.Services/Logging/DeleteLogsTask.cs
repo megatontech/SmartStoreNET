@@ -34,7 +34,7 @@ namespace SmartStore.Services.Logging
         public void Execute(TaskExecutionContext ctx)
         {
             var olderThanDays = 7; // TODO: move to settings
-            var toUtc = DateTime.UtcNow.AddDays(-olderThanDays);
+            var toUtc = DateTime.Now.AddDays(-olderThanDays);
 
             _logService.ClearLog(toUtc, LogLevel.Error);
         }

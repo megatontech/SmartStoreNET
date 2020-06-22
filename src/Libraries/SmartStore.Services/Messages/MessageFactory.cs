@@ -147,7 +147,7 @@ namespace SmartStore.Services.Messages
 				ReplyTo = replyTo?.ToString(),
 				Subject = subject,
 				Body = body,
-				CreatedOnUtc = DateTime.UtcNow,
+				CreatedOnUtc = DateTime.Now,
 				EmailAccountId = messageContext.EmailAccount.Id,
 				SendManually = messageTemplate.SendManually
 			};

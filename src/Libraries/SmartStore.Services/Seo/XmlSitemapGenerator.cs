@@ -131,7 +131,7 @@ namespace SmartStore.Services.Seo
 
 			if (isRetry)
 			{
-				var msg = "Could not generate XML sitemap. Index: {0}, Date: {1}".FormatInvariant(index, DateTime.UtcNow);
+				var msg = "Could not generate XML sitemap. Index: {0}, Date: {1}".FormatInvariant(index, DateTime.Now);
 				Logger.Error(msg);
 				throw new SmartException(msg);
 			}
@@ -369,7 +369,7 @@ namespace SmartStore.Services.Seo
 								{
 									// Ensure that at least one entry exists. Otherwise,
 									// the system will try to rebuild again.
-									var homeNode = new XmlSitemapNode { LastMod = DateTime.UtcNow, Loc = data.BaseUrl };
+									var homeNode = new XmlSitemapNode { LastMod = DateTime.Now, Loc = data.BaseUrl };
 									var documents = GetSiteMapDocuments(new List<XmlSitemapNode> { homeNode });
 									await SaveTempAsync(documents, data, 0);
 								}
@@ -499,7 +499,7 @@ namespace SmartStore.Services.Seo
 				var topics = queries.Topics.Select(x => new { x.Id }).ToList();
 				foreach (var x in topics)
 				{
-					yield return new NamedEntity { EntityName = "Topic", Id = x.Id, LastMod = DateTime.UtcNow };
+					yield return new NamedEntity { EntityName = "Topic", Id = x.Id, LastMod = DateTime.Now };
 				}
 			}
 

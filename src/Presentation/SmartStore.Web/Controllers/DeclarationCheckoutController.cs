@@ -503,7 +503,7 @@ namespace SmartStore.Web.Controllers
             if (ModelState.IsValid)
             {
                 var address = model.NewAddress.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
@@ -578,7 +578,7 @@ namespace SmartStore.Web.Controllers
             if (ModelState.IsValid)
             {
                 var address = model.NewAddress.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
@@ -843,10 +843,11 @@ namespace SmartStore.Web.Controllers
                 AcceptThirdPartyEmailHandOver = false
             };
             order.PaymentMethodSystemName = image;
-            order.PaidDateUtc = DateTime.UtcNow;
+            order.PaidDateUtc = DateTime.Now;
             order.OrderGuid = Guid.NewGuid();
             var no = _DeclarationOrderService.GetOrdersMaxNo();
-            order.OrderNumber = DateTime.UtcNow.ToString("yyyyMMdd") + (no+1);
+            string seriNo = String.Format("%08d", (no + 1));
+            order.OrderNumber = DateTime.Now.ToString("yyyyMMdd")+ seriNo;
             _DeclarationOrderService.InsertOrder(order);
             var neworder = _DeclarationOrderService.GetOrderByGuid(order.OrderGuid);
             List<OrderItem> OrderItems = new List<OrderItem>();

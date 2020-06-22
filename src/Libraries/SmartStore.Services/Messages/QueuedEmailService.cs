@@ -196,7 +196,7 @@ namespace SmartStore.Services.Messages
 
 				await _emailSender.SendEmailAsync(smtpContext, msg);
 
-				queuedEmail.SentOnUtc = DateTime.UtcNow;
+				queuedEmail.SentOnUtc = DateTime.Now;
 				result = true;
 			}
 			catch (Exception ex)

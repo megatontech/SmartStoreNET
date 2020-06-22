@@ -80,7 +80,7 @@ namespace SmartStore.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var giftCard = model.ToEntity();
-                giftCard.CreatedOnUtc = DateTime.UtcNow;
+                giftCard.CreatedOnUtc = DateTime.Now;
                 _giftCardService.InsertGiftCard(giftCard);
 
                 //activity log

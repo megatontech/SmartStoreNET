@@ -192,7 +192,7 @@ namespace SmartStore
 				cookie = new HttpCookie("sm.UserThemeChoice")
 				{
 					HttpOnly = true,
-					Expires = DateTime.UtcNow.AddYears(1)
+					Expires = DateTime.Now.AddYears(1)
 				};				
 			}
 
@@ -204,7 +204,7 @@ namespace SmartStore
 
 			if (value.IsEmpty() && cookie != null)
 			{
-				cookie.Expires = DateTime.UtcNow.AddYears(-10);
+				cookie.Expires = DateTime.Now.AddYears(-10);
 			}
 
 			if (cookie != null)
@@ -227,7 +227,7 @@ namespace SmartStore
 			if (cookie != null)
 			{
 				// when cookie gets created or touched, extend its lifetime
-				cookie.Expires = DateTime.UtcNow.AddMinutes(20);
+				cookie.Expires = DateTime.Now.AddMinutes(20);
 			}
 
 			return cookie;
@@ -261,11 +261,11 @@ namespace SmartStore
 				{
 					if (!cookie.HasKeys)
 					{
-						cookie.Expires = DateTime.UtcNow.AddYears(-10);
+						cookie.Expires = DateTime.Now.AddYears(-10);
 					}
 					else
 					{
-						cookie.Expires = DateTime.UtcNow.AddMinutes(20);
+						cookie.Expires = DateTime.Now.AddMinutes(20);
 					}
 
 					context.Response.SetCookie(cookie);

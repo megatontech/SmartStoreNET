@@ -2102,7 +2102,7 @@ namespace SmartStore.Admin.Controllers
         {
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTime.Now;
                 var products = _productService.GetProductsByIds(selectedProductIds);
 
                 var maxDisplayOrder = _productService.GetBundleItems(productId, true)

@@ -681,8 +681,8 @@ namespace SmartStore.Admin.Controllers
                     AdminComment = model.AdminComment,
                     IsTaxExempt = model.IsTaxExempt,
                     Active = model.Active,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    LastActivityDateUtc = DateTime.UtcNow,
+                    CreatedOnUtc = DateTime.Now,
+                    LastActivityDateUtc = DateTime.Now,
                 };
                 if (model.IsCustomer)
                 {
@@ -1233,7 +1233,7 @@ namespace SmartStore.Admin.Controllers
                     To = new EmailAddress(customer.Email, customer.GetFullName()),
                     Subject = model.SendEmail.Subject,
                     Body = model.SendEmail.Body,
-                    CreatedOnUtc = DateTime.UtcNow,
+                    CreatedOnUtc = DateTime.Now,
                 };
 
                 _queuedEmailService.InsertQueuedEmail(email);
@@ -1278,7 +1278,7 @@ namespace SmartStore.Admin.Controllers
                     IsDeletedByAuthor = false,
                     IsDeletedByRecipient = false,
                     IsRead = false,
-                    CreatedOnUtc = DateTime.UtcNow
+                    CreatedOnUtc = DateTime.Now
                 };
 
                 _forumService.InsertPrivateMessage(privateMessage);
@@ -1405,7 +1405,7 @@ namespace SmartStore.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var address = model.Address.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
@@ -1927,7 +1927,7 @@ namespace SmartStore.Admin.Controllers
 
         [SmartResourceDisplayName("Account.Login.Fields.UsernameOrEmail")]
         public string UsernameOrEmail { get; set; }
-        [SmartResourceDisplayName("用户名或手机号")]
+        [SmartResourceDisplayName("手机号")]
         public string UsernameOrMobile { get; set; }
 
         [DataType(DataType.Password)]

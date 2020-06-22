@@ -25,7 +25,7 @@ namespace SmartStore.Services.Messages
 
 		public override async Task ExecuteAsync(TaskExecutionContext ctx)
         {
-			var olderThan = DateTime.UtcNow.AddDays(-Math.Abs(_commonSettings.MaxQueuedMessagesAgeInDays));
+			var olderThan = DateTime.Now.AddDays(-Math.Abs(_commonSettings.MaxQueuedMessagesAgeInDays));
 			await _qeRepository.DeleteAllAsync(x => x.SentOnUtc.HasValue && x.CreatedOnUtc < olderThan);
 
 			_qeRepository.Context.ShrinkDatabase();

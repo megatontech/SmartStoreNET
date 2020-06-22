@@ -109,7 +109,7 @@ namespace SmartStore.Admin.Controllers
                 var newsItem = model.ToEntity();
                 newsItem.StartDateUtc = model.StartDate;
                 newsItem.EndDateUtc = model.EndDate;
-                newsItem.CreatedOnUtc = DateTime.UtcNow;
+                newsItem.CreatedOnUtc = DateTime.Now;
                 _newsService.InsertNews(newsItem);
 
                 // Search engine name.

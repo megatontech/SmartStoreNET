@@ -42,7 +42,7 @@ namespace SmartStore.Services.Wallet
         {
             var entity = GetPoints(customerid);
             entity.Amount += points;
-            entity.UpdateTime = DateTime.UtcNow;
+            entity.UpdateTime = DateTime.Now;
             _CustomerPointsTotalRepository.Update(entity);
         }
 
@@ -71,7 +71,7 @@ namespace SmartStore.Services.Wallet
         {
             var entity = GetPoints(customerid);
             entity.Amount -= points;
-            entity.UpdateTime = DateTime.UtcNow;
+            entity.UpdateTime = DateTime.Now;
             _CustomerPointsTotalRepository.Update(entity);
         }
 

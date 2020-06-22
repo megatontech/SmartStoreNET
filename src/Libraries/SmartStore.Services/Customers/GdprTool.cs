@@ -138,7 +138,7 @@ namespace SmartStore.Services.Customers
                 customer.CustomerRoles.Add(_services.Resolve<ICustomerService>().GetCustomerRoleBySystemName(SystemCustomerRoleNames.Guests));
 
                 // Delete shopping cart & wishlist (TBD: (mc) Really?!?)
-                _shoppingCartService.DeleteExpiredShoppingCartItems(DateTime.UtcNow, customer.Id);
+                _shoppingCartService.DeleteExpiredShoppingCartItems(DateTime.Now, customer.Id);
 
                 // Delete forum subscriptions
                 var forumSubscriptions = _forumService.GetAllSubscriptions(customer.Id, 0, 0, 0, int.MaxValue);

@@ -214,7 +214,7 @@ namespace SmartStore.Web.Framework.WebApi.Security
 			var result = HmacResult.FailedForUnknownReason;
 			var controllingData = WebApiCachingControllingData.Data();
 			var dependencyScope = actionContext.Request.GetDependencyScope();
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 			Customer customer = null;
 
 			try

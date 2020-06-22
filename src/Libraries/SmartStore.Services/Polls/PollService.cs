@@ -43,7 +43,7 @@ namespace SmartStore.Services.Polls
 		{
 			if (!showHidden)
 			{
-				var utcNow = DateTime.UtcNow;
+				var utcNow = DateTime.Now;
 				query = query.Where(p => p.Published);
 				query = query.Where(p => !p.StartDateUtc.HasValue || p.StartDateUtc <= utcNow);
 				query = query.Where(p => !p.EndDateUtc.HasValue || p.EndDateUtc >= utcNow);

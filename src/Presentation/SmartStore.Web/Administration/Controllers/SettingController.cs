@@ -1555,7 +1555,7 @@ namespace SmartStore.Admin.Controllers
                 if (storeScope == 0 || StoreDependingSettings.IsOverrideChecked(shippingSettings, "ShippingOriginAddress", form))
                 {
                     var addressId = _services.Settings.SettingExists(shippingSettings, x => x.ShippingOriginAddressId, storeScope) ? shippingSettings.ShippingOriginAddressId : 0;
-                    var originAddress = _addressService.GetAddressById(addressId) ?? new Address { CreatedOnUtc = DateTime.UtcNow };
+                    var originAddress = _addressService.GetAddressById(addressId) ?? new Address { CreatedOnUtc = DateTime.Now };
 
                     // Update ID manually (in case we're in multi-store configuration mode it'll be set to the shared one).
                     model.ShippingOriginAddress.Id = addressId;
@@ -1781,7 +1781,7 @@ namespace SmartStore.Admin.Controllers
                 if (storeScope == 0 || StoreDependingSettings.IsOverrideChecked(taxSettings, "DefaultTaxAddress", form))
                 {
                     var addressId = _services.Settings.SettingExists(taxSettings, x => x.DefaultTaxAddressId, storeScope) ? taxSettings.DefaultTaxAddressId : 0;
-                    var originAddress = _addressService.GetAddressById(addressId) ?? new Address { CreatedOnUtc = DateTime.UtcNow };
+                    var originAddress = _addressService.GetAddressById(addressId) ?? new Address { CreatedOnUtc = DateTime.Now };
 
                     // Update ID manually (in case we're in multi-store configuration mode it'll be set to the shared one).
                     model.DefaultTaxAddress.Id = addressId;

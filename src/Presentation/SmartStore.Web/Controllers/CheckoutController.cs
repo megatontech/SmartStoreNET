@@ -497,7 +497,7 @@ namespace SmartStore.Web.Controllers
             if (ModelState.IsValid)
             {
                 var address = model.NewAddress.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
@@ -572,7 +572,7 @@ namespace SmartStore.Web.Controllers
             if (ModelState.IsValid)
             {
                 var address = model.NewAddress.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.Now;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;

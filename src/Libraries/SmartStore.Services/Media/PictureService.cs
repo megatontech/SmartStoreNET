@@ -519,7 +519,7 @@ namespace SmartStore.Services.Media
             picture.SeoFilename = seoFilename.Truncate(100);
             picture.IsNew = isNew;
             picture.IsTransient = isTransient;
-            picture.UpdatedOnUtc = DateTime.UtcNow;
+            picture.UpdatedOnUtc = DateTime.Now;
 
             if (width > 0 && height > 0)
             {
@@ -620,7 +620,7 @@ namespace SmartStore.Services.Media
             picture.MimeType = mimeType;
             picture.SeoFilename = seoFilename;
             picture.IsNew = isNew;
-            picture.UpdatedOnUtc = DateTime.UtcNow;
+            picture.UpdatedOnUtc = DateTime.Now;
 
             if (!size.IsEmpty)
             {
@@ -816,7 +816,7 @@ namespace SmartStore.Services.Media
                         var size = ImageHeader.GetDimensions(stream, picture.MimeType, true);
                         picture.Width = size.Width;
                         picture.Height = size.Height;
-                        picture.UpdatedOnUtc = DateTime.UtcNow;
+                        picture.UpdatedOnUtc = DateTime.Now;
 
                         if (saveOnResolve)
                         {

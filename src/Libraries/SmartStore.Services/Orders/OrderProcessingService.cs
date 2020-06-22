@@ -391,7 +391,7 @@ namespace SmartStore.Services.Orders
             if (order.PaymentStatus == PaymentStatus.Paid && !order.PaidDateUtc.HasValue)
             {
                 //ensure that paid date is set
-                order.PaidDateUtc = DateTime.UtcNow;
+                order.PaidDateUtc = DateTime.Now;
                 _orderService.UpdateOrder(order);
             }
 
@@ -444,7 +444,7 @@ namespace SmartStore.Services.Orders
                 return true;
             }
 
-            var interval = DateTime.UtcNow - lastOrder.CreatedOnUtc;
+            var interval = DateTime.Now - lastOrder.CreatedOnUtc;
             return interval.TotalSeconds > _orderSettings.MinimumOrderPlacementInterval;
         }
 
@@ -719,7 +719,7 @@ namespace SmartStore.Services.Orders
             }
 
             var result = new PlaceOrderResult();
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 
             try
             {
@@ -1636,7 +1636,7 @@ namespace SmartStore.Services.Orders
                     var rph = new RecurringPaymentHistory
                     {
                         RecurringPayment = recurringPayment,
-                        CreatedOnUtc = DateTime.UtcNow,
+                        CreatedOnUtc = DateTime.Now,
                         OrderId = result.PlacedOrder.Id
                     };
 
@@ -1760,7 +1760,7 @@ namespace SmartStore.Services.Orders
             if (shipment.ShippedDateUtc.HasValue)
                 throw new SmartException(T("Shipment.AlreadyShipped"));
 
-            shipment.ShippedDateUtc = DateTime.UtcNow;
+            shipment.ShippedDateUtc = DateTime.Now;
             _shipmentService.UpdateShipment(shipment);
 
             //check whether we have more items to ship
@@ -1804,7 +1804,7 @@ namespace SmartStore.Services.Orders
 			if (shipment.DeliveryDateUtc.HasValue)
                 throw new SmartException(T("Shipment.AlreadyDelivered"));
 
-            shipment.DeliveryDateUtc = DateTime.UtcNow;
+            shipment.DeliveryDateUtc = DateTime.Now;
             _shipmentService.UpdateShipment(shipment);
 
 			if (!order.CanAddItemsToShipment() && !order.HasItemsToDispatch() && !order.HasItemsToDeliver())
@@ -2080,7 +2080,7 @@ namespace SmartStore.Services.Orders
                     var paidDate = order.PaidDateUtc;
 					if (result.NewPaymentStatus == PaymentStatus.Paid)
 					{
-						paidDate = DateTime.UtcNow;
+						paidDate = DateTime.Now;
 					}
 
                     order.CaptureTransactionId = result.CaptureTransactionId;
@@ -2150,7 +2150,7 @@ namespace SmartStore.Services.Orders
                 throw new SmartException(T("Order.CannotMarkPaid"));
 
             order.PaymentStatusId = (int)PaymentStatus.Paid;
-            order.PaidDateUtc = DateTime.UtcNow;
+            order.PaidDateUtc = DateTime.Now;
 
 			_orderService.UpdateOrder(order);
 
@@ -2636,7 +2636,7 @@ namespace SmartStore.Services.Orders
             }
             else
             {
-                var daysPassed = (DateTime.UtcNow - order.CreatedOnUtc).TotalDays;
+                var daysPassed = (DateTime.Now - order.CreatedOnUtc).TotalDays;
                 numberOfDaysReturnRequestAvailableValid = (daysPassed - _orderSettings.NumberOfDaysReturnRequestAvailable) < 0;
             }
 
@@ -2742,7 +2742,7 @@ namespace SmartStore.Services.Orders
 						TotalWeight = null,
 						ShippedDateUtc = null,
 						DeliveryDateUtc = null,
-						CreatedOnUtc = DateTime.UtcNow,
+						CreatedOnUtc = DateTime.Now,
 					};
 				}
 

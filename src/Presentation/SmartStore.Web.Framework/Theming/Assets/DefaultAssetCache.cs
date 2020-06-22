@@ -242,7 +242,7 @@ namespace SmartStore.Web.Framework.Theming.Assets
 			var cacheDependency = new CacheDependency(
 				new string[0], 
 				new[] { FrameworkCacheConsumer.BuildThemeVarsCacheKey(entry.ThemeName, entry.StoreId) }, 
-				DateTime.UtcNow);
+				DateTime.Now);
 
 			HttpRuntime.Cache.Insert(
 				cacheKey,

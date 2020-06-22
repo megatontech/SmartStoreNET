@@ -174,8 +174,8 @@ namespace SmartStore.Web.Infrastructure.Installation
                 PasswordFormat = PasswordFormat.Clear,
                 PasswordSalt = "",
                 Active = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                LastActivityDateUtc = DateTime.UtcNow,
+                CreatedOnUtc = DateTime.Now,
+                LastActivityDateUtc = DateTime.Now,
             };
 
             var adminAddress = _data.AdminAddress();

@@ -89,7 +89,7 @@ namespace SmartStore.Web.Controllers
 						NewsLetterSubscriptionGuid = Guid.NewGuid(),
 						Email = email,
 						Active = false,
-						CreatedOnUtc = DateTime.UtcNow,
+						CreatedOnUtc = DateTime.Now,
 						StoreId = _storeContext.CurrentStore.Id,
                         WorkingLanguageId = _workContext.WorkingLanguage.Id
                     };

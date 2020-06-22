@@ -96,7 +96,7 @@ namespace SmartStore.Services.Authentication
 
         public virtual void SignIn(Customer customer, bool createPersistentCookie)
         {
-            var now = DateTime.UtcNow.ToLocalTime();
+            var now = DateTime.Now.ToLocalTime();
             var name = _customerSettings.CustomerLoginType != CustomerLoginType.Email ? customer.Username : customer.Email;
 
             var ticket = new FormsAuthenticationTicket(

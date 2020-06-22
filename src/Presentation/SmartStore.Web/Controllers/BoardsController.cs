@@ -280,7 +280,7 @@ namespace SmartStore.Web.Controllers
                     _genericAttributeService.SaveAttribute(
                         customer,
                         SystemCustomerAttributeNames.LastForumVisit,
-                        DateTime.UtcNow,
+                        DateTime.Now,
                         Services.StoreContext.CurrentStore.Id);
                 }
             }
@@ -328,7 +328,7 @@ namespace SmartStore.Web.Controllers
 
             var model = new BoardsIndexModel
             {
-                CurrentTime = _dateTimeHelper.ConvertToUserTime(DateTime.UtcNow)
+                CurrentTime = _dateTimeHelper.ConvertToUserTime(DateTime.Now)
             };
 
             foreach (var group in groups)
@@ -499,7 +499,7 @@ namespace SmartStore.Web.Controllers
                     SubscriptionGuid = Guid.NewGuid(),
                     CustomerId = customer.Id,
                     ForumId = forum.Id,
-                    CreatedOnUtc = DateTime.UtcNow
+                    CreatedOnUtc = DateTime.Now
                 };
 
                 _forumService.InsertSubscription(subscription);
@@ -781,7 +781,7 @@ namespace SmartStore.Web.Controllers
                     SubscriptionGuid = Guid.NewGuid(),
                     CustomerId = customer.Id,
                     TopicId = topic.Id,
-                    CreatedOnUtc = DateTime.UtcNow
+                    CreatedOnUtc = DateTime.Now
                 };
 
                 _forumService.InsertSubscription(subscription);
@@ -1001,7 +1001,7 @@ namespace SmartStore.Web.Controllers
                                 SubscriptionGuid = Guid.NewGuid(),
                                 CustomerId = customer.Id,
                                 TopicId = topic.Id,
-                                CreatedOnUtc = DateTime.UtcNow
+                                CreatedOnUtc = DateTime.Now
                             };
 
                             _forumService.InsertSubscription(forumSubscription);
@@ -1167,7 +1167,7 @@ namespace SmartStore.Web.Controllers
                                     SubscriptionGuid = Guid.NewGuid(),
                                     CustomerId = customer.Id,
                                     TopicId = topic.Id,
-                                    CreatedOnUtc = DateTime.UtcNow
+                                    CreatedOnUtc = DateTime.Now
                                 };
 
                                 _forumService.InsertSubscription(forumSubscription);
@@ -1373,7 +1373,7 @@ namespace SmartStore.Web.Controllers
                                     SubscriptionGuid = Guid.NewGuid(),
                                     CustomerId = customer.Id,
                                     TopicId = post.TopicId,
-                                    CreatedOnUtc = DateTime.UtcNow
+                                    CreatedOnUtc = DateTime.Now
                                 };
 
                                 _forumService.InsertSubscription(forumSubscription);
@@ -1533,7 +1533,7 @@ namespace SmartStore.Web.Controllers
                                     SubscriptionGuid = Guid.NewGuid(),
                                     CustomerId = customer.Id,
                                     TopicId = post.TopicId,
-                                    CreatedOnUtc = DateTime.UtcNow
+                                    CreatedOnUtc = DateTime.Now
                                 };
 
                                 _forumService.InsertSubscription(forumSubscription);

@@ -458,23 +458,23 @@ namespace SmartStore.Services.Calc
         #endregion Public Methods
         public decimal GetTodayDOrderAmount() { 
             decimal todayAmount = 0M;
-            var yestoday = DateTime.UtcNow.Date.AddDays(-1);
-            var today = DateTime.UtcNow.Date;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus== Core.Domain.Payments.PaymentStatus.Paid
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday
                          select d;
-            todayAmount = dorder.ToList().Sum(x => x.OrderTotal);
+            todayAmount = dorder.ToList().Where(x => x.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid).Sum(x => x.OrderTotal);
 
             return todayAmount; 
         }
         public decimal GetTodayOrderAmount() {
             decimal todayAmount = 0M;
-            var yestoday = DateTime.UtcNow.Date.AddDays(-1);
-            var today = DateTime.UtcNow.Date;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
             var order = from d in _OrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday 
                         select d;
-            todayAmount = order.ToList().Sum(x => x.OrderTotal);
+            todayAmount = order.ToList().Where(x=> x.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid).Sum(x => x.OrderTotal );
             return todayAmount; 
         }
     }

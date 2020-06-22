@@ -90,7 +90,7 @@ namespace SmartStore.Admin.Controllers
             }
 
             var span = model.IsRunning
-                ? DateTime.UtcNow - historyEntry.StartedOnUtc
+                ? DateTime.Now - historyEntry.StartedOnUtc
                 : (historyEntry.FinishedOnUtc ?? historyEntry.StartedOnUtc) - historyEntry.StartedOnUtc;
 
             if (span > TimeSpan.Zero)
@@ -114,7 +114,7 @@ namespace SmartStore.Admin.Controllers
                 return null;
             }
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             var nextRunPretty = string.Empty;
             var isOverdue = false;
 

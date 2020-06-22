@@ -455,7 +455,7 @@ namespace SmartStore.Admin.Controllers
                 }
 
                 manufacturer.HasDiscountsApplied = manufacturer.AppliedDiscounts.Count > 0;
-                manufacturer.UpdatedOnUtc = DateTime.UtcNow;
+                manufacturer.UpdatedOnUtc = DateTime.Now;
 
                 // Commit now
                 _manufacturerService.UpdateManufacturer(manufacturer);

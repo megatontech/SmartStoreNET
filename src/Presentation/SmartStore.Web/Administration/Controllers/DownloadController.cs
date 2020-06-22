@@ -73,7 +73,7 @@ namespace SmartStore.Admin.Controllers
                 Extension = postedFile.FileExtension,
                 IsNew = true,
                 IsTransient = true,
-                UpdatedOnUtc = DateTime.UtcNow
+                UpdatedOnUtc = DateTime.Now
             };
 
             _downloadService.InsertDownload(download, postedFile.Buffer);
@@ -159,7 +159,7 @@ namespace SmartStore.Admin.Controllers
                 DownloadUrl = downloadUrl,
                 IsNew = true,
                 IsTransient = true,
-                UpdatedOnUtc = DateTime.UtcNow
+                UpdatedOnUtc = DateTime.Now
             };
 
             _downloadService.InsertDownload(download, null);

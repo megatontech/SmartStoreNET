@@ -165,7 +165,7 @@ namespace SmartStore.Web.Framework.Modelling
 			// in the future, check the last modified time and set it to
 			// DateTime.Now if it's in the future. 
 			// This is to fix VSWhidbey #402323
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 			if (lastModified > utcNow)
 			{
 				// use 1 second resolution

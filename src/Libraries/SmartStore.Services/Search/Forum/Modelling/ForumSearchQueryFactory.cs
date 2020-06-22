@@ -260,7 +260,7 @@ namespace SmartStore.Services.Search.Modelling
             var store = _services.StoreContext.CurrentStore;
             var customer = _services.WorkContext.CurrentCustomer;
             var count = 0;
-            var utcNow = DateTime.UtcNow;
+            var utcNow = DateTime.Now;
             utcNow = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, 0, 0, 0);
 
             foreach (ForumDateFilter filter in Enum.GetValues(typeof(ForumDateFilter)))

@@ -246,7 +246,7 @@ namespace SmartStore.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTime.Now;
 
                 if (returnRequest.RequestedAction != model.RequestedAction)
                     returnRequest.RequestedActionUpdatedOnUtc = utcNow;

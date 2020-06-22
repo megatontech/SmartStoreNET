@@ -118,7 +118,7 @@ namespace SmartStore.Services.Catalog
             using (_services.Chronometer.Step("Copy product " + product.Id))
             {
                 Product clone = null;
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTime.Now;
                 var languages = _languageService.GetAllLanguages(true);
 
                 // Media stuff
@@ -410,7 +410,7 @@ namespace SmartStore.Services.Catalog
                 Filename = download.Filename,
                 Extension = download.Extension,
                 IsNew = download.IsNew,
-                UpdatedOnUtc = DateTime.UtcNow,
+                UpdatedOnUtc = DateTime.Now,
                 EntityId = download.EntityId,
                 EntityName = download.EntityName,
                 Changelog = download.Changelog,

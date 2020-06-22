@@ -117,7 +117,7 @@ namespace SmartStore.Utilities
 			if (!dir.Exists)
 				return;
 
-			var olderThanDate = DateTime.UtcNow.Subtract(olderThan);
+			var olderThanDate = DateTime.Now.Subtract(olderThan);
 
 			for (int i = 0; i < 10; i++)
 			{

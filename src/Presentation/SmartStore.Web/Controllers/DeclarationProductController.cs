@@ -481,7 +481,7 @@ namespace SmartStore.Web.Controllers
 					//	Customer = customer,
 					//	Product = product,
 					//	StoreId = store.Id,
-					//	CreatedOnUtc = DateTime.UtcNow
+					//	CreatedOnUtc = DateTime.Now
 					//};
 
 					_backInStockSubscriptionService.InsertSubscription(subscription);

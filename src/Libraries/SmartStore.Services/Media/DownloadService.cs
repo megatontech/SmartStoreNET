@@ -195,7 +195,7 @@ namespace SmartStore.Services.Media
                             //expiration date
                             if (product.DownloadExpirationDays.HasValue)
                             {
-                                if (order.PaidDateUtc.Value.AddDays(product.DownloadExpirationDays.Value) > DateTime.UtcNow)
+                                if (order.PaidDateUtc.Value.AddDays(product.DownloadExpirationDays.Value) > DateTime.Now)
                                 {
                                     return true;
                                 }
@@ -215,7 +215,7 @@ namespace SmartStore.Services.Media
                             //expiration date
                             if (product.DownloadExpirationDays.HasValue)
                             {
-                                if (order.CreatedOnUtc.AddDays(product.DownloadExpirationDays.Value) > DateTime.UtcNow)
+                                if (order.CreatedOnUtc.AddDays(product.DownloadExpirationDays.Value) > DateTime.Now)
                                 {
                                     return true;
                                 }
@@ -275,7 +275,7 @@ namespace SmartStore.Services.Media
 
         private void UpdateDownloadCore(Download download, byte[] downloadBinary, bool updateDataStorage)
         {
-            download.UpdatedOnUtc = DateTime.UtcNow;
+            download.UpdatedOnUtc = DateTime.Now;
 
             _downloadRepository.Update(download);
 

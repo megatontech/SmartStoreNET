@@ -261,7 +261,7 @@ namespace SmartStore.Web.Controllers
 
 			if (_blogSettings.MaxAgeInDays > 0)
 			{
-				maxAge = DateTime.UtcNow.Subtract(new TimeSpan(_blogSettings.MaxAgeInDays, 0, 0, 0));
+				maxAge = DateTime.Now.Subtract(new TimeSpan(_blogSettings.MaxAgeInDays, 0, 0, 0));
 			}
 
 			var language = _languageService.GetLanguageById(languageId.Value);
@@ -302,8 +302,8 @@ namespace SmartStore.Web.Controllers
 
             var blogPost = _blogService.GetBlogPostById(blogPostId);
             if (blogPost == null ||
-                (blogPost.StartDateUtc.HasValue && blogPost.StartDateUtc.Value >= DateTime.UtcNow) ||
-                (blogPost.EndDateUtc.HasValue && blogPost.EndDateUtc.Value <= DateTime.UtcNow))
+                (blogPost.StartDateUtc.HasValue && blogPost.StartDateUtc.Value >= DateTime.Now) ||
+                (blogPost.EndDateUtc.HasValue && blogPost.EndDateUtc.Value <= DateTime.Now))
 				return HttpNotFound();
 
 			//Store mapping
@@ -435,7 +435,7 @@ namespace SmartStore.Web.Controllers
                     var months = new SortedDictionary<DateTime, int>();
 
                     var first = blogPosts[blogPosts.Count - 1].CreatedOnUtc;
-                    while (DateTime.SpecifyKind(first, DateTimeKind.Utc) <= DateTime.UtcNow.AddMonths(1))
+                    while (DateTime.SpecifyKind(first, DateTimeKind.Utc) <= DateTime.Now.AddMonths(1))
                     {
                         var list = blogPosts.GetPostsByDate(new DateTime(first.Year, first.Month, 1), new DateTime(first.Year, first.Month, 1).AddMonths(1).AddSeconds(-1));
                         if (list.Count > 0)

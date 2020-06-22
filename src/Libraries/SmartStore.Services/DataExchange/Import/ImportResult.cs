@@ -174,7 +174,7 @@ namespace SmartStore.Services.DataExchange.Import
         public void Clear()
         {
             Messages.Clear();
-            StartDateUtc = EndDateUtc = DateTime.UtcNow;
+            StartDateUtc = EndDateUtc = DateTime.Now;
             TotalRecords = 0;
             SkippedRecords = 0;
             NewRecords = 0;

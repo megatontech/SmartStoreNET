@@ -1714,7 +1714,7 @@ namespace SmartStore.Web.Controllers
                         Filename = postedFile.FileTitle,
                         Extension = postedFile.FileExtension,
                         IsNew = true,
-                        UpdatedOnUtc = DateTime.UtcNow,
+                        UpdatedOnUtc = DateTime.Now,
                         EntityId = 0,
                         EntityName = "CheckoutAttribute"
                     };
@@ -2135,7 +2135,7 @@ namespace SmartStore.Web.Controllers
                 Extension = postedFile.FileExtension,
                 IsNew = true,
                 IsTransient = true,
-                UpdatedOnUtc = DateTime.UtcNow,
+                UpdatedOnUtc = DateTime.Now,
                 EntityId = productId,
                 EntityName = "ProductAttribute"
             };

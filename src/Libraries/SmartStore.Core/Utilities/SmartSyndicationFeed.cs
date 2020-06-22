@@ -10,7 +10,7 @@ namespace SmartStore.Utilities
 	public class SmartSyndicationFeed : SyndicationFeed
 	{
 		public SmartSyndicationFeed(Uri feedAlternateLink, string title, string description = null)
-			: base(title, description ?? title, feedAlternateLink, null, DateTime.UtcNow)
+			: base(title, description ?? title, feedAlternateLink, null, DateTime.Now)
 		{
 		}
 

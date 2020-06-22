@@ -293,6 +293,7 @@ namespace SmartStore.Admin.Controllers
             model.StoreName = store != null ? store.Name : "".NaIfEmpty();
             model.CustomerId = order.CustomerId;
             model.CustomerName = order.Customer.GetFullName();
+            if (string.IsNullOrEmpty(model.CustomerName)) { model.CustomerName = order.Customer.Mobile; }
             model.CustomerIp = order.CustomerIp;
             model.VatNumber = order.VatNumber;
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc);
@@ -1110,7 +1111,7 @@ namespace SmartStore.Admin.Controllers
                 if (isChangeVal == "true") {
                     ChangedVal = (decimal.Parse((Request["OrderTotalValue"])));
                     order.OrderTotal = ChangedVal;
-                    order.UpdatedOnUtc = DateTime.UtcNow;
+                    order.UpdatedOnUtc = DateTime.Now;
                     //var order = _DeclarationOrderService.GetOrderById(id);
                     if (order == null || order.Deleted)
                         return RedirectToAction("List");
@@ -1126,7 +1127,7 @@ namespace SmartStore.Admin.Controllers
                 {
                     order.OrderStatus = OrderStatus.Complete;
                     order.PaymentStatus = PaymentStatus.Paid;
-                    order.PaidDateUtc = DateTime.UtcNow;
+                    order.PaidDateUtc = DateTime.Now;
                     _DeclarationOrderService.UpdateOrder(order);
                     //分钱
                     var customer = _customerService.GetCustomerById(order.CustomerId);
@@ -1153,6 +1154,7 @@ namespace SmartStore.Admin.Controllers
             var model = new OrderModel();
             PrepareOrderDetailsModel(model, order);
             var pictureUrl = _pictureService.GetUrl(order.PaymentMethodSystemName.ToInt());
+            
             model.ShippingAddressGoogleMapsUrl = pictureUrl;
             return View(model);
         }
@@ -1650,7 +1652,7 @@ namespace SmartStore.Admin.Controllers
                             SenderEmail = senderEmail,
                             Message = giftCardMessage,
                             IsRecipientNotified = false,
-                            CreatedOnUtc = DateTime.UtcNow
+                            CreatedOnUtc = DateTime.Now
                         };
                         _giftCardService.InsertGiftCard(gc);
                     }
@@ -2484,7 +2486,7 @@ namespace SmartStore.Admin.Controllers
             {
                 DisplayToCustomer = displayToCustomer,
                 Note = message,
-                CreatedOnUtc = DateTime.UtcNow,
+                CreatedOnUtc = DateTime.Now,
             };
             order.OrderNotes.Add(orderNote);
             _orderService.UpdateOrder(order);

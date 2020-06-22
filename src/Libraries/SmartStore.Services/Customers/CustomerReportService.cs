@@ -148,7 +148,7 @@ namespace SmartStore.Services.Customers
                         cr.Id == registeredCustomerRole.Id &&
                         c.CreatedOnUtc >= date
 
-                        //&& c.CreatedOnUtc <= DateTime.UtcNow
+                        //&& c.CreatedOnUtc <= DateTime.Now
                         select c;
             int count = query.Count();
             return count;

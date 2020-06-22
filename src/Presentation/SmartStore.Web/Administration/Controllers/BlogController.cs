@@ -89,7 +89,7 @@ namespace SmartStore.Admin.Controllers
             ViewBag.AllLanguages = _languageService.GetAllLanguages(true);
 
             var model = new BlogPostModel();
-            model.CreatedOnUtc = DateTime.UtcNow;
+            model.CreatedOnUtc = DateTime.Now;
 
             //Stores
             PrepareStoresMappingModel(model, null, false);
@@ -112,7 +112,7 @@ namespace SmartStore.Admin.Controllers
                 blogPost.CreatedOnUtc = model.CreatedOnUtc;
                 blogPost.StartDateUtc = model.StartDate;
                 blogPost.EndDateUtc = model.EndDate;
-                blogPost.CreatedOnUtc = DateTime.UtcNow;
+                blogPost.CreatedOnUtc = DateTime.Now;
                 _blogService.InsertBlogPost(blogPost);
 
                 //search engine name

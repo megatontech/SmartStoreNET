@@ -113,7 +113,7 @@ namespace SmartStore.Services.News
 
             if (!showHidden)
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTime.Now;
                 query = query.Where(n => n.Published);
                 query = query.Where(n => !n.StartDateUtc.HasValue || n.StartDateUtc <= utcNow);
                 query = query.Where(n => !n.EndDateUtc.HasValue || n.EndDateUtc >= utcNow);

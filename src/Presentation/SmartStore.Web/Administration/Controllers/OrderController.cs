@@ -1601,7 +1601,7 @@ namespace SmartStore.Admin.Controllers
                             SenderEmail = senderEmail,
                             Message = giftCardMessage,
                             IsRecipientNotified = false,
-                            CreatedOnUtc = DateTime.UtcNow
+                            CreatedOnUtc = DateTime.Now
                         };
                         _giftCardService.InsertGiftCard(gc);
                     }
@@ -2435,7 +2435,7 @@ namespace SmartStore.Admin.Controllers
             {
                 DisplayToCustomer = displayToCustomer,
                 Note = message,
-                CreatedOnUtc = DateTime.UtcNow,
+                CreatedOnUtc = DateTime.Now,
             };
             order.OrderNotes.Add(orderNote);
             _orderService.UpdateOrder(order);

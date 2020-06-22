@@ -8,7 +8,7 @@ namespace SmartStore.Data.Migrations
     {
         public override void Up()
         {
-			AddColumn("dbo.Order", "UpdatedOnUtc", c => c.DateTime(nullable: false, defaultValue: DateTime.UtcNow));
+			AddColumn("dbo.Order", "UpdatedOnUtc", c => c.DateTime(nullable: false, defaultValue: DateTime.Now));
 			AddColumn("dbo.Order", "RewardPointsRemaining", c => c.Int());
         }
         

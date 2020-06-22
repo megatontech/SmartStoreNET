@@ -134,7 +134,7 @@ namespace SmartStore.Services.DataExchange.Import
 
         protected void Initialize(ImportExecuteContext context)
         {
-            UtcNow = DateTime.UtcNow;
+            UtcNow = DateTime.Now;
             DownloadedItems = new Dictionary<string, string>();
             ImageDownloadFolder = Path.Combine(context.ImportFolder, IMAGE_DOWNLOAD_FOLDER);
 

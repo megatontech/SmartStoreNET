@@ -108,7 +108,7 @@ namespace SmartStore.Services.Blogs
 
             if (!showHidden)
             {
-                var utcNow = DateTime.UtcNow;
+                var utcNow = DateTime.Now;
                 query = query.Where(b => !b.StartDateUtc.HasValue || b.StartDateUtc <= utcNow);
                 query = query.Where(b => !b.EndDateUtc.HasValue || b.EndDateUtc >= utcNow);
             }

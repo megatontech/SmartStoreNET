@@ -427,7 +427,7 @@ namespace SmartStore.Admin.Controllers
                 return AccessDeniedView();
 
             var model = new MaintenanceModel();
-            model.DeleteGuests.EndDate = DateTime.UtcNow.AddDays(-7);
+            model.DeleteGuests.EndDate = DateTime.Now.AddDays(-7);
             model.DeleteGuests.OnlyWithoutShoppingCart = true;
 
             // image cache stats
@@ -639,7 +639,7 @@ namespace SmartStore.Admin.Controllers
 
             model.ServerTimeZone = TimeZone.CurrentTimeZone.StandardName;
             model.ServerLocalTime = DateTime.Now;
-            model.UtcTime = DateTime.UtcNow;
+            model.UtcTime = DateTime.Now;
             model.HttpHost = _services.WebHelper.ServerVariables("HTTP_HOST");
 
             // DB size & used RAM

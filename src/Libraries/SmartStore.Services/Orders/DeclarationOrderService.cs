@@ -214,8 +214,8 @@ namespace SmartStore.Services.Orders
             var query = _orderRepository.Table;
             query = query.Where(o => !o.Deleted);
             query = query.Where(o => o.AffiliateId == affiliateId);
-            var today = DateTime.UtcNow.Date;
-            var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+            var today = DateTime.Now.Date;
+            var tomorrow = DateTime.Now.Date.AddDays(1);
             query = query.Where(o => o.CreatedOnUtc >= today);
             query = query.Where(o => o.CreatedOnUtc <= tomorrow);
             query = query.OrderByDescending(o => o.CreatedOnUtc);
@@ -301,7 +301,7 @@ namespace SmartStore.Services.Orders
 				{
 					Note = note,
 					DisplayToCustomer = displayToCustomer,
-					CreatedOnUtc = DateTime.UtcNow
+					CreatedOnUtc = DateTime.Now
 				});
 
 				UpdateOrder(order);

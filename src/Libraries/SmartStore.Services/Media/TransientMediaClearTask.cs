@@ -49,7 +49,7 @@ namespace SmartStore.Services.Media
         public override async Task ExecuteAsync(TaskExecutionContext ctx)
         {
             // Delete all media records which are in transient state since at least 3 hours.
-            var olderThan = DateTime.UtcNow.AddHours(-3);
+            var olderThan = DateTime.Now.AddHours(-3);
             var pictureAutoCommit = _pictureRepository.AutoCommitEnabled;
             var downloadAutoCommit = _downloadRepository.AutoCommitEnabled;
 

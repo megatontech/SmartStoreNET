@@ -80,7 +80,7 @@ namespace SmartStore.Web.Framework.Filters
 				if (consentCookie.Value == "asked")
 				{
 					// consent is implicitly given
-					consentCookie.Expires = DateTime.UtcNow.AddYears(1);
+					consentCookie.Expires = DateTime.Now.AddYears(1);
 					filterContext.HttpContext.Response.Cookies.Set(consentCookie);
 					viewBag.HasCookieConsent = true;
 				}
@@ -135,7 +135,7 @@ namespace SmartStore.Web.Framework.Filters
 		{
 			var consentCookie = new HttpCookie(CookieConsent.CONSENT_COOKIE_NAME);
 			consentCookie.Value = consent ? "true" : "false";
-			consentCookie.Expires = DateTime.UtcNow.AddYears(1);
+			consentCookie.Expires = DateTime.Now.AddYears(1);
 			response.Cookies.Set(consentCookie);
 		}
 

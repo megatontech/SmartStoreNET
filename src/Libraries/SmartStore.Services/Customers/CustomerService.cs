@@ -114,15 +114,16 @@ namespace SmartStore.Services.Customers
                         orderby c.Id
                         where c.IsCustomer == true
                         select c;
-            var yestoday = DateTime.UtcNow.Date.AddDays(-1);
-            var today = DateTime.UtcNow.Date;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday //&& d.PaymentStatus == 30
                          select d;
             tree = query.ToList();
+            var dList = dorder.ToList();
             foreach (var item in tree)
             {
-                item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
+                item.OrderList.AddRange(dList.Where(x => x.CustomerId == item.Id && x.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid));
             }
 
             //tree.AddRange(query);
@@ -137,17 +138,18 @@ namespace SmartStore.Services.Customers
                         orderby c.Id
                         where c.IsCustomer == true
                         select c;
-            var yestoday = DateTime.UtcNow.Date.AddDays(-1);
-            var today = DateTime.UtcNow.Date;
-            var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
+            var tomorrow = DateTime.Now.Date.AddDays(1);
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= tomorrow && d.PaidDateUtc.Value >= today && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
+                         where d.PaidDateUtc.Value <= tomorrow && d.PaidDateUtc.Value >= today //
                          select d;
             tree = query.ToList();
+            var dList = dorder.ToList();
             foreach (var item in tree)
             {
                 item.OrderList.Clear();
-                item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
+                item.OrderList.AddRange(dList.Where(x => x.CustomerId == item.Id &&  x.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid));
             }
 
             //tree.AddRange(query);
@@ -162,16 +164,17 @@ namespace SmartStore.Services.Customers
                         orderby c.Id
                         where c.IsCustomer == true
                         select c;
-            var yestoday = DateTime.UtcNow.Date.AddDays(-1);
-            var today = DateTime.UtcNow.Date;
+            var yestoday = DateTime.Now.Date.AddDays(-1);
+            var today = DateTime.Now.Date;
             var dorder = from d in _declarationOrderRepository.Table
-                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday && d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
+                         where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday //&& d.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid
                          select d;
             tree = query.ToList();
+            var dList = dorder.ToList();
             foreach (var item in tree)
             {
                 item.OrderList.Clear();
-                item.OrderList.AddRange(dorder.Where(x => x.CustomerId == item.Id));
+                item.OrderList.AddRange(dList.Where(x => x.CustomerId == item.Id&& x.PaymentStatus== Core.Domain.Payments.PaymentStatus.Paid));
             }
 
             //tree.AddRange(query);
@@ -329,7 +332,7 @@ namespace SmartStore.Services.Customers
                     return null;
                 }
 
-                var dateFrom = DateTime.UtcNow.AddSeconds(maxAgeSeconds * -1);
+                var dateFrom = DateTime.Now.AddSeconds(maxAgeSeconds * -1);
 
                 IQueryable<Customer> query;
                 if (DataSettings.Current.IsSqlServer)
@@ -580,8 +583,8 @@ namespace SmartStore.Services.Customers
             {
                 CustomerGuid = customerGuid ?? Guid.NewGuid(),
                 Active = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                LastActivityDateUtc = DateTime.UtcNow,
+                CreatedOnUtc = DateTime.Now,
+                LastActivityDateUtc = DateTime.Now,
             };
 
             // Add to 'Guests' role

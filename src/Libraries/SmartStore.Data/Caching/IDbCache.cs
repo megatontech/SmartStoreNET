@@ -93,7 +93,7 @@ namespace SmartStore.Data.Caching
 
 		public DbCacheEntry Put(string key, object value, IEnumerable<string> dependentEntitySets, TimeSpan? duration)
 		{
-			return new DbCacheEntry { Key = key, Value = value, CachedOnUtc = DateTime.UtcNow, EntitySets = dependentEntitySets.ToArray(), Duration = duration };
+			return new DbCacheEntry { Key = key, Value = value, CachedOnUtc = DateTime.Now, EntitySets = dependentEntitySets.ToArray(), Duration = duration };
 		}
 
 		public void InvalidateSets(IEnumerable<string> entitySets)
@@ -116,7 +116,7 @@ namespace SmartStore.Data.Caching
 
 		public DbCacheEntry RequestPut(string key, object value, string[] dependentEntitySets)
 		{
-			return new DbCacheEntry { Key = key, Value = value, CachedOnUtc = DateTime.UtcNow, EntitySets = dependentEntitySets.ToArray() };
+			return new DbCacheEntry { Key = key, Value = value, CachedOnUtc = DateTime.Now, EntitySets = dependentEntitySets.ToArray() };
 		}
 
 		public void RequestInvalidateSets(IEnumerable<string> entitySets)

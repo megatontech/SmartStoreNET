@@ -221,7 +221,7 @@ namespace SmartStore
 			var absoluteExpiration = Cache.NoAbsoluteExpiration;
 			if (duration.HasValue)
 			{
-				absoluteExpiration = DateTime.UtcNow + duration.Value;
+				absoluteExpiration = DateTime.Now + duration.Value;
 			}
 
 			cache.Insert(key, value, null, Cache.NoAbsoluteExpiration, Cache.NoSlidingExpiration);

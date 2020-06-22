@@ -11,7 +11,7 @@ namespace SmartStore.Services.Hooks
 
         protected override void OnInserting(IAuditable entity, IHookedEntity entry)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
 
             if (entity.CreatedOnUtc == DateTime.MinValue)
                 entity.CreatedOnUtc = now;
@@ -22,7 +22,7 @@ namespace SmartStore.Services.Hooks
 
         protected override void OnUpdating(IAuditable entity, IHookedEntity entry)
         {
-            entity.UpdatedOnUtc = DateTime.UtcNow;
+            entity.UpdatedOnUtc = DateTime.Now;
         }
 
         #endregion Protected Methods

@@ -240,7 +240,7 @@ namespace SmartStore.Web.Controllers
 
 			if (_newsSettings.MaxAgeInDays > 0)
 			{
-				maxAge = DateTime.UtcNow.Subtract(new TimeSpan(_newsSettings.MaxAgeInDays, 0, 0, 0));
+				maxAge = DateTime.Now.Subtract(new TimeSpan(_newsSettings.MaxAgeInDays, 0, 0, 0));
 			}
 
 			var language = _languageService.GetLanguageById(languageId.Value);
@@ -282,8 +282,8 @@ namespace SmartStore.Web.Controllers
             var newsItem = _newsService.GetNewsById(newsItemId);
             if (newsItem == null ||
                 !newsItem.Published ||
-                (newsItem.StartDateUtc.HasValue && newsItem.StartDateUtc.Value >= DateTime.UtcNow) ||
-				(newsItem.EndDateUtc.HasValue && newsItem.EndDateUtc.Value <= DateTime.UtcNow) ||
+                (newsItem.StartDateUtc.HasValue && newsItem.StartDateUtc.Value >= DateTime.Now) ||
+				(newsItem.EndDateUtc.HasValue && newsItem.EndDateUtc.Value <= DateTime.Now) ||
 				//Store mapping
 				!_storeMappingService.Authorize(newsItem))
 				return HttpNotFound();

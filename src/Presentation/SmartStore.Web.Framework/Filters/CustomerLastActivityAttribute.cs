@@ -30,9 +30,9 @@ namespace SmartStore.Web.Framework.Filters
             var customer = WorkContext.Value.CurrentCustomer;
             
             // update last activity date
-            if (!customer.IsSystemAccount && customer.LastActivityDateUtc.AddMinutes(1.0) < DateTime.UtcNow)
+            if (!customer.IsSystemAccount && customer.LastActivityDateUtc.AddMinutes(1.0) < DateTime.Now)
             {
-                customer.LastActivityDateUtc = DateTime.UtcNow;
+                customer.LastActivityDateUtc = DateTime.Now;
 				CustomerService.Value.UpdateCustomer(customer);
             }
         }

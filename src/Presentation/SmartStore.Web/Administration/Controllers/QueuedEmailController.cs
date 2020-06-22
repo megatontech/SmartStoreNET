@@ -290,7 +290,7 @@ namespace SmartStore.Admin.Controllers
                 Bcc = queuedEmail.Bcc,
                 Subject = queuedEmail.Subject,
                 Body = queuedEmail.Body,
-                CreatedOnUtc = DateTime.UtcNow,
+                CreatedOnUtc = DateTime.Now,
                 EmailAccountId = queuedEmail.EmailAccountId,
                 SendManually = queuedEmail.SendManually
             };

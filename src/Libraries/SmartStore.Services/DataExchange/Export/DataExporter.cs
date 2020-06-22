@@ -658,7 +658,7 @@ namespace SmartStore.Services.DataExchange.Export
 
                 context.Result = new DataDeploymentResult
                 {
-                    LastExecutionUtc = DateTime.UtcNow
+                    LastExecutionUtc = DateTime.Now
                 };
 
                 try
@@ -2051,7 +2051,7 @@ namespace SmartStore.Services.DataExchange.Export
             //	To = message.To.First().Address,
             //	Subject = message.Subject,
             //	Body = message.Body,
-            //	CreatedOnUtc = DateTime.UtcNow,
+            //	CreatedOnUtc = DateTime.Now,
             //	EmailAccountId = emailAccount.Id,
             //	SendManually = true
             //});

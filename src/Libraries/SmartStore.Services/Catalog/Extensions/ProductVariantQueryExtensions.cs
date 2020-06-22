@@ -121,7 +121,7 @@ namespace SmartStore.Services.Catalog.Extensions
                                         Filename = System.IO.Path.GetFileNameWithoutExtension(postedFile.FileName),
                                         Extension = System.IO.Path.GetExtension(postedFile.FileName),
                                         IsNew = true,
-                                        UpdatedOnUtc = DateTime.UtcNow
+                                        UpdatedOnUtc = DateTime.Now
                                     };
 
                                     downloadService.InsertDownload(download, postedFile.InputStream != null ? postedFile.InputStream.ToByteArray() : null);

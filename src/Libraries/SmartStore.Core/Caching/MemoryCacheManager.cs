@@ -212,7 +212,7 @@ namespace SmartStore.Core.Caching
 
 			if (duration.HasValue)
 			{
-				absoluteExpiration = DateTime.UtcNow + duration.Value;
+				absoluteExpiration = DateTime.Now + duration.Value;
 			}
 			
 			var cacheItemPolicy = new CacheItemPolicy

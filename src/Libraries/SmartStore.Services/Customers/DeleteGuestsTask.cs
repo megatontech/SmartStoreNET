@@ -32,7 +32,7 @@ namespace SmartStore.Services.Customers
         {
             //60*24 = 1 day
             var olderThanMinutes = 1440; // TODO: move to settings
-            await _customerService.DeleteGuestCustomersAsync(null, DateTime.UtcNow.AddMinutes(-olderThanMinutes), true);
+            await _customerService.DeleteGuestCustomersAsync(null, DateTime.Now.AddMinutes(-olderThanMinutes), true);
         }
 
         #endregion Public Methods

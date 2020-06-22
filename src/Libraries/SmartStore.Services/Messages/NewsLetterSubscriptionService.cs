@@ -138,7 +138,7 @@ namespace SmartStore.Services.Messages
 							NewsLetterSubscriptionGuid = Guid.NewGuid(),
 							Email = email,
 							Active = false,
-							CreatedOnUtc = DateTime.UtcNow,
+							CreatedOnUtc = DateTime.Now,
 							StoreId = storeId,
                             WorkingLanguageId = _services.WorkContext.WorkingLanguage.Id
 						};

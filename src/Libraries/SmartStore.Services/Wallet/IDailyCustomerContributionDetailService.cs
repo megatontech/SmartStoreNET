@@ -1,4 +1,5 @@
-﻿using SmartStore.Core.Domain.Wallet;
+﻿using SmartStore.Core.Domain.Customers;
+using SmartStore.Core.Domain.Wallet;
 using System;
 
 namespace SmartStore.Services.Wallet
@@ -8,5 +9,8 @@ namespace SmartStore.Services.Wallet
         public DailyCustomerContributionDetail Get(int id, Guid guid);
         public void Update(DailyCustomerContributionDetail entity);
         public void Add(DailyCustomerContributionDetail entity);
+        
+        public DailyCustomerContributionDetail Get(Customer customer);
+
     }
 }

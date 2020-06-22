@@ -35,7 +35,7 @@ namespace SmartStore.Web.Controllers
             _services = services;
 
 			//// Fuzzy: substract the possible max time passed since timer trigger in ITaskScheduler
-			//_sweepStart = DateTime.UtcNow.AddMilliseconds(-500);
+			//_sweepStart = DateTime.Now.AddMilliseconds(-500);
         }
 
         [HttpPost]
@@ -59,7 +59,7 @@ namespace SmartStore.Web.Controllers
 			{
 				var task = pendingTasks[i];
 
-				if (i > 0 /*&& (DateTime.UtcNow - _sweepStart).TotalMinutes > _taskScheduler.SweepIntervalMinutes*/)
+				if (i > 0 /*&& (DateTime.Now - _sweepStart).TotalMinutes > _taskScheduler.SweepIntervalMinutes*/)
 				{
                     // Maybe a subsequent Sweep call or another machine in a webfarm executed 
                     // successive tasks already.

@@ -133,7 +133,7 @@ namespace SmartStore.Web.Framework.UI
 				{
 					rawJson = _env.AppDataFolder.ReadFile(fileName);
 					var virtualPath = _env.AppDataFolder.GetVirtualPath(fileName);
-					var cacheDependency = _env.AppDataFolder.VirtualPathProvider.GetCacheDependency(virtualPath, DateTime.UtcNow);
+					var cacheDependency = _env.AppDataFolder.VirtualPathProvider.GetCacheDependency(virtualPath, DateTime.Now);
 					HttpRuntime.Cache.Insert(cacheKey, rawJson, cacheDependency);
 				}
 				else

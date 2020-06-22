@@ -177,7 +177,7 @@ namespace SmartStore.Services.Search
 		protected virtual IQueryable<Product> GetProductQuery(CatalogSearchQuery searchQuery, IQueryable<Product> baseQuery)
 		{
 			var ordered = false;
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
             var categoryId = 0;
             var manufacturerId = 0;
 			var query = baseQuery ?? _productRepository.Table;
@@ -588,7 +588,7 @@ namespace SmartStore.Services.Search
 		protected virtual IQueryable<DeclarationProduct> GetDeclarationProductQuery(CatalogSearchQuery searchQuery, IQueryable<DeclarationProduct> baseQuery)
 		{
 			var ordered = false;
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 			var categoryId = 0;
 			var manufacturerId = 0;
 			var query = baseQuery ?? _DeclarationproductRepository.Table;

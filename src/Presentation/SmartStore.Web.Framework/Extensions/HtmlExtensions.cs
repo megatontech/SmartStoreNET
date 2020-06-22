@@ -373,9 +373,9 @@ namespace SmartStore.Web.Framework
             years.AppendFormat("<option value=''>{0}</option>", yearLocale);
 
             if (beginYear == null)
-                beginYear = DateTime.UtcNow.Year - 90;
+                beginYear = DateTime.Now.Year - 90;
             if (endYear == null)
-                endYear = DateTime.UtcNow.Year + 10;
+                endYear = DateTime.Now.Year + 10;
 
             for (int i = beginYear.Value; i <= endYear.Value; i++)
                 years.AppendFormat("<option value='{0}'{1}>{0}</option>", i,

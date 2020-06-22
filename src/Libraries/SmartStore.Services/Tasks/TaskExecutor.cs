@@ -78,7 +78,7 @@ namespace SmartStore.Services.Tasks
                 ScheduleTaskId = entity.Id,
                 IsRunning = true,
                 MachineName = _env.MachineName.EmptyNull(),
-                StartedOnUtc = DateTime.UtcNow
+                StartedOnUtc = DateTime.Now
             };
 
             try
@@ -150,7 +150,7 @@ namespace SmartStore.Services.Tasks
             }
             finally
             {
-                var now = DateTime.UtcNow;
+                var now = DateTime.Now;
                 var updateTask = false;
 
                 historyEntry.IsRunning = false;

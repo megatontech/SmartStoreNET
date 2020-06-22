@@ -32,8 +32,8 @@ namespace SmartStore.Data.Migrations
 					Active = true,
 					IsSystemAccount = true,
 					SystemName = SystemCustomerNames.PdfConverter,
-					CreatedOnUtc = DateTime.UtcNow,
-					LastActivityDateUtc = DateTime.UtcNow,
+					CreatedOnUtc = DateTime.Now,
+					LastActivityDateUtc = DateTime.Now,
 				}
 			);
 		}

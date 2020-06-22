@@ -66,7 +66,7 @@ namespace SmartStore.Services.Media.Storage
             Guard.NotNull(targetProvider, nameof(targetProvider));
 
             var success = false;
-            var utcNow = DateTime.UtcNow;
+            var utcNow = DateTime.Now;
             var context = new MediaMoverContext(sourceProvider.Metadata.SystemName, targetProvider.Metadata.SystemName);
 
             var source = sourceProvider.Value as ISupportsMediaMoving;

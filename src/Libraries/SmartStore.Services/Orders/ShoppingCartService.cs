@@ -512,7 +512,7 @@ namespace SmartStore.Services.Orders
             var availableStartDateError = false;
             if (product.AvailableStartDateTimeUtc.HasValue)
             {
-                DateTime now = DateTime.UtcNow;
+                DateTime now = DateTime.Now;
                 DateTime availableStartDateTime = DateTime.SpecifyKind(product.AvailableStartDateTimeUtc.Value, DateTimeKind.Utc);
                 if (availableStartDateTime.CompareTo(now) > 0)
                 {
@@ -523,7 +523,7 @@ namespace SmartStore.Services.Orders
 
             if (product.AvailableEndDateTimeUtc.HasValue && !availableStartDateError)
             {
-                DateTime now = DateTime.UtcNow;
+                DateTime now = DateTime.Now;
                 DateTime availableEndDateTime = DateTime.SpecifyKind(product.AvailableEndDateTimeUtc.Value, DateTimeKind.Utc);
                 if (availableEndDateTime.CompareTo(now) < 0)
                 {
@@ -1107,7 +1107,7 @@ namespace SmartStore.Services.Orders
 				{
 					existingCartItem.Item.AttributesXml = selectedAttributes;
 					existingCartItem.Item.Quantity = newQuantity;
-					existingCartItem.Item.UpdatedOnUtc = DateTime.UtcNow;
+					existingCartItem.Item.UpdatedOnUtc = DateTime.Now;
 					_customerService.UpdateCustomer(customer);
 				}
 			}
@@ -1133,7 +1133,7 @@ namespace SmartStore.Services.Orders
 						return warnings;
 					}
 
-					var now = DateTime.UtcNow;
+					var now = DateTime.Now;
 					var cartItem = new ShoppingCartItem
 					{
 						ShoppingCartType = cartType,
@@ -1287,7 +1287,7 @@ namespace SmartStore.Services.Orders
                     {
                         // if everything is OK, then update a shopping cart item
                         shoppingCartItem.Quantity = newQuantity;
-                        shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
+                        shoppingCartItem.UpdatedOnUtc = DateTime.Now;
                         _customerService.UpdateCustomer(customer);
                     }
                 }
@@ -1857,7 +1857,7 @@ namespace SmartStore.Services.Orders
 				{
 					existingCartItem.Item.AttributesXml = selectedAttributes;
 					existingCartItem.Item.Quantity = newQuantity;
-					existingCartItem.Item.UpdatedOnUtc = DateTime.UtcNow;
+					existingCartItem.Item.UpdatedOnUtc = DateTime.Now;
 					_customerService.UpdateCustomer(customer);
 				}
 			}
@@ -1883,7 +1883,7 @@ namespace SmartStore.Services.Orders
 						return warnings;
 					}
 
-					var now = DateTime.UtcNow;
+					var now = DateTime.Now;
 					var cartItem = new DeclarationShoppingCartItem
 					{
 						ShoppingCartType = cartType,
@@ -1990,7 +1990,7 @@ namespace SmartStore.Services.Orders
 				{
 					existingCartItem.Item.AttributesXml = selectedAttributes;
 					existingCartItem.Item.Quantity = newQuantity;
-					existingCartItem.Item.UpdatedOnUtc = DateTime.UtcNow;
+					existingCartItem.Item.UpdatedOnUtc = DateTime.Now;
 					_customerService.UpdateCustomer(customer);
 				}
 			}
@@ -2013,7 +2013,7 @@ namespace SmartStore.Services.Orders
 						return warnings;
 					}
 
-					var now = DateTime.UtcNow;
+					var now = DateTime.Now;
 					var cartItem = new ShoppingCartItem
 					{
 						ShoppingCartType = cartType,
@@ -2168,7 +2168,7 @@ namespace SmartStore.Services.Orders
 					{
 						// if everything is OK, then update a shopping cart item
 						shoppingCartItem.Quantity = newQuantity;
-						shoppingCartItem.UpdatedOnUtc = DateTime.UtcNow;
+						shoppingCartItem.UpdatedOnUtc = DateTime.Now;
 						_customerService.UpdateCustomer(customer);
 					}
 				}

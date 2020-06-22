@@ -295,7 +295,7 @@ namespace SmartStore.Services.Orders
 				{
 					Note = note,
 					DisplayToCustomer = displayToCustomer,
-					CreatedOnUtc = DateTime.UtcNow
+					CreatedOnUtc = DateTime.Now
 				});
 
 				UpdateOrder(order);

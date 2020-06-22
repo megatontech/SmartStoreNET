@@ -606,7 +606,7 @@ namespace SmartStore.Services.Catalog
                 return null;
 
             //check date range
-            DateTime now = DateTime.UtcNow;
+            DateTime now = DateTime.Now;
             if (product.SpecialPriceStartDateTimeUtc.HasValue)
             {
                 DateTime startDate = DateTime.SpecifyKind(product.SpecialPriceStartDateTimeUtc.Value, DateTimeKind.Utc);

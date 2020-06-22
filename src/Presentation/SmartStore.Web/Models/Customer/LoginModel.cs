@@ -19,7 +19,7 @@ namespace SmartStore.Web.Models.Customer
 
         [SmartResourceDisplayName("Account.Login.Fields.UsernameOrEmail")]
         public string UsernameOrEmail { get; set; }
-        [SmartResourceDisplayName("用户名或手机号")]
+        [SmartResourceDisplayName("手机号")]
         public string UsernameOrMobile { get; set; }
         
         [DataType(DataType.Password)]

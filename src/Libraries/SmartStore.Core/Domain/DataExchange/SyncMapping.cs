@@ -18,7 +18,7 @@ namespace SmartStore.Core.Domain.DataExchange
 	{
 		public SyncMapping()
 		{
-			this.SyncedOnUtc = DateTime.UtcNow;
+			this.SyncedOnUtc = DateTime.Now;
 		}
 
 		/// <summary>

@@ -47,7 +47,7 @@ namespace SmartStore
         {
             if (!value.HasValue)
             {
-                value = DateTime.UtcNow;
+                value = DateTime.Now;
             }
 
             DateTime d = value.Value.AddHours(1);
@@ -69,7 +69,7 @@ namespace SmartStore
         {
             if (!value.HasValue)
             {
-                value = DateTime.UtcNow;
+                value = DateTime.Now;
             }
 
             DateTime d = value.Value;
@@ -92,7 +92,7 @@ namespace SmartStore
         {
             if (!value.HasValue)
             {
-                value = DateTime.UtcNow;
+                value = DateTime.Now;
             }
 
             DateTime d = value.Value;

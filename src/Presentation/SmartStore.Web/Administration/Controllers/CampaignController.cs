@@ -65,7 +65,7 @@ namespace SmartStore.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var campaign = model.ToEntity();
-                campaign.CreatedOnUtc = DateTime.UtcNow;
+                campaign.CreatedOnUtc = DateTime.Now;
                 _campaignService.InsertCampaign(campaign);
 
                 SaveStoreMappings(campaign, model);

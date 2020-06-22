@@ -26,7 +26,7 @@
     @if (Model.Items.Count > 0)
 	{
 		// Items added in the last 2 seconds are considered to be current
-		var currentItem = Model.Items.FirstOrDefault(x => x.CreatedOnUtc >= DateTime.UtcNow.AddSeconds(-2));
+		var currentItem = Model.Items.FirstOrDefault(x => x.CreatedOnUtc >= DateTime.Now.AddSeconds(-2));
 
 		if (currentItem != null)
 		{

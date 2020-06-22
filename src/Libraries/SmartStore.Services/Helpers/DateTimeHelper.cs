@@ -115,7 +115,7 @@ namespace SmartStore.Services.Helpers
 
         public virtual DateTime ConvertToUserTime(DateTime dt, DateTimeKind sourceDateTimeKind)
         {
-            dt = DateTime.SpecifyKind(dt, sourceDateTimeKind);
+            dt = DateTime.SpecifyKind(dt, DateTimeKind.Local);
             var currentUserTimeZoneInfo = this.CurrentTimeZone;
             return TimeZoneInfo.ConvertTime(dt, currentUserTimeZoneInfo);
         }

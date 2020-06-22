@@ -20,7 +20,7 @@ namespace SmartStore.Web.Framework.Modelling
 		{
 			var response = context.Response;
 
-			var utcNow = DateTime.UtcNow;
+			var utcNow = DateTime.Now;
 
 			// Specify content type
 			response.ContentType = FileResponse.ContentType;

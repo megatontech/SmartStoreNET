@@ -52,7 +52,7 @@ namespace SmartStore.Services.DataExchange.Export.Deployment
                     To = email,
                     Subject = deployment.EmailSubject.NaIfEmpty(),
                     Body = deployment.EmailSubject.NaIfEmpty(),
-                    CreatedOnUtc = DateTime.UtcNow,
+                    CreatedOnUtc = DateTime.Now,
                     EmailAccountId = deployment.EmailAccountId
                 };
 

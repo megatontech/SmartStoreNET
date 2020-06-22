@@ -56,7 +56,7 @@ namespace SmartStore.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
                 return AccessDeniedView();
 
-            var customers = _customerService.GetOnlineCustomers(DateTime.UtcNow.AddMinutes(-_customerSettings.OnlineCustomerMinutes),
+            var customers = _customerService.GetOnlineCustomers(DateTime.Now.AddMinutes(-_customerSettings.OnlineCustomerMinutes),
                 null, 0, _adminAreaSettings.GridPageSize);
 
             var model = new GridModel<OnlineCustomerModel>
@@ -85,7 +85,7 @@ namespace SmartStore.Admin.Controllers
 
             if (_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
             {
-                var lastActivityFrom = DateTime.UtcNow.AddMinutes(-_customerSettings.OnlineCustomerMinutes);
+                var lastActivityFrom = DateTime.Now.AddMinutes(-_customerSettings.OnlineCustomerMinutes);
                 var customers = _customerService.GetOnlineCustomers(lastActivityFrom, null, command.Page - 1, command.PageSize);
 
                 model.Data = customers.Select(x =>

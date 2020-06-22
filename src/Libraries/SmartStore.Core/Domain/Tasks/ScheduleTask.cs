@@ -64,7 +64,7 @@ namespace SmartStore.Core.Domain.Tasks
 		{
 			get
 			{
-                var result = Enabled && NextRunUtc.HasValue && NextRunUtc <= DateTime.UtcNow && (LastHistoryEntry == null || !LastHistoryEntry.IsRunning);
+                var result = Enabled && NextRunUtc.HasValue && NextRunUtc <= DateTime.Now && (LastHistoryEntry == null || !LastHistoryEntry.IsRunning);
 				return result;
 			}
 		}

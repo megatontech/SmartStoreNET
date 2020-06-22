@@ -28,7 +28,7 @@ namespace SmartStore.Services.Wallet
        
         public DailyTotalContribution Get()
         {
-            var today = DateTime.UtcNow.Date;
+            var today = DateTime.Now.Date;
             if (!_DailyTotalContributionRepository.Table.Any(x=>x.CreateTime>= today))
             {
                 DailyTotalContribution dailyTotalContribution = new DailyTotalContribution()
@@ -39,7 +39,7 @@ namespace SmartStore.Services.Wallet
                     DecValue = 0M,
                     IsCount = false,
                     TotalValue = 0M,
-                    UpdateTime = DateTime.UtcNow
+                    UpdateTime = DateTime.Now
                 };
                 _DailyTotalContributionRepository.Insert(dailyTotalContribution);
                 return _DailyTotalContributionRepository.Table.FirstOrDefault(x => x.CreateTime >= today);

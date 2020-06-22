@@ -383,7 +383,7 @@ namespace SmartStore.Web.Controllers
                         text = text.Substring(0, _forumSettings.PMTextMaxLength);
                     }
 
-                    var nowUtc = DateTime.UtcNow;
+                    var nowUtc = DateTime.Now;
 
                     var privateMessage = new PrivateMessage
                     {

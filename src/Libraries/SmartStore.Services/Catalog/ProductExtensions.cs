@@ -333,7 +333,7 @@ namespace SmartStore.Services.Catalog
         {
             if (catalogSettings.LabelAsNewForMaxDays.HasValue)
             {
-                return ((DateTime.UtcNow - product.CreatedOnUtc).Days <= catalogSettings.LabelAsNewForMaxDays.Value);
+                return ((DateTime.Now - product.CreatedOnUtc).Days <= catalogSettings.LabelAsNewForMaxDays.Value);
             }
 
             return false;

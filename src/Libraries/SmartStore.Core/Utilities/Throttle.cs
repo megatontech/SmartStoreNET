@@ -37,7 +37,7 @@ namespace SmartStore.Core.Utilities
 			Guard.NotNull(check, nameof(check));
 
 			bool added = false;
-			var now = DateTime.UtcNow;
+			var now = DateTime.Now;
 
 			var entry = _checks.GetOrAdd(key, x => 
 			{
