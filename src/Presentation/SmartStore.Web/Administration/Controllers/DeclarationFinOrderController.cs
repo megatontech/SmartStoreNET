@@ -2679,7 +2679,8 @@ namespace SmartStore.Admin.Controllers
             {
                 item.CurrentOrderSum = item.OrderList.Sum(x => x.OrderTotal);
             }
-            customer.OrderBy(x => x.CurrentOrderSum).Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
+            var temp = customer.OrderByDescending(x => x.CurrentOrderSum).ToList();
+            temp.Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
             {
                 Item = x.Username,
                 Count = x.OrderList.Count(),
@@ -2881,7 +2882,8 @@ namespace SmartStore.Admin.Controllers
             {
                 item.CurrentOrderSum = item.OrderList.Sum(x => x.OrderTotal);
             }
-            customer.OrderBy(x => x.OrderList.Count()).Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
+            var temp = customer.OrderByDescending(x => x.OrderList.Count()).ToList();
+            temp.Take(5).Each(x => model.Add(new OrderIncompleteReportLineModel()
             {
                 Item = x.Username,
                 Count = x.OrderList.Count(),
