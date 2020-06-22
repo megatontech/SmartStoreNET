@@ -5,7 +5,7 @@
 @{
 	Html.AddTitleParts(T("PageTitle.Account").Text);
 
-	Layout = "_MyAccount";
+	Layout = "_dMyAccount";
 	ViewBag.PageClassToken = "info";
 	ViewBag.PageTitle = T("Account.CustomerInfo").Text;
 }
@@ -22,10 +22,12 @@
     <fieldset class="content-group">
         <legend><span>@T("Account.YourPersonalDetails")</span></legend>
 
-       
-        @Html.ControlGroupFor(model => model.FirstName, required: true, breakpoint: "lg")
 
-        @if (Model.UsernamesEnabled)
+        @Html.ControlGroupFor(model => model.FirstName, required: false, breakpoint: "lg")
+        @Html.ControlGroupFor(model => model.VatNumber, required: false, breakpoint: "lg")
+        @Html.ControlGroupFor(model => model.VatNumberStatusNote, required: false, breakpoint: "lg")
+
+        @*@if (Model.UsernamesEnabled)
         {
             <div class="form-group row">
                 @Html.LabelFor(model => model.Username, new { @class = "col-lg-3 col-form-label required", @for = "Username" })
@@ -49,29 +51,29 @@
                 else
                 {
                     <div class="col-lg-9">
-						<div class="form-control-plaintext">@Model.Username</div>
-					</div>
-				}
+                        <div class="form-control-plaintext">@Model.Username</div>
+                    </div>
+                }
             </div>
-        }
+        }*@
 
-        @if (Model.DisplayCustomerNumber)
+        @*@if (Model.DisplayCustomerNumber)
         {
-			var customerNumberAttributes = !Model.CustomerNumberEnabled ? (object)(new { @class = "form-control", @readonly = "true" }) : (object)(new { @class = "form-control" });
+            var customerNumberAttributes = !Model.CustomerNumberEnabled ? (object)(new { @class = "form-control", @readonly = "true" }) : (object)(new { @class = "form-control" });
             <div class="form-group row">
                 @Html.LabelFor(model => model.CustomerNumber, new { @class = "col-lg-3 col-form-label", @for = "CustomerNumber" })
                 <div class="col-lg-9">
                     @Html.TextBoxFor(model => model.CustomerNumber, customerNumberAttributes)
                 </div>
             </div>
-        }
+        }*@
 
     </fieldset>
 
-        <fieldset class="content-group">
+        @*<fieldset class="content-group">
             <legend><span>@T("Account.YourContactInformation")</span></legend>
                 @Html.ControlGroupFor(model => model.Phone, required: true, breakpoint: "lg")
-        </fieldset>
+        </fieldset>*@
 
 
     <div class="form-group row">

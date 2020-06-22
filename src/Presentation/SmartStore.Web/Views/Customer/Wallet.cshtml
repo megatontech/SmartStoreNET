@@ -102,9 +102,9 @@
         <div class="alert alert-info">
             您的可提现额度为： @Model.Total.ToString("F2") 。<a href="@Url.Action("WithDrawApply", "Customer", new { })" rel="nofollow"><strong>提现</strong></a>
         </div>
-        <div class="alert alert-info">
+        @*<div class="alert alert-info">
             贡献值个数： @Model.TotalPoints。
-        </div>
+        </div>*@
         @*<div class="alert alert-info">
             直推 @Model.Push.ToString("F2")。
         </div>

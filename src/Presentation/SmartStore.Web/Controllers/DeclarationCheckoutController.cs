@@ -846,7 +846,7 @@ namespace SmartStore.Web.Controllers
             order.PaidDateUtc = DateTime.Now;
             order.OrderGuid = Guid.NewGuid();
             var no = _DeclarationOrderService.GetOrdersMaxNo();
-            string seriNo = String.Format("%08d", (no + 1));
+            string seriNo =  (no + 1).ToString().PadLeft(6, '0'); ;
             order.OrderNumber = DateTime.Now.ToString("yyyyMMdd")+ seriNo;
             _DeclarationOrderService.InsertOrder(order);
             var neworder = _DeclarationOrderService.GetOrderByGuid(order.OrderGuid);

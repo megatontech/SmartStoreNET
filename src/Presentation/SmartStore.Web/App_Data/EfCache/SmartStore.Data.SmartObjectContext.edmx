@@ -166,6 +166,8 @@
           <Property Name="IsSystemAccount" Type="Boolean" Nullable="false" />
           <Property Name="SystemName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="LastIpAddress" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CreditCard" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreditCardBank" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreatedOnUtc" Type="DateTime" Nullable="false" />
           <Property Name="LastLoginDateUtc" Type="DateTime" />
           <Property Name="LastActivityDateUtc" Type="DateTime" Nullable="false" />
@@ -4602,6 +4604,8 @@
                 <ScalarProperty Name="IsSystemAccount" ColumnName="IsSystemAccount" />
                 <ScalarProperty Name="SystemName" ColumnName="SystemName" />
                 <ScalarProperty Name="LastIpAddress" ColumnName="LastIpAddress" />
+                <ScalarProperty Name="CreditCard" ColumnName="CreditCard" />
+                <ScalarProperty Name="CreditCardBank" ColumnName="CreditCardBank" />
                 <ScalarProperty Name="CreatedOnUtc" ColumnName="CreatedOnUtc" />
                 <ScalarProperty Name="LastLoginDateUtc" ColumnName="LastLoginDateUtc" />
                 <ScalarProperty Name="LastActivityDateUtc" ColumnName="LastActivityDateUtc" />
@@ -6810,6 +6814,8 @@
           <Property Name="IsSystemAccount" Type="bit" Nullable="false" />
           <Property Name="SystemName" Type="nvarchar" customannotation:Index="{ }" MaxLength="500" Nullable="true" />
           <Property Name="LastIpAddress" Type="nvarchar" customannotation:Index="{ Name: IX_Customer_LastIpAddress }" MaxLength="100" Nullable="true" />
+          <Property Name="CreditCard" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreditCardBank" Type="nvarchar(max)" Nullable="true" />
           <Property Name="CreatedOnUtc" Type="datetime" customannotation:Index="{ Name: IX_Customer_CreatedOn }" Nullable="false" />
           <Property Name="LastLoginDateUtc" Type="datetime" Nullable="true" />
           <Property Name="LastActivityDateUtc" Type="datetime" customannotation:Index="{ Name: IX_Customer_LastActivity }" Nullable="false" />

@@ -114,6 +114,8 @@
 <script>
     $(function () {
         $("#checkout").hide();
+        $("#BrandUrl").change(function () { if ($("#BrandUrl").val() && $("#BrandUrl").val() != "0") { console.log(1); $("#checkout").show(); } else { $("#checkout").hide(); }  });
+        $(".remove").change(function () { if ($("#BrandUrl").val() && $("#BrandUrl").val() != "0") { console.log(1); $("#checkout").show(); } else { $("#checkout").hide(); } });
 		var validationSummary = $('#payment-info-validation-summary');
 
 		if (validationSummary.length) {

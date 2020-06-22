@@ -108,9 +108,15 @@ namespace SmartStore.Web.Infrastructure
             {
                 Id = Name
             };
-         
-       
 
+
+            root.Append(new MenuItem
+            {
+                Id = "Wallet",
+                Text = T("贡献值个数"),
+                Icon = "fal fa-money-bill-alt",
+                Url = _urlHelper.Action("ContributePoints", "Customer", new { area = "" })
+            });
             root.Append(new MenuItem
             {
                 Id = "Wallet",

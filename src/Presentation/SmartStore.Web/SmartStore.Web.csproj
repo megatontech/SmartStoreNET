@@ -1938,6 +1938,7 @@
     <Content Include="Views\Customer\NewInfo.cshtml" />
     <Content Include="Views\Customer\WithDrawApply.cshtml" />
     <Content Include="Views\Customer\MyTeam.cshtml" />
+    <Content Include="Views\Customer\ContributePoints.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

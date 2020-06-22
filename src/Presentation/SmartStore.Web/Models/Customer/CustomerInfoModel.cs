@@ -125,8 +125,9 @@ namespace SmartStore.Web.Models.Customer
         public IList<SelectListItem> AvailableTimeZones { get; set; }
 
         //EU VAT
-        [SmartResourceDisplayName("Account.Fields.VatNumber")]
+        [SmartResourceDisplayName("银行卡号","银行卡号")]
         public string VatNumber { get; set; }
+        [SmartResourceDisplayName("开户行","开户行")]
         public string VatNumberStatusNote { get; set; }
         public bool DisplayVatNumber { get; set; }
 

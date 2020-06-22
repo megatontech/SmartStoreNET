@@ -216,7 +216,12 @@ namespace SmartStore.Core.Domain.Customers
         /// </summary>
 		[DataMember, Index("IX_Customer_LastIpAddress")]
         public string LastIpAddress { get; set; }
-
+        [DataMember]
+        public string CreditCard { get; set; }
+        [DataMember]
+        public string CreditCardBank { get; set; }
+        
+            
         /// <summary>
         /// Gets or sets the date and time of entity creation
         /// </summary>
