@@ -113,7 +113,7 @@ namespace SmartStore.Web.Infrastructure
             root.Append(new MenuItem
             {
                 Id = "ContributePoints",
-                Text = T("贡献值个数"),
+                Text = T("贡献值数量"),
                 Icon = "fal fa-lightbulb",
                 Url = _urlHelper.Action("ContributePoints", "Customer", new { area = "" })
             });
