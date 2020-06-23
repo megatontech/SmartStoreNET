@@ -24,7 +24,7 @@
 		{
 			if (!Model.AddToCart.HideQuantityControl)
 			{
-				<div class="col pd-offer-action-qty">
+				<div class="col pd-offer-action-qty" style="display:none;">
 					@Html.EditorFor(model => model.AddToCart, "QtyInput", new { large = true })
 				</div>
 			}
