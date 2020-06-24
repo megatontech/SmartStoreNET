@@ -90,12 +90,18 @@ namespace SmartStore.Web.Models.Customer
         [SmartResourceDisplayName("Account.Fields.City")]
         public string City { get; set; }
         //[SmartResourceDisplayName("Account.Fields.Email")]
+        [RegularExpression(@"^1([23456789]\d{9}$",ErrorMessage = "手机号规则不正确")]
+        [Required]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "手机号长度必须为11位")]
         [SmartResourceDisplayName("手机号码", "手机号码")]
         [DataType(DataType.PhoneNumber)]
         public string Mobile { get; set; }
         [SmartResourceDisplayName("身份证号码", "身份证号码")]
         public string IDCardNo { get; set; }
         //[SmartResourceDisplayName("Account.Fields.Email")]
+        [RegularExpression(@"^1([23456789]\d{9}$", ErrorMessage = "手机号规则不正确")]
+        [Required]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "手机号长度必须为11位")]
         [SmartResourceDisplayName("推荐人手机号码", "推荐人手机号码")]
         [DataType(DataType.PhoneNumber)]
         public string ParentMobile { get; set; }

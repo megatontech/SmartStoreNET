@@ -100,7 +100,9 @@
             columns.Bound(x => x.Id)
                 .Centered()
                 .Template(x => Html.ActionLink(T("Admin.Common.Edit").Text, "Edit", new { id = x.Id }, new { @class = "t-button" }))
-                .ClientTemplate("<a href=\"Edit/<#= Id #>\" class=\"t-button\">" + T("Admin.Common.Edit").Text + "</a>")
+                .ClientTemplate("<a href=\"Edit/<#= Id #>\" class=\"t-button\">" + T("Admin.Common.Edit").Text + "</a>"+
+                "<a href=\"MyTeam/<#= Id #>\" class=\"t-button\">" + T("团队组织").Text + "</a>"
+                )
                 .Title(String.Empty)
                 .HtmlAttributes(new { align = "right", @class = "omega" });
         })

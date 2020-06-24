@@ -3,7 +3,7 @@
 @using Telerik.Web.Mvc.UI
 @{
     var allString = T("Admin.Common.All").Text;
-
+    var gridPageSize = EngineContext.Current.Resolve<SmartStore.Core.Domain.Common.AdminAreaSettings>().GridPageSize;
     ViewBag.Title = T("后台钱包流水").Text;
 }
 @using (Html.BeginForm())
@@ -33,14 +33,14 @@
                 //	.HtmlAttributes(new { style = "text-align:center" })
                 //	.HeaderHtmlAttributes(new { style = "text-align:center" });
 
-                columns.Bound(x => x.Customer).Title("会员id").Centered();
+                columns.Bound(x => x.CustomerMobile).Title("手机号").Centered();
                 columns.Bound(x => x.CustomerName).Title("会员名字").Centered();
                 columns.Bound(x => x.Amount).Title("金额")
                     .Format("{0:0.00}")
                     .RightAlign();
                 columns.Bound(x => x.Comment).Title("详情")
                     .Centered();
-                columns.Bound(x => x.WithdrawType).Title("类型")
+                columns.Bound(x => x.WithdrawTypeStr).Title("类型")
 
                     .Centered();
                 columns.Bound(x => x.WithdrawTime).Title("时间").Centered();
@@ -51,7 +51,7 @@
                 x.AllowUnsort(true);
                 x.SortMode(GridSortMode.SingleColumn);
             })
-            //.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+            .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
             .DataBinding(dataBinding => dataBinding.Ajax().Select("WalletList", "DeclarationWalletOverview"))
             .ClientEvents(events => events.OnDataBinding("productsGrid_onDataBinding").OnDataBound("productsGrid_onDataBound"))
             //.EnableCustomBinding(true)

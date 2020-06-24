@@ -377,6 +377,11 @@ namespace SmartStore.Core.Domain.Orders
         /// </summary>
         [DataMember]
         public string CustomerOrderComment { get; set; }
+        /// <summary>
+        /// Gets or sets the customer order comment
+        /// </summary>
+        [DataMember]
+        public string AuditOrderComment { get; set; }
 
         /// <summary>
         /// Gets or sets the authorization transaction identifier
@@ -578,6 +583,7 @@ namespace SmartStore.Core.Domain.Orders
                 this.OrderStatusId = (int)value;
             }
         }
+        
 
         /// <summary>
         /// Gets or sets the payment status

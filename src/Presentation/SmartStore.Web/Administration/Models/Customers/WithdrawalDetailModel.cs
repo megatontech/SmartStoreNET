@@ -28,10 +28,11 @@ namespace SmartStore.Admin.Models.Customers
         /// 用户id
         /// </summary>
         public string CustomerName { get; set; }
+        public string CustomerMobile { get; set; }
         /// <summary>
         /// 操作人ID
         /// </summary>
-        
+
         public Guid OperaterID { get; set; }
         /// <summary>
         /// 钱数
@@ -53,10 +54,11 @@ namespace SmartStore.Admin.Models.Customers
         /// </summary>
         
         public int WithdrawType { get; set; }
+        public string WithdrawTypeStr { get; set; }
         /// <summary>
         /// 转账时间
         /// </summary>
-        
+
         public DateTime WithdrawTime { get; set; }
         /// <summary>
         /// 是否参与统计

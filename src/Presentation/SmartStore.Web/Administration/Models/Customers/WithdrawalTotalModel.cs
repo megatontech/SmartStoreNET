@@ -25,11 +25,12 @@ namespace SmartStore.Admin.Models.Customers
         /// 用户id
         /// </summary>
         public string CustomerName { get; set; }
+        public string CustomerMobile { get; set; }
 
         /// <summary>
         /// 是否参与统计
         /// </summary>
-        
+
         public bool IsCount { get; set; }
 
         /// <summary>

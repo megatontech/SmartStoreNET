@@ -3,6 +3,9 @@
 @using Telerik.Web.Mvc.UI;
 @{
     ViewBag.Title = T("操盘控制台").Text;
+    var singlePointValue = 0M;
+    if (Model.ContributionValue != 0) { singlePointValue = Model.DecValue / Model.ContributionValue; }
+
 }
 
 <div class="section-header">
@@ -32,6 +35,10 @@
                 <div class='col-auto stats-today-item")'>
                     <div class="stats-today-item-label">贡献值个数</div>
                     <div class="stats-today-item-value active" )">@Model.ContributionValue.ToString("F2")</div>
+                </div>
+                <div class='col-auto stats-today-item")'>
+                    <div class="stats-today-item-label">贡献值价值</div>
+                    <div class="stats-today-item-value active" )">@singlePointValue.ToString("F2")</div>
                 </div>
                 <div class='col-auto stats-today-item")'>
                     <div class="stats-today-item-label">分红金额</div>

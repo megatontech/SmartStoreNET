@@ -22,10 +22,11 @@
     <fieldset class="content-group">
         <legend><span>@T("Account.YourPersonalDetails")</span></legend>
 
-
-        @Html.ControlGroupFor(model => model.FirstName, required: false, breakpoint: "lg")
-        @Html.ControlGroupFor(model => model.VatNumber, required: false, breakpoint: "lg")
-        @Html.ControlGroupFor(model => model.VatNumberStatusNote, required: false, breakpoint: "lg")
+        
+        @Html.ControlGroupFor(model => model.Username, required: true,  breakpoint: "lg")
+        @Html.ControlGroupFor(model => model.FirstName, required: true, breakpoint: "lg")
+        @Html.ControlGroupFor(model => model.VatNumber, required: true, breakpoint: "lg")
+        @Html.ControlGroupFor(model => model.VatNumberStatusNote, required: true, breakpoint: "lg")
 
         @*@if (Model.UsernamesEnabled)
         {

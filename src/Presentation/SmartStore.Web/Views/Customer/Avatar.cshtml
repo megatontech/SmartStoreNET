@@ -32,7 +32,7 @@
 
 	@if (!Model.Avatar.PictureUrl.HasValue())
 	{
-		<div class="alert alert-info mt-2">@T("Account.Avatar.UploadRules", Model.MaxFileSize)</div>
+		<div class="alert alert-info mt-2">@T("头像大小限制为500KB", Model.MaxFileSize)</div>
 	}
 </div>
 

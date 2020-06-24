@@ -688,6 +688,7 @@ namespace SmartStore.Admin.Controllers
                 {
                     customer.Mobile = model.Phone;
                     customer.IsCustomer = true;
+                    customer.EverHadOrder = false;
                     customer.ParentMobile = model.ParentPhone;
                     if (!string.IsNullOrEmpty(customer.ParentMobile) && _customerService.GetCustomerByMobile(customer.ParentMobile) != null)
                     {
@@ -1644,7 +1645,21 @@ namespace SmartStore.Admin.Controllers
         }
 
         #endregion Addresses
-
+        #region myteam
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult MyTeam(int id)
+        {
+            var customer = _customerService.GetCustomerById(id);
+            var allcustomer = _customerService.BuildAllTreeWithoutOrder();
+            //钱包展示总额，可提现，冻结，以及最近入账
+            var model = new CustomerTeamModel();
+            model.Self = customer;
+            model.Team = new System.Collections.Generic.List<Customer>();
+            model.Team.AddRange(allcustomer.Where(x => x.ParentID == customer.Id).ToList());
+            model.Total = model.Team.Count;
+            return View(model);
+        }
+        #endregion
         #region Orders
 
         [HttpPost, GridAction(EnableCustomBinding = true)]
@@ -1939,5 +1954,16 @@ namespace SmartStore.Admin.Controllers
 
         public bool DisplayCaptcha { get; set; }
 
+    }
+    public partial class CustomerTeamModel : ModelBase
+    {
+        public CustomerTeamModel()
+        {
+
+        }
+
+        public int Total { get; set; }
+        public List<SmartStore.Core.Domain.Customers.Customer> Team { get; set; }
+        public SmartStore.Core.Domain.Customers.Customer Self { get; set; }
     }
 }

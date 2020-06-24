@@ -383,9 +383,10 @@ namespace SmartStore.Web.Controllers
                     {
                         Id = x.Id,
                         OrderNumber = x.OrderNumber.ToString(),
-                        OrderProductName = (x.ProductID==0?"失效产品": _productService.GetProductById(x.ProductID).Name),
+                        OrderProductName = (x.ProductID == 0 ? "失效产品" : _productService.GetProductById(x.ProductID).Name),
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
                         OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
+                        OrderStatusVal = (int)x.OrderStatus,
                         IsReturnRequestAllowed = false
                     };
 
@@ -441,7 +442,8 @@ namespace SmartStore.Web.Controllers
 						Id = x.Id,
 						OrderNumber = x.GetOrderNumber(),
 						CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
-						OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
+                        OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
+                        OrderStatusVal = (int)x.OrderStatus,
 						IsReturnRequestAllowed = _orderProcessingService.IsReturnRequestAllowed(x)
 					};
 

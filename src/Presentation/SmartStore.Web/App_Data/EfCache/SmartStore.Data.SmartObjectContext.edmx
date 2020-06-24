@@ -159,6 +159,7 @@
           <Property Name="PasswordFormatId" Type="Int32" Nullable="false" />
           <Property Name="PasswordSalt" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="AdminComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="EverHadOrder" Type="Boolean" Nullable="false" />
           <Property Name="IsTaxExempt" Type="Boolean" Nullable="false" />
           <Property Name="AffiliateId" Type="Int32" Nullable="false" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
@@ -1667,6 +1668,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="Order" Type="Int32" Nullable="false" />
           <Property Name="Operater" Type="Int32" Nullable="false" />
           <Property Name="CustomerID" Type="Guid" Nullable="false" />
           <Property Name="OperaterID" Type="Guid" Nullable="false" />
@@ -1809,6 +1811,7 @@
           <Property Name="DirectDebitCountry" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="DirectDebitIban" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CustomerOrderComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="AuditOrderComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AuthorizationTransactionId" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AuthorizationTransactionCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AuthorizationTransactionResult" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -4597,6 +4600,7 @@
                 <ScalarProperty Name="PasswordFormatId" ColumnName="PasswordFormatId" />
                 <ScalarProperty Name="PasswordSalt" ColumnName="PasswordSalt" />
                 <ScalarProperty Name="AdminComment" ColumnName="AdminComment" />
+                <ScalarProperty Name="EverHadOrder" ColumnName="EverHadOrder" />
                 <ScalarProperty Name="IsTaxExempt" ColumnName="IsTaxExempt" />
                 <ScalarProperty Name="AffiliateId" ColumnName="AffiliateId" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
@@ -5997,6 +6001,7 @@
               <MappingFragment StoreEntitySet="WithdrawalDetail">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="Order" ColumnName="Order" />
                 <ScalarProperty Name="Operater" ColumnName="Operater" />
                 <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
                 <ScalarProperty Name="OperaterID" ColumnName="OperaterID" />
@@ -6143,6 +6148,7 @@
                 <ScalarProperty Name="DirectDebitCountry" ColumnName="DirectDebitCountry" />
                 <ScalarProperty Name="DirectDebitIban" ColumnName="DirectDebitIban" />
                 <ScalarProperty Name="CustomerOrderComment" ColumnName="CustomerOrderComment" />
+                <ScalarProperty Name="AuditOrderComment" ColumnName="AuditOrderComment" />
                 <ScalarProperty Name="AuthorizationTransactionId" ColumnName="AuthorizationTransactionId" />
                 <ScalarProperty Name="AuthorizationTransactionCode" ColumnName="AuthorizationTransactionCode" />
                 <ScalarProperty Name="AuthorizationTransactionResult" ColumnName="AuthorizationTransactionResult" />
@@ -6807,6 +6813,7 @@
           <Property Name="PasswordFormatId" Type="int" Nullable="false" />
           <Property Name="PasswordSalt" Type="nvarchar" MaxLength="500" Nullable="true" />
           <Property Name="AdminComment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="EverHadOrder" Type="bit" Nullable="false" />
           <Property Name="IsTaxExempt" Type="bit" Nullable="false" />
           <Property Name="AffiliateId" Type="int" Nullable="false" />
           <Property Name="Active" Type="bit" Nullable="false" />
@@ -8138,6 +8145,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="Order" Type="int" Nullable="false" />
           <Property Name="Operater" Type="int" Nullable="false" />
           <Property Name="CustomerID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="OperaterID" Type="uniqueidentifier" Nullable="false" />
@@ -8278,6 +8286,7 @@
           <Property Name="DirectDebitCountry" Type="nvarchar(max)" Nullable="true" />
           <Property Name="DirectDebitIban" Type="nvarchar(max)" Nullable="true" />
           <Property Name="CustomerOrderComment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="AuditOrderComment" Type="nvarchar(max)" Nullable="true" />
           <Property Name="AuthorizationTransactionId" Type="nvarchar(max)" Nullable="true" />
           <Property Name="AuthorizationTransactionCode" Type="nvarchar(max)" Nullable="true" />
           <Property Name="AuthorizationTransactionResult" Type="nvarchar(max)" Nullable="true" />

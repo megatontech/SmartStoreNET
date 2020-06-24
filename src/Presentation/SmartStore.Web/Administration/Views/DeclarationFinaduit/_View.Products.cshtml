@@ -1,0 +1,53 @@
+﻿@model OrderModel
+@using SmartStore.Core.Domain.Tax;
+@using SmartStore.Core.Domain.Catalog;
+
+
+<div>
+	<div class="table-responsive">
+		<table id="OrderItemTable" class="table admin-table">
+			<thead>
+				<tr>
+					<th>
+						@T("Admin.Orders.Products.ProductName")
+					</th>
+					
+					<th class="text-center">
+						@T("Admin.Orders.Products.Price")
+					</th>
+					<th class="text-center">
+						@T("Admin.Orders.Products.Quantity")
+					</th>
+				
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model.Items)
+			{
+					<tr>
+						<td style="" class="align-top">
+							<div>
+                                <div class="mb-2">
+                                    @Html.Raw(item.ProductName)
+                                </div>
+							</div>
+						</td>
+
+						<td style="" class="align-top">
+
+                            <div class="text-center">
+                                @item.UnitPriceExclTax
+                            </div>
+						</td>
+						<td align="center" style="" class="align-top">
+							<div>
+								@item.Quantity
+							</div>
+						</td>
+					</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+</div>

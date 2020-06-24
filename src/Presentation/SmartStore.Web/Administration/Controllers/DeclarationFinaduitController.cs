@@ -31,6 +31,7 @@ using SmartStore.Services.Search;
 using SmartStore.Services.Security;
 using SmartStore.Services.Shipping;
 using SmartStore.Services.Tax;
+using SmartStore.Services.Wallet;
 using SmartStore.Utilities;
 using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
@@ -88,6 +89,7 @@ namespace SmartStore.Admin.Controllers
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductService _productService;
+        private readonly IDeclarationProductService _dproductService;
         private readonly SearchSettings _searchSettings;
         private readonly IShipmentService _shipmentService;
         private readonly IShoppingCartService _shoppingCartService;
@@ -97,13 +99,14 @@ namespace SmartStore.Admin.Controllers
         private readonly TaxSettings _taxSettings;
         private readonly IWorkContext _workContext;
         private readonly ICalcRewardService _CalcRewardService;
+        private readonly IWithdrawalDetailService _detailService;
         #endregion Fields
 
         #region Ctor
 
         public DeclarationFinaduitController(IOrderService orderService, IPictureService pictureService,
-            IOrderReportService orderReportService,
-            IOrderProcessingService orderProcessingService,
+            IOrderReportService orderReportService, IWithdrawalDetailService detailService, IDeclarationProductService dproductService,
+        IOrderProcessingService orderProcessingService,
             IDateTimeHelper dateTimeHelper,
             IPriceFormatter priceFormatter,
             ILocalizationService localizationService,
@@ -146,6 +149,8 @@ namespace SmartStore.Admin.Controllers
            IDeclarationOrderService declarationOrderService
             )
         {
+            _dproductService = dproductService;
+            _detailService = detailService;
             _pictureService = pictureService;
             _orderService = orderService;
             _orderReportService = orderReportService;
@@ -303,6 +308,8 @@ namespace SmartStore.Admin.Controllers
             model.TaxDisplayType = _taxSettings.TaxDisplayType;
             model.AffiliateId = order.AffiliateId;
             model.CustomerComment = order.CustomerOrderComment;
+            model.AuditOrderComment = order.AuditOrderComment;
+            
             model.HasNewPaymentNotification = order.HasNewPaymentNotification;
             model.AcceptThirdPartyEmailHandOver = order.AcceptThirdPartyEmailHandOver;
 
@@ -978,7 +985,7 @@ namespace SmartStore.Admin.Controllers
                     var orderModel = new OrderModel
                     {
                         Id = x.Id,
-                        OrderNumber = x.Id.ToString(),
+                        OrderNumber = x.OrderNumber.ToString(),
                         StoreName = store != null ? store.Name : "".NaIfEmpty(),
                         OrderTotal = _priceFormatter.FormatPrice(x.OrderTotal, true, false),
                         OrderStatus = x.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
@@ -990,7 +997,10 @@ namespace SmartStore.Admin.Controllers
                         StatusShipping = ShippingStatus.Delivered,
                         ShippingMethod = x.ShippingMethod.NullEmpty() ?? "".NaIfEmpty(),
                         CustomerName = x.Customer.Username,
+                        CustomerMobile = x.Customer.Mobile,
                         CustomerEmail = "",
+                        CardName = x.CardName,
+                        CardNumber = x.CardNumber,
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
                         HasNewPaymentNotification = x.HasNewPaymentNotification,
                         UpdatedOn =x.PaidDateUtc.Value
@@ -1104,8 +1114,12 @@ namespace SmartStore.Admin.Controllers
             if (order == null)
                 return RedirectToAction("List");
             var isChangeVal = "";
+            var AuditOrderComment = "";
             var ChangedVal = 0M;
             isChangeVal = Request["isChangeVal"];
+            var isAudit = true;
+            isAudit = Request["isAudit"].ToBool();
+            AuditOrderComment = Request["AuditOrderComment"];
             try
             {
                 if (isChangeVal == "true") {
@@ -1125,13 +1139,29 @@ namespace SmartStore.Admin.Controllers
                 }
                 else
                 {
-                    order.OrderStatus = OrderStatus.Complete;
-                    order.PaymentStatus = PaymentStatus.Paid;
-                    order.PaidDateUtc = DateTime.Now;
-                    _DeclarationOrderService.UpdateOrder(order);
-                    //分钱
-                    var customer = _customerService.GetCustomerById(order.CustomerId);
-                    _CalcRewardService.CalcRewardOne(customer, order);
+                    if (isAudit) 
+                    {
+                        order.OrderStatus = OrderStatus.Complete;
+                        order.PaymentStatus = PaymentStatus.Paid;
+                        order.PaidDateUtc = DateTime.Now;
+                        _DeclarationOrderService.UpdateOrder(order);
+                        
+                        //分钱
+                        var customer = _customerService.GetCustomerById(order.CustomerId);
+                        //EverHadOrder没报单的会员不给他任何佣金（一直没出单的不给钱，会员表加字段）
+                        customer.EverHadOrder = true;
+                        _customerService.UpdateCustomer(customer);
+                        _CalcRewardService.CalcRewardOne(customer, order);
+                    }
+                    else 
+                    {
+                        order.OrderStatus = OrderStatus.Cancelled;
+                        order.PaymentStatus = PaymentStatus.Refunded;
+                        order.AuditOrderComment = AuditOrderComment;
+                        order.PaidDateUtc = DateTime.Now;
+                        _DeclarationOrderService.UpdateOrder(order);
+                    }
+                   
                 }
 
             }
@@ -1142,10 +1172,36 @@ namespace SmartStore.Admin.Controllers
 
             return RedirectToAction("List");
         }
+        public ActionResult View(int id)
+        {
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
+
+            var order = _DeclarationOrderService.GetOrderById(id);
+            if (order == null || order.Deleted)
+                return RedirectToAction("List");
+            var customer = _customerService.BuildAllTreeWithoutOrder();
+            var model = new OrderModel();
+            PrepareOrderDetailsModel(model, order);
+            var pictureUrl = _pictureService.GetUrl(order.PaymentMethodSystemName.ToInt());
+            model.details = _detailService.GetByOrderid(order.Id);
+            foreach (var item in model.details)
+            {
+                item.customerName = customer.FirstOrDefault(x=>x.Id==item.Customer).FirstName;
+                item.customerMobile = customer.FirstOrDefault(x=>x.Id==item.Customer).Mobile;
+            }
+            var product = _dproductService.GetProductById(order.ProductID);
+            if (product != null) {
+            model.Items.Add(new OrderModel.OrderItemModel() {  ProductName= product .Name, Quantity=1,UnitPriceExclTax = product.Price.ToString("F2")});
+
+            }
+            model.ShippingAddressGoogleMapsUrl = pictureUrl;
+            return View(model);
+        }
         public ActionResult Audit(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _DeclarationOrderService.GetOrderById(id);
             if (order == null || order.Deleted)

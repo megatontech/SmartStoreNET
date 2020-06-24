@@ -15,12 +15,18 @@
         </div>
         <div class="options">
             @{ Html.RenderWidget("admin_button_toolbar_before"); }
-            <button type="submit" id="AuditOper" class="btn btn-primary">
+            <button type="submit" id="AuditOper" onclick="changeOper(true)"  class="btn btn-primary">
                 <i class="far fa-check"></i>
                 <span>@T("通过")</span>
             </button>
+            <button type="submit" id="AuditDeny" onclick="changeOper(false)" class="btn btn-primary">
+                <i class="far fa-check"></i>
+                <span>@T("拒绝")</span>
+            </button>
             <input type="submit" id="order-audit" name="btnRefreshPage" class="d-none" />
             <input type="hidden" class="loaded-tab-name" name="id" value="@Model.Id" />
+            <input type="hidden" id="isAudit" class="loaded-tab-name" name="isAudit" value="true" />
+            <input type="hidden" id="AuditOrderComment" class="loaded-tab-name" name="AuditOrderComment" value="" />
             @{ Html.RenderWidget("admin_button_toolbar_after"); }
         </div>
     </div>

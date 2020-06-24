@@ -39,10 +39,10 @@
 </style>
 <script>
     jQuery(document).ready(function () {
-        $("#org").jOrgChart({
-            chartElement: '#chart',
-            dragAndDrop: true
-        });
+        //$("#org").jOrgChart({
+        //    chartElement: '#chart',
+        //    dragAndDrop: true
+        //});
     });</script>
 <script>
     jQuery(document).ready(function () {
@@ -78,7 +78,7 @@
         <h1 class="h3">我的团队</h1>
     </div>
 
-    <ul id="org" style="display:none">
+    <ul id="org" style="display:block">
         <li>
             @Model.Self.Username 团队人数： @Model.Total
             <ul>

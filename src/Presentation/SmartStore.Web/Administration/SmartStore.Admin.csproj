@@ -766,6 +766,11 @@
     <Content Include="Views\DeclarationFinaduit\_Audit.Info.cshtml" />
     <Content Include="Views\Customer\Login.cshtml" />
     <Content Include="Views\Customer\_Layout.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\View.cshtml" />
+    <Content Include="Views\Customer\MyTeam.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_View.Info.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_View.Products.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\_View.BillingAndShipment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />

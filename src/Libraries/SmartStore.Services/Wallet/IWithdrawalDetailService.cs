@@ -9,10 +9,12 @@ namespace SmartStore.Services.Wallet
 
         public void Add(WithdrawalDetail entity);
         public WithdrawalDetail GetByid(int id);
+        public List<WithdrawalDetail> GetByOrderid(int orderid);
         public List<WithdrawalDetail> GetByCustomId(int id);
         public List<WithdrawalDetail> GetByCustomId(int id, int count);
         public List<WithdrawalDetail> GetByCustomId(int id,int skip, int count);
         public List<WithdrawalDetail> Get();
+        public List<WithdrawalDetail> Get(int start,int length);
 
         #endregion Public Methods
     }

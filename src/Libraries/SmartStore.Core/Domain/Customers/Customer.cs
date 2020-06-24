@@ -173,7 +173,11 @@ namespace SmartStore.Core.Domain.Customers
         /// </summary>
         [DataMember]
         public string AdminComment { get; set; }
-
+        /// <summary>
+        /// 5.	没报单的会员不给他任何佣金（一直没出单的不给钱，会员表加字段）
+        /// </summary>
+        [DataMember]
+        public bool EverHadOrder { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether the customer is tax exempt
         /// </summary>

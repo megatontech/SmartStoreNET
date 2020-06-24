@@ -9,6 +9,7 @@ using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Core.Domain.Tax;
+using SmartStore.Core.Domain.Wallet;
 using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Modelling;
@@ -22,7 +23,8 @@ namespace SmartStore.Admin.Models.Orders
             TaxRates = new List<TaxRate>();
             GiftCards = new List<GiftCard>();
             Items = new List<OrderItemModel>();
-			AutoUpdateOrderItem = new AutoUpdateOrderItemModel();
+            details = new List<WithdrawalDetail>();
+            AutoUpdateOrderItem = new AutoUpdateOrderItemModel();
         }
 
         //identifiers
@@ -44,6 +46,8 @@ namespace SmartStore.Admin.Models.Orders
 
 		[SmartResourceDisplayName("Admin.Orders.List.CustomerName")]
 		public string CustomerName { get; set; }
+        [SmartResourceDisplayName("手机号")]
+        public string CustomerMobile { get; set; }
 
         [SmartResourceDisplayName("Admin.Orders.Fields.CustomerEmail")]
         public string CustomerEmail { get; set; }
@@ -160,7 +164,10 @@ namespace SmartStore.Admin.Models.Orders
 		//payment info
 		[SmartResourceDisplayName("Admin.Orders.Fields.PaymentStatus")]
         public string PaymentStatus { get; set; }
-		public PaymentStatus StatusPayment { get; set; }
+        [SmartResourceDisplayName("订单审核备注")]
+        public string AuditOrderComment { get; set; }
+        
+        public PaymentStatus StatusPayment { get; set; }
 
 		public bool HasPaymentMethod { get; set; }
 		[SmartResourceDisplayName("Admin.Orders.Fields.PaymentMethod")]
@@ -316,6 +323,7 @@ namespace SmartStore.Admin.Models.Orders
         //items
         public bool HasDownloadableProducts { get; set; }
         public IList<OrderItemModel> Items { get; set; }
+        public IList<WithdrawalDetail> details { get; set; }
 
         [SmartResourceDisplayName("Common.CreatedOn")]
         public DateTime CreatedOn { get; set; }

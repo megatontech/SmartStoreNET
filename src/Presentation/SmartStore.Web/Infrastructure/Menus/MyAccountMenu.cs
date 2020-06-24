@@ -140,6 +140,13 @@ namespace SmartStore.Web.Infrastructure
             });
             root.Append(new MenuItem
             {
+                Id = "ProxyOrders",
+                Text = T("代客报单"),
+                Icon = "fal fa-folder",
+                Url = _urlHelper.Action("ProxyOrders", "Customer", new { area = "" })
+            });
+            root.Append(new MenuItem
+            {
                 Id = "dOrders",
                 Text = T("我的团队"),
                 Icon = "fal fa-handshake",
@@ -153,13 +160,13 @@ namespace SmartStore.Web.Infrastructure
             //    Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
             //});
 
-            //root.Append(new MenuItem
-            //{
-            //    Id = "info",
-            //    Text = T("我的资料"),
-            //    Icon = "fal fa-user",
-            //    Url = _urlHelper.Action("Info", "Customer", new { area = "" })
-            //});
+            root.Append(new MenuItem
+            {
+                Id = "info",
+                Text = T("我的资料"),
+                Icon = "fal fa-user",
+                Url = _urlHelper.Action("Info", "Customer", new { area = "" })
+            });
 
             //root.Append(new MenuItem
             //{
@@ -236,16 +243,16 @@ namespace SmartStore.Web.Infrastructure
                 Icon = "fal fa-sign-out-alt fa-fw",
                 Url = _urlHelper.Action("logout", new { area = "" })
             });
-            //if (_customerSettings.AllowCustomersToUploadAvatars)
-            //{
-            //    root.Append(new MenuItem
-            //    {
-            //        Id = "avatar",
-            //        Text = T("Account.Avatar"),
-            //        Icon = "fal fa-user-circle",
-            //        Url = _urlHelper.Action("Avatar", "Customer", new { area = "" })
-            //    });
-            //}
+            if (_customerSettings.AllowCustomersToUploadAvatars)
+            {
+                root.Append(new MenuItem
+                {
+                    Id = "avatar",
+                    Text = T("Account.Avatar"),
+                    Icon = "fal fa-user-circle",
+                    Url = _urlHelper.Action("Avatar", "Customer", new { area = "" })
+                });
+            }
 
             //if (_forumSettings.ForumsEnabled && _forumSettings.AllowCustomersToManageSubscriptions)
             //{

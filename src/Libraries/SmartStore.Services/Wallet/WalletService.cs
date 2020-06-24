@@ -130,7 +130,8 @@ namespace SmartStore.Services.Wallet
                     isOut = false,
                     WithdrawTime = DateTime.Now,
                     WithdrawType = 1,
-                    CustomerID = customer.CustomerGuid
+                    CustomerID = customer.CustomerGuid,
+                    Order = order.Id
                 });
                 //send reward
             }
@@ -187,7 +188,7 @@ namespace SmartStore.Services.Wallet
                 _IWithdrawalDetailService.Add(new WithdrawalDetail
                 {
                     Amount = finalAmount,
-                    Comment = "营业额度分红入账：" + finalAmount+"封顶值："+customer.CapLinesTotal + "贡献值预计分红：" + customer.TotalPointsValue2,
+                    Comment = "营业额度分红入账：" + finalAmount.ToString("F2")+"封顶值："+customer.CapLinesTotal.ToString("F2") + "贡献值预计分红：" + customer.TotalPointsValue2.ToString("F2"),
                     Customer = customer.Id,
                     isOut = false,
                     WithdrawTime = DateTime.Now,

@@ -87,7 +87,7 @@ namespace SmartStore.Admin.Controllers
         public ActionResult Wallet(GridCommand command, DeclarationProductListModel model = null)
         {
             var gridModel = new GridModel<WithdrawalTotalModel>();
-                var detail = _total.GetAll();
+                var detail = _total.GetAll((command.Page - 1) * command.PageSize, command.PageSize);
                 var customer = _CustomerService.BuildAllTreeWithoutOrder();
                 List<WithdrawalTotalModel> modelList = new List<WithdrawalTotalModel>();
                 foreach (var item in detail)
@@ -109,15 +109,19 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<WithdrawalDetailModel>();
             {
-                var detail = _detailrule.Get();
+                var detail = _detailrule.Get((command.Page - 1) * command.PageSize, command.PageSize);
                 var customer = _CustomerService.BuildAllTreeWithoutOrder();
                 List<WithdrawalDetailModel> modelList = new List<WithdrawalDetailModel>();
                 foreach (var item in detail)
                 {
                     var name = customer.FirstOrDefault(x => x.Id == item.Customer) == null ? "" : customer.FirstOrDefault(x => x.Id == item.Customer).Username;
                     item.CustomerName = name;
-                    if (item.Amount != 0M) { modelList.Add(item.ToModel()); }
+                    var WithdrawTypeStr = ConvertEnum(item);
+                    var mod = item.ToModel();
+                    mod.WithdrawTypeStr = WithdrawTypeStr;
+                    if (item.Amount != 0M) { modelList.Add(mod); }
                 }
+               // modelList.Select(x => x.WithdrawTypeStr = ConvertEnum(x));
                 var products = new PagedList<WithdrawalDetailModel>(modelList.AsEnumerable(), command.Page - 1, command.PageSize, detail.Count());
                 gridModel.Data = products;
                 gridModel.Total = products.TotalCount;
@@ -126,6 +130,20 @@ namespace SmartStore.Admin.Controllers
             {
                 Data = gridModel
             };
+        }
+        
+        public string ConvertEnum(WithdrawalDetail detail) 
+        {
+            string result = "";
+            if (detail.isOut) { result = "提现"; }
+            else
+            {
+                if (detail.WithdrawType == 1) { result = "直推佣金"; }
+                else if (detail.WithdrawType == 2) { result = "业绩分红"; }
+                else if (detail.WithdrawType == 3) { result = "商城分红"; }
+                else if (detail.WithdrawType == 4) { result = "红包"; }
+            }
+            return result;
         }
         #endregion Public Methods
     }

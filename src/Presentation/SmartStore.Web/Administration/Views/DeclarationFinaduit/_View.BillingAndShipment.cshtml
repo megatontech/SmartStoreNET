@@ -1,0 +1,41 @@
+﻿@model OrderModel
+@{ 
+    Model.MaxAmountToRefund = Model.details.Sum(x => x.Amount);
+}
+<div class="row">
+    <div class="card-deck card-cols-sm-1 card-cols-lg-3 col-md-12">
+        @foreach (var item in Model.details)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">@T("金额：") @item.Amount.ToString("F2")</h6>
+                    <div class="mb-2">
+                        @T("姓名:") @item.customerName
+                    </div>
+                    <div class="phone">
+                        @T("手机:") @item.customerMobile
+                    </div>
+
+                    <div class="fax">
+                        @T("时间:") @item.WithdrawTime.ToShortDateString()
+                    </div>
+                </div>
+                <div class="card-footer d-flex p-0">
+                    @*<a href="@Url.Action("AddressEdit", new { addressId = Model.BillingAddress.Id, orderId = Model.Id })" class="btn btn-warning btn-lg btn-flat rounded-0">
+                        <i class="far fa-edit"></i>
+                        <span>@T("Admin.Common.Edit")</span>
+                    </a>*@
+                </div>
+            </div>
+        }
+
+
+        <div class="card border-0">
+            <h6>@T("订单合计")</h6>
+            <p> @Model.OrderTotal</p>
+            <h6>@T("直推佣金")</h6>
+            <p>@Model.MaxAmountToRefund</p>
+        </div>
+    </div>
+</div>
+

@@ -116,6 +116,12 @@
                 <dl class="row mb-0">
                     <dt class="col-sm-3 font-weight-400 text-muted">@T("Order.OrderStatus")</dt>
                     <dd class="col-sm-9">@order.OrderStatus</dd>
+                    @if (order.OrderStatusVal>20)
+                    {
+                        
+                        <dt class="col-sm-3 font-weight-400 text-muted">@T("订单审核信息")</dt>
+                        <dd class="col-sm-9">@order.AuditOrderComment</dd>
+                    }
                     <dt class="col-sm-3 font-weight-400 text-muted">@T("Order.OrderDate")</dt>
                     <dd class="col-sm-9">@order.CreatedOn.ToNativeString()</dd>
                     <dt class="col-sm-3 font-weight-400 text-muted">@T("下单产品")</dt>

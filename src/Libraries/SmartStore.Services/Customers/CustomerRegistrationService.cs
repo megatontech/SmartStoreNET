@@ -321,6 +321,7 @@ namespace SmartStore.Services.Customers
             request.Customer.Mobile = request.Mobile;
             request.Customer.ParentMobile = request.ParentMobile;
             request.Customer.IsCustomer = true;
+            request.Customer.EverHadOrder = false;
             request.Customer.IsLock = false;
             switch (request.PasswordFormat)
             {

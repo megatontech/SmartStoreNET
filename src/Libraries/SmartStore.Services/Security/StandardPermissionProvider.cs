@@ -6,6 +6,18 @@ namespace SmartStore.Services.Security
 {
     public partial class StandardPermissionProvider : IPermissionProvider
     {
+        //declaration
+        //操盘人员查看操盘控制台
+        public static readonly PermissionRecord DeclarationControlcenter = new PermissionRecord { Name = "操盘控制台", SystemName = "DeclarationControlcenter", Category = "Standard" };
+        //业务员可进行后台报单操作(放到操盘控制台)
+        public static readonly PermissionRecord OrderDeclarationControlcenter = new PermissionRecord { Name = "后台报单", SystemName = "OrderDeclarationControlcenter", Category = "Standard" };
+        //财务人员可进行提现的管理操作
+        public static readonly PermissionRecord FinAudit = new PermissionRecord { Name = "报单审核", SystemName = "FinAudit", Category = "Standard" };
+        //财务收支报表的查看
+        public static readonly PermissionRecord FinDeclarationReport = new PermissionRecord { Name = "财务收支报表", SystemName = "FinDeclarationReport", Category = "Standard" };
+        //总经理具有报表查看权限
+        public static readonly PermissionRecord DeclarationReport = new PermissionRecord { Name = "数据报表", SystemName = "DeclarationReport", Category = "Standard" };
+        public static readonly PermissionRecord DeclarationManage = new PermissionRecord { Name = "报单系统管理", SystemName = "DeclarationManage", Category = "Standard" };
         //admin area permissions
         public static readonly PermissionRecord AccessAdminPanel = new PermissionRecord { Name = "Access admin area", SystemName = "AccessAdminPanel", Category = "Standard" };
         public static readonly PermissionRecord AllowCustomerImpersonation = new PermissionRecord { Name = "Admin area. Allow Customer Impersonation", SystemName = "AllowCustomerImpersonation", Category = "Customers" };
@@ -63,6 +75,13 @@ namespace SmartStore.Services.Security
         {
             return new[] 
             {
+                DeclarationControlcenter ,
+                OrderDeclarationControlcenter ,
+                FinAudit ,
+                FinDeclarationReport ,
+                DeclarationManage,
+                DeclarationReport ,
+
                 AccessAdminPanel,
                 AllowCustomerImpersonation,
                 ManageCatalog,

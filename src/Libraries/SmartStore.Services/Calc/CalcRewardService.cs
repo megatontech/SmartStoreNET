@@ -208,18 +208,16 @@ namespace SmartStore.Services.Calc
             recursiveFindNode(customers2, treeNode, customer, 2, 1 + _calcrule.CalcRewardOneL2Count, 0);
             customers2 = customers2.Distinct().ToList();
 
-            //再向上5层orderAmount*15%*5%
+            //再向上7层orderAmount*15%*5%
             List<Customer> customers3 = new List<Customer>();
             var reward03 = Math.Round(order.OrderTotal * (decimal)((decimal)_calcrule.CalcRewardOneL1Percent / 100) * (decimal)((decimal)_calcrule.CalcRewardOneL3Percent / 100), 2);
-            recursiveFindNode(customers3, treeNode, customer, 2 + _calcrule.CalcRewardOneL2Count, 2 + _calcrule.CalcRewardOneL2Count + _calcrule.CalcRewardOneL3Count, 0);
+            recursiveFindNode(customers3, treeNode, customer, 2 + _calcrule.CalcRewardOneL2Count, 4 + _calcrule.CalcRewardOneL2Count + _calcrule.CalcRewardOneL3Count, 0);
             customers3 = customers3.Distinct().ToList();
 
             //保存佣金计算结果，分配钱到每个人的钱包
             if (customer1 != null) { _walletService.SendRewardToWalletOne(new List<Customer> { customer1 }, reward01, order); }
             if (customers2 != null) { _walletService.SendRewardToWalletOne(customers2, reward02, order); }
             if (customers3 != null) { _walletService.SendRewardToWalletOne(customers3, reward03, order); }
-            
-            
             
         }
 

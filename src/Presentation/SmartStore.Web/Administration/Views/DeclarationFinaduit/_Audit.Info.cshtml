@@ -23,7 +23,7 @@
     function changeVal() {
         $("#isChangeVal").val("true");
         $("#ChangedVal").val($("#OrderTotalValue").val());
-        
+
     }
     function toggleOrderTotals(editmode) {
         if (editmode) {
@@ -41,7 +41,11 @@
             $("#isChangeVal").val("false");
         }
     }
-
+        function changeOper(isAudit) {
+            $("#isAudit").val(isAudit);
+            $("#AuditOrderComment").val($("#AddOrderNoteMessage").val());
+            
+        }
     function toggleCC(editmode) {
 		if (editmode) {
 			$('.cc-control').parent().hide();
@@ -251,6 +255,14 @@
                     @Model.CustomerComment
                 </div>
             }
+        </td>
+    </tr>
+    <tr id="">
+        <td colspan="2">
+                <h4>@T("订单审核备注")</h4>
+                <div class="alert alert-info">
+                    @Html.EditorFor(model => model.AddOrderNoteMessage)
+                </div>
         </td>
     </tr>
 </table>

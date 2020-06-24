@@ -45,8 +45,8 @@ namespace SmartStore.Web.Models.Customer
         public bool TitleEnabled { get; set; }
         [SmartResourceDisplayName("Account.Fields.Title")]
         public string Title { get; set; }
-        
-        [SmartResourceDisplayName("Account.Fields.FirstName")]
+
+        [SmartResourceDisplayName("真实姓名", "真实姓名")]
         public string FirstName { get; set; }
 
         [SmartResourceDisplayName("Account.Fields.LastName")]

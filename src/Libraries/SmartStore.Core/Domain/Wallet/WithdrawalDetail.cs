@@ -27,6 +27,8 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember] 
         public int Customer { get; set; }
+        [DataMember]
+        public int Order { get; set; }
         /// <summary>
         /// 操作人
         /// </summary>
@@ -77,6 +79,10 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember]
         public bool IsCount { get; set; }
+        [NotMapped]
+        public string customerName { get; set; }
+        [NotMapped]
+        public string customerMobile { get; set; }
     }
 }
 

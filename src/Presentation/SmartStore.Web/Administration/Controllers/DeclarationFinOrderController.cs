@@ -1164,6 +1164,7 @@ namespace SmartStore.Admin.Controllers
                 ShippingRateComputationMethodSystemName = string.Empty,
                 VatNumber = string.Empty,
                 CustomerOrderComment = "",
+                AuditOrderComment="",
                 AcceptThirdPartyEmailHandOver = false
             };
             model.PaidDateUtc = DateTime.Now;
