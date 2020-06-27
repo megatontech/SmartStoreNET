@@ -1,10 +1,10 @@
 ﻿@model CustomerTeamModel
-@using SmartStore.Web.Models.Customer;
+@using SmartStore.Admin.Controllers;
 
 @{
     Html.AddTitleParts(T("PageTitle.Account").Text);
 
-    Layout = "_dMyAccount";
+    //Layout = "_Layout";
     ViewBag.PageClassToken = "rewardpoints";
     ViewBag.PageTitle = T("").Text;
 }
@@ -32,6 +32,7 @@
         line-height: 11px;
         padding: 2px;
     }
+
     .alert-info:after {
         content: "";
         color: #d7ecfa;
@@ -73,25 +74,44 @@
         });
     });
 </script>
-<div class="col-md-8 col-lg-9">
-    <div class="page-title pt-4 pt-md-0">
-        <h1 class="h3">我的团队</h1>
+
+    <div class="section-header">
+        <div class="title">
+            @T("团队组织") -  @Model.Self.Username
+            <a href='@Url.Action("List")'>(@T("返回列表"))</a>
+        </div>
+        <div class="options">
+            @{ Html.RenderWidget("admin_button_toolbar_before"); }
+            @*<button type="submit" id="AuditOper" onclick="changeOper(true)" class="btn btn-primary">
+                <i class="far fa-check"></i>
+                <span>@T("通过")</span>
+            </button>
+            <button type="submit" id="AuditDeny" onclick="changeOper(false)" class="btn btn-primary">
+                <i class="far fa-check"></i>
+                <span>@T("拒绝")</span>
+            </button>*@
+            <input type="submit" id="order-audit" name="btnRefreshPage" class="d-none" />
+            <input type="hidden" id="isAudit" class="loaded-tab-name" name="isAudit" value="true" />
+            <input type="hidden" id="AuditOrderComment" class="loaded-tab-name" name="AuditOrderComment" value="" />
+            @{ Html.RenderWidget("admin_button_toolbar_after"); }
+        </div>
     </div>
+    <div class="col-md-8 col-lg-9">
+        <div class="page-title pt-4 pt-md-0">
+            <h1 class="h3">团队架构</h1>
+        </div>
 
-    <ul id="org" style="display:none">
-        <li>
-            @Model.Self.Username 团队人数： @Model.Total
-            <ul>
-                @foreach (var customer in Model.Team)
-                {
-                    <li id="@customer.Id">@customer.Username - @customer.Mobile</li>
-                }
-            </ul>
-        </li>
-    </ul>
+        <ul id="org" style="display:none">
+            <li>
+                @Model.Self.Username 团队人数： @Model.Total
+                <ul>
+                    @foreach (var customer in Model.Team)
+                    {
+                        <li id="@customer.Id">@customer.Username - @customer.Mobile</li>
+                    }
+                </ul>
+            </li>
+        </ul>
 
-    <div id="chart" class="orgChart"></div>
-
-</div>
-
-
+        <div id="chart" class="orgChart"></div>
+    </div>

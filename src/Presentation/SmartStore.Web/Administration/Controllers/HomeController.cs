@@ -3,6 +3,7 @@ using SmartStore.Core;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Services;
 using SmartStore.Services.Common;
+using SmartStore.Services.Customers;
 using SmartStore.Web.Framework;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
@@ -24,13 +25,14 @@ namespace SmartStore.Admin.Controllers
         private readonly CommonSettings _commonSettings;
         private readonly ICommonServices _services;
         private readonly Lazy<IUserAgent> _userAgent;
-
+        private readonly IWorkContext _workContext;
         #endregion Fields
 
         #region Ctor
 
-        public HomeController(ICommonServices services, CommonSettings commonSettings, Lazy<IUserAgent> userAgent)
+        public HomeController(ICommonServices services, CommonSettings commonSettings, IWorkContext workContext, Lazy<IUserAgent> userAgent)
         {
+            _workContext = workContext;
             this._commonSettings = commonSettings;
             this._services = services;
             this._userAgent = userAgent;
@@ -47,6 +49,10 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Index()
         {
+            if (_workContext.CurrentCustomer == null|| string.IsNullOrEmpty( _workContext.CurrentCustomer.Username))
+                 return Redirect("~/admin/Customer/Login");
+
+
             return View();
         }
 

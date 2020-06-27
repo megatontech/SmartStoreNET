@@ -99,14 +99,19 @@
             columns.Bound(x => x.LastActivityDate);
             columns.Bound(x => x.Id)
                 .Centered()
-                .Template(x => Html.ActionLink(T("Admin.Common.Edit").Text, "Edit", new { id = x.Id }, new { @class = "t-button" }))
-                .ClientTemplate("<a href=\"Edit/<#= Id #>\" class=\"t-button\">" + T("Admin.Common.Edit").Text + "</a>"+
+                 .Template(x => Html.ActionLink(T("Admin.Common.Edit").Text, "Edit", new { id = x.Id }, new { @class = "t-button" }))
+                .ClientTemplate("<a href=\"Edit/<#= Id #>\" class=\"t-button\">" + T("Admin.Common.Edit").Text + "</a> "
+                )
+                .Title(string.Empty);
+            columns.Bound(x => x.Id)
+                .Centered()
+                 .Template(x => Html.ActionLink(T("团队组织").Text, "MyTeam", new { id = x.Id }, new { @class = "t-button" }))
+                .ClientTemplate(
                 "<a href=\"MyTeam/<#= Id #>\" class=\"t-button\">" + T("团队组织").Text + "</a>"
                 )
-                .Title(String.Empty)
-                .HtmlAttributes(new { align = "right", @class = "omega" });
+                .Title(string.Empty);
         })
-        .Pageable(settings => settings.Total(Model.Customers.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+        .Pageable(settings => settings.Total(Model.Customers.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
         .DataBinding(dataBinding => dataBinding.Ajax().Select("CustomerList", "Customer"))
         .PreserveGridState()
         .EnableCustomBinding(true))

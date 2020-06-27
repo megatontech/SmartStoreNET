@@ -1642,7 +1642,7 @@ namespace SmartStore.Web.Controllers
                 return new HttpUnauthorizedResult();
 
             var customer = _workContext.CurrentCustomer;
-            var allcustomer =_customerService.BuildAllTreeWithoutOrder();
+            var allcustomer =_customerService.BuildNoLimitAllTreeWithoutOrder();
             var total = _total.Get(customer);
             //钱包展示总额，可提现，冻结，以及最近入账
             var model = new CustomerTeamModel();

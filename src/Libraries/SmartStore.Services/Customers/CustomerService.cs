@@ -105,6 +105,17 @@ namespace SmartStore.Services.Customers
 
 
         #region Public Methods
+        public List<Customer> BuildNoLimitAllTreeWithoutOrder()
+        {
+            List<Customer> tree = new List<Customer>();
+            var query = from c in IncludeShoppingCart(_customerRepository.Table)
+                        join d in _declarationOrderRepository.Table on c.Id equals d.CustomerId into custom
+                        orderby c.Id
+                        where c.IsCustomer == true 
+                        select c;
+            tree = query.ToList();
+            return tree;
+        }
 
         public List<Customer> BuildAllTreeWithoutOrder()
         {

@@ -14,7 +14,7 @@ namespace SmartStore.Services.Customers
     public partial interface ICustomerService
     {
         #region Public Methods
-
+        List<Customer> BuildNoLimitAllTreeWithoutOrder();
         List<Customer> BuildAllTreeWithoutOrder();
 
         List<Customer> BuildCurrentTree();

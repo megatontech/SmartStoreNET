@@ -1180,7 +1180,7 @@ namespace SmartStore.Admin.Controllers
             var order = _DeclarationOrderService.GetOrderById(id);
             if (order == null || order.Deleted)
                 return RedirectToAction("List");
-            var customer = _customerService.BuildAllTreeWithoutOrder();
+            var customer = _customerService.BuildNoLimitAllTreeWithoutOrder();
             var model = new OrderModel();
             PrepareOrderDetailsModel(model, order);
             var pictureUrl = _pictureService.GetUrl(order.PaymentMethodSystemName.ToInt());

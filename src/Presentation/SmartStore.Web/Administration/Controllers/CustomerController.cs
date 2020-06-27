@@ -230,7 +230,7 @@ namespace SmartStore.Admin.Controllers
                     // Redirect home where redirect to referrer would be confusing.
                     if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
                     {
-                        return RedirectToRoute("HomePage");
+                        return Redirect("~/admin");
                     }
 
                     return RedirectToReferrer(returnUrl);
@@ -266,7 +266,7 @@ namespace SmartStore.Admin.Controllers
                         // Redirect home where redirect to referrer would be confusing.
                         if (returnUrl.IsEmpty() || returnUrl.Contains(@"/login?") || returnUrl.Contains(@"/passwordrecoveryconfirm"))
                         {
-                            return RedirectToRoute("/");
+                            return Redirect("~/admin");
                         }
 
                         return RedirectToReferrer(returnUrl);
@@ -1650,7 +1650,7 @@ namespace SmartStore.Admin.Controllers
         public ActionResult MyTeam(int id)
         {
             var customer = _customerService.GetCustomerById(id);
-            var allcustomer = _customerService.BuildAllTreeWithoutOrder();
+            var allcustomer = _customerService.BuildNoLimitAllTreeWithoutOrder();
             //钱包展示总额，可提现，冻结，以及最近入账
             var model = new CustomerTeamModel();
             model.Self = customer;
