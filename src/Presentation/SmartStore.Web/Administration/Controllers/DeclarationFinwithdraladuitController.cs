@@ -132,7 +132,7 @@ namespace SmartStore.Admin.Controllers
                         var custom = customer.FirstOrDefault(y=>y.Id==x.Customer);
                         model.CustomerLoginName = custom.Username;
                         model.CustomerName = custom.FullName;
-                        model.WithdrawStatusStr = model.WithdrawStatus==10?"申请中":"已完成";
+                        model.WithdrawStatusStr = convertStatus(model.WithdrawStatus);
                         return model;
                     })
                     .ToList();
@@ -150,6 +150,15 @@ namespace SmartStore.Admin.Controllers
             {
                 Data = gridModel
             };
+        }
+        public string convertStatus(int status) 
+        {
+            string result = "";
+            if (status == 10) { result = "已发起"; }
+            if (status == 20) { result = "申请中"; }
+            if (status == 30) { result = "已完成"; }
+            if (status == 40) { result = "已拒绝"; }
+            return result;
         }
         // GET: DeclarationFinwithdraladuit
         public ActionResult Index()

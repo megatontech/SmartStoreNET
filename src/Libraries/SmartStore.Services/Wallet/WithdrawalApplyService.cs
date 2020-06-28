@@ -101,7 +101,7 @@ namespace SmartStore.Services.Wallet
 
         public List<WithdrawalApply> GetList()
         {
-           return _WithdrawalApplyRepository.Table.ToList();
+           return _WithdrawalApplyRepository.Table.OrderBy(x=>x.WithdrawStatus).ToList();
         }
 
         public List<WithdrawalApply> GetListByID(int id)
