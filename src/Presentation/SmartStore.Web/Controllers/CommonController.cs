@@ -501,8 +501,9 @@ namespace SmartStore.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult Menu(string name, string template = null)
 		{
-			var menu = _menuService.GetMenu(name);
-
+            var currentCustomer = _services.WorkContext.CurrentCustomer;
+            var menu = _menuService.GetMenu(name);
+            if (name == "Admin" && string.IsNullOrEmpty(currentCustomer.Username)) { menu = null; }
 			if (menu == null)
 				return new EmptyResult();
 

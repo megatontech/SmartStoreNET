@@ -1,0 +1,75 @@
+﻿@model WithDrawApplyModel
+
+@using SmartStore.Web.Models.Customer;
+
+@{
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+
+    Layout = "_MyAccount";
+    ViewBag.PageClassToken = "changepassword";
+    ViewBag.PageTitle = T("转换购物积分").Text;
+}
+    <script type="text/javascript">
+        function keyPress(ob) {
+            if (!ob.value.match(/^[\+\-]?\d*?\.?\d*?$/)) ob.value = ob.t_value; else ob.t_value = ob.value; if (ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) ob.o_value = ob.value;
+        }
+        function keyUp(ob) {
+            if (!ob.value.match(/^[\+\-]?\d*?\.?\d*?$/)) ob.value = ob.t_value; else ob.t_value = ob.value; if (ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) ob.o_value = ob.value;
+        }
+        function onBlur(ob) {
+            if (!ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?|\.\d*?)?$/)) ob.value = ob.o_value; else { if (ob.value.match(/^\.\d+$/)) ob.value = 0 + ob.value; if (ob.value.match(/^\.$/)) ob.value = 0; ob.o_value = ob.value };
+        }
+        $(function () {
+            $("#alert").hide();
+            $("#Amount").keyup(function () { this.value = this.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') })
+
+            $("#Amount").change(function () {
+                $("#alert").hide();
+                var amount = 0;
+                var totalamount = 0;
+                amount = parseFloat($("#Amount").val());
+                totalamount = parseFloat($("#TotalAmount").val());
+                console.log(amount);
+                console.log(totalamount);
+                if (totalamount >= amount) { $("#alert").hide(); $("#submitbtn").show(); }
+                else { $("#alert").show(); $("#submitbtn").hide(); }
+            });
+        });
+
+       
+    </script>
+@using (Html.BeginForm("WithDrawApply", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+
+    if (!ViewData.ModelState.IsValid)
+    {
+        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+    }
+    <div id="alert" class="alert alert-info">
+        请输入正确的数值
+    </div>
+    <div class="form-group row">
+        <label class="col-lg-4 col-form-label ">可提现金额</label>
+        <div class="col-lg-8">
+            @Html.HiddenFor(x => x.TotalAmount)
+            @Html.DisplayTextFor(model => model.TotalAmount)
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-lg-4 col-form-label ">金额</label>
+        <div class="col-lg-8">
+            @Html.TextBoxFor(model => model.Amount, new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col">
+            <button type="submit" id="submitbtn" class="btn btn-lg btn-primary">
+                <i class="fa fa-check"></i>
+                <span>@T("提交")</span>
+            </button>
+        </div>
+    </div>
+}

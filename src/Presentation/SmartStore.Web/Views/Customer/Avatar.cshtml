@@ -2,7 +2,7 @@
 @using SmartStore.Web.Framework.UI;
 @model CustomerAvatarEditModel
 @{
-	Layout = "_MyAccount";
+	Layout = "_dMyAccount";
 	ViewBag.PageClassToken = "avatar";
 	ViewBag.PageTitle = T("Account.Avatar").Text;
 
@@ -32,7 +32,7 @@
 
 	@if (!Model.Avatar.PictureUrl.HasValue())
 	{
-		<div class="alert alert-info mt-2">@T("头像大小限制为500KB", Model.MaxFileSize)</div>
+		<div class="alert alert-info mt-2">@T("头像大小限制为3MB", Model.MaxFileSize)</div>
 	}
 </div>
 

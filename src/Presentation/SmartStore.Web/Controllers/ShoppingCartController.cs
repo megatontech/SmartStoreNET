@@ -1976,7 +1976,7 @@ namespace SmartStore.Web.Controllers
         }
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult AddProductAndOrder(int productId, int shoppingCartTypeId, ProductVariantQuery query, FormCollection form)
+        public ActionResult ProxyAddProductAndOrder(int productId, int shoppingCartTypeId, ProductVariantQuery query, FormCollection form)
         {
             var product = _dproductService.GetProductById(productId);
             if (product == null)
@@ -2040,6 +2040,111 @@ namespace SmartStore.Web.Controllers
             _dshoppingCartService.AddToCart(addToCartContext);
 
             //#region Return result
+
+            //if (addToCartContext.Warnings.Count > 0)
+            //{
+            //    //cannot be added to the cart/wishlist
+            //    //let's display warnings
+            //    return Json(new
+            //    {
+            //        success = false,
+            //        message = addToCartContext.Warnings.ToArray()
+            //    });
+            //}
+
+            ////activity log
+            //_customerActivityService.InsertActivity("PublicStore.AddToShoppingCart", _localizationService.GetResource("ActivityLog.PublicStore.AddToShoppingCart"), product.Name);
+            //return Redirect("~/DeclarationCheckout/Confirm");
+            return Json(new
+            {
+                redirect = "../../DeclarationCheckout/ProxyConfirm"
+            });
+            //return RedirectToAction("~/DeclarationCheckout/PaymentMethod?productid=" + product.Id);
+            //if (_shoppingCartSettings.DisplayCartAfterAddingProduct)
+            //{
+            //    //redirect to the shopping cart page
+            //    return Json(new
+            //    {
+            //        redirect = Url.RouteUrl("ShoppingCart"),
+            //    });
+            //}
+            //else
+            //{
+            //    return Json(new
+            //    {
+            //        success = true
+            //    });
+            //}
+
+            #endregion Return result
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult AddProductAndOrder(int productId, int shoppingCartTypeId, ProductVariantQuery query, FormCollection form)
+        {
+            var product = _dproductService.GetProductById(productId);
+            if (product == null)
+            {
+                return Json(new
+                {
+                    redirect = Url.RouteUrl("HomePage"),
+                });
+            }
+
+            #region Customer entered price
+
+            decimal customerEnteredPriceConverted = decimal.Zero;
+            if (product.CustomerEntersPrice)
+            {
+                foreach (string formKey in form.AllKeys)
+                {
+                    if (formKey.Equals(string.Format("addtocart_{0}.CustomerEnteredPrice", productId), StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        decimal customerEnteredPrice = decimal.Zero;
+                        if (decimal.TryParse(form[formKey], out customerEnteredPrice))
+                            customerEnteredPriceConverted = _currencyService.ConvertToPrimaryStoreCurrency(customerEnteredPrice, _workContext.WorkingCurrency);
+                        break;
+                    }
+                }
+            }
+
+            #endregion Customer entered price
+
+            #region Quantity
+
+            int quantity = product.OrderMinimumQuantity;
+            string key1 = "addtocart_{0}.EnteredQuantity".FormatWith(productId);
+            string key2 = "addtocart_{0}.AddToCart.EnteredQuantity".FormatWith(productId);
+
+            if (form.AllKeys.Contains(key1))
+            {
+                int.TryParse(form[key1], out quantity);
+            }
+            else if (form.AllKeys.Contains(key2))
+            {
+                int.TryParse(form[key2], out quantity);
+            }
+
+            #endregion Quantity
+
+            //save item
+            var cartType = (ShoppingCartType)shoppingCartTypeId;
+
+            var addToCartContext = new AddToCartContext
+            {
+                Customer = _workContext.CurrentCustomer,
+                dProduct = product,
+                VariantQuery = query,
+                CartType = cartType,
+                CustomerEnteredPrice = product.Price,
+                Quantity = quantity,
+                AddRequiredProducts = true
+            };
+
+            _dshoppingCartService.AddToCart(addToCartContext);
+
+            #region Return result
 
             //if (addToCartContext.Warnings.Count > 0)
             //{
@@ -2170,6 +2275,19 @@ namespace SmartStore.Web.Controllers
             _httpContext.Session.SafeSet(CheckoutState.CheckoutStateSessionKey, new CheckoutState());
 
             return View(model);
+        }
+        [ChildActionOnly]
+        public ActionResult ProxydOrderSummary(bool? prepareAndDisplayOrderReviewData)
+        {
+            var cart = _workContext.CurrentCustomer.GetdCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var model = new ShoppingCartModel();
+
+            PreparedShoppingCartModel(model, cart,
+                isEditable: false,
+                prepareEstimateShippingIfEnabled: false,
+                prepareAndDisplayOrderReviewData: prepareAndDisplayOrderReviewData.HasValue ? prepareAndDisplayOrderReviewData.Value : false);
+
+            return PartialView(model);
         }
         [ChildActionOnly]
         public ActionResult dOrderSummary(bool? prepareAndDisplayOrderReviewData)

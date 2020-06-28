@@ -142,7 +142,7 @@ namespace SmartStore.Web.Infrastructure
             {
                 Id = "ProxyOrders",
                 Text = T("代客报单"),
-                Icon = "fal fa-folder",
+                Icon = "fal fa-flipboard",
                 Url = _urlHelper.Action("ProxyOrders", "Customer", new { area = "" })
             });
             root.Append(new MenuItem
@@ -236,13 +236,7 @@ namespace SmartStore.Web.Infrastructure
                 Url = _urlHelper.Action("ChangePassword", "Customer", new { area = "" })
             });
          
-            root.Append(new MenuItem
-            {
-                Id = "logout",
-                Text = T("注销"),
-                Icon = "fal fa-sign-out-alt fa-fw",
-                Url = _urlHelper.Action("logout", new { area = "" })
-            });
+            
             if (_customerSettings.AllowCustomersToUploadAvatars)
             {
                 root.Append(new MenuItem
@@ -253,7 +247,13 @@ namespace SmartStore.Web.Infrastructure
                     Url = _urlHelper.Action("Avatar", "Customer", new { area = "" })
                 });
             }
-
+            root.Append(new MenuItem
+            {
+                Id = "logout",
+                Text = T("注销"),
+                Icon = "fal fa-sign-out-alt fa-fw",
+                Url = _urlHelper.Action("logout", new { area = "" })
+            });
             //if (_forumSettings.ForumsEnabled && _forumSettings.AllowCustomersToManageSubscriptions)
             //{
             //    root.Append(new MenuItem

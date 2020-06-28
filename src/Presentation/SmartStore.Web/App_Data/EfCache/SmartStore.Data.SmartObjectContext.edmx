@@ -2122,6 +2122,14 @@
           <NavigationProperty Name="Deployments" Relationship="Self.ExportDeployment_Profile" FromRole="ExportDeployment_Profile_Target" ToRole="ExportDeployment_Profile_Source" />
           <NavigationProperty Name="ScheduleTask" Relationship="Self.ExportProfile_ScheduleTask" FromRole="ExportProfile_ScheduleTask_Source" ToRole="ExportProfile_ScheduleTask_Target" />
         </EntityType>
+        <EntityType Name="CheckIn" customannotation:ClrType="SmartStore.Core.Domain.Customers.CheckIn, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerId" Type="Int32" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" />
+        </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:ClrType="SmartStore.Core.Domain.Declaration.DeclarationCapRule, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -3899,6 +3907,7 @@
           <EntitySet Name="SyncMappings" EntityType="Self.SyncMapping" />
           <EntitySet Name="ExportDeployments" EntityType="Self.ExportDeployment" />
           <EntitySet Name="ExportProfiles" EntityType="Self.ExportProfile" />
+          <EntitySet Name="CheckIns" EntityType="Self.CheckIn" />
           <EntitySet Name="DeclarationCapRules" EntityType="Self.DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscriptions" EntityType="Self.BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplates" EntityType="Self.ManufacturerTemplate" />
@@ -6461,6 +6470,15 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="CheckIns">
+            <EntityTypeMapping TypeName="SmartStore.Data.CheckIn">
+              <MappingFragment StoreEntitySet="CheckIn">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="DeclarationCapRules">
             <EntityTypeMapping TypeName="SmartStore.Data.DeclarationCapRule">
               <MappingFragment StoreEntitySet="DeclarationCapRule">
@@ -8579,6 +8597,14 @@
           <Property Name="CreateZipArchive" Type="bit" Nullable="false" />
           <Property Name="Cleanup" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="CheckIn" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerId" Type="int" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:Index="{ }">
           <Key>
             <PropertyRef Name="Id" />
@@ -10655,6 +10681,7 @@
           <EntitySet Name="SyncMapping" EntityType="Self.SyncMapping" Schema="dbo" Table="SyncMapping" />
           <EntitySet Name="ExportDeployment" EntityType="Self.ExportDeployment" Schema="dbo" Table="ExportDeployment" />
           <EntitySet Name="ExportProfile" EntityType="Self.ExportProfile" Schema="dbo" Table="ExportProfile" />
+          <EntitySet Name="CheckIn" EntityType="Self.CheckIn" Schema="dbo" Table="CheckIn" />
           <EntitySet Name="DeclarationCapRule" EntityType="Self.DeclarationCapRule" Schema="dbo" Table="DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscription" EntityType="Self.BackInStockSubscription" Schema="dbo" Table="BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplate" EntityType="Self.ManufacturerTemplate" Schema="dbo" Table="ManufacturerTemplate" />

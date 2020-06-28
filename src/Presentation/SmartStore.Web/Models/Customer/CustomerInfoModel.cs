@@ -20,7 +20,7 @@ namespace SmartStore.Web.Models.Customer
             this.AvailableStates = new List<SelectListItem>();
             this.AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
         }
-
+        public CustomerAvatarModel Avatar { get; set; }
         [SmartResourceDisplayName("Account.Fields.Email")]
 		[DataType(DataType.EmailAddress)]
 		public string Email { get; set; }

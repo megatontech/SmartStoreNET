@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using SmartStore.Core;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
@@ -18,6 +19,7 @@ using SmartStore.Services.Authentication;
 using SmartStore.Services.Authentication.External;
 using SmartStore.Services.Catalog;
 using SmartStore.Services.Catalog.Extensions;
+using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
@@ -45,7 +47,6 @@ namespace SmartStore.Web.Controllers
     public partial class CustomerController : PublicControllerBase
     {
         #region Fields
-        
         private readonly IDailyCustomerContributionDetailService _iDailyCustomerContributionDetailService;
         private readonly IDeclarationProductService _productService;
         private readonly IAuthenticationService _authenticationService;
@@ -92,18 +93,20 @@ namespace SmartStore.Web.Controllers
         private readonly IWithdrawalDetailService _detailrule;
         private readonly IWithdrawalTotalService _total;
         private readonly IWithdrawalApplyService _apply;
+        private readonly CatalogHelper _helper;
         
+        //private readonly ICheckInService _checkinService;
         #endregion
 
         #region Ctor
 
         public CustomerController(
-            IAuthenticationService authenticationService, IDeclarationProductService productService,
+            IAuthenticationService authenticationService, IDeclarationProductService productService, //ICheckInService checkinService,
             IDateTimeHelper dateTimeHelper, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
             ILocalizationService localizationService,
 			IWorkContext workContext, IStoreContext storeContext,
-			ICustomerService customerService,
+			ICustomerService customerService, CatalogHelper helper,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
             ITaxService taxService, RewardPointsSettings rewardPointsSettings,
@@ -129,6 +132,8 @@ namespace SmartStore.Web.Controllers
             IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
             )
         {
+            //_checkinService = checkinService;
+            _helper = helper;
             _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
             _productService = productService;
             _authenticationService = authenticationService;
@@ -178,6 +183,44 @@ namespace SmartStore.Web.Controllers
         }
 
         #endregion
+
+        [RewriteUrl(SslRequirement.No)]
+        public ActionResult ProductDetails(int productId)
+        {
+            var product = _productService.GetProductById(productId);
+            if (product == null || product.Deleted || product.IsSystemProduct)
+                return HttpNotFound();
+
+            // Is product individually visible?
+            if (!product.VisibleIndividually)
+            {
+                // Find parent grouped product.
+                var parentGroupedProduct = _productService.GetProductById(product.ParentGroupedProductId);
+                if (parentGroupedProduct == null)
+                    return HttpNotFound();
+
+                var seName = parentGroupedProduct.GetSeName();
+                if (seName.IsEmpty())
+                    return HttpNotFound();
+
+                var routeValues = new RouteValueDictionary();
+                routeValues.Add("SeName", seName);
+
+                // Add query string parameters.
+                Request.QueryString.AllKeys.Each(x => routeValues.Add(x, Request.QueryString[x]));
+
+                return RedirectToRoute("Product", routeValues);
+            }
+
+            // Prepare the view model
+            var model = _helper.PrepareProductDetailsPageModel(product, new ProductVariantQuery() { });
+
+            // Some cargo data
+            model.PictureSize = _mediaSettings.ProductDetailsPictureSize;
+            var total = _total.Get(_workContext.CurrentCustomer);
+            model.WithdrawalTotal = total;
+            return View(model.ProductTemplateViewPath, model);
+        }
 
         #region Utilities
 
@@ -1085,7 +1128,68 @@ namespace SmartStore.Web.Controllers
 
             var model = new CustomerInfoModel();
             //PrepareCustomerInfoModel(model, customer, false);
+            model.AllowCustomersToSetTimeZone = _dateTimeSettings.AllowCustomersToSetTimeZone;
+                var dateOfBirth = customer.BirthDate;
+                var newsletter = _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmail(customer.Email, _storeContext.CurrentStore.Id);
 
+                model.VatNumber = customer.GetAttribute<string>(SystemCustomerAttributeNames.VatNumber);
+                model.Title = customer.Title;
+                model.FirstName = customer.FirstName;
+                model.LastName = customer.LastName;
+                model.Gender = customer.GetAttribute<string>(SystemCustomerAttributeNames.Gender);
+                if (dateOfBirth.HasValue)
+                {
+                    model.DateOfBirthDay = dateOfBirth.Value.Day;
+                    model.DateOfBirthMonth = dateOfBirth.Value.Month;
+                    model.DateOfBirthYear = dateOfBirth.Value.Year;
+                }
+                model.Company = customer.Company;
+                model.StreetAddress = customer.GetAttribute<string>(SystemCustomerAttributeNames.StreetAddress);
+                model.StreetAddress2 = customer.GetAttribute<string>(SystemCustomerAttributeNames.StreetAddress2);
+                model.ZipPostalCode = customer.GetAttribute<string>(SystemCustomerAttributeNames.ZipPostalCode);
+                model.City = customer.GetAttribute<string>(SystemCustomerAttributeNames.City);
+                model.CountryId = customer.GetAttribute<int>(SystemCustomerAttributeNames.CountryId);
+                model.StateProvinceId = customer.GetAttribute<int>(SystemCustomerAttributeNames.StateProvinceId);
+                model.Phone = customer.GetAttribute<string>(SystemCustomerAttributeNames.Phone);
+                model.Fax = customer.GetAttribute<string>(SystemCustomerAttributeNames.Fax);
+                model.CustomerNumber = customer.CustomerNumber;
+                model.Newsletter = newsletter != null && newsletter.Active;
+                model.Signature = customer.GetAttribute<string>(SystemCustomerAttributeNames.Signature);
+                model.Email = customer.Email;
+                model.Username = customer.Username;
+            
+            model.DisplayVatNumber = _taxSettings.EuVatEnabled;
+            model.VatNumberStatusNote = ((VatNumberStatus)customer.GetAttribute<int>(SystemCustomerAttributeNames.VatNumberStatusId))
+                 .GetLocalizedEnum(_localizationService, _workContext);
+            model.GenderEnabled = _customerSettings.GenderEnabled;
+            model.TitleEnabled = _customerSettings.TitleEnabled;
+            model.DateOfBirthEnabled = _customerSettings.DateOfBirthEnabled;
+            model.CompanyEnabled = _customerSettings.CompanyEnabled;
+            model.CompanyRequired = _customerSettings.CompanyRequired;
+            model.StreetAddressEnabled = _customerSettings.StreetAddressEnabled;
+            model.StreetAddressRequired = _customerSettings.StreetAddressRequired;
+            model.StreetAddress2Enabled = _customerSettings.StreetAddress2Enabled;
+            model.StreetAddress2Required = _customerSettings.StreetAddress2Required;
+            model.ZipPostalCodeEnabled = _customerSettings.ZipPostalCodeEnabled;
+            model.ZipPostalCodeRequired = _customerSettings.ZipPostalCodeRequired;
+            model.CityEnabled = _customerSettings.CityEnabled;
+            model.CityRequired = _customerSettings.CityRequired;
+            model.CountryEnabled = _customerSettings.CountryEnabled;
+            model.StateProvinceEnabled = _customerSettings.StateProvinceEnabled;
+            model.PhoneEnabled = _customerSettings.PhoneEnabled;
+            model.PhoneRequired = _customerSettings.PhoneRequired;
+            model.FaxEnabled = _customerSettings.FaxEnabled;
+            model.FaxRequired = _customerSettings.FaxRequired;
+            model.NewsletterEnabled = _customerSettings.NewsletterEnabled;
+            model.UsernamesEnabled = _customerSettings.CustomerLoginType != CustomerLoginType.Email;
+            model.AllowUsersToChangeUsernames = _customerSettings.AllowUsersToChangeUsernames;
+            model.CheckUsernameAvailabilityEnabled = _customerSettings.CheckUsernameAvailabilityEnabled;
+            model.SignatureEnabled = _forumSettings.ForumsEnabled && _forumSettings.SignaturesEnabled;
+            model.DisplayCustomerNumber = _customerSettings.CustomerNumberMethod != CustomerNumberMethod.Disabled
+                && _customerSettings.CustomerNumberVisibility != CustomerNumberVisibility.None;
+
+            model.Username = customer.Username;
+            model.Avatar = _workContext.CurrentCustomer.ToAvatarModel(_genericAttributeService, _pictureService, _customerSettings, _mediaSettings, Url, null, true);
             return View(model);
         }
         [RewriteUrl(SslRequirement.Yes)]
@@ -1098,7 +1202,9 @@ namespace SmartStore.Web.Controllers
 
             var model = new CustomerInfoModel();
             PrepareCustomerInfoModel(model, customer, false);
-			
+            model.VatNumber = customer.CreditCard;
+            model.VatNumberStatusNote = customer.CreditCardBank;
+
             return View(model);
         }
 
@@ -1110,159 +1216,15 @@ namespace SmartStore.Web.Controllers
             {
                 return new HttpUnauthorizedResult();
             }
-
             var customer = _workContext.CurrentCustomer;
-
-   //         if (model.Email.IsEmpty())
-			//{
-			//	ModelState.AddModelError("", "Email is not provided.");
-			//}               
-   //         if (_customerSettings.CustomerLoginType != CustomerLoginType.Email && _customerSettings.AllowUsersToChangeUsernames && model.Username.IsEmpty())
-   //         {
-			//	ModelState.AddModelError("", "Username is not provided.");
-   //         }
-
             try
             {
-                if (ModelState.IsValid)
                 {
                     customer.FirstName = model.FirstName;
                     customer.CreditCard = model.VatNumber;
                     customer.CreditCardBank = model.VatNumberStatusNote;
                     //customer.LastName = model.LastName;
-
-                    //// Username.
-                    //if (_customerSettings.CustomerLoginType != CustomerLoginType.Email && _customerSettings.AllowUsersToChangeUsernames)
-                    //{
-                    //    if (!customer.Username.Equals(model.Username.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                    //    {
-                    //        // Change username.
-                    //        _customerRegistrationService.SetUsername(customer, model.Username.Trim());
-                    //        // Re-authenticate.
-                    //        _authenticationService.SignIn(customer, true);
-                    //    }
-                    //}
-
-                    //// Email.
-                    //if (!customer.Email.Equals(model.Email.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                    //{
-                    //    // Change email.
-                    //    _customerRegistrationService.SetEmail(customer, model.Email.Trim());
-                    //    // Re-authenticate (if usernames are disabled).
-                    //    if (_customerSettings.CustomerLoginType == CustomerLoginType.Email)
-                    //    {
-                    //        _authenticationService.SignIn(customer, true);
-                    //    }
-                    //}
-
-                    // VAT number.
-                    //              if (_taxSettings.EuVatEnabled)
-                    //              {
-                    //var prevVatNumber = customer.GetAttribute<string>(SystemCustomerAttributeNames.VatNumber);
-                    //_genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.VatNumber, model.VatNumber);
-
-                    //if (prevVatNumber != model.VatNumber)
-                    //{
-                    //	var vatNumberStatus = _taxService.GetVatNumberStatus(model.VatNumber, out var vatName, out var vatAddress);
-                    //	_genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.VatNumberStatusId, (int)vatNumberStatus);
-
-                    //                      // Send VAT number admin notification.
-                    //                      if (model.VatNumber.HasValue() && _taxSettings.EuVatEmailAdminWhenNewVatSubmitted)
-                    //                      {
-                    //                          Services.MessageFactory.SendNewVatSubmittedStoreOwnerNotification(customer, model.VatNumber, vatAddress, _localizationSettings.DefaultAdminLanguageId);
-                    //                      }
-                    //}
-                    //              }
-
-                    // Customer number.
-                    //if (_customerSettings.CustomerNumberMethod != CustomerNumberMethod.Disabled)
-                    //{
-                    //	var numberExists = _customerService.SearchCustomers(new CustomerSearchQuery { CustomerNumber = model.CustomerNumber }).SourceQuery.Any();
-                    //	if (model.CustomerNumber != customer.CustomerNumber && numberExists)
-                    //	{
-                    //		NotifyError("Common.CustomerNumberAlreadyExists");
-                    //	}
-                    //	else
-                    //	{
-                    //		customer.CustomerNumber = model.CustomerNumber;
-                    //	}
-                    //}
-
-                    //               if (_customerSettings.DateOfBirthEnabled)
-                    //               {
-                    //                   try
-                    //                   {
-                    //                       if (model.DateOfBirthYear.HasValue && model.DateOfBirthMonth.HasValue && model.DateOfBirthDay.HasValue)
-                    //                       {
-                    //                           customer.BirthDate = new DateTime(model.DateOfBirthYear.Value, model.DateOfBirthMonth.Value, model.DateOfBirthDay.Value);
-                    //                       }
-                    //                       else
-                    //                       {
-                    //                           customer.BirthDate = null;
-                    //                       }
-                    //	}
-                    //                   catch { }
-                    //               }
-
-                    //               if (_customerSettings.CompanyEnabled)
-                    //               {
-                    //                   customer.Company = model.Company;
-                    //               }
-                    //               if (_customerSettings.TitleEnabled)
-                    //               {
-                    //                   customer.Title = model.Title;
-                    //               }
-                    //               if (_customerSettings.GenderEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Gender, model.Gender);
-                    //               }
-                    //               if (_customerSettings.StreetAddressEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StreetAddress, model.StreetAddress);
-                    //               }
-                    //               if (_customerSettings.StreetAddress2Enabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StreetAddress2, model.StreetAddress2);
-                    //               }
-                    //               if (_customerSettings.ZipPostalCodeEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.ZipPostalCode, model.ZipPostalCode);
-                    //               }
-                    //               if (_customerSettings.CityEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.City, model.City);
-                    //               }
-                    //               if (_customerSettings.CountryEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CountryId, model.CountryId);
-                    //               }
-                    //               if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StateProvinceId, model.StateProvinceId);
-                    //               }
-                    //               if (_customerSettings.PhoneEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Phone, model.Phone);
-                    //               }
-                    //               if (_customerSettings.FaxEnabled)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Fax, model.Fax);
-                    //               }
-                    //               if (_customerSettings.NewsletterEnabled)
-                    //               {
-                    //	_newsLetterSubscriptionService.AddNewsLetterSubscriptionFor(model.Newsletter, customer.Email, _storeContext.CurrentStore.Id);
-                    //               }
-                    //if (_forumSettings.ForumsEnabled && _forumSettings.SignaturesEnabled)
-                    //{
-                    //	_genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Signature, model.Signature);
-                    //}
-                    //               if (_dateTimeSettings.AllowCustomersToSetTimeZone)
-                    //               {
-                    //                   _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.TimeZoneId, model.TimeZoneId);
-                    //               }
-
                     _customerService.UpdateCustomer(customer);
-
                     return RedirectToAction("Info");
                 }
             }
@@ -1270,7 +1232,6 @@ namespace SmartStore.Web.Controllers
             {
                 ModelState.AddModelError("", ex.Message);
             }
-
             // If we got this far, something failed, redisplay form.
             PrepareCustomerInfoModel(model, customer, true);
             return View(model);
@@ -1320,7 +1281,64 @@ namespace SmartStore.Web.Controllers
 
 			return RedirectToAction("Addresses");
         }
+        #region checkin
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult CheckinAdd()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
 
+            var customer = _workContext.CurrentCustomer;
+            
+            var model = new CheckInModel();
+           //var modelori = _checkinService.Get(customer.Id);
+           // if (modelori == null) {
+           //     model.Date = DateTime.Now;
+           //     model.CustomerId = _workContext.CurrentCustomer.Id;
+           // }
+           // else {
+           //     model.Date = modelori.Date;
+           //     model.CustomerId = _workContext.CurrentCustomer.Id;
+           //     model.Result = "已签到";
+           // }
+            //model.Address.PrepareModel(null, false, _addressSettings, _localizationService, _stateProvinceService, () => _countryService.GetAllCountries());
+            
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult CheckinAdd(CheckInModel model)
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+
+
+            if (ModelState.IsValid)
+            {
+                //var address = model.Address.ToEntity();
+                //address.CreatedOnUtc = DateTime.Now;
+                ////some validation
+                //if (address.CountryId == 0)
+                //    address.CountryId = null;
+                //if (address.StateProvinceId == 0)
+                //    address.StateProvinceId = null;
+                //customer.Addresses.Add(address);
+                var modelor = new CheckIn();
+                modelor.Date = model.Date;
+                modelor.CustomerId = model.CustomerId;
+                //_checkinService.Insert(modelor);
+
+                return RedirectToAction("NewInfo");
+            }
+
+
+            // If we got this far, something failed, redisplay form
+
+            return View(model);
+        }
+        #endregion
         [RewriteUrl(SslRequirement.Yes)]
         public ActionResult AddressAdd()
         {
@@ -1633,6 +1651,29 @@ namespace SmartStore.Web.Controllers
             return View(model);
         }
         #endregion
+        #region ProxyOrders
+
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult ProxyOrders()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+            var allcustomer = _customerService.BuildNoLimitAllTreeWithoutOrder();
+            var total = _total.Get(customer);
+            //钱包展示总额，可提现，冻结，以及最近入账
+            var model = new CustomerTeamModel();
+            model.Self = customer;
+            model.Team = new System.Collections.Generic.List<Customer>();
+            model.Team.AddRange(allcustomer.Where(x => x.ParentID == customer.Id).ToList());
+            model.Total = model.Team.Count;
+
+            return View(model);
+        }
+
+        #endregion
+
         #region myteam
 
         [RewriteUrl(SslRequirement.Yes)]
@@ -1782,6 +1823,36 @@ namespace SmartStore.Web.Controllers
         }
 
         #endregion
+        #region pointapply
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult PointApply()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var model = new WithDrawApplyModel();
+            var customer = _workContext.CurrentCustomer;
+            var total = _total.Get(customer);
+            //model.TotalAmount = total.TotalAmount - total.TotalFreezeAmount;
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult PointApply(WithDrawApplyModel applyModel)
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+            if (ModelState.IsValid)
+            {
+                _apply.WithdrawalPointMethod(customer, applyModel.Amount);
+            }
+            
+            return RedirectToAction("Wallet");
+        }
+        #endregion
         [RewriteUrl(SslRequirement.Yes)]
         public ActionResult WithDrawApply()
         {
@@ -1854,6 +1925,7 @@ namespace SmartStore.Web.Controllers
             {
                 var changePasswordRequest = new ChangePasswordRequest(customer.Email,
                     true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                changePasswordRequest.CustomerGuid = customer.CustomerGuid;
                 var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
                 if (changePasswordResult.Success)
                 {
@@ -1909,9 +1981,9 @@ namespace SmartStore.Web.Controllers
 
 				if (uploadedFile != null && uploadedFile.FileName.HasValue())
 				{
-					if (uploadedFile.Size > _customerSettings.AvatarMaximumSizeBytes)
+					if (uploadedFile.Size > 4000000)
 					{
-						throw new SmartException(T("Account.Avatar.MaximumUploadedFileSize", Prettifier.BytesToString(_customerSettings.AvatarMaximumSizeBytes)));
+						throw new SmartException(T("头像过大", Prettifier.BytesToString(_customerSettings.AvatarMaximumSizeBytes)));
 					}
 
 					var customerAvatar = _pictureService.GetPictureById(customer.GetAttribute<int>(SystemCustomerAttributeNames.AvatarPictureId));

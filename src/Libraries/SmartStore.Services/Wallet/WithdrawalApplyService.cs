@@ -90,6 +90,10 @@ namespace SmartStore.Services.Wallet
         {
             return _WithdrawalApplyRepository.Table.FirstOrDefault(x => x.Id == id);
         }
+        public WithdrawalApply GetByOrderID(int id,Guid orderguid)
+        {
+            return _WithdrawalApplyRepository.Table.FirstOrDefault(x => x.Operater == id&& x.OperaterID== orderguid);
+        }
         public WithdrawalApply GetByID(int customerid)
         {
             return _WithdrawalApplyRepository.Table.FirstOrDefault(x => x.Customer == customerid);
@@ -115,6 +119,80 @@ namespace SmartStore.Services.Wallet
         {
              _WithdrawalApplyRepository.Update(model);
         }
+        
+        /// <summary>
+        /// 提现审核
+        /// </summary>
+        /// <param name="customid"></param>
+        /// <param name="amount"></param>
+        public void WithdrawalPayAudit(WithdrawalApply withdrawal, Customer customer)
+        {
+            //修改WithdrawalApply记录 减冻钱 扣手续费 加积分 写入日志详细
+            this._WithdrawalApplyRepository.Update(withdrawal);
+            var total = _IWithdrawalTotalService.Get(customer);
+            //total.TotalAmount -= withdrawal.Amount;
+            total.TotalFreezeAmount -= withdrawal.Amount;
+            total.UpdateTime = DateTime.Now;
+            _IWithdrawalTotalService.Update(total);
+            _IWithdrawalDetailService.Add(new WithdrawalDetail()
+            {
+                Amount = withdrawal.Amount,
+                Customer = customer.Id,
+                Comment = "代付金额" + withdrawal.Amount ,
+                CustomerID = customer.CustomerGuid,
+                IsCount = false,
+                isOut = true,
+                Operater = customer.Id,
+                OperaterID = customer.CustomerGuid,
+                WithdrawTime = DateTime.Now,
+                WithdrawType = 2
+            });
+        }
+        
+        /// <summary>
+        /// 提现审核
+        /// </summary>
+        /// <param name="customid"></param>
+        /// <param name="amount"></param>
+        public void WithdrawalApplyDeny(WithdrawalApply withdrawal, Customer customer, Customer applier)
+        {
+            //修改WithdrawalApply记录 减冻钱 扣手续费 加积分 写入日志详细
+            this._WithdrawalApplyRepository.Update(withdrawal);
+            var total = _IWithdrawalTotalService.Get(customer);
+            total.TotalAmount += withdrawal.Amount;
+            total.TotalFreezeAmount -= withdrawal.Amount;
+            total.UpdateTime = DateTime.Now;
+            _IWithdrawalTotalService.Update(total);
+            //var pointVal = 0f;
+            //pointVal = (float)withdrawal.Amount * (float)(_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
+            //_ICustomerPointsTotalService.AddPointsToCustomer((int)pointVal, customer.Id);
+            //_ICustomerPointsDetailService.CreateDetail(new CustomerPointsDetail()
+            //{
+            //    Amount = (int)pointVal,
+            //    Comment = "提现金额" + withdrawal.Amount + "转积分金额" + withdrawal.ToPointAmount + "获得了商城积分" + (int)pointVal,
+            //    Customer = customer.Id,
+            //    CustomerID = customer.CustomerGuid,
+            //    IsCount = false,
+            //    isOut = false,
+            //    PointGetType = PointGetType.Withdraw,
+            //    PointUseType = PointUseType.Shop,
+            //    UpdateTime = DateTime.Now
+            //});
+            //_IWithdrawalDetailService.Add(new WithdrawalDetail()
+            //{
+            //    Amount = withdrawal.Amount,
+            //    Customer = customer.Id,
+            //    Comment = "提现金额" + withdrawal.Amount + "其中手续费" + withdrawal.ToFeeAmount + "转积分" + withdrawal.ToPointAmount + "获得了商城积分" + (int)pointVal,
+            //    CustomerID = customer.CustomerGuid,
+            //    IsCount = false,
+            //    isOut = true,
+            //    Operater = customer.Id,
+            //    OperaterID = customer.CustomerGuid,
+            //    WithdrawTime = DateTime.Now,
+            //    WithdrawType = 2
+            //});
+        }
+
         /// <summary>
         /// 提现审核
         /// </summary>
@@ -158,6 +236,43 @@ namespace SmartStore.Services.Wallet
                 WithdrawType = 2
             });
         }
+        
+        /// <summary>
+        /// 代付款申请
+        /// </summary>
+        /// <param name="customid"></param>
+        /// <param name="amount"></param>
+        public void WithdrawalPayMethod(Customer customer, decimal amount,int order,Guid orderguid)
+        {
+            // 减total余额 冻钱 不写日志  创建WithdrawalApply纪录
+            var total = _IWithdrawalTotalService.Get(customer);
+            total.TotalAmount -= amount;
+            total.TotalFreezeAmount += amount;
+            total.UpdateTime = DateTime.Now;
+            _IWithdrawalTotalService.Update(total);
+            var model = new WithdrawalApply()
+            {
+                Amount = amount,
+                ExpectAmount = amount * ((100 - _calcrule.WithDrawApplyFeePercent - _calcrule.WithDrawApplyToPointPercent) / 100),
+                ToFeeAmount = amount * (_calcrule.WithDrawApplyFeePercent / 100),
+                ToPointAmount = amount * (_calcrule.WithDrawApplyToPointPercent / 100),
+                Comment = "",
+                Customer = customer.Id,
+                CustomerID = customer.CustomerGuid,
+                IsCount = false,
+                isOut = true,
+                Operater = order,
+                OperaterID = orderguid,
+                UpdateTime = DateTime.Now,
+                WithdrawStatus = WithdrawalApplyStatus.Pending,
+                WithdrawTime = DateTime.Now,
+                WithdrawType = WithdrawalApplyType.Present
+
+            };
+            this._WithdrawalApplyRepository.Insert(model);
+
+        }
+
         /// <summary>
         /// 提现申请
         /// </summary>
@@ -193,7 +308,32 @@ namespace SmartStore.Services.Wallet
             this._WithdrawalApplyRepository.Insert(model) ;
             
         }
+        
+        public void WithdrawalPointMethod(Customer customer, decimal amount)
+        {
+            // 余额 to point创建WithdrawalApply纪录
+            var total = _IWithdrawalTotalService.Get(customer);
+            total.TotalAmount -= amount;
+            total.UpdateTime = DateTime.Now;
+            _IWithdrawalTotalService.Update(total);
+            var pointVal = 0f;
+            pointVal = (float)amount * (float)(_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
+            _ICustomerPointsTotalService.AddPointsToCustomer((int)pointVal, customer.Id);
+            _ICustomerPointsDetailService.CreateDetail(new CustomerPointsDetail()
+            {
+                Amount = (int)pointVal,
+                Comment =  "转积分金额" + amount + "获得了商城积分" + (int)pointVal,
+                Customer = customer.Id,
+                CustomerID = customer.CustomerGuid,
+                IsCount = false,
+                isOut = false,
+                PointGetType = PointGetType.Withdraw,
+                PointUseType = PointUseType.Shop,
+                UpdateTime = DateTime.Now
+            });
+           
 
+        }
         #endregion Public Constructors
 
 

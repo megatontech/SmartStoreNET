@@ -3,12 +3,13 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-	Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("PageTitle.Account").Text);
 
-	Layout = "_MyAccount";
-	ViewBag.PageClassToken = "info";
-	ViewBag.PageTitle = T("").Text;
+    Layout = "_MyAccount";
+    ViewBag.PageClassToken = "info";
+    ViewBag.PageTitle = T("").Text;
 }
+
 <div style="height:130px;"></div>
 @using (Html.BeginForm("Wallet", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
 {

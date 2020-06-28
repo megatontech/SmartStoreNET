@@ -22,6 +22,7 @@ using SmartStore.Services.Orders;
 using SmartStore.Services.Payments;
 using SmartStore.Services.Shipping;
 using SmartStore.Services.Tax;
+using SmartStore.Services.Wallet;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Plugins;
@@ -62,13 +63,15 @@ namespace SmartStore.Web.Controllers
         private readonly IDeclarationProductService _dproductService;
         private readonly IWebHelper _webHelper;
         private readonly IDeclarationOrderService _DeclarationOrderService;
+        private readonly IWithdrawalApplyService _apply;
+        private readonly IWithdrawalTotalService _total;
         #endregion
 
         #region Constructors
 
         public DeclarationCheckoutController(
-            IWorkContext workContext, IDeclarationShoppingCartService dshoppingCartService,
-            IStoreContext storeContext,
+            IWorkContext workContext, IDeclarationShoppingCartService dshoppingCartService, IWithdrawalApplyService apply,
+            IStoreContext storeContext, IWithdrawalTotalService total,
             //IShoppingCartService shoppingCartService, 
             ILocalizationService localizationService, 
             ITaxService taxService, 
@@ -118,6 +121,8 @@ namespace SmartStore.Web.Controllers
             _shippingSettings = shippingSettings;
             _shoppingCartSettings = shoppingCartSettings;
 			_pluginMediator = pluginMediator;
+            _apply = apply;
+            _total = total;
         }
 
         #endregion
@@ -709,8 +714,211 @@ namespace SmartStore.Web.Controllers
 
 			return RedirectToAction("PaymentMethod");
         }
-        
-        
+        #region Proxy
+        public ActionResult ProxyConfirm()
+        {
+            if ((_workContext.CurrentCustomer.IsGuest()))
+                return new HttpUnauthorizedResult();
+            var model = new CheckoutConfirmModel();
+            model.TermsOfServiceEnabled = _orderSettings.TermsOfServiceEnabled;
+            model.ShowEsdRevocationWaiverBox = _shoppingCartSettings.ShowEsdRevocationWaiverBox;
+            model.BypassPaymentMethodInfo = _paymentSettings.BypassPaymentMethodInfo;
+            model.NewsLetterSubscription = _shoppingCartSettings.NewsLetterSubscription;
+            model.ThirdPartyEmailHandOver = _shoppingCartSettings.ThirdPartyEmailHandOver;
+
+            if (_shoppingCartSettings.ThirdPartyEmailHandOver != CheckoutThirdPartyEmailHandOver.None)
+            {
+                model.ThirdPartyEmailHandOverLabel = _shoppingCartSettings.GetLocalized(x => x.ThirdPartyEmailHandOverLabel, _workContext.WorkingLanguage, true, false);
+
+                if (model.ThirdPartyEmailHandOverLabel.IsEmpty())
+                    model.ThirdPartyEmailHandOverLabel = T("Admin.Configuration.Settings.ShoppingCart.ThirdPartyEmailHandOverLabel.Default");
+            }
+            //if (TempData["ConfirmOrderWarnings"] != null)
+            //	model.Warnings.AddRange(TempData["ConfirmOrderWarnings"] as IList<string>);
+
+            return View(model);
+        }
+        [HttpPost, ActionName("ProxyConfirm")]
+        public ActionResult ProxyConfirmOrder(FormCollection form)
+        {
+            var store = _storeContext.CurrentStore;
+            var customer = _workContext.CurrentCustomer;
+            //var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+            var Ordercustomer = _customerService.GetCustomerByMobile(form["mobile"]);
+            if (Ordercustomer == null) 
+            {
+                var modelresult = new CheckoutConfirmModel();
+                modelresult.TermsOfServiceEnabled = _orderSettings.TermsOfServiceEnabled;
+                modelresult.ShowEsdRevocationWaiverBox = _shoppingCartSettings.ShowEsdRevocationWaiverBox;
+                modelresult.BypassPaymentMethodInfo = _paymentSettings.BypassPaymentMethodInfo;
+                modelresult.NewsLetterSubscription = _shoppingCartSettings.NewsLetterSubscription;
+                modelresult.ThirdPartyEmailHandOver = _shoppingCartSettings.ThirdPartyEmailHandOver;
+                modelresult.MinOrderTotalWarning = "输入手机号不正确！";
+                if (_shoppingCartSettings.ThirdPartyEmailHandOver != CheckoutThirdPartyEmailHandOver.None)
+                {
+                    modelresult.ThirdPartyEmailHandOverLabel = _shoppingCartSettings.GetLocalized(x => x.ThirdPartyEmailHandOverLabel, _workContext.WorkingLanguage, true, false);
+
+                    if (modelresult.ThirdPartyEmailHandOverLabel.IsEmpty())
+                        modelresult.ThirdPartyEmailHandOverLabel = T("Admin.Configuration.Settings.ShoppingCart.ThirdPartyEmailHandOverLabel.Default");
+                }
+                //if (TempData["ConfirmOrderWarnings"] != null)
+                //	model.Warnings.AddRange(TempData["ConfirmOrderWarnings"] as IList<string>);
+
+                return View(modelresult);
+            }
+            var model = new CheckoutConfirmModel();
+            PlaceOrderResult placeOrderResult = null;
+            PostProcessPaymentRequest postProcessPaymentRequest = null;
+            var processPaymentRequest = _httpContext.Session["dOrderPaymentInfo"] as ProcessPaymentRequest;
+            // Place order.
+            processPaymentRequest = new ProcessPaymentRequest();
+            processPaymentRequest.StoreId = store.Id;
+            processPaymentRequest.CustomerId = customer.Id;
+            processPaymentRequest.PaymentMethodSystemName = customer.GetAttribute<string>(SystemCustomerAttributeNames.SelectedPaymentMethod, _genericAttributeService, store.Id);
+            var placeOrderExtraData = new Dictionary<string, string>();
+            placeOrderExtraData["CustomerComment"] = form["customercommenthidden"];
+            string comment = form["customercommenthidden"];
+            placeOrderExtraData["SubscribeToNewsLetter"] = form["SubscribeToNewsLetter"];
+            placeOrderExtraData["AcceptThirdPartyEmailHandOver"] = form["AcceptThirdPartyEmailHandOver"];
+            //var cart = _workContext.CurrentCustomer.GetdCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            //placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest, placeOrderExtraData);
+            return RedirectToAction("ProxyPaymentMethod", new { CustomerComment = comment , mobile = form["mobile"] });
+        }
+
+        public ActionResult ProxyPaymentMethod(string CustomerComment = "",string mobile="")
+        {
+            var cart = _workContext.CurrentCustomer.GetdCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var model = PreparePaymentMethodModel(cart);
+            model.Total = cart.FirstOrDefault().dItem.CustomerEnteredPrice;
+            model.CustomerComment = CustomerComment;
+            model.Mobile = mobile;
+            var total = _total.Get(_workContext.CurrentCustomer);
+            model.WithdrawalTotal = total;
+            model.customer = _customerService.GetCustomerByMobile(mobile);
+            return View(model);
+        }
+
+        [HttpPost, ActionName("ProxyPaymentMethod")]
+        [FormValueRequired("nextstep")]
+        public ActionResult ProxySelectPaymentMethod(string paymentmethod, CheckoutPaymentMethodModel model, FormCollection form)
+        {
+            //代报单需要冻结报单人的钱并且加标识为代报单，其他信息均为被报人的
+            // validation
+            var storeId = _storeContext.CurrentStore.Id;
+            var customer = _workContext.CurrentCustomer;
+            var Ordercustomer = _customerService.GetCustomerByMobile(model.Mobile);
+            var cart = customer.GetdCartItems(ShoppingCartType.ShoppingCart, storeId);
+            string CustomerComment = model.CustomerComment;
+            var image = form["BrandUrl"];
+            if ((customer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
+                return new HttpUnauthorizedResult();
+            var subtotalBase = cart.Sum(x => x.dItem.CustomerEnteredPrice * x.dItem.Quantity);
+            var product = _dproductService.GetProductById(cart.FirstOrDefault().dItem.Product.Id);
+            var order = new DeclarationOrder
+            {
+                StoreId = 0,
+                OrderGuid = Guid.NewGuid(),
+                CustomerId = Ordercustomer.Id,
+                CustomerLanguageId = Ordercustomer.GetLanguage().Id,
+                BillingAddressId = customer.Id,
+                ProductID = product.Id,
+                //CustomerTaxDisplayType = TaxDisplayType.ExcludingTax,
+                CustomerIp = _webHelper.GetCurrentIpAddress(),
+                OrderSubtotalInclTax = 0M,
+                OrderSubtotalExclTax = 0M,
+                OrderSubTotalDiscountInclTax = 0M,
+                OrderSubTotalDiscountExclTax = 0M,
+                OrderShippingInclTax = 0M,
+                OrderShippingExclTax = 0M,
+                OrderShippingTaxRate = 0M,
+                PaymentMethodAdditionalFeeInclTax = 0M,
+                PaymentMethodAdditionalFeeExclTax = 0M,
+                PaymentMethodAdditionalFeeTaxRate = 0M,
+                TaxRates = "",
+                OrderTax = 0M,
+                OrderTotalRounding = subtotalBase,
+                OrderTotal = subtotalBase,
+                RefundedAmount = decimal.Zero,
+                OrderDiscount = 0M,
+                CreditBalance = 0M,
+                CheckoutAttributeDescription = "",
+                CheckoutAttributesXml = "",
+                CustomerCurrencyCode = "",
+                CurrencyRate = 0M,
+                AffiliateId = 0,
+                OrderStatus = OrderStatus.Pending,
+                AllowStoringCreditCardNumber = false,
+                CardType = string.Empty,
+                CardName = string.Empty,
+                CardNumber = string.Empty,
+                MaskedCreditCardNumber = string.Empty,
+                CardCvv2 = string.Empty,
+                CardExpirationMonth = string.Empty,
+                CardExpirationYear = string.Empty,
+                AllowStoringDirectDebit = false,
+                DirectDebitAccountHolder = string.Empty,
+                DirectDebitAccountNumber = string.Empty,
+                DirectDebitBankCode = string.Empty,
+                DirectDebitBankName = string.Empty,
+                DirectDebitBIC = string.Empty,
+                DirectDebitCountry = string.Empty,
+                DirectDebitIban = string.Empty,
+                PaymentMethodSystemName = string.Empty,
+                AuthorizationTransactionId = string.Empty,
+                AuthorizationTransactionCode = string.Empty,
+                AuthorizationTransactionResult = string.Empty,
+                CaptureTransactionId = string.Empty,
+                CaptureTransactionResult = string.Empty,
+                SubscriptionTransactionId = string.Empty,
+                PurchaseOrderNumber = string.Empty,
+                PaymentStatus = PaymentStatus.Pending,
+                PaidDateUtc = DateTime.Now,
+                //BillingAddress = new Address(),
+                //ShippingAddress = new Address(),
+                //ShippingStatus = ShippingStatus.NotYetShipped,
+                ShippingMethod = string.Empty,
+                ShippingRateComputationMethodSystemName = string.Empty,
+                VatNumber = string.Empty,
+                CustomerOrderComment = CustomerComment,
+
+                AcceptThirdPartyEmailHandOver = false
+            };
+            //订单备注
+            order.VatNumber = "代客下单";
+            //标识为代客下单
+            order.HasNewPaymentNotification = true;
+            order.PaymentMethodSystemName = image;
+            order.PaidDateUtc = DateTime.Now;
+            order.OrderGuid = Guid.NewGuid();
+            var no = _DeclarationOrderService.GetOrdersMaxNo();
+            string seriNo = (no + 1).ToString().PadLeft(6, '0'); ;
+            order.OrderNumber = DateTime.Now.ToString("yyyyMMdd") + seriNo;
+            _DeclarationOrderService.InsertOrder(order);
+            var neworder = _DeclarationOrderService.GetOrderByGuid(order.OrderGuid);
+            List<OrderItem> OrderItems = new List<OrderItem>();
+            OrderItems.Add(new OrderItem()
+            {
+                ProductId = product.Id,
+                OrderId = neworder.Id,
+                OrderItemGuid = Guid.NewGuid(),
+                Quantity = cart.FirstOrDefault().dItem.Quantity,
+                ProductCost = product.Price
+            });
+            //_orderService.InsertOrderItem(OrderItems);
+            // save
+            //_genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.SelectedPaymentMethod, paymentmethod, storeId);
+            _apply.WithdrawalPayMethod(customer, order.OrderTotal,order.Id,order.OrderGuid);
+
+            // save payment data so that the user must not re-enter it
+            //form.CopyTo(_httpContext.GetCheckoutState().PaymentData, true);
+            //清空报单购物车，下单，存图，设置状态
+            //MediaHelper.UpdatePictureTransientStateFor(store, s => s.LogoPictureId);
+            //order 
+            return RedirectToAction("Completed");
+        }
+
+        #endregion
+
         public ActionResult PaymentMethod(string CustomerComment="")
         {
             //validation
@@ -843,6 +1051,7 @@ namespace SmartStore.Web.Controllers
                 AcceptThirdPartyEmailHandOver = false
             };
             order.PaymentMethodSystemName = image;
+            order.HasNewPaymentNotification = false;
             order.PaidDateUtc = DateTime.Now;
             order.OrderGuid = Guid.NewGuid();
             var no = _DeclarationOrderService.GetOrdersMaxNo();
@@ -892,7 +1101,8 @@ namespace SmartStore.Web.Controllers
 
 			return RedirectToAction(infoRoute.Action, infoRoute.Controller, infoRoute.RouteValues);
 		}
-
+        
+         
         public ActionResult Confirm()
         {
             if ((_workContext.CurrentCustomer.IsGuest() ))
@@ -917,6 +1127,7 @@ namespace SmartStore.Web.Controllers
             return View(model);
         }
 
+        
         [HttpPost, ActionName("Confirm")]
         public ActionResult ConfirmOrder(FormCollection form)
         {

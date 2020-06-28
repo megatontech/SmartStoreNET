@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic;
 using SmartStore.Collections;
 using SmartStore.Core;
 using SmartStore.Core.Data;
@@ -207,7 +208,15 @@ namespace SmartStore.Services.Orders
 				return new PagedList<DeclarationOrder>(query, pageIndex, pageSize);
 			}  
         }
-
+        public Tuple<int, decimal> GetOrderTotalByProduct(int product) 
+        {
+            var query = _orderRepository.Table;
+            var ord = query.Where(x => x.ProductID == product).ToList();
+            var item1 = ord.Sum(x => x.OrderTotal);
+            var item2 = ord.Count();
+            Tuple<int, decimal> tuple = new Tuple<int, decimal>(item2, item1 );
+            return tuple;
+        }
         public virtual IPagedList<DeclarationOrder> GetAllOrders(int affiliateId, int pageIndex, int pageSize)
         {
             var query = _orderRepository.Table;

@@ -110,7 +110,7 @@ namespace SmartStore.Services.Calc
                 item.CapLines = item.ActiveLines;
                 //所有下级订单都为3980小单
                 
-                if (customers.Where(x => x.ParentID == item.Id).SelectMany(x => x.OrderList).All(y => y.OrderTotal == 3980M)) {
+                if (item.Title== "金卡会员") {
                     //封顶钱数
                     for (int i = 1; i <= item.CapLines; i++)
                     {

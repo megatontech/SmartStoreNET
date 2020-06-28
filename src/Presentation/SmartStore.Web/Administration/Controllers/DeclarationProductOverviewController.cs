@@ -1,5 +1,10 @@
-﻿using SmartStore.Web.Framework.Controllers;
+﻿using SmartStore.Admin.Models.Stores;
+using SmartStore.Services.Catalog;
+using SmartStore.Services.Orders;
+using SmartStore.Web.Framework.Controllers;
+using System.Linq;
 using System.Web.Mvc;
+using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -8,7 +13,45 @@ namespace SmartStore.Admin.Controllers
     /// </summary>
     public class DeclarationProductOverviewController : AdminControllerBase
     {
+        public IDeclarationProductService _productService;
+        public IDeclarationOrderService declarationOrderService;
+
+        public DeclarationProductOverviewController(IDeclarationProductService productService, IDeclarationOrderService declarationOrderService)
+        {
+            _productService = productService;
+            this.declarationOrderService = declarationOrderService;
+        }
+
         #region Public Methods
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command)
+        {
+            var gridModel = new GridModel<DeclarationProductDispModel>();
+
+            {
+                var Models = _productService.GetAllProductsDisplayedOnHomePage()
+                    .Select(x =>
+                    {
+                        var model = new DeclarationProductDispModel();
+                        model.Name = x.Name;
+                        model.Price = x.Price;
+                        model.Level = x.IsEsd ? "白金产品" : "金卡产品";
+                        var temp = declarationOrderService.GetOrderTotalByProduct(x.Id);
+                        model.Count = temp.Item1;
+                        model.Amount = temp.Item2;
+                        return model;
+                    })
+                    .ToList();
+                gridModel.Data = Models;
+                gridModel.Total = Models.Count();
+            }
+            
+
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
         // GET: DeclarationProductOverview/Create
         public ActionResult Create()

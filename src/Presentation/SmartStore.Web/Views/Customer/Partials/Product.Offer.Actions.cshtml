@@ -1,0 +1,61 @@
+﻿@model ProductDetailsModel
+
+@using SmartStore.Web.Models.Catalog;
+@using SmartStore.Core.Domain.Orders;
+
+@{
+	var addModel = Model.AddToCart;
+	var showBuyAction = Model.IsAvailable && !Model.AddToCart.DisableBuyButton;
+}
+
+    <div class="row pd-offer-actions">
+        @if (showBuyAction)
+        {
+            {
+                if (!Model.AddToCart.HideQuantityControl)
+                {
+                    <div class="col pd-offer-action-qty" style="display:none;">
+                        @Html.EditorFor(model => model.AddToCart, "QtyInput", new { large = true })
+                    </div>
+                }
+                <div class="col flex-grow-1">
+                    <a class="btn btn-secondary btn-lg btn-block " id="noafford"
+                       href="/Customer/NewInfo">
+                        <i class="fa fa-clock"></i>
+                        <span>@T("返回")</span>
+                    </a>
+                </div>  
+                <div class="col flex-grow-1">
+                    <a class="btn btn-secondary btn-lg btn-block " id="noafford"
+                       href="#" >
+                        <i class="fa fa-cart-arrow-down"></i>
+                        <span>@T("可用余额不足")</span>
+                    </a>
+                </div>
+                <div class="col flex-grow-1">
+                    <a class="btn btn-primary btn-lg btn-block btn-add-to-cart ajax-cart-link" id="afford"
+                       href="#"
+                       rel="nofollow"
+                       data-href='@Url.Action("ProxyAddProductAndOrder", "ShoppingCart", new { productId = Model.AddToCart.ProductId, shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart })'
+                       data-form-selector="#pd-form"
+                       data-type="cart"
+                       data-action="add"
+                       data-toggle="offcanvas" data-target="#offcanvas-cart">
+                        <i class="fa fa-cart-arrow-down"></i>
+                        <span>@T("代客下单")</span>
+                    </a>
+                </div>
+
+            }
+        }
+    </div>
+    <script>
+        $(function () {
+            var total = 0.00;
+            var price = 0.00;
+            total = parseFloat($("#WithdrawalTotal_TotalAmount").val());
+            price = parseFloat($("#ProductPrice_Price").val());
+            if (total >= price) { $("#noafford").hide(); $("#afford").show();  }
+            else { $("#afford").hide(); $("#noafford").show();  }
+        });
+    </script>

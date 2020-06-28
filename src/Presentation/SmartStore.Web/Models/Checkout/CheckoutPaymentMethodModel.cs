@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SmartStore.Web.Framework.Modelling;
 using SmartStore.Services.Localization;
+using SmartStore.Core.Domain.Wallet;
 
 namespace SmartStore.Web.Models.Checkout
 {
@@ -9,7 +10,12 @@ namespace SmartStore.Web.Models.Checkout
         public CheckoutPaymentMethodModel()
         {
             PaymentMethods = new List<PaymentMethodModel>();
+            WithdrawalTotal = new WithdrawalTotal();
         }
+        public SmartStore.Core.Domain.Customers.Customer customer { get; set; }
+        public WithdrawalTotal WithdrawalTotal { get; set; }
+        public decimal Total { get; set; }
+        public string Mobile { get; set; }
         public string CustomerComment { get; set; }
         public List<PaymentMethodModel> PaymentMethods { get; set; }
 

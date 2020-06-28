@@ -1,5 +1,9 @@
-﻿using SmartStore.Web.Framework.Controllers;
+﻿using SmartStore.Admin.Models.Stores;
+using SmartStore.Services.Customers;
+using SmartStore.Web.Framework.Controllers;
+using System.Linq;
 using System.Web.Mvc;
+using Telerik.Web.Mvc;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -8,7 +12,40 @@ namespace SmartStore.Admin.Controllers
     /// </summary>
     public class DeclarationCustomOverviewController : AdminControllerBase
     {
+        private readonly ICustomerService _customerService;
+
+        public DeclarationCustomOverviewController(ICustomerService customerService)
+        {
+            _customerService = customerService;
+        }
         #region Public Methods
+        [HttpPost, GridAction(EnableCustomBinding = true)]
+        public ActionResult List(GridCommand command)
+        {
+            var gridModel = new GridModel<DeclarationCustomerModel>();
+
+            {
+                var Models = _customerService.BuildTree()
+                    .Select(x =>
+                    {
+                        var model = new DeclarationCustomerModel();
+                        model.Name = x.Username;
+                        model.Mobile = x.Mobile;
+                        model.Total = x.SelfTotal;
+                        model.OrderCount = x.OrderList.Count();
+                        return model;
+                    })
+                    .ToList();
+                gridModel.Data = Models;
+                gridModel.Total = Models.Count();
+            }
+
+
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
 
         // GET: DeclarationCustomOverview/Create
         public ActionResult Create()

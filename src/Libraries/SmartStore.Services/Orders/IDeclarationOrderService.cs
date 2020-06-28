@@ -129,7 +129,7 @@ namespace SmartStore.Services.Orders
         /// <param name="pageSize">Page size</param>
         /// <returns>Orders</returns>
         IPagedList<DeclarationOrder> GetAllOrders(int affiliateId, int pageIndex, int pageSize);
-
+        public Tuple<int, decimal> GetOrderTotalByProduct(int product);
         /// <summary>
         /// Gets all orders by affiliate identifier
         /// </summary>

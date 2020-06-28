@@ -974,8 +974,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult CopyProduct(DeclarationProductModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var copyModel = model.CopyProductModel;
             try
@@ -1008,8 +1008,8 @@ namespace SmartStore.Admin.Controllers
         //create product
         public ActionResult Create()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var model = new DeclarationProductModel();
             model.IsTaxExempt = true;
@@ -1027,8 +1027,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult Create(DeclarationProductModel model, bool continueEditing, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             if (model.DownloadFileVersion.HasValue() && model.DownloadId != null)
             {
@@ -1115,8 +1115,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var product = _productService.GetProductById(id);
             _productService.DeleteProduct(product);
@@ -1130,8 +1130,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult DeleteSelected(string selectedIds)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var products = new List<DeclarationProduct>();
             if (selectedIds != null)
@@ -1155,8 +1155,8 @@ namespace SmartStore.Admin.Controllers
         //edit product
         public ActionResult Edit(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var product = _productService.GetProductById(id);
 
@@ -1199,10 +1199,10 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult Edit(DeclarationProductModel model, bool continueEditing, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                return AccessDeniedView();
-            }
+            //
+            //{
+            //    
+            //}
 
             var product = _productService.GetProductById(model.Id);
             if (product == null)
@@ -1261,8 +1261,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult List(DeclarationProductListModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var allStores = _storeService.GetAllStores();
 
@@ -1291,8 +1291,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult LoadEditTab(int id, string tabName, string viewPath = null)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return Content("Error while loading template: Access denied.");
+            //
+            //    return Content("Error while loading template: Access denied.");
 
             try
             {
@@ -1344,12 +1344,12 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<DeclarationProductModel>();
 
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-            {
-                gridModel.Data = Enumerable.Empty<DeclarationProductModel>();
-                NotifyAccessDenied();
-            }
-            else
+            //
+            //{
+            //    gridModel.Data = Enumerable.Empty<DeclarationProductModel>();
+            //    NotifyAccessDenied();
+            //}
+            //else
             {
                 var fields = new List<string> { "name" };
                 if (_searchSettings.SearchFields.Contains("sku"))
@@ -1489,7 +1489,7 @@ namespace SmartStore.Admin.Controllers
             var productCategory = _categoryService.GetProductCategoryById(id);
             var productId = productCategory.ProductId;
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 _categoryService.DeleteProductCategory(productCategory);
             }
@@ -1500,7 +1500,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductCategoryInsert(GridCommand command, DeclarationProductModel.ProductCategoryModel model)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productCategory = new ProductCategory
                 {
@@ -1528,7 +1528,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<DeclarationProductModel.ProductCategoryModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productCategories = _categoryService.GetProductCategoriesByProductId(productId, true);
                 var productCategoriesModel = productCategories
@@ -1550,12 +1550,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = productCategoriesModel;
                 model.Total = productCategoriesModel.Count;
             }
-            else
-            {
-                model.Data = Enumerable.Empty<DeclarationProductModel.ProductCategoryModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<DeclarationProductModel.ProductCategoryModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -1568,7 +1568,7 @@ namespace SmartStore.Admin.Controllers
         {
             var productCategory = _categoryService.GetProductCategoryById(model.Id);
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var categoryChanged = (Int32.Parse(model.Category) != productCategory.CategoryId);
 
@@ -1602,7 +1602,7 @@ namespace SmartStore.Admin.Controllers
             var productManufacturer = _manufacturerService.GetProductManufacturerById(id);
             var productId = productManufacturer.ProductId;
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 _manufacturerService.DeleteProductManufacturer(productManufacturer);
             }
@@ -1613,7 +1613,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductManufacturerInsert(GridCommand command, DeclarationProductModel.ProductManufacturerModel model)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productManufacturer = new ProductManufacturer
                 {
@@ -1641,7 +1641,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<DeclarationProductModel.ProductManufacturerModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productManufacturers = _manufacturerService.GetProductManufacturersByProductId(productId, true);
                 var productManufacturersModel = productManufacturers
@@ -1662,12 +1662,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = productManufacturersModel;
                 model.Total = productManufacturersModel.Count;
             }
-            else
-            {
-                model.Data = Enumerable.Empty<DeclarationProductModel.ProductManufacturerModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<DeclarationProductModel.ProductManufacturerModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -1680,7 +1680,7 @@ namespace SmartStore.Admin.Controllers
         {
             var productManufacturer = _manufacturerService.GetProductManufacturerById(model.Id);
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var manufacturerChanged = (Int32.Parse(model.Manufacturer) != productManufacturer.ManufacturerId);
 
@@ -1711,8 +1711,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult ProductPictureAdd(int pictureId, int displayOrder, int productId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             if (pictureId == 0)
                 throw new ArgumentException();
@@ -1763,7 +1763,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<DeclarationProductModel.ProductPictureModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productPictures = _productService.GetProductPicturesByProductId(productId);
 
@@ -1795,12 +1795,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = productPicturesModel;
                 model.Total = productPicturesModel.Count;
             }
-            else
-            {
-                model.Data = Enumerable.Empty<DeclarationProductModel.ProductPictureModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<DeclarationProductModel.ProductPictureModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -1811,7 +1811,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductPictureUpdate(DeclarationProductModel.ProductPictureModel model, GridCommand command)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productPicture = _productService.GetProductPictureById(model.Id);
                 if (productPicture != null)
@@ -1835,7 +1835,7 @@ namespace SmartStore.Admin.Controllers
             var psa = _specificationAttributeService.GetProductSpecificationAttributeById(psaId);
             var productId = psa.ProductId;
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 _specificationAttributeService.DeleteProductSpecificationAttribute(psa);
             }
@@ -1848,7 +1848,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<ProductSpecificationAttributeModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productSpecAttributes = _specificationAttributeService.GetProductSpecificationAttributesByProductId(productId);
                 var specAttributeIds = productSpecAttributes.Select(x => x.SpecificationAttributeOption.SpecificationAttributeId).ToArray();
@@ -1893,12 +1893,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = productSpecModel;
                 model.Total = productSpecModel.Count;
             }
-            else
-            {
-                model.Data = Enumerable.Empty<ProductSpecificationAttributeModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<ProductSpecificationAttributeModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -1911,7 +1911,7 @@ namespace SmartStore.Admin.Controllers
         {
             var psa = _specificationAttributeService.GetProductSpecificationAttributeById(psaId);
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 psa.AllowFiltering = model.AllowFiltering;
                 psa.ShowOnProductPage = model.ShowOnProductPage;
@@ -1933,7 +1933,7 @@ namespace SmartStore.Admin.Controllers
             var success = false;
             var message = string.Empty;
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var psa = new ProductSpecificationAttribute
                 {
@@ -1954,10 +1954,10 @@ namespace SmartStore.Admin.Controllers
                     message = exception.Message;
                 }
             }
-            else
-            {
-                NotifyAccessDenied();
-            }
+            //else
+            //{
+            //    NotifyAccessDenied();
+            //}
 
             return Json(new { success = success, message = message });
         }
@@ -1969,8 +1969,8 @@ namespace SmartStore.Admin.Controllers
         //edit
         public ActionResult EditProductTag(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var productTag = _productTagService.GetProductTagById(id);
             if (productTag == null)
@@ -1995,8 +1995,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult EditProductTag(string btnId, string formId, ProductTagModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var productTag = _productTagService.GetProductTagById(model.Id);
             if (productTag == null)
@@ -2023,7 +2023,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductTagDelete(int id, GridCommand command)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var tag = _productTagService.GetProductTagById(id);
 
@@ -2035,8 +2035,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult ProductTags()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             return View();
         }
@@ -2046,7 +2046,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<ProductTagModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var tags = _productTagService.GetAllProductTags()
                     .OrderByDescending(x => _productTagService.GetProductCount(x.Id, 0))
@@ -2064,12 +2064,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = tags.PagedForCommand(command);
                 model.Total = tags.Count();
             }
-            else
-            {
-                model.Data = Enumerable.Empty<ProductTagModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<ProductTagModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -2083,8 +2083,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult LowStockReport()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             return View();
         }
@@ -2095,8 +2095,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult BulkEdit()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var allStores = _services.StoreService.GetAllStores();
 
@@ -2130,7 +2130,7 @@ namespace SmartStore.Admin.Controllers
             [Bind(Prefix = "deleted")]IEnumerable<BulkEditProductModel> deletedProducts,
             BulkEditListModel model)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 if (updatedProducts != null)
                 {
@@ -2191,7 +2191,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<BulkEditProductModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var fields = new List<string> { "name" };
                 if (_searchSettings.SearchFields.Contains("sku"))
@@ -2238,12 +2238,12 @@ namespace SmartStore.Admin.Controllers
 
                 gridModel.Total = products.TotalCount;
             }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<BulkEditProductModel>();
+            //else
+            //{
+            //    gridModel.Data = Enumerable.Empty<BulkEditProductModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -2441,7 +2441,7 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult CopyAttributeOptions(int productVariantAttributeId, int optionsSetId, bool deleteExistingValues)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var pva = _productAttributeService.GetProductVariantAttributeById(productVariantAttributeId);
                 if (pva == null)
@@ -2463,10 +2463,10 @@ namespace SmartStore.Admin.Controllers
                     }
                 }
             }
-            else
-            {
-                NotifyAccessDenied();
-            }
+            //else
+            //{
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult { Data = string.Empty };
         }
@@ -2477,7 +2477,7 @@ namespace SmartStore.Admin.Controllers
             var pva = _productAttributeService.GetProductVariantAttributeById(id);
             var productId = pva.ProductId;
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 _productAttributeService.DeleteProductVariantAttribute(pva);
             }
@@ -2488,7 +2488,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductVariantAttributeInsert(GridCommand command, DeclarationProductModel.ProductVariantAttributeModel model)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var pva = new ProductVariantAttribute
                 {
@@ -2509,10 +2509,10 @@ namespace SmartStore.Admin.Controllers
                     Services.Notifier.Error(exception.Message);
                 }
             }
-            else
-            {
-                NotifyAccessDenied();
-            }
+            //else
+            //{
+            //    NotifyAccessDenied();
+            //}
 
             return ProductVariantAttributeList(command, model.ProductId);
         }
@@ -2522,7 +2522,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<DeclarationProductModel.ProductVariantAttributeModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var productVariantAttributes = _productAttributeService.GetProductVariantAttributesByProductId(productId);
                 var productVariantAttributesModel = productVariantAttributes
@@ -2562,12 +2562,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = productVariantAttributesModel;
                 model.Total = productVariantAttributesModel.Count;
             }
-            else
-            {
-                model.Data = Enumerable.Empty<DeclarationProductModel.ProductVariantAttributeModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<DeclarationProductModel.ProductVariantAttributeModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -2580,7 +2580,7 @@ namespace SmartStore.Admin.Controllers
         {
             var pva = _productAttributeService.GetProductVariantAttributeById(model.Id);
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 //use ProductAttribute property (not ProductAttributeId) because appropriate property is stored in it
                 pva.ProductAttributeId = Int32.Parse(model.ProductAttribute);
@@ -2599,10 +2599,10 @@ namespace SmartStore.Admin.Controllers
                     NotifyError(exception.Message);
                 }
             }
-            else
-            {
-                NotifyAccessDenied();
-            }
+            //else
+            //{
+            //    NotifyAccessDenied();
+            //}
 
             return ProductVariantAttributeList(command, pva.ProductId);
         }
@@ -2613,8 +2613,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult EditAttributeValues(int productVariantAttributeId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var pva = _productAttributeService.GetProductVariantAttributeById(productVariantAttributeId);
             if (pva == null)
@@ -2637,8 +2637,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult ProductAttributeValueCreatePopup(int productVariantAttributeId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var pva = _productAttributeService.GetProductVariantAttributeById(productVariantAttributeId);
             if (pva == null)
@@ -2661,7 +2661,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult ProductAttributeValueDelete(int pvavId, int productVariantAttributeId, GridCommand command)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var pvav = _productAttributeService.GetProductVariantAttributeValueById(pvavId);
 
@@ -2673,8 +2673,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult ProductAttributeValueEditPopup(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            //
+            //    
 
             var pvav = _productAttributeService.GetProductVariantAttributeValueById(id);
             if (pvav == null)
@@ -2726,7 +2726,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<DeclarationProductModel.ProductVariantAttributeValueModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
             {
                 var pva = _productAttributeService.GetProductVariantAttributeById(productVariantAttributeId);
 
@@ -2773,12 +2773,12 @@ namespace SmartStore.Admin.Controllers
 
                 gridModel.Total = values.Count();
             }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<DeclarationProductModel.ProductVariantAttributeValueModel>();
+            //else
+            //{
+            //    gridModel.Data = Enumerable.Empty<DeclarationProductModel.ProductVariantAttributeValueModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -2792,8 +2792,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AttributeCombinationCreatePopup(string btnId, string formId, int productId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             var product = _productService.GetProductById(productId);
             if (product == null)
@@ -2818,8 +2818,8 @@ namespace SmartStore.Admin.Controllers
             ProductVariantAttributeCombinationModel model,
             ProductVariantQuery query)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             var product = _productService.GetProductById(productId);
             if (product == null)
@@ -2863,8 +2863,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AttributeCombinationEditPopup(int id, string btnId, string formId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             var combination = _productAttributeService.GetProductVariantAttributeCombinationById(id);
             if (combination == null)
@@ -2891,8 +2891,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult AttributeCombinationEditPopup(string btnId, string formId, ProductVariantAttributeCombinationModel model, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             if (ModelState.IsValid)
             {
@@ -2961,8 +2961,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult CreateAllAttributeCombinations(ProductVariantAttributeCombinationModel model, int productId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             var product = _productService.GetProductById(productId);
             if (product == null)
@@ -2979,8 +2979,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult DeleteAllAttributeCombinations(ProductVariantAttributeCombinationModel model, int productId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             var product = _productService.GetProductById(productId);
             if (product == null)
@@ -3188,8 +3188,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult FixProductMainPictureIds(DateTime? ifModifiedSinceUtc = null)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCatalog))
-                return AccessDeniedView();
+            
+                
 
             var count = DataMigrator.FixProductMainPictureIds(_dbContext, ifModifiedSinceUtc);
 

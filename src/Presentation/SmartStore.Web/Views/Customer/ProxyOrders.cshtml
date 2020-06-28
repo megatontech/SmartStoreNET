@@ -1,0 +1,21 @@
+﻿@model CustomerTeamModel
+@using SmartStore.Web.Models.Customer;
+
+@{
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+
+    Layout = "_dMyAccount";
+    ViewBag.PageClassToken = "rewardpoints";
+    ViewBag.PageTitle = T("").Text;
+}
+
+    <div class="col-md-8 col-lg-9">
+        <div class="page-title pt-4 pt-md-0">
+            <h1 class="h3">代客报单</h1>
+        </div>
+        @{Html.RenderAction("ProxyDHomepageProducts", "Catalog");
+            Html.RenderWidget("home_page_after_products");
+        }
+    </div>
+
+

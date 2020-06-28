@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 using SmartStore.Core.Domain.Catalog;
+using SmartStore.Core.Domain.Wallet;
 using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Localization;
 using SmartStore.Web.Framework;
@@ -29,9 +30,11 @@ namespace SmartStore.Web.Models.Catalog
 			BundleItem = new ProductBundleItemModel();
 			ActionItems = new Dictionary<string, ActionItemModel>();
 			IsAvailable = true;
-        }
+			WithdrawalTotal = new WithdrawalTotal();
 
-		public ProductDetailsPictureModel DetailsPictureModel
+		}
+		
+	public ProductDetailsPictureModel DetailsPictureModel
 		{
 			get
 			{
@@ -42,8 +45,8 @@ namespace SmartStore.Web.Models.Catalog
 				return _detailsPictureModel;
 			}
 		}
-
-        public LocalizedValue<string> Name { get; set; }
+		public WithdrawalTotal WithdrawalTotal { get; set; }
+	public LocalizedValue<string> Name { get; set; }
         public LocalizedValue<string> ShortDescription { get; set; }
         public LocalizedValue<string> FullDescription { get; set; }
         public string ProductTemplateViewPath { get; set; }

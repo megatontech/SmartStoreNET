@@ -100,6 +100,7 @@ namespace SmartStore.Admin.Controllers
         private readonly IWorkContext _workContext;
         private readonly ICalcRewardService _CalcRewardService;
         private readonly IWithdrawalDetailService _detailService;
+        private readonly IWithdrawalApplyService _apply;
         #endregion Fields
 
         #region Ctor
@@ -107,7 +108,7 @@ namespace SmartStore.Admin.Controllers
         public DeclarationFinaduitController(IOrderService orderService, IPictureService pictureService,
             IOrderReportService orderReportService, IWithdrawalDetailService detailService, IDeclarationProductService dproductService,
         IOrderProcessingService orderProcessingService,
-            IDateTimeHelper dateTimeHelper,
+            IDateTimeHelper dateTimeHelper, IWithdrawalApplyService apply,
             IPriceFormatter priceFormatter,
             ILocalizationService localizationService,
             IWorkContext workContext,
@@ -196,6 +197,7 @@ namespace SmartStore.Admin.Controllers
             _searchSettings = searchSettings;
             _shoppingCartSettings = shoppingCartSettings;
             _DeclarationOrderService = declarationOrderService;
+            _apply = apply;
         }
 
         #endregion Ctor
@@ -907,10 +909,10 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult List(OrderListModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-            {
-                return AccessDeniedView();
-            }
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //{
+            //    return AccessDeniedView();
+            //}
 
             var allStores = Services.StoreService.GetAllStores();
             var paymentMethods = _paymentService.LoadAllPaymentMethods();
@@ -959,7 +961,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<OrderModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+           // if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
                 DateTime? startDateValue = (model.StartDate == null) ? null : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.StartDate.Value, _dateTimeHelper.CurrentTimeZone);
                 DateTime? endDateValue = (model.EndDate == null) ? null : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
@@ -1066,12 +1068,12 @@ namespace SmartStore.Admin.Controllers
 
                 gridModel.Aggregates = aggregator;
             }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<OrderModel>();
+            //else
+            //{
+            //    gridModel.Data = Enumerable.Empty<OrderModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -1086,8 +1088,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult ExportPdf(bool all, string selectedIds = null)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             if (!all && selectedIds.IsEmpty())
             {
@@ -1107,8 +1109,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult AuditOper(int id )
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
             //int id = Request["id"].ToInt();
             var order = _DeclarationOrderService.GetOrderById(id);
             if (order == null)
@@ -1145,11 +1147,26 @@ namespace SmartStore.Admin.Controllers
                         order.PaymentStatus = PaymentStatus.Paid;
                         order.PaidDateUtc = DateTime.Now;
                         _DeclarationOrderService.UpdateOrder(order);
-                        
+                        //代客下单
+                        if (order.HasNewPaymentNotification&&order.VatNumber=="代客下单") 
+                        {
+                            //解冻钱包
+                            var withdraw =  _apply.GetByOrderID(order.Id,order.OrderGuid);
+                            var custom= _customerService.GetCustomerById(withdraw.Customer);
+                            withdraw.WithdrawStatus = Core.Domain.Wallet.WithdrawalApplyStatus.Complete;
+                            _apply.WithdrawalPayAudit(withdraw, custom);
+                        }
                         //分钱
                         var customer = _customerService.GetCustomerById(order.CustomerId);
                         //EverHadOrder没报单的会员不给他任何佣金（一直没出单的不给钱，会员表加字段）
                         customer.EverHadOrder = true;
+                        #region 会员分金卡会员（一般就是指3980小单），白金会员（大单）
+                        var isBig = false;
+                        var product = _dproductService.GetProductById(order.ProductID);
+                        if (product.IsEsd) { isBig = true; }
+                        if (isBig ) { customer.Title = "白金会员"; }
+                        else if (customer.Title != "白金会员") { customer.Title = "金卡会员"; }
+                        #endregion
                         _customerService.UpdateCustomer(customer);
                         _CalcRewardService.CalcRewardOne(customer, order);
                     }
@@ -1218,8 +1235,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("captureorder")]
         public ActionResult CaptureOrder(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1245,8 +1262,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("completeorder")]
         public ActionResult CompleteOrder(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1268,8 +1285,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("markorderaspaid")]
         public ActionResult MarkOrderAsPaid(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1306,8 +1323,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("partialrefundorder")]
         public ActionResult PartiallyRefundOrderPopup(string btnId, string formId, int id, bool online, OrderModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1361,8 +1378,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("refundorder")]
         public ActionResult RefundOrder(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1388,8 +1405,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("refundorderoffline")]
         public ActionResult RefundOrderOffline(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1411,8 +1428,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("voidorder")]
         public ActionResult VoidOrder(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1436,8 +1453,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("voidorderoffline")]
         public ActionResult VoidOrderOffline(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1464,8 +1481,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult ActivateDownloadOrderItem(int id, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1492,8 +1509,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AddProductToOrder(int orderId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var model = new OrderModel.AddOrderProductModel { OrderId = orderId };
 
@@ -1517,7 +1534,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<OrderModel.AddOrderProductModel.ProductModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
                 var fields = new List<string> { "name" };
                 if (_searchSettings.SearchFields.Contains("sku"))
@@ -1555,12 +1572,12 @@ namespace SmartStore.Admin.Controllers
 
                 gridModel.Total = products.TotalCount;
             }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<OrderModel.AddOrderProductModel.ProductModel>();
+            //else
+            //{
+            //    gridModel.Data = Enumerable.Empty<OrderModel.AddOrderProductModel.ProductModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -1570,8 +1587,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AddProductToOrderDetails(int orderId, int productId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var model = PrepareAddProductToOrderModel(orderId, productId);
             return View(model);
@@ -1581,8 +1598,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult AddProductToOrderDetails(int orderId, int productId, bool adjustInventory, bool? updateTotals, ProductVariantQuery query, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(orderId);
             var product = _productService.GetProductById(productId);
@@ -1747,8 +1764,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult AddReturnRequest(int id, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageReturnRequests))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageReturnRequests))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1792,8 +1809,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1814,8 +1831,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("deletelicense")]
         public ActionResult DeleteLicenseFilePopup(string btnId, string formId, OrderModel.UploadLicenseModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(model.OrderId);
             if (order == null)
@@ -1842,8 +1859,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult DeleteOrderItem(AutoUpdateOrderItemModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var oi = _orderService.GetOrderItemById(model.Id);
 
@@ -1872,8 +1889,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Edit(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null || order.Deleted)
@@ -1889,8 +1906,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("btnSaveCC")]
         public ActionResult EditCreditCardInfo(int id, OrderModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1923,8 +1940,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("btnSaveDD")]
         public ActionResult EditDirectDebitInfo(int id, OrderModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -1958,8 +1975,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult EditOrderItem(AutoUpdateOrderItemModel model, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var oi = _orderService.GetOrderItemById(model.Id);
 
@@ -2009,8 +2026,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("btnSaveOrderTotals")]
         public ActionResult EditOrderTotals(int id, OrderModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -2038,8 +2055,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Print(int orderId, bool pdf = false)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             return RedirectToAction("Print", "Order", new { id = orderId, pdf, area = "" });
         }
@@ -2049,8 +2066,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult ResetDownloadCount(int id, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -2077,8 +2094,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult UploadLicenseFilePopup(int id, int orderItemId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(id);
             if (order == null)
@@ -2106,8 +2123,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("uploadlicense")]
         public ActionResult UploadLicenseFilePopup(string btnId, string formId, OrderModel.UploadLicenseModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(model.OrderId);
             if (order == null)
@@ -2144,8 +2161,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AddressEdit(int addressId, int orderId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(orderId);
             if (order == null)
@@ -2165,8 +2182,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult AddressEdit(OrderAddressModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(model.OrderId);
             if (order == null)
@@ -2202,10 +2219,10 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AddShipment(int orderId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-            {
-                return AccessDeniedView();
-            }
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //{
+            //    return AccessDeniedView();
+            //}
 
             var order = _orderService.GetOrderById(orderId);
             if (order == null)
@@ -2242,8 +2259,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("save", "save-continue")]
         public ActionResult AddShipment(int orderId, FormCollection form, bool continueEditing)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(orderId);
             if (order == null)
@@ -2285,8 +2302,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult DeleteShipment(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var shipment = _shipmentService.GetShipmentById(id);
             if (shipment == null)
@@ -2302,8 +2319,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult PdfPackagingSlips(bool all, string selectedIds = null)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             if (!all && selectedIds.IsEmpty())
             {
@@ -2367,8 +2384,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("setasdelivered")]
         public ActionResult SetAsDelivered(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var shipment = _shipmentService.GetShipmentById(id);
             if (shipment == null)
@@ -2392,8 +2409,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("setasshipped")]
         public ActionResult SetAsShipped(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var shipment = _shipmentService.GetShipmentById(id);
             if (shipment == null)
@@ -2417,8 +2434,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("settrackingnumber")]
         public ActionResult SetTrackingNumber(ShipmentModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var shipment = _shipmentService.GetShipmentById(model.Id);
             if (shipment == null)
@@ -2433,8 +2450,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult ShipmentDetails(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var shipment = _shipmentService.GetShipmentById(id);
             if (shipment == null)
@@ -2448,8 +2465,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult ShipmentList()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var model = new ShipmentListModel
             {
@@ -2464,7 +2481,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<ShipmentModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
                 DateTime? startDateValue = (model.StartDate == null) ? null
                     : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.StartDate.Value, _dateTimeHelper.CurrentTimeZone);
@@ -2478,12 +2495,12 @@ namespace SmartStore.Admin.Controllers
                 gridModel.Data = shipments.Select(shipment => PrepareShipmentModel(shipment, false, false));
                 gridModel.Total = shipments.TotalCount;
             }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<ShipmentModel>();
+            //else
+            //{
+            //    gridModel.Data = Enumerable.Empty<ShipmentModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -2496,7 +2513,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<ShipmentModel>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
                 var order = _orderService.GetOrderById(orderId);
 
@@ -2511,12 +2528,12 @@ namespace SmartStore.Admin.Controllers
                 model.Data = shipmentModels;
                 model.Total = shipmentModels.Count;
             }
-            else
-            {
-                model.Data = Enumerable.Empty<ShipmentModel>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<ShipmentModel>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {
@@ -2531,8 +2548,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult OrderNoteAdd(int orderId, bool displayToCustomer, string message)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //    return AccessDeniedView();
 
             var order = _orderService.GetOrderById(orderId);
             if (order == null)
@@ -2560,7 +2577,7 @@ namespace SmartStore.Admin.Controllers
         [GridAction(EnableCustomBinding = true)]
         public ActionResult OrderNoteDelete(int orderId, int orderNoteId, GridCommand command)
         {
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
                 var order = _orderService.GetOrderById(orderId);
                 var orderNote = order.OrderNotes.Where(on => on.Id == orderNoteId).FirstOrDefault();
@@ -2576,7 +2593,7 @@ namespace SmartStore.Admin.Controllers
         {
             var model = new GridModel<OrderModel.OrderNote>();
 
-            if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
                 var order = _orderService.GetOrderById(orderId);
 
@@ -2603,12 +2620,12 @@ namespace SmartStore.Admin.Controllers
                     _orderService.UpdateOrder(order);
                 }
             }
-            else
-            {
-                model.Data = Enumerable.Empty<OrderModel.OrderNote>();
+            //else
+            //{
+            //    model.Data = Enumerable.Empty<OrderModel.OrderNote>();
 
-                NotifyAccessDenied();
-            }
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {

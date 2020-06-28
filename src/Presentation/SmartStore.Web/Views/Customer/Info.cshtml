@@ -3,11 +3,11 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-	Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("PageTitle.Account").Text);
 
-	Layout = "_dMyAccount";
-	ViewBag.PageClassToken = "info";
-	ViewBag.PageTitle = T("Account.CustomerInfo").Text;
+    Layout = "_dMyAccount";
+    ViewBag.PageClassToken = "info";
+    ViewBag.PageTitle = T("Account.CustomerInfo").Text;
 }
 
 @using (Html.BeginForm("Info", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
@@ -18,60 +18,60 @@
     {
         @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
     }
-
+    
     <fieldset class="content-group">
         <legend><span>@T("Account.YourPersonalDetails")</span></legend>
 
-        
-        @Html.ControlGroupFor(model => model.Username, required: true,  breakpoint: "lg")
+
+        @Html.ControlGroupFor(model => model.Username, required: true, breakpoint: "lg")
         @Html.ControlGroupFor(model => model.FirstName, required: true, breakpoint: "lg")
         @Html.ControlGroupFor(model => model.VatNumber, required: true, breakpoint: "lg")
         @Html.ControlGroupFor(model => model.VatNumberStatusNote, required: true, breakpoint: "lg")
 
         @*@if (Model.UsernamesEnabled)
-        {
-            <div class="form-group row">
-                @Html.LabelFor(model => model.Username, new { @class = "col-lg-3 col-form-label required", @for = "Username" })
-                @if (Model.AllowUsersToChangeUsernames)
-                {
-                    <div class="col-lg-9">
-                        @if (Model.CheckUsernameAvailabilityEnabled)
-                        {
-                            <div class="input-group">
+            {
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Username, new { @class = "col-lg-3 col-form-label required", @for = "Username" })
+                    @if (Model.AllowUsersToChangeUsernames)
+                    {
+                        <div class="col-lg-9">
+                            @if (Model.CheckUsernameAvailabilityEnabled)
+                            {
+                                <div class="input-group">
+                                    @Html.TextBoxFor(model => model.Username, new { @class = "form-control" })
+                                    @{ Html.RenderPartial("_CheckUsernameAvailability"); }
+                                </div>
+                            }
+                            else
+                            {
                                 @Html.TextBoxFor(model => model.Username, new { @class = "form-control" })
-                                @{ Html.RenderPartial("_CheckUsernameAvailability"); }
-                            </div>
-                        }
-                        else
-                        {
-                            @Html.TextBoxFor(model => model.Username, new { @class = "form-control" })
-                        }
-                        @Html.ValidationMessageFor(model => model.Username)
-                    </div>
-                }
-                else
-                {
-                    <div class="col-lg-9">
-                        <div class="form-control-plaintext">@Model.Username</div>
-                    </div>
-                }
-            </div>
-        }*@
+                            }
+                            @Html.ValidationMessageFor(model => model.Username)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-lg-9">
+                            <div class="form-control-plaintext">@Model.Username</div>
+                        </div>
+                    }
+                </div>
+            }*@
 
         @*@if (Model.DisplayCustomerNumber)
-        {
-            var customerNumberAttributes = !Model.CustomerNumberEnabled ? (object)(new { @class = "form-control", @readonly = "true" }) : (object)(new { @class = "form-control" });
-            <div class="form-group row">
-                @Html.LabelFor(model => model.CustomerNumber, new { @class = "col-lg-3 col-form-label", @for = "CustomerNumber" })
-                <div class="col-lg-9">
-                    @Html.TextBoxFor(model => model.CustomerNumber, customerNumberAttributes)
+            {
+                var customerNumberAttributes = !Model.CustomerNumberEnabled ? (object)(new { @class = "form-control", @readonly = "true" }) : (object)(new { @class = "form-control" });
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.CustomerNumber, new { @class = "col-lg-3 col-form-label", @for = "CustomerNumber" })
+                    <div class="col-lg-9">
+                        @Html.TextBoxFor(model => model.CustomerNumber, customerNumberAttributes)
+                    </div>
                 </div>
-            </div>
-        }*@
+            }*@
 
     </fieldset>
 
-        @*<fieldset class="content-group">
+    @*<fieldset class="content-group">
             <legend><span>@T("Account.YourContactInformation")</span></legend>
                 @Html.ControlGroupFor(model => model.Phone, required: true, breakpoint: "lg")
         </fieldset>*@

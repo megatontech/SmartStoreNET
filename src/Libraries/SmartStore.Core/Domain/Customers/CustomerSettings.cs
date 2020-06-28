@@ -13,7 +13,7 @@ namespace SmartStore.Core.Domain.Customers
 			HashedPasswordFormat = "SHA1";
 			PasswordMinLength = 6;
 			UserRegistrationType = UserRegistrationType.Standard;
-			AvatarMaximumSizeBytes = 512000;
+			AvatarMaximumSizeBytes = 4000000;
 			CustomerNameFormat = CustomerNameFormat.ShowFirstName;
 			CustomerNameFormatMaxLength = 64;
 			GenderEnabled = true;

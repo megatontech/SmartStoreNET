@@ -56,7 +56,7 @@ namespace SmartStore.Services.Wallet
         }
         public List<WithdrawalTotal> GetAll(int start, int length)
         {
-            return _WithdrawalTotalRepository.Table.Where(x => x.IsCount == false).Skip(start).Take(length).ToList();
+            return _WithdrawalTotalRepository.Table.Where(x => x.IsCount == false).OrderByDescending(x=>x.TotalAmount).Skip(start).Take(length).ToList();
         }
        
         public void Update(WithdrawalTotal entity)

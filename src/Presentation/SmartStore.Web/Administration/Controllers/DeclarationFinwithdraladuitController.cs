@@ -51,7 +51,10 @@ namespace SmartStore.Admin.Controllers
                var customer = _customerService.GetCustomerById(model.Customer);
                var apply = _workContext.CurrentCustomer;
                 model.WithdrawStatus = WithdrawalApplyStatus.Complete;
-                _withdrawalApplyService.WithdrawalApplyAudit(model, customer, apply);
+                
+                var isDENY = false;
+                if (isDENY) { _withdrawalApplyService.WithdrawalApplyDeny(model, customer, apply); }
+                else { _withdrawalApplyService.WithdrawalApplyAudit(model, customer, apply); }
                 return RedirectToAction("Index");
             }
             catch
@@ -117,7 +120,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<DeclarationFinwithdraladuitModel>();
             var customer = _customerService.BuildAllTreeWithoutOrder();
-            if (Services.Permissions.Authorize(StandardPermissionProvider.ManageStores))
+            //if (Services.Permissions.Authorize(StandardPermissionProvider.ManageStores))
             {
                 var storeModels = _withdrawalApplyService.GetList()
                     .Select(x =>
@@ -136,11 +139,11 @@ namespace SmartStore.Admin.Controllers
                 gridModel.Data = storeModels;
                 gridModel.Total = storeModels.Count();
             }
-            else
-            {
-                gridModel.Data = Enumerable.Empty<DeclarationFinwithdraladuitModel>();
-                NotifyAccessDenied();
-            }
+            //else
+            //{
+            //    gridModel.Data = Enumerable.Empty<DeclarationFinwithdraladuitModel>();
+            //    NotifyAccessDenied();
+            //}
 
             return new JsonResult
             {

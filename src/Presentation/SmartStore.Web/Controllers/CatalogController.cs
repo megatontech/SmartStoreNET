@@ -453,6 +453,26 @@ namespace SmartStore.Web.Controllers
 			return PartialView(model);
 		}
 		
+			[ChildActionOnly]
+		public ActionResult ProxyDHomepageProducts(int? productThumbPictureSize)
+		{
+			var products = _dproductService.GetAllProductsDisplayedOnHomePage();
+
+			// ACL and store mapping
+			//products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+
+			var viewMode = _catalogSettings.UseSmallProductBoxOnHomePage ? ProductSummaryViewMode.Mini : ProductSummaryViewMode.Grid;
+
+			var settings = _helper.GetBestFitProductSummaryMappingSettings(viewMode, x =>
+			{
+				x.ThumbnailSize = productThumbPictureSize;
+			});
+			var model = _helper.MapProductSummaryModel(products, settings);
+			//DeclarationProductSummaryModel model = new DeclarationProductSummaryModel(new PagedList<DeclarationProduct>(products, 0, int.MaxValue));
+			model.GridColumnSpan = GridColumnSpan.Max6Cols;
+
+			return PartialView(model);
+		}
 		[ChildActionOnly]
 		public ActionResult DHomepageProducts(int? productThumbPictureSize)
 		{

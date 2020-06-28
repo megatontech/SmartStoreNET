@@ -38,4 +38,12 @@ namespace SmartStore.Data.Mapping.Customers
             this.HasOptional<Address>(c => c.ShippingAddress);
         }
     }
+    public partial class CheckInMap : EntityTypeConfiguration<CheckIn>
+    {
+        public CheckInMap()
+        {
+            this.ToTable("CheckIn");
+            this.HasKey(c => c.Id);
+        }
+    }
 }

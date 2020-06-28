@@ -65,24 +65,24 @@
                 </td>
             </tr>
         }
-    <tr style="display:none;">
-        <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.ProductTypeId)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.ProductTypeId, ((ProductType)Model.ProductTypeId).ToSelectList())
-            @Html.ValidationMessageFor(model => model.ProductTypeId)
-        </td>
-    </tr>
-    <tr style="display:none;">
-        <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.VisibleIndividually)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.VisibleIndividually,new { Value=true})
-            @Html.ValidationMessageFor(model => model.VisibleIndividually)
-        </td>
-    </tr>
+        <tr style="display:none;">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.ProductTypeId)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.ProductTypeId, ((ProductType)Model.ProductTypeId).ToSelectList())
+                @Html.ValidationMessageFor(model => model.ProductTypeId)
+            </td>
+        </tr>
+        <tr style="display:none;">
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.VisibleIndividually)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.VisibleIndividually, new { Value = true })
+                @Html.ValidationMessageFor(model => model.VisibleIndividually)
+            </td>
+        </tr>
     </table>
 
     <p></p>
@@ -154,33 +154,33 @@
 
     <table class="adminContent">
         @*<tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.Sku)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(model => model.Sku)
-                @Html.ValidationMessageFor(model => model.Sku)
-            </td>
-        </tr>*@
-        
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Sku)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.Sku)
+                    @Html.ValidationMessageFor(model => model.Sku)
+                </td>
+            </tr>*@
+
         @*<tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.AdminComment)
-            </td>
-            <td class="adminData">
-                @Html.TextAreaFor(model => model.AdminComment)
-                @Html.ValidationMessageFor(model => model.AdminComment)
-            </td>
-        </tr>*@
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.AdminComment)
+                </td>
+                <td class="adminData">
+                    @Html.TextAreaFor(model => model.AdminComment)
+                    @Html.ValidationMessageFor(model => model.AdminComment)
+                </td>
+            </tr>*@
         @*<tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.ProductTags)
-            </td>
-            <td class="adminData">
-                @Html.ListBoxFor(model => model.ProductTags, Model.AvailableProductTags, new { multiple = "multiple", data_tags = "true" })
-                @Html.ValidationMessageFor(model => model.ProductTags)
-            </td>
-        </tr>*@
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.ProductTags)
+                </td>
+                <td class="adminData">
+                    @Html.ListBoxFor(model => model.ProductTags, Model.AvailableProductTags, new { multiple = "multiple", data_tags = "true" })
+                    @Html.ValidationMessageFor(model => model.ProductTags)
+                </td>
+            </tr>*@
         <tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.AvailableStartDateTimeUtc)
@@ -199,16 +199,16 @@
                 @Html.ValidationMessageFor(model => model.AvailableEndDateTimeUtc)
             </td>
         </tr>
-        
+
         @*<tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.ShowOnHomePage)
-            </td>
-            <td class="adminData">
-                @Html.CheckBoxFor(model => model.ShowOnHomePage, new {data_toggler_for = "#pnlHomePageDisplayOrder"})
-                @Html.ValidationMessageFor(model => model.ShowOnHomePage)
-            </td>
-        </tr>*@
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.ShowOnHomePage)
+                </td>
+                <td class="adminData">
+                    @Html.CheckBoxFor(model => model.ShowOnHomePage, new {data_toggler_for = "#pnlHomePageDisplayOrder"})
+                    @Html.ValidationMessageFor(model => model.ShowOnHomePage)
+                </td>
+            </tr>*@
         <tr id="pnlHomePageDisplayOrder">
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.HomePageDisplayOrder)
@@ -256,218 +256,238 @@
     </table>
 
     @*<table class="adminContent" id="group-required-other-products">
-        <tr class="adminSeparator">
-            <td colspan="2">
-                <hr />
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.RequireOtherProducts)
-            </td>
-            <td class="adminData">
-                @Html.CheckBoxFor(model => model.RequireOtherProducts, new { data_toggler_for = "#pnlRequireOtherProducts" })
-                @Html.ValidationMessageFor(model => model.RequireOtherProducts)
-            </td>
-        </tr>
-        <tbody id="pnlRequireOtherProducts">
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.RequiredProductIds)
-                </td>
-                <td class="adminData">
-                    <div class="input-group">
-                        @Html.TextBoxFor(model => model.RequiredProductIds, new { @readonly = "readonly" })
-                        <span class="input-group-append">
-                            <a class="btn btn-secondary" id="reset-required-productids" title="@T("Admin.Common.Reset")">
-                                <i class="fa fa-times"></i>
-                            </a>
-                        </span>
-                        <span class="input-group-append">
-                            @(Html.SmartStore().EntityPicker()
-								.For(x => x.RequiredProductIds)
-								.DialogTitle(T("Admin.Catalog.Products.Fields.RequireOtherProducts").Text.EncodeJsString('\'', false))
-								.Caption(T("Admin.Common.Search").Text.EncodeJsString('\'', false)))
-                        </span>
-                    </div>
-                    @Html.ValidationMessageFor(model => model.RequiredProductIds)
+            <tr class="adminSeparator">
+                <td colspan="2">
+                    <hr />
                 </td>
             </tr>
             <tr>
                 <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.AutomaticallyAddRequiredProducts)
+                    @Html.SmartLabelFor(model => model.RequireOtherProducts)
                 </td>
                 <td class="adminData">
-                    @Html.EditorFor(model => model.AutomaticallyAddRequiredProducts)
-                    @Html.ValidationMessageFor(model => model.AutomaticallyAddRequiredProducts)
+                    @Html.CheckBoxFor(model => model.RequireOtherProducts, new { data_toggler_for = "#pnlRequireOtherProducts" })
+                    @Html.ValidationMessageFor(model => model.RequireOtherProducts)
                 </td>
             </tr>
-        </tbody>
-    </table>*@
+            <tbody id="pnlRequireOtherProducts">
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.RequiredProductIds)
+                    </td>
+                    <td class="adminData">
+                        <div class="input-group">
+                            @Html.TextBoxFor(model => model.RequiredProductIds, new { @readonly = "readonly" })
+                            <span class="input-group-append">
+                                <a class="btn btn-secondary" id="reset-required-productids" title="@T("Admin.Common.Reset")">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </span>
+                            <span class="input-group-append">
+                                @(Html.SmartStore().EntityPicker()
+                                    .For(x => x.RequiredProductIds)
+                                    .DialogTitle(T("Admin.Catalog.Products.Fields.RequireOtherProducts").Text.EncodeJsString('\'', false))
+                                    .Caption(T("Admin.Common.Search").Text.EncodeJsString('\'', false)))
+                            </span>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.RequiredProductIds)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.AutomaticallyAddRequiredProducts)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.AutomaticallyAddRequiredProducts)
+                        @Html.ValidationMessageFor(model => model.AutomaticallyAddRequiredProducts)
+                    </td>
+                </tr>
+            </tbody>
+        </table>*@
 
     @*<table class="adminContent" id="group-giftcard">
-        <tr class="adminSeparator">
-            <td colspan="2">
-                <hr />
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.IsGiftCard)
-            </td>
-            <td class="adminData">
-                @Html.CheckBoxFor(model => model.IsGiftCard, new { data_toggler_for = "#pnlGiftCardType" })
-                @Html.ValidationMessageFor(model => model.IsGiftCard)
-            </td>
-        </tr>
-        <tr id="pnlGiftCardType">
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.GiftCardTypeId)
-            </td>
-            <td class="adminData">
-                @Html.DropDownListFor(model => model.GiftCardTypeId, ((GiftCardType)Model.GiftCardTypeId).ToSelectList())
-                @Html.ValidationMessageFor(model => model.GiftCardTypeId)
-            </td>
-        </tr>
-    </table>
+            <tr class="adminSeparator">
+                <td colspan="2">
+                    <hr />
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.IsGiftCard)
+                </td>
+                <td class="adminData">
+                    @Html.CheckBoxFor(model => model.IsGiftCard, new { data_toggler_for = "#pnlGiftCardType" })
+                    @Html.ValidationMessageFor(model => model.IsGiftCard)
+                </td>
+            </tr>
+            <tr id="pnlGiftCardType">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.GiftCardTypeId)
+                </td>
+                <td class="adminData">
+                    @Html.DropDownListFor(model => model.GiftCardTypeId, ((GiftCardType)Model.GiftCardTypeId).ToSelectList())
+                    @Html.ValidationMessageFor(model => model.GiftCardTypeId)
+                </td>
+            </tr>
+        </table>
 
-    <table class="adminContent" id="group-recurring">
-        <tr class="adminSeparator">
-            <td colspan="2">
-                <hr />
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.IsRecurring)
-            </td>
-            <td class="adminData">
-                @Html.CheckBoxFor(model => model.IsRecurring, new { data_toggler_for = "#pnlIsRecurring" })
-                @Html.ValidationMessageFor(model => model.IsRecurring)
-            </td>
-        </tr>
-        <tbody id="pnlIsRecurring">
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.RecurringCycleLength)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.RecurringCycleLength)
-                    @Html.ValidationMessageFor(model => model.RecurringCycleLength)
+        <table class="adminContent" id="group-recurring">
+            <tr class="adminSeparator">
+                <td colspan="2">
+                    <hr />
                 </td>
             </tr>
             <tr>
                 <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.RecurringCyclePeriodId)
+                    @Html.SmartLabelFor(model => model.IsRecurring)
                 </td>
                 <td class="adminData">
-                    @Html.DropDownListFor(model => model.RecurringCyclePeriodId, ((RecurringProductCyclePeriod)Model.RecurringCyclePeriodId).ToSelectList())
-                    @Html.ValidationMessageFor(model => model.RecurringCyclePeriodId)
+                    @Html.CheckBoxFor(model => model.IsRecurring, new { data_toggler_for = "#pnlIsRecurring" })
+                    @Html.ValidationMessageFor(model => model.IsRecurring)
                 </td>
             </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.RecurringTotalCycles)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.RecurringTotalCycles)
-                    @Html.ValidationMessageFor(model => model.RecurringTotalCycles)
-                </td>
-            </tr>
-        </tbody>
-    </table>*@
+            <tbody id="pnlIsRecurring">
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.RecurringCycleLength)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.RecurringCycleLength)
+                        @Html.ValidationMessageFor(model => model.RecurringCycleLength)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.RecurringCyclePeriodId)
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.RecurringCyclePeriodId, ((RecurringProductCyclePeriod)Model.RecurringCyclePeriodId).ToSelectList())
+                        @Html.ValidationMessageFor(model => model.RecurringCyclePeriodId)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.RecurringTotalCycles)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.RecurringTotalCycles)
+                        @Html.ValidationMessageFor(model => model.RecurringTotalCycles)
+                    </td>
+                </tr>
+            </tbody>
+        </table>*@
 
     @*<table class="adminContent" id="group-shipping">
+            <tr class="adminSeparator">
+                <td colspan="2">
+                    <hr />
+                </td>
+            </tr>
+            <tr>
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.IsShipEnabled)
+                </td>
+                <td class="adminData">
+                    @Html.CheckBoxFor(model => model.IsShipEnabled, new { data_toggler_for = "#pnlIsShipEnabled" })
+                    @Html.ValidationMessageFor(model => model.IsShipEnabled)
+                </td>
+            </tr>
+            <tbody id="pnlIsShipEnabled">
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.DeliveryTimeId)
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.DeliveryTimeId, Model.AvailableDeliveryTimes, T("Common.Unspecified"))
+                        @Html.ValidationMessageFor(model => model.DeliveryTimeId)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.IsFreeShipping)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.IsFreeShipping)
+                        @Html.ValidationMessageFor(model => model.IsFreeShipping)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.AdditionalShippingCharge)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.AdditionalShippingCharge, new { postfix = Model.PrimaryStoreCurrencyCode })
+                        @Html.ValidationMessageFor(model => model.AdditionalShippingCharge)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.QuantityUnitId)
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.QuantityUnitId, Model.AvailableQuantityUnits, T("Common.Unspecified"))
+                        @Html.ValidationMessageFor(model => model.QuantityUnitId)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Weight)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.Weight, new { postfix = Model.BaseWeightIn })
+                        @Html.ValidationMessageFor(model => model.Weight)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Length)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.Length, new { postfix = Model.BaseDimensionIn })
+                        @Html.ValidationMessageFor(model => model.Length)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Width)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.Width, new { postfix = Model.BaseDimensionIn })
+                        @Html.ValidationMessageFor(model => model.Width)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.Height)
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.Height, new { postfix = Model.BaseDimensionIn })
+                        @Html.ValidationMessageFor(model => model.Height)
+                    </td>
+                </tr>
+            </tbody>
+        </table>*@
+    
+    <table class="adminContent" id="group-tax" style="display:block">
         <tr class="adminSeparator">
             <td colspan="2">
                 <hr />
             </td>
         </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.IsShipEnabled)
-            </td>
-            <td class="adminData">
-                @Html.CheckBoxFor(model => model.IsShipEnabled, new { data_toggler_for = "#pnlIsShipEnabled" })
-                @Html.ValidationMessageFor(model => model.IsShipEnabled)
-            </td>
-        </tr>
-        <tbody id="pnlIsShipEnabled">
+        <tbody id="">
             <tr>
                 <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.DeliveryTimeId)
+                    <div class="ctl-label">
+                        <label for="IsEsd">是否为白金产品</label>
+                    <a class="hint" href="#" onclick="return false;" tabindex="-1" title="" data-original-title="打开：则购买此产品可获得白金会员身份。">
+                        <i class="fa fa-question-circle"></i></a></div>
                 </td>
                 <td class="adminData">
-                    @Html.DropDownListFor(model => model.DeliveryTimeId, Model.AvailableDeliveryTimes, T("Common.Unspecified"))
-                    @Html.ValidationMessageFor(model => model.DeliveryTimeId)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.IsFreeShipping)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.IsFreeShipping)
-                    @Html.ValidationMessageFor(model => model.IsFreeShipping)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.AdditionalShippingCharge)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.AdditionalShippingCharge, new { postfix = Model.PrimaryStoreCurrencyCode })
-                    @Html.ValidationMessageFor(model => model.AdditionalShippingCharge)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.QuantityUnitId)
-                </td>
-                <td class="adminData">
-                    @Html.DropDownListFor(model => model.QuantityUnitId, Model.AvailableQuantityUnits, T("Common.Unspecified"))
-                    @Html.ValidationMessageFor(model => model.QuantityUnitId)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Weight)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Weight, new { postfix = Model.BaseWeightIn })
-                    @Html.ValidationMessageFor(model => model.Weight)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Length)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Length, new { postfix = Model.BaseDimensionIn })
-                    @Html.ValidationMessageFor(model => model.Length)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Width)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Width, new { postfix = Model.BaseDimensionIn })
-                    @Html.ValidationMessageFor(model => model.Width)
-                </td>
-            </tr>
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Height)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Height, new { postfix = Model.BaseDimensionIn })
-                    @Html.ValidationMessageFor(model => model.Height)
+                    @Html.CheckBoxFor(model => model.IsEsd)
                 </td>
             </tr>
         </tbody>
-    </table>*@
-
+    </table>
     <table class="adminContent" id="group-tax" style="display:none">
         <tr class="adminSeparator">
             <td colspan="2">
@@ -493,7 +513,7 @@
                     @Html.ValidationMessageFor(model => model.TaxCategoryId)
                 </td>
             </tr>
-            <tr>
+            @*<tr>
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.IsEsd)
                 </td>
@@ -501,7 +521,7 @@
                     @Html.EditorFor(model => model.IsEsd)
                     @Html.ValidationMessageFor(model => model.IsEsd)
                 </td>
-            </tr>
+            </tr>*@
         </tbody>
     </table>
 </div>

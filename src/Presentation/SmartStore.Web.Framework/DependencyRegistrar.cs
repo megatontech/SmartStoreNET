@@ -296,6 +296,7 @@ namespace SmartStore.Web.Framework
 			//º∆À„πÊ‘Ú
 			builder.RegisterType<DeclarationCalcRuleService>().As<IDeclarationCalcRuleService>().InstancePerRequest();
 			builder.RegisterType<DeclarationShoppingCartService>().As<IDeclarationShoppingCartService>().InstancePerRequest();
+			builder.RegisterType<CheckInService>().As<ICheckInService>().InstancePerRequest();
 			
 			builder.RegisterType<CommonServices>().As<ICommonServices>().InstancePerRequest();
 		}

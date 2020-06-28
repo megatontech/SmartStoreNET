@@ -172,7 +172,32 @@ namespace SmartStore.Admin.Controllers
 
             return View(model);
         }
+        public ActionResult Logout()
+        {
+            //external authentication
+            ExternalAuthorizerHelper.RemoveParameters();
 
+            if (_workContext.OriginalCustomerIfImpersonated != null)
+            {
+                //logout impersonated customer
+                _genericAttributeService.SaveAttribute<int?>(_workContext.OriginalCustomerIfImpersonated,
+                    SystemCustomerAttributeNames.ImpersonatedCustomerId, null);
+                //redirect back to customer details page (admin area)
+                return this.RedirectToAction("Edit", "Customer", new { id = _workContext.CurrentCustomer.Id, area = "Admin" });
+
+            }
+            else
+            {
+                //standard logout 
+
+                //activity log
+                _customerActivityService.InsertActivity("PublicStore.Logout", _localizationService.GetResource("ActivityLog.PublicStore.Logout"));
+
+                _authenticationService.SignOut();
+                return RedirectToAction("Login", "Customer");
+            }
+
+        }
         [HttpPost]
         [ValidateCaptcha]
         public ActionResult Login(LoginModel model, string returnUrl, bool captchaValid)
