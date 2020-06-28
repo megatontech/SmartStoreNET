@@ -187,29 +187,64 @@
             <hr />
         </td>
     </tr>
-    <tr>
-        <td class="adminTitle">
-            <div class="ctl-label">
-                <label for="adminData">付款凭证</label>
-            </div>
-        </td>
-        <td class="adminData">
-            <div class="form-control-plaintext">
-                <img alt="@Model.Id" style="width:400px;height:300px;" src="@Model.ShippingAddressGoogleMapsUrl" class=" adminContent" />
-                @*<div class='zoomable-thumb-container'>
-                        <img alt='@Model.Id' src='@Model.ShippingAddressGoogleMapsUrl' class='zoomable-thumb' />
-                    </div>*@
-            </div>
-        </td>
-    </tr>
+    @if (@Model.HasNewPaymentNotification) {
+        <tr>
+            <td class="adminTitle">
+                <div class="ctl-label">
+                    <label for="adminData">代付报单人</label>
+                </div>
+            </td>
+            <td class="adminData">
+                <div class="form-control-plaintext">
+                    <span class="muted">@Model.OrderShippingExclTax</span>
+                    <span class="muted">@Model.OrderShippingInclTax</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                <div class="ctl-label">
+                    <label for="adminData">代付报单金额</label>
+                </div>
+            </td>
+            <td class="adminData">
+                <div class="form-control-plaintext">
+                    <span class="muted">@Model.OrderTotal</span>
+                    
+                </div>
+            </td>
+        </tr>
+    }
+    else 
+    {
+        <tr>
+            <td class="adminTitle">
+                <div class="ctl-label">
+                    <label for="adminData">付款凭证</label>
+                </div>
+            </td>
+            <td class="adminData">
+                <div class="form-control-plaintext">
+                    <img alt="@Model.Id" style="width:400px;height:300px;" src="@Model.ShippingAddressGoogleMapsUrl" class=" adminContent" />
+                    @*<div class='zoomable-thumb-container'>
+                            <img alt='@Model.Id' src='@Model.ShippingAddressGoogleMapsUrl' class='zoomable-thumb' />
+                        </div>*@
+                </div>
+            </td>
+        </tr>
+    }
+    
     <tr>
         <td class="adminTitle">
             @Html.SmartLabelFor(model => model.PaymentMethod)
         </td>
         <td class="adminData">
             <div class="form-control-plaintext">
-                <span class="muted">转账</span>
-            </div>
+                @if (@Model.HasNewPaymentNotification)
+                { <span class="muted">余额</span>}
+                else {<span class="muted">转账</span> }
+                    
+                </div>
         </td>
     </tr>
     <tr>

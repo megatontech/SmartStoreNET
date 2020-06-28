@@ -142,7 +142,7 @@ namespace SmartStore.Web.Infrastructure
             {
                 Id = "ProxyOrders",
                 Text = T("代客报单"),
-                Icon = "fal fa-flipboard",
+                Icon = "fal fa-flag",
                 Url = _urlHelper.Action("ProxyOrders", "Customer", new { area = "" })
             });
             root.Append(new MenuItem

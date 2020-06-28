@@ -156,7 +156,7 @@ namespace SmartStore.Web.Models.Customer
             //RuleFor(x => x.Email).EmailAddress();
 
             RuleFor(x => x.Password).NotEmpty();
-            RuleFor(x => x.Password).Length(customerSettings.PasswordMinLength, 999);
+            RuleFor(x => x.Password).Length(customerSettings.PasswordMinLength, 15);
             RuleFor(x => x.ConfirmPassword).NotEmpty();
             RuleFor(x => x.ConfirmPassword).Equal(x => x.Password).WithMessage(T("Account.Fields.Password.EnteredPasswordsDoNotMatch"));
 

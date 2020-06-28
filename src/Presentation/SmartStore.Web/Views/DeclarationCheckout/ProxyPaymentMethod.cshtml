@@ -20,6 +20,7 @@
         {
             Html.RenderWidget("checkout_payment_method_top");
         <p class="page-intro lead">
+            订单人信息： 
             @Html.Raw(@Model.customer.Username)
             @Html.Raw(@Model.customer.FirstName)
             @Html.Raw(@Model.customer.Mobile)
@@ -38,16 +39,18 @@
                                 <span class="opt-name">余额代付</span>
                             </label>
                         </div>
-                        @Html.SettingEditorFor(model => model.PaymentMethods.FirstOrDefault().BrandUrl, Html.EditorFor(m => m.PaymentMethods.FirstOrDefault().BrandUrl, "Picture", new { transientUpload = true, validate = true }))
+                        @*@Html.SettingEditorFor(model => model.PaymentMethods.FirstOrDefault().BrandUrl, Html.EditorFor(m => m.PaymentMethods.FirstOrDefault().BrandUrl, "Picture", new { transientUpload = true, validate = true }))*@
 
                         <div class="pd-oldp1rice d-flex">
                             <span>可用余额:</span>
                             <span class="pd-oldp1rice pl-1" style="text-decoration:none;">@Model.WithdrawalTotal.TotalAmount.ToString("F2")</span>
                         </div>
+                        <br />
                         <div class="pd-oldp1rice d-flex">
                             <span>订单总额:</span>
                             <span class="pd-oldp1rice pl-1" style="text-decoration:none;">@Model.Total.ToString("F2")</span>
                         </div>
+                        <br />
                     </div>
 
                     <div class="opt-info-item payment-method-description">

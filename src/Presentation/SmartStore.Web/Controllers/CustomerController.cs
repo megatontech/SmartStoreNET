@@ -94,6 +94,7 @@ namespace SmartStore.Web.Controllers
         private readonly IWithdrawalTotalService _total;
         private readonly IWithdrawalApplyService _apply;
         private readonly CatalogHelper _helper;
+        private readonly ICustomerPointsTotalService _points;
         
         //private readonly ICheckInService _checkinService;
         #endregion
@@ -104,8 +105,9 @@ namespace SmartStore.Web.Controllers
             IAuthenticationService authenticationService, IDeclarationProductService productService, //ICheckInService checkinService,
             IDateTimeHelper dateTimeHelper, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
-            ILocalizationService localizationService,
-			IWorkContext workContext, IStoreContext storeContext,
+            ILocalizationService localizationService, ICustomerPointsTotalService points,
+
+            IWorkContext workContext, IStoreContext storeContext,
 			ICustomerService customerService, CatalogHelper helper,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
@@ -134,6 +136,7 @@ namespace SmartStore.Web.Controllers
         {
             //_checkinService = checkinService;
             _helper = helper;
+            _points = points;
             _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
             _productService = productService;
             _authenticationService = authenticationService;
@@ -1782,12 +1785,16 @@ namespace SmartStore.Web.Controllers
         public string GetWithInfo(WithdrawalDetail detail) 
         {
             string result = "";
-            if (detail.isOut) { result = "提现"; }
+            if (detail.isOut) {
+                if (detail.WithdrawType == 5) { result = "支出"; }
+                else { result = "提现"; }
+                 }
             else {
                 if (detail.WithdrawType == 1) { result = "推广佣金"; }
                 else if (detail.WithdrawType == 2) { result = "业绩分红"; }
                 else if (detail.WithdrawType == 3) { result = "商城分红"; }
                 else if (detail.WithdrawType == 4) { result = "红包"; }
+               
             }
             return result;
         }
@@ -1804,7 +1811,8 @@ namespace SmartStore.Web.Controllers
 				return RedirectToAction("Info");
 
             var customer = _workContext.CurrentCustomer;
-
+            var entity = _points.GetPoints(customer.Id);
+            
             var model = new CustomerRewardPointsModel();
             foreach (var rph in customer.RewardPointsHistory.OrderByDescending(rph => rph.CreatedOnUtc).ThenByDescending(rph => rph.Id))
             {
@@ -1819,8 +1827,8 @@ namespace SmartStore.Web.Controllers
             int rewardPointsBalance = customer.GetRewardPointsBalance();
             decimal rewardPointsAmountBase = _orderTotalCalculationService.ConvertRewardPointsToAmount(rewardPointsBalance);
             decimal rewardPointsAmount =_currencyService.ConvertFromPrimaryStoreCurrency(rewardPointsAmountBase,_workContext.WorkingCurrency);
-            model.RewardPointsBalance = string.Format(_localizationService.GetResource("RewardPoints.CurrentBalance"), rewardPointsBalance, _priceFormatter.FormatPrice(rewardPointsAmount, true, false));
-            
+            //model.RewardPointsBalance = string.Format(_localizationService.GetResource("RewardPoints.CurrentBalance"), rewardPointsBalance, _priceFormatter.FormatPrice(rewardPointsAmount, true, false));
+            model.RewardPointsBalance = entity.Amount.ToString("F2");
             return View(model);
         }
 
@@ -1835,7 +1843,7 @@ namespace SmartStore.Web.Controllers
             var model = new WithDrawApplyModel();
             var customer = _workContext.CurrentCustomer;
             var total = _total.Get(customer);
-            //model.TotalAmount = total.TotalAmount - total.TotalFreezeAmount;
+            model.TotalAmount = total.TotalAmount - total.TotalFreezeAmount;
             return View(model);
         }
 

@@ -94,14 +94,16 @@
         </div>
 
         <div class="alert alert-info" style="">
-            您的当前总额为： @nonFreeze.ToString("F2")。
+            您的当前总额为：<b> @nonFreeze.ToString("F2")</b> 。
         </div>
         <div class="alert alert-info">
-            您的冻结额度为： @Model.Freeze.ToString("F2")。
+            您的冻结额度为： <b> @Model.Freeze.ToString("F2")</b> 。
         </div>
         <div class="alert alert-info">
-            您的可提现额度为： @Model.Total.ToString("F2") 。
+            您的可提现额度为：<b> @Model.Total.ToString("F2") </b> 。
+            <br />
             <a href="@Url.Action("WithDrawApply", "Customer", new { })" rel="nofollow"><strong>提现</strong></a>
+            <br />
             <a href="@Url.Action("PointApply", "Customer", new { })" rel="nofollow"><strong>兑换积分</strong></a>
         </div>
         @*<div class="alert alert-info">

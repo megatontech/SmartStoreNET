@@ -93,9 +93,10 @@ namespace SmartStore.Admin.Controllers
                 List<WithdrawalTotalModel> modelList = new List<WithdrawalTotalModel>();
                 foreach (var item in detail)
                 {
-                    var name = customer.FirstOrDefault(x => x.Id == item.CustomerId) == null ? "" : customer.FirstOrDefault(x => x.Id == item.CustomerId).Username;
-                    item.CustomerName = name;
-                    modelList.Add(item.ToModel());
+                    var dispmodel = item.ToModel();
+                    var customerModel = customer.FirstOrDefault(x => x.Id == item.CustomerId);
+                    if (customerModel != null) { dispmodel.CustomerName = customerModel.Username; dispmodel.CustomerMobile = customerModel.Mobile; }
+                    modelList.Add(dispmodel);
                 }
                 var products = new PagedList<WithdrawalTotalModel>(modelList.AsEnumerable(), command.Page - 1, command.PageSize, detail.Count());
                 gridModel.Data = products;
@@ -116,10 +117,14 @@ namespace SmartStore.Admin.Controllers
                 List<WithdrawalDetailModel> modelList = new List<WithdrawalDetailModel>();
                 foreach (var item in detail)
                 {
-                    var name = customer.FirstOrDefault(x => x.Id == item.Customer) == null ? "" : customer.FirstOrDefault(x => x.Id == item.Customer).Username;
-                    item.CustomerName = name;
+                    //var dispmodel = item.ToModel();
+                    var customerModel = customer.FirstOrDefault(x => x.Id == item.Customer);
+                    //modelList.Add(dispmodel);
+                    //var name = customer.FirstOrDefault(x => x.Id == item.Customer) == null ? "" : customer.FirstOrDefault(x => x.Id == item.Customer).Username;
+                    //item.CustomerName = name;
                     var WithdrawTypeStr = ConvertEnum(item);
                     var mod = item.ToModel();
+                    if (customerModel != null) { mod.CustomerName = customerModel.Username; mod.CustomerMobile = customerModel.Mobile; }
                     mod.WithdrawTypeStr = WithdrawTypeStr;
                     if (item.Amount != 0M) { modelList.Add(mod); }
                 }
@@ -137,7 +142,10 @@ namespace SmartStore.Admin.Controllers
         public string ConvertEnum(WithdrawalDetail detail) 
         {
             string result = "";
-            if (detail.isOut) { result = "提现"; }
+            if (detail.isOut) {
+                if (detail.WithdrawType == 5) { result = "支出"; }
+                else { result = "提现"; }
+            }
             else
             {
                 if (detail.WithdrawType == 1) { result = "推广佣金"; }

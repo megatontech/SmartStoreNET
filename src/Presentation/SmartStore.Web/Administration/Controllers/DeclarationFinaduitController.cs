@@ -1227,7 +1227,12 @@ namespace SmartStore.Admin.Controllers
             var model = new OrderModel();
             PrepareOrderDetailsModel(model, order);
             var pictureUrl = _pictureService.GetUrl(order.PaymentMethodSystemName.ToInt());
-            
+            if (order.HasNewPaymentNotification) 
+            {
+                var custom= _customerService.GetCustomerById(order.BillingAddressId);
+                model.OrderShippingExclTax = custom.Username;
+                model.OrderShippingInclTax = custom.Mobile;
+            }
             model.ShippingAddressGoogleMapsUrl = pictureUrl;
             return View(model);
         }

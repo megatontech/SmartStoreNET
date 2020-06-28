@@ -145,7 +145,7 @@ namespace SmartStore.Services.Wallet
                 Operater = customer.Id,
                 OperaterID = customer.CustomerGuid,
                 WithdrawTime = DateTime.Now,
-                WithdrawType = 2
+                WithdrawType = 5
             });
         }
         
@@ -317,7 +317,7 @@ namespace SmartStore.Services.Wallet
             total.UpdateTime = DateTime.Now;
             _IWithdrawalTotalService.Update(total);
             var pointVal = 0f;
-            pointVal = (float)amount * (float)(_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
+            pointVal = (float)amount * (float)((float)_calcrule.WithDrawToPointPercent / 100) * 100;
             _ICustomerPointsTotalService.AddPointsToCustomer((int)pointVal, customer.Id);
             _ICustomerPointsDetailService.CreateDetail(new CustomerPointsDetail()
             {
