@@ -39,11 +39,11 @@ namespace SmartStore.Web.Framework.Security
             if (OutputCacheAttribute.IsChildActionCacheActive(filterContext))
                 throw new InvalidOperationException("You cannot use [AdminAuthorize] attribute when a child action cache is active");
 
-            if (IsAdminPageRequested(filterContext))
-            {
-                if (!this.HasAdminAccess(filterContext))
-                    this.HandleUnauthorizedRequest(filterContext);
-            }
+            //if (IsAdminPageRequested(filterContext))
+            //{
+            //    if (!this.HasAdminAccess(filterContext))
+            //        this.HandleUnauthorizedRequest(filterContext);
+            //}
         }
 
         public virtual bool HasAdminAccess(AuthorizationContext filterContext)
