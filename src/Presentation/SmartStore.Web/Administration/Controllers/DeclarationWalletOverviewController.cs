@@ -87,6 +87,7 @@ namespace SmartStore.Admin.Controllers
         public ActionResult Wallet(GridCommand command, DeclarationProductListModel model = null)
         {
             var gridModel = new GridModel<WithdrawalTotalModel>();
+            var count = _total.GetAllCount();
                 var detail = _total.GetAll((command.Page - 1) * command.PageSize, command.PageSize);
                 var customer = _CustomerService.BuildAllTreeWithoutOrder();
                 List<WithdrawalTotalModel> modelList = new List<WithdrawalTotalModel>();
@@ -98,7 +99,7 @@ namespace SmartStore.Admin.Controllers
                 }
                 var products = new PagedList<WithdrawalTotalModel>(modelList.AsEnumerable(), command.Page - 1, command.PageSize, detail.Count());
                 gridModel.Data = products;
-                gridModel.Total = products.TotalCount;
+                gridModel.Total = count;
             return new JsonResult
             {
                 Data = gridModel
@@ -109,6 +110,7 @@ namespace SmartStore.Admin.Controllers
         {
             var gridModel = new GridModel<WithdrawalDetailModel>();
             {
+                var count = _detailrule.GetCount();
                 var detail = _detailrule.Get((command.Page - 1) * command.PageSize, command.PageSize);
                 var customer = _CustomerService.BuildAllTreeWithoutOrder();
                 List<WithdrawalDetailModel> modelList = new List<WithdrawalDetailModel>();
@@ -124,7 +126,7 @@ namespace SmartStore.Admin.Controllers
                // modelList.Select(x => x.WithdrawTypeStr = ConvertEnum(x));
                 var products = new PagedList<WithdrawalDetailModel>(modelList.AsEnumerable(), command.Page - 1, command.PageSize, detail.Count());
                 gridModel.Data = products;
-                gridModel.Total = products.TotalCount;
+                gridModel.Total = count;
             }
             return new JsonResult
             {

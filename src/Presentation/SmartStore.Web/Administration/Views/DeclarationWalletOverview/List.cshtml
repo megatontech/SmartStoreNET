@@ -46,12 +46,7 @@
                 columns.Bound(x => x.WithdrawTime).Title("时间").Centered();
                
             })
-            .Sortable(x =>
-            {
-                x.AllowUnsort(true);
-                x.SortMode(GridSortMode.SingleColumn);
-            })
-            .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+            .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
             .DataBinding(dataBinding => dataBinding.Ajax().Select("WalletList", "DeclarationWalletOverview"))
             .ClientEvents(events => events.OnDataBinding("productsGrid_onDataBinding").OnDataBound("productsGrid_onDataBound"))
             //.EnableCustomBinding(true)

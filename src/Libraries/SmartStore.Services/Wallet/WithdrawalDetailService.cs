@@ -30,7 +30,7 @@ namespace SmartStore.Services.Wallet
         {
             _WithdrawalDetailRepository.Insert(entity);
         }
-
+        public int GetCount() { return _WithdrawalDetailRepository.Table.Count(); }
         public List<WithdrawalDetail> Get()
         {
            return  _WithdrawalDetailRepository.Table.ToList();

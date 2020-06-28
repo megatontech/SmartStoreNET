@@ -20,7 +20,7 @@
 			columns.Bound(x => x.OrderCount).Title("订单量");
 			columns.Bound(x => x.Total).Title("订单金额");
 		})
-		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "DeclarationProductOverview"))
+		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "DeclarationCustomOverview"))
 		.EnableCustomBinding(true))
 </div>
 

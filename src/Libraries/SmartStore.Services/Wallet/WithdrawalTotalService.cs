@@ -49,7 +49,10 @@ namespace SmartStore.Services.Wallet
                 return _WithdrawalTotalRepository.GetFirst(x => x.CustomerId == customer.Id);
             }
         }
-
+         public int GetAllCount()
+        {
+            return _WithdrawalTotalRepository.Table.Where(x => x.IsCount == false).Count();
+        }
         public List<WithdrawalTotal> GetAll()
         {
             return _WithdrawalTotalRepository.Table.Where(x => x.IsCount == false).ToList();

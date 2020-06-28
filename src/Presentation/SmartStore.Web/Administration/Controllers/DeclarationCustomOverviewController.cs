@@ -36,7 +36,7 @@ namespace SmartStore.Admin.Controllers
                         return model;
                     })
                     .ToList();
-                gridModel.Data = Models;
+                gridModel.Data = Models.OrderByDescending(x=>x.OrderCount);
                 gridModel.Total = Models.Count();
             }
 
