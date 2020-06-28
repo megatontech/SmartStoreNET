@@ -53,7 +53,10 @@ namespace SmartStore.Web.Infrastructure
 				"register/",
 				new { controller = "Customer", action = "Register" },
 				new[] { "SmartStore.Web.Controllers" });
-
+			//routes.MapLocalizedRoute("AdminLogin",
+			//	"admin/",
+			//	new { controller = "Customer", action = "Login" },
+			//	new[] { "SmartStore.Admin.Controllers" });
 			routes.MapLocalizedRoute("Login",
 				"login/",
 				new { controller = "Customer", action = "Login" },

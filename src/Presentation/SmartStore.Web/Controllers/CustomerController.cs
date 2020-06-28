@@ -529,6 +529,8 @@ namespace SmartStore.Web.Controllers
         [RewriteUrl(SslRequirement.Yes)]
         public ActionResult Login(bool? checkoutAsGuest)
         {
+            var url = Request.RawUrl;
+            if (url.Contains("admin")) { return Redirect("~/admin/Customer/Login"); }
             var model = new LoginModel();
             model.CustomerLoginType = _customerSettings.CustomerLoginType;
             model.CheckoutAsGuest = checkoutAsGuest ?? false;
