@@ -153,9 +153,17 @@ namespace SmartStore.Services.Orders
 			if (endTime.HasValue)
 				query = query.Where(x => endTime.Value >= x.CreatedOnUtc);
 
-            //if (billingEmail.HasValue())
-            //	query = query.Where(x => x.BillingAddress != null && !String.IsNullOrEmpty(x.BillingAddress.Email) && x.BillingAddress.Email.Contains(billingEmail));
+            if (billingEmail.HasValue())
+            {
+               var customerids =  _customerRepository.Table.Where(a => a.Mobile.Contains(billingEmail)).Select(a=>a.Id).ToList();
+                query = query.Where(x => customerids.Contains( x.CustomerId ) );
+            }
 
+            if (billingName.HasValue())
+            {
+                var customerids = _customerRepository.Table.Where(a => a.FirstName.Contains(billingName)).Select(a => a.Id).ToList();
+                query = query.Where(x => customerids.Contains(x.CustomerId));
+            }
             //if (billingName.HasValue())
             //{
             //	query = query.Where(x => x.BillingAddress != null && (
@@ -164,7 +172,7 @@ namespace SmartStore.Services.Orders
             //	));
             //}
             //if (paystatus > 0) { query = query.Where(x => x.OrderStatusId == paystatus); }
-			if (orderNumber.HasValue())
+            if (orderNumber.HasValue())
 				query = query.Where(x => x.OrderNumber.ToLower().Contains(orderNumber.ToLower()));
 
 			if (orderStatusIds != null && orderStatusIds.Count() > 0)
@@ -193,7 +201,7 @@ namespace SmartStore.Services.Orders
         {
 			var query = GetOrders(0, customerId, startTime, endTime, orderStatusIds, paymentStatusIds, shippingStatusIds,
 				billingEmail, orderNumber, billingName, paymentMethods);
-            query = query.OrderBy(x=>x.PaymentStatusId).OrderByDescending(x => x.CreatedOnUtc);
+            query = query.OrderBy(x => x.PaymentStatusId).ThenByDescending(x => x.CreatedOnUtc).AsQueryable();
 
 			//if (orderGuid.HasValue())
 			//{

@@ -57,18 +57,14 @@
             @Html.Label("订单审核状态")
             @Html.DropDownList("PaymentStatusIds", Model.AvailablePaymentStatuses, null, new { multiple = "multiple", @class = "form-control" })
         </div>
-        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+        @*<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
+            @Html.SmartLabelFor(model => model.OrderNumber)
             @Html.Label("姓名")
             @Html.EditorFor(model => Model.CustomerName)
-        </div>
-        <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
-            @*@Html.SmartLabelFor(model => model.OrderNumber)*@
-			@Html.Label("账号")
-            @Html.EditorFor(model => Model.OrderNumber)
-        </div>
+        </div>*@
         <div class="col-sm-6 col-lg-4 col-xl-3 form-group">
             @Html.Label("手机")
-            @Html.EditorFor(model => Model.OrderNumber)
+            @Html.EditorFor(model => Model.CustomerEmail)
         </div>
         @*<div class="col-xl-3"></div>*@
 
@@ -99,7 +95,7 @@
                 columns.Bound(x => x.OrderNumber)
                     .Width(150)
                     .Title(T("订单编号"))
-                    .ClientTemplate("<a href='#'><#= OrderNumber #></a>");
+                    .ClientTemplate("<#= OrderNumber #>");
 
                 columns.Bound(x => x.CardName)
                    .Title(T("客户姓名"))
@@ -108,7 +104,7 @@
                 columns.Bound(x => x.CardNumber)
                    .Title(T("客户手机"))
                    .ClientTemplate(
-                       "<div><#= CustomerName #></div>");
+                       "<div><#= CustomerMobile #></div>");
                 columns.Bound(x => x.CreatedOn)
                     .Width(200)
                     .Title(T("订单创建时间"))
@@ -208,6 +204,8 @@
 				PaymentStatusIds: jQuery.makeArray($('#@Html.FieldIdFor(model => model.PaymentStatusIds)').val()).join(),
                 OrderNumber: $('#@Html.FieldIdFor(model => model.OrderNumber)').val(),
                 PaymentMethods: jQuery.makeArray($('#@Html.FieldIdFor(model => model.PaymentMethods)').val()).join(),
+                CustomerEmail: jQuery.makeArray($('#@Html.FieldIdFor(model => model.CustomerEmail)').val()).join(),
+                CustomerName: jQuery.makeArray($('#@Html.FieldIdFor(model => model.CustomerName)').val()).join(),
 			};
 			e.data = searchModel;
 		}
@@ -237,5 +235,5 @@
 			var numChkBoxesChecked = $('#orders-grid input[type=checkbox][checked][id!=mastercheckbox]').length;
 			$('#mastercheckbox').attr('checked', numChkBoxes == numChkBoxesChecked && numChkBoxes > 0);
 		}
-   </script>   
+    </script>   
 }

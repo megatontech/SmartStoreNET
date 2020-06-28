@@ -51,10 +51,11 @@ namespace SmartStore.Admin.Controllers
                var customer = _customerService.GetCustomerById(model.Customer);
                var apply = _workContext.CurrentCustomer;
                 model.WithdrawStatus = WithdrawalApplyStatus.Complete;
-                
-                var isDENY = false;
-                if (isDENY) { _withdrawalApplyService.WithdrawalApplyDeny(model, customer, apply); }
-                else { _withdrawalApplyService.WithdrawalApplyAudit(model, customer, apply); }
+                var isAudit = true;
+                isAudit = Request["isAudit"].ToBool();
+                if (isAudit) { _withdrawalApplyService.WithdrawalApplyAudit(model, customer, apply); 
+                    }
+                else { model.WithdrawStatus = WithdrawalApplyStatus.Cancelled; _withdrawalApplyService.WithdrawalApplyDeny(model, customer, apply); }
                 return RedirectToAction("Index");
             }
             catch

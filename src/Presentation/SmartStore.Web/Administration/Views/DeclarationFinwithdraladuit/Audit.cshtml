@@ -10,14 +10,15 @@
             @T("返回") @Html.ActionLink("(" + T("提现审批列表") + ")", "List")
         </div>
         <div class="options">
-            <button type="submit" name="save" value="save" class="btn btn-primary">
+            <button type="submit" name="save" value="save"  onclick="changeOper(true)"  class="btn btn-primary">
                 <i class="fa fa-check"></i>
                 <span>@T("审批")</span>
             </button>
-            <button type="submit" name="save" value="save" class="btn btn-primary">
+            <button type="submit" name="save" value="save" onclick="changeOper(false)"   class="btn btn-primary">
                 <i class="fa fa-times"></i>
                 <span>@T("拒绝")</span>
             </button>
+            <input type="hidden" id="isAudit" class="loaded-tab-name" name="isAudit" value="true" />
         </div>
     </div>
 

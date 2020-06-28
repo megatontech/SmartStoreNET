@@ -4,11 +4,15 @@
 @Html.HiddenFor(model => model.Id)
 
 @*<input type="hidden"  name="id" value="@Model.Id" />*@
-
+<script>
+    function changeOper(isAudit) {
+        $("#isAudit").val(isAudit);
+    }
+</script>
 <table class="adminContent">
     <tr>
         <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.Amount)
+            <div class="ctl-label"><label for="Amount">金额</label></div>
         </td>
         <td class="adminData">
             @Html.EditorFor(model => model.Amount)
@@ -16,18 +20,18 @@
     </tr>
     <tr>
         <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.Comment)
+            <div class="ctl-label"><label for="Amount">备注</label></div>
         </td>
         <td class="adminData">
             @Html.EditorFor(model => model.Comment)
         </td>
     </tr>
-    <tr>
+    @*<tr>
         <td class="adminTitle">
             @Html.SmartLabelFor(model => model.UpdateTime)
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.UpdateTime)
+            @Html.DisplayFor(model => model.UpdateTime)
         </td>
-    </tr>
+    </tr>*@
 </table>
