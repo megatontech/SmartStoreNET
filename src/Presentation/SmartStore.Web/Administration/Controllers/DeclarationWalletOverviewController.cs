@@ -140,7 +140,7 @@ namespace SmartStore.Admin.Controllers
             if (detail.isOut) { result = "提现"; }
             else
             {
-                if (detail.WithdrawType == 1) { result = "直推佣金"; }
+                if (detail.WithdrawType == 1) { result = "推广佣金"; }
                 else if (detail.WithdrawType == 2) { result = "业绩分红"; }
                 else if (detail.WithdrawType == 3) { result = "商城分红"; }
                 else if (detail.WithdrawType == 4) { result = "红包"; }
