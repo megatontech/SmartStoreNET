@@ -86,21 +86,24 @@ namespace SmartStore.Services.Wallet
         {
             foreach (var customer in customers)
             {
-                //log
-                LuckMoney luck = new LuckMoney();
-                luck.Amount = customer.TotalPointsValue4;
-                luck.StartTime = sdateTime;
-                luck.SendTime = sdateTime;
-                luck.EndTime = edateTime;
-                luck.Comment = sdateTime.ToString() + "2小时内有效";
-                luck.Customer = customer.Id;
-                luck.CustomerAmount = customers.Count;
-                luck.CustomerID = customer.CustomerGuid;
-                luck.IsCount = false;
-                luck.isOut = false;
-                luck.TotalAmount = customers.Sum(x => x.TotalPointsValue4);
-                //send reward
-                _ILuckMoneyService.AddLuckMoney(luck);
+                if (customer.EverHadOrder)
+                {
+                    //log
+                    LuckMoney luck = new LuckMoney();
+                    luck.Amount = customer.TotalPointsValue4;
+                    luck.StartTime = sdateTime;
+                    luck.SendTime = sdateTime;
+                    luck.EndTime = edateTime;
+                    luck.Comment = sdateTime.ToString() + "2小时内有效";
+                    luck.Customer = customer.Id;
+                    luck.CustomerAmount = customers.Count;
+                    luck.CustomerID = customer.CustomerGuid;
+                    luck.IsCount = false;
+                    luck.isOut = false;
+                    luck.TotalAmount = customers.Sum(x => x.TotalPointsValue4);
+                    //send reward
+                    _ILuckMoneyService.AddLuckMoney(luck);
+                }
             }
             return true;
         }
@@ -116,24 +119,27 @@ namespace SmartStore.Services.Wallet
         {
             foreach (var customer in customers)
             {
-                //log
-                var total = _IWithdrawalTotalService.Get(customer);
-                total.TotalAmount += amount;
-                total.TotalPushAmount += amount;
-                total.UpdateTime = DateTime.Now;
-                _IWithdrawalTotalService.Update(total);
-                _IWithdrawalDetailService.Add(new WithdrawalDetail
+                if (customer.EverHadOrder)
                 {
-                    Amount = amount,
-                    Comment = "直推佣金入账" + amount.ToString("F2"),
-                    Customer = customer.Id,
-                    isOut = false,
-                    WithdrawTime = DateTime.Now,
-                    WithdrawType = 1,
-                    CustomerID = customer.CustomerGuid,
-                    Order = order.Id
-                });
-                //send reward
+                    //log
+                    var total = _IWithdrawalTotalService.Get(customer);
+                    total.TotalAmount += amount;
+                    total.TotalPushAmount += amount;
+                    total.UpdateTime = DateTime.Now;
+                    _IWithdrawalTotalService.Update(total);
+                    _IWithdrawalDetailService.Add(new WithdrawalDetail
+                    {
+                        Amount = amount,
+                        Comment = "直推佣金入账" + amount.ToString("F2"),
+                        Customer = customer.Id,
+                        isOut = false,
+                        WithdrawTime = DateTime.Now,
+                        WithdrawType = 1,
+                        CustomerID = customer.CustomerGuid,
+                        Order = order.Id
+                    });
+                    //send reward
+                }
             }
             return true;
         }
@@ -147,23 +153,26 @@ namespace SmartStore.Services.Wallet
         {
             foreach (var customer in customers)
             {
-                //log
-                var total = _IWithdrawalTotalService.Get(customer);
-                total.TotalAmount += customer.TotalPointsValue3;
-                total.TotalPushAmount += customer.TotalPointsValue3;
-                total.UpdateTime = DateTime.Now;
-                _IWithdrawalTotalService.Update(total);
-                _IWithdrawalDetailService.Add(new WithdrawalDetail
+                if (customer.EverHadOrder)
                 {
-                    Amount = customer.TotalPointsValue3,
-                    Comment = "商城利润分红入账"+ customer.TotalPointsValue3.ToString("F2"),
-                    Customer = customer.Id,
-                    isOut = false,
-                    WithdrawTime = DateTime.Now,
-                    WithdrawType = 3,
-                    CustomerID = customer.CustomerGuid
-                });
-                //send reward
+                    //log
+                    var total = _IWithdrawalTotalService.Get(customer);
+                    total.TotalAmount += customer.TotalPointsValue3;
+                    total.TotalPushAmount += customer.TotalPointsValue3;
+                    total.UpdateTime = DateTime.Now;
+                    _IWithdrawalTotalService.Update(total);
+                    _IWithdrawalDetailService.Add(new WithdrawalDetail
+                    {
+                        Amount = customer.TotalPointsValue3,
+                        Comment = "商城利润分红入账" + customer.TotalPointsValue3.ToString("F2"),
+                        Customer = customer.Id,
+                        isOut = false,
+                        WithdrawTime = DateTime.Now,
+                        WithdrawType = 3,
+                        CustomerID = customer.CustomerGuid
+                    });
+                    //send reward
+                }
             }
             return true;
         }
@@ -178,24 +187,27 @@ namespace SmartStore.Services.Wallet
         {
             foreach (var customer in customers)
             {
-                //log
-                var total = _IWithdrawalTotalService.Get(customer);
-                var finalAmount = customer.TotalPointsValue2 > customer.CapLinesTotal ? customer.CapLinesTotal : customer.TotalPointsValue2;
-                total.TotalAmount += finalAmount;
-                total.TotalDecShareAmount += finalAmount;
-                total.UpdateTime = DateTime.Now;
-                _IWithdrawalTotalService.Update(total);
-                _IWithdrawalDetailService.Add(new WithdrawalDetail
+                if (customer.EverHadOrder)
                 {
-                    Amount = finalAmount,
-                    Comment = "营业额度分红入账：" + finalAmount.ToString("F2")+"封顶值："+customer.CapLinesTotal.ToString("F2") + "贡献值预计分红：" + customer.TotalPointsValue2.ToString("F2"),
-                    Customer = customer.Id,
-                    isOut = false,
-                    WithdrawTime = DateTime.Now,
-                    WithdrawType = 2,
-                    CustomerID = customer.CustomerGuid
-                });
-                //send reward
+                    //log
+                    var total = _IWithdrawalTotalService.Get(customer);
+                    var finalAmount = customer.TotalPointsValue2 > customer.CapLinesTotal ? customer.CapLinesTotal : customer.TotalPointsValue2;
+                    total.TotalAmount += finalAmount;
+                    total.TotalDecShareAmount += finalAmount;
+                    total.UpdateTime = DateTime.Now;
+                    _IWithdrawalTotalService.Update(total);
+                    _IWithdrawalDetailService.Add(new WithdrawalDetail
+                    {
+                        Amount = finalAmount,
+                        Comment = "营业额度分红入账：" + finalAmount.ToString("F2") + "封顶值：" + customer.CapLinesTotal.ToString("F2") + "贡献值预计分红：" + customer.TotalPointsValue2.ToString("F2"),
+                        Customer = customer.Id,
+                        isOut = false,
+                        WithdrawTime = DateTime.Now,
+                        WithdrawType = 2,
+                        CustomerID = customer.CustomerGuid
+                    });
+                    //send reward
+                }
             }
             return true;
         }
