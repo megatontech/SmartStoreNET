@@ -95,6 +95,7 @@ namespace SmartStore.Web.Controllers
         private readonly IWithdrawalApplyService _apply;
         private readonly CatalogHelper _helper;
         private readonly ICustomerPointsTotalService _points;
+        private readonly ICAPTCHACodeService _captcha;
         
         //private readonly ICheckInService _checkinService;
         #endregion
@@ -106,7 +107,7 @@ namespace SmartStore.Web.Controllers
             IDateTimeHelper dateTimeHelper, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
             ILocalizationService localizationService, ICustomerPointsTotalService points,
-
+            ICAPTCHACodeService captcha,
             IWorkContext workContext, IStoreContext storeContext,
 			ICustomerService customerService, CatalogHelper helper,
             IGenericAttributeService genericAttributeService,
@@ -135,6 +136,7 @@ namespace SmartStore.Web.Controllers
             )
         {
             //_checkinService = checkinService;
+            _captcha = captcha;
             _helper = helper;
             _points = points;
             _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
@@ -1655,6 +1657,18 @@ namespace SmartStore.Web.Controllers
             model.RewardPointsBalance = string.Format(_localizationService.GetResource("RewardPoints.CurrentBalance"), rewardPointsBalance, _priceFormatter.FormatPrice(rewardPointsAmount, true, false));
 
             return View(model);
+        }
+        #endregion
+        #region _captcha
+        public ActionResult SendCode(string mobile)
+        {
+            if (_captcha.Send(mobile)) { return Json("OK"); }
+            else { return Json("验证码发送过于频繁，请30分钟后重试"); }
+        }
+        public ActionResult ValidCode(string mobile,string code)
+        {
+            if (_captcha.ValidCode(mobile, code)) { return Json("OK"); }
+            else { return Json("ERROR"); }
         }
         #endregion
         #region ProxyOrders

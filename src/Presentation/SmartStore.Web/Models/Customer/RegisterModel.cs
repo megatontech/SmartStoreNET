@@ -96,6 +96,9 @@ namespace SmartStore.Web.Models.Customer
         [SmartResourceDisplayName("手机号码", "手机号码")]
         [DataType(DataType.PhoneNumber)]
         public string Mobile { get; set; }
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "短信验证码长度必须为6位")]
+        [SmartResourceDisplayName("短信验证码", "短信验证码")]
+        public string MobileCode { get; set; }
         [SmartResourceDisplayName("身份证号码", "身份证号码")]
         public string IDCardNo { get; set; }
         //[SmartResourceDisplayName("Account.Fields.Email")]

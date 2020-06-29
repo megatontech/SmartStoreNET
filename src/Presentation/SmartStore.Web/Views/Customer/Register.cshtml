@@ -44,7 +44,15 @@
                             @Html.HoneypotField()
                         </div>
                     }
-                    @Html.ControlGroupFor(model => model.Mobile, editorType:InputEditorType.TextBox, required: true, breakpoint: "md")
+                    @Html.ControlGroupFor(model => model.Mobile, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
+                    @Html.ControlGroupFor(model => model.MobileCode, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
+                    <div class="form-group row">
+                        <div class="col">
+                            <button type="button" onclick="showtime(120)" class="btn btn-primary btn-lg" id="sendcode" name="sendcode-button">
+                                @T("获取验证码")
+                            </button>
+                        </div>
+                    </div>
                     @Html.ControlGroupFor(model => model.ParentMobile, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
                     @{ Html.RenderWidget("gdpr_consent"); }
                 </fieldset>
@@ -72,16 +80,13 @@
 
                 <div class="form-group row">
                     <div class="col">
-                        <button type="submit" onclick="checkPhone()" class="btn btn-primary btn-lg" name="register-button">
+                        <button type="submit" id="register" onclick="checkPhone()" class="btn btn-primary btn-lg" name="register-button">
                             @T("Account.Register.Button")
                         </button>
                     </div>
                 </div>
                 <fieldset class="content-group" style="height:60px;">
                     <legend><span></span></legend>
-
-
-
                     <div class="form-group row">
                         <div class="captcha-box col-md-9 offset-md-3">
                         </div>
@@ -92,7 +97,75 @@
     </div>
 }
 <script>
+    function showtime(t) {
+        if (!$("#Mobile").val()) { alert("请先输入手机号"); return false;}
+        if ($('#sendcode').attr("disabled")) { return false; }
+        else { 
+            $('#sendcode').attr("disabled", true);
+        $.ajax({
+                    cache:false,
+                    type: "POST",
+                    url: "@(Url.Action("SendCode", "Customer"))",
+                    data: { "mobile": $("#Mobile").val()},
+                    success: function (data) {
+                        // var rewardPointsGrid = $("#customer-rewardpoints-grid");
+                        // rewardPointsGrid.data('tGrid').ajaxRequest();
+                        //$('#addRewardPoints').attr('disabled', false);
+                        if (data == "OK") { $("#MobileCode").show(); }
+                        else { alert(data); }
+                        
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                        alert('验证码发送失败请稍后重试.')
+						//$('#addRewardPoints').attr('disabled', false);
+						//$("#add-reward-points-window").modal("hide");
+                    }
+                });
+            for (i = 0; i <= t; i++) {
+            window.setTimeout("update_p(" + i + "," + t + ")", i *1000 );
+        }
+        }
+    }
+    function valid() {
+        var code = $("#MobileCode").val();
+        $.ajax({
+                    cache:false,
+                    type: "POST",
+                    url: "@(Url.Action("ValidCode", "Customer"))",
+            data: { "mobile": $("#Mobile").val(), "code": code},
+                    success: function (data) {
+                        if (data == "OK") { $("#register").show();}
+                        else{ }
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                        alert('验证码发送失败请稍后重试.')
+						//$('#addRewardPoints').attr('disabled', false);
+						//$("#add-reward-points-window").modal("hide");
+                    }
+                });
+    }
+    function update_p(num, t) {
+        if (num == t) {
+            $("#sendcode").text(" 重新发送 ");
+            $('#sendcode').attr("disabled", false);
+            //$("#sendcode").disabled = false;
+        }
+        else {
+           var printnr = t - num;
+            $("#sendcode").text ( " (" + printnr + ")秒后重新发送");
+        }
+    }
+</script>
+<script>
     $(function () {
+        $("#MobileCode").hide();
+        $("#register").hide();
+        $("#MobileCode").change(function () {
+            valid();
+        });
+        $("#Mobile").change(function () {
+            $("#register").hide(); $("#MobileCode").hide();
+        });
         $.extend($.validator.messages, {
             required: "必填信息",
             remote: "请修正该信息",
@@ -113,5 +186,5 @@
             min: $.validator.format("请输入一个最小为 {0} 的值")
         });
     });
-  
+
 </script>

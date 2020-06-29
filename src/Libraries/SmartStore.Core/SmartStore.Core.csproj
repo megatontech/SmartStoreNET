@@ -221,6 +221,7 @@
     <Compile Include="Domain\Cms\MenuItemRecord.cs" />
     <Compile Include="Domain\Cms\WidgetSettings.cs" />
     <Compile Include="Domain\Common\PerformanceSettings.cs" />
+    <Compile Include="Domain\Customers\CAPTCHACode.cs" />
     <Compile Include="Domain\Customers\CustomerLoginType.cs" />
     <Compile Include="Domain\Customers\CustomerNumberVisibility.cs" />
     <Compile Include="Domain\Customers\CustomerNumberMethod.cs" />

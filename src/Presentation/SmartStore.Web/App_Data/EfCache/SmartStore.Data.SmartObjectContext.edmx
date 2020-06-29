@@ -2130,6 +2130,17 @@
           <Property Name="CustomerId" Type="Int32" Nullable="false" />
           <Property Name="Date" Type="DateTime" Nullable="false" />
         </EntityType>
+        <EntityType Name="CAPTCHACode" customannotation:ClrType="SmartStore.Core.Domain.Customers.CAPTCHACode, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Mobile" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Code" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsUsed" Type="Boolean" Nullable="false" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SendDate" Type="DateTime" Nullable="false" />
+        </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:ClrType="SmartStore.Core.Domain.Declaration.DeclarationCapRule, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -3908,6 +3919,7 @@
           <EntitySet Name="ExportDeployments" EntityType="Self.ExportDeployment" />
           <EntitySet Name="ExportProfiles" EntityType="Self.ExportProfile" />
           <EntitySet Name="CheckIns" EntityType="Self.CheckIn" />
+          <EntitySet Name="CAPTCHACodes" EntityType="Self.CAPTCHACode" />
           <EntitySet Name="DeclarationCapRules" EntityType="Self.DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscriptions" EntityType="Self.BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplates" EntityType="Self.ManufacturerTemplate" />
@@ -6479,6 +6491,18 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="CAPTCHACodes">
+            <EntityTypeMapping TypeName="SmartStore.Data.CAPTCHACode">
+              <MappingFragment StoreEntitySet="CAPTCHACode">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Mobile" ColumnName="Mobile" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="IsUsed" ColumnName="IsUsed" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="SendDate" ColumnName="SendDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="DeclarationCapRules">
             <EntityTypeMapping TypeName="SmartStore.Data.DeclarationCapRule">
               <MappingFragment StoreEntitySet="DeclarationCapRule">
@@ -8605,6 +8629,17 @@
           <Property Name="CustomerId" Type="int" Nullable="false" />
           <Property Name="Date" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="CAPTCHACode" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Mobile" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Code" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="IsUsed" Type="bit" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="SendDate" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:Index="{ }">
           <Key>
             <PropertyRef Name="Id" />
@@ -10682,6 +10717,7 @@
           <EntitySet Name="ExportDeployment" EntityType="Self.ExportDeployment" Schema="dbo" Table="ExportDeployment" />
           <EntitySet Name="ExportProfile" EntityType="Self.ExportProfile" Schema="dbo" Table="ExportProfile" />
           <EntitySet Name="CheckIn" EntityType="Self.CheckIn" Schema="dbo" Table="CheckIn" />
+          <EntitySet Name="CAPTCHACode" EntityType="Self.CAPTCHACode" Schema="dbo" Table="CAPTCHACode" />
           <EntitySet Name="DeclarationCapRule" EntityType="Self.DeclarationCapRule" Schema="dbo" Table="DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscription" EntityType="Self.BackInStockSubscription" Schema="dbo" Table="BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplate" EntityType="Self.ManufacturerTemplate" Schema="dbo" Table="ManufacturerTemplate" />

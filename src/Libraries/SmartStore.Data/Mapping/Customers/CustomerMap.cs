@@ -46,4 +46,12 @@ namespace SmartStore.Data.Mapping.Customers
             this.HasKey(c => c.Id);
         }
     }
+    public partial class CAPTCHACodeMap : EntityTypeConfiguration<CAPTCHACode>
+    {
+        public CAPTCHACodeMap()
+        {
+            this.ToTable("CAPTCHACode");
+            this.HasKey(c => c.Id);
+        }
+    }
 }
