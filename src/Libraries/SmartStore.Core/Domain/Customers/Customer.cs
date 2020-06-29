@@ -2,6 +2,7 @@ using SmartStore.Collections;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Forums;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Core.Domain.Wallet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,6 +24,7 @@ namespace SmartStore.Core.Domain.Customers
         private ICollection<DeclarationShoppingCartItem> _dshoppingCartItems;
         private ICollection<Order> _orders;
         private ICollection<RewardPointsHistory> _rewardPointsHistory;
+        //private ICollection<CustomerPointsDetail> _PointsHistory;
         private ICollection<WalletHistory> _walletHistory;
         private ICollection<ReturnRequest> _returnRequests;
         private ICollection<Address> _addresses;
@@ -396,7 +398,8 @@ namespace SmartStore.Core.Domain.Customers
             get { return _rewardPointsHistory ?? (_rewardPointsHistory = new HashSet<RewardPointsHistory>()); }
             protected set { _rewardPointsHistory = value; }
         }
-
+        //public virtual List<CustomerPointsDetail> PointsHistory { get; set; }
+        
         /// <summary>
         /// Gets or sets the wallet history.
         /// </summary>

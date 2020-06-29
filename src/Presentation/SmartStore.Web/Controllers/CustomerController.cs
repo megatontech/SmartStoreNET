@@ -95,6 +95,7 @@ namespace SmartStore.Web.Controllers
         private readonly IWithdrawalApplyService _apply;
         private readonly CatalogHelper _helper;
         private readonly ICustomerPointsTotalService _points;
+        private readonly ICustomerPointsDetailService _pointsDetail;
         private readonly ICAPTCHACodeService _captcha;
         
         //private readonly ICheckInService _checkinService;
@@ -108,8 +109,9 @@ namespace SmartStore.Web.Controllers
             DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
             ILocalizationService localizationService, ICustomerPointsTotalService points,
             ICAPTCHACodeService captcha,
-            IWorkContext workContext, IStoreContext storeContext,
-			ICustomerService customerService, CatalogHelper helper,
+            IWorkContext workContext, IStoreContext storeContext, ICustomerPointsDetailService pointsDetail,
+
+            ICustomerService customerService, CatalogHelper helper,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
             ITaxService taxService, RewardPointsSettings rewardPointsSettings,
@@ -137,6 +139,7 @@ namespace SmartStore.Web.Controllers
         {
             //_checkinService = checkinService;
             _captcha = captcha;
+            _pointsDetail = pointsDetail;
             _helper = helper;
             _points = points;
             _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
@@ -1846,16 +1849,16 @@ namespace SmartStore.Web.Controllers
 
             var customer = _workContext.CurrentCustomer;
             var entity = _points.GetPoints(customer.Id);
-            
+            var PointsHistory = _pointsDetail.GetDetailByCustomer(customer.Id);
             var model = new CustomerRewardPointsModel();
-            foreach (var rph in customer.RewardPointsHistory.OrderByDescending(rph => rph.CreatedOnUtc).ThenByDescending(rph => rph.Id))
+            foreach (var rph in PointsHistory.OrderByDescending(rph => rph.UpdateTime).ThenByDescending(rph => rph.Id))
             {
                 model.RewardPoints.Add(new CustomerRewardPointsModel.RewardPointsHistoryModel()
                 {
-                    Points = rph.Points,
-                    PointsBalance = rph.PointsBalance,
-                    Message = rph.Message,
-                    CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.CreatedOnUtc, DateTimeKind.Utc)
+                    Points = (int)rph.Amount,
+                    PointsBalance = (int)rph.Amount,
+                    Message = rph.Comment,
+                    CreatedOn = rph.UpdateTime
                 });
             }
             int rewardPointsBalance = customer.GetRewardPointsBalance();

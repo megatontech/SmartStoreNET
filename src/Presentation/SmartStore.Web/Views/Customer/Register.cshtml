@@ -5,6 +5,13 @@
     Html.AddTitleParts(T("PageTitle.Register").Text);
 }
 <script>
+    function checkMobile() {
+        var phone = document.getElementById('Mobile').value;
+        if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))) {
+            alert("手机号码有误，请重填");
+            return false;
+        }
+    }
     function checkPhone() {
         var phone = document.getElementById('Mobile').value;
         if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))) {
@@ -98,32 +105,42 @@
 }
 <script>
     function showtime(t) {
-        if (!$("#Mobile").val()) { alert("请先输入手机号"); return false;}
-        if ($('#sendcode').attr("disabled")) { return false; }
-        else { 
-            $('#sendcode').attr("disabled", true);
-        $.ajax({
-                    cache:false,
+        if (!$("#Mobile").val()) {
+            
+            alert("请先输入手机号"); return false;
+        }
+        var phone = document.getElementById('Mobile').value;
+        if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))) {
+            alert("手机号码有误，请重填");
+            return false;
+        } else {
+
+            if ($('#sendcode').attr("disabled")) { return false; }
+            else {
+                $('#sendcode').attr("disabled", true);
+                $.ajax({
+                    cache: false,
                     type: "POST",
                     url: "@(Url.Action("SendCode", "Customer"))",
-                    data: { "mobile": $("#Mobile").val()},
+                    data: { "mobile": $("#Mobile").val() },
                     success: function (data) {
                         // var rewardPointsGrid = $("#customer-rewardpoints-grid");
                         // rewardPointsGrid.data('tGrid').ajaxRequest();
                         //$('#addRewardPoints').attr('disabled', false);
                         if (data == "OK") { $("#MobileCode").show(); }
                         else { alert(data); }
-                        
+
                     },
-                    error:function (xhr, ajaxOptions, thrownError){
+                    error: function (xhr, ajaxOptions, thrownError) {
                         alert('验证码发送失败请稍后重试.')
-						//$('#addRewardPoints').attr('disabled', false);
-						//$("#add-reward-points-window").modal("hide");
+                        //$('#addRewardPoints').attr('disabled', false);
+                        //$("#add-reward-points-window").modal("hide");
                     }
                 });
-            for (i = 0; i <= t; i++) {
-            window.setTimeout("update_p(" + i + "," + t + ")", i *1000 );
-        }
+                for (i = 0; i <= t; i++) {
+                    window.setTimeout("update_p(" + i + "," + t + ")", i * 1000);
+                }
+            }
         }
     }
     function valid() {
