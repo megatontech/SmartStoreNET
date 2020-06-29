@@ -39,7 +39,7 @@ namespace SmartStore.Web.Models.Customer
             RuleFor(x => x.OldPassword).NotEmpty();
             RuleFor(x => x.NewPassword).NotEmpty();
             RuleFor(x => x.ConfirmNewPassword).NotEmpty();
-            RuleFor(x => x.NewPassword).Length(customerSettings.PasswordMinLength, 999);
+            RuleFor(x => x.NewPassword).Length(customerSettings.PasswordMinLength, 15);
 
             RuleFor(x => x.ConfirmNewPassword).Equal(x => x.NewPassword).WithMessage(T("Account.ChangePassword.Fields.NewPassword.EnteredPasswordsDoNotMatch"));
         }
