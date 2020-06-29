@@ -103,17 +103,17 @@
         }
 
         @{ Html.RenderWidget("checkout_confirm_before_summary"); }
-
-        <div class="order-summary-body mb-4">
-            @{ Html.RenderAction("ProxydOrderSummary", "ShoppingCart", new { prepareAndDisplayOrderReviewData = true }); }
-        </div>
-
         @if (Model.MinOrderTotalWarning.HasValue())
         {
             <div class="alert alert-danger">
                 @Model.MinOrderTotalWarning
             </div>
         }
+        <div class="order-summary-body mb-4">
+            @{ Html.RenderAction("ProxydOrderSummary", "ShoppingCart", new { prepareAndDisplayOrderReviewData = true }); }
+        </div>
+
+
 
         <div class="cart-buttons my-4 row">
             <div class="col-sm-6 col-lg-4 order-last order-sm-first mt-3 mt-sm-0">

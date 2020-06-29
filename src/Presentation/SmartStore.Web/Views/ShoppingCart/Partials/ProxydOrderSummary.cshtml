@@ -12,21 +12,12 @@
 
         @if (Model.Items.Count > 0)
         {
-            if (Model.Warnings.Count > 0)
-            {
-                <div class="alert alert-danger">
-                    <ul>
-                        @for (int i = 0; i < Model.Warnings.Count; i++)
-                        {
-                            <li>@Model.Warnings[i]</li>
-                        }
-                    </ul>
-                </div>
-            }
+
 
             @*we add enctype = "multipart/form-data" because "File upload" attribute control type requries it*@
             using (Html.BeginRouteForm("ShoppingCart", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
+
                 <div class="comment-box card mb-3">
                     <div class="card-header h5">
                         下单人手机号
@@ -35,6 +26,17 @@
                         @Html.TextAreaFor(model => model.Mobile, new { placeholder = T("（非本人手机号）"), @class = "form-control" })
                     </div>
                 </div>
+                if (Model.Warnings.Count > 0)
+                {
+                    <div class="alert alert-danger test">
+                        <ul>
+                            @for (int i = 0; i < Model.Warnings.Count; i++)
+                            {
+                                <li>@Model.Warnings[i]</li>
+                            }
+                        </ul>
+                    </div>
+                }
                 <div class="card">
                     <div id="cart-items" class="cart mb-0@(Model.IsEditable ? " cart-editable" : "")">
                         <div class="cart-head">
