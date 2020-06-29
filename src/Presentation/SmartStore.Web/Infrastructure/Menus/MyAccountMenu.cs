@@ -152,6 +152,14 @@ namespace SmartStore.Web.Infrastructure
                 Icon = "fal fa-handshake",
                 Url = _urlHelper.Action("MyTeam", "Customer", new { area = "" })
             });
+            //海报生成二维码，并且跳转到注册页面填入自己的手机号
+            root.Append(new MenuItem
+            {
+                Id = "MyPoster",
+                Text = T("推广海报"),
+                Icon = "fal fa-image",
+                Url = _urlHelper.Action("MyPoster", "Customer", new { area = "" })
+            });
             //root.Append(new MenuItem
             //{
             //    Id = "Orders",

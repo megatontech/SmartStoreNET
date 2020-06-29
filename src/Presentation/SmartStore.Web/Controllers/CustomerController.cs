@@ -725,7 +725,8 @@ namespace SmartStore.Web.Controllers
 					}
                 }
             }
-
+            if (!string.IsNullOrEmpty(Request.QueryString["parentmobile"])) { model.ParentMobile = Request.QueryString["parentmobile"]; }
+           
             return View(model);
         }
 
@@ -1697,6 +1698,25 @@ namespace SmartStore.Web.Controllers
             model.Team.AddRange( allcustomer.Where(x=>x.ParentID==customer.Id).ToList());
             model.Total = model.Team.Count;
 
+            return View(model);
+        }
+
+        #endregion
+
+        #region MyPoster
+
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult MyPoster()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+            var allcustomer = _customerService.BuildNoLimitAllTreeWithoutOrder();
+            var total = _total.Get(customer);
+            //钱包展示总额，可提现，冻结，以及最近入账
+            var model = new CustomerTeamModel();
+            model.Self = customer;
             return View(model);
         }
 

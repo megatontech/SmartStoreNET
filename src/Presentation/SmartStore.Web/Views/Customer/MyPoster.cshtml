@@ -1,0 +1,127 @@
+﻿@model CustomerTeamModel
+@using SmartStore.Web.Models.Customer;
+
+@{
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+
+    Layout = "_dMyAccount";
+    ViewBag.PageClassToken = "rewardpoints";
+    ViewBag.PageTitle = T("").Text;
+}
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+<style>
+    /* Custom chart styling */
+    .jOrgChart {
+        margin: 10px;
+        padding: 20px;
+    }
+
+        /* Custom node styling */
+        .jOrgChart .node {
+            font-size: 14px;
+            background-color: #35363B;
+            border-radius: 8px;
+            border: 5px solid white;
+            color: #F38630;
+            -moz-border-radius: 8px;
+        }
+
+    .node p {
+        font-family: tahoma;
+        font-size: 10px;
+        line-height: 11px;
+        padding: 2px;
+    }
+
+    .alert-info:after {
+        content: "";
+        color: #d7ecfa;
+    }
+</style>
+<script>
+    jQuery(document).ready(function () {
+        var curWwwPath = window.document.location.href;　　//获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+        var pathName = window.document.location.pathname;　　//获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0, pos);　　//获取主机地址，如： http://localhost:8083
+        $("#qrcode").qrcode({
+            width: 100, //宽度
+            height: 100, //高度
+            text: localhostPaht +"/register?parentmobile="+ @Model.Self.Mobile, //任意内容
+        });
+        //画海报
+        var width = document.getElementById("canbox").offsetWidth; //宽度
+        var height = document.getElementById("canbox").offsetHeight; // 高度
+        var c = document.getElementById("myCanvas");
+        c.width = width
+        c.height = height
+        var ctx = c.getContext("2d");
+        //画上二维码
+        function convertCanvasToImage(canvas) {
+            var image = new Image();
+            image.src = canvas.toDataURL("image/png");
+            return image;
+        }
+        var mycans = $('canvas')[0];//二维码所在的canvas
+        var codeimg = convertCanvasToImage(mycans)
+        var xw = width - 130
+        var xh = height - 160
+        //首先画上背景图
+        var img = new Image();
+        img.src = "../../Content/Images/10856.jpg";
+        img.setAttribute("crossOrigin", 'Anonymous')
+        var x_bot = height - 34 //画上名字
+        ctx.font = "19px Georgia";
+        img.onload = function () { //必须等待图片加载完成
+            ctx.width = width;
+            ctx.height = height;
+            ctx.drawImage(img, 0, 0, width, height); //绘制图像进行拉伸
+            ctx.fillText('@Model.Self.Username', 170, x_bot);
+            ctx.drawImage(codeimg, xw, xh, 100, 100);
+            //绘制完成,转为图片
+            setTimeout(function () { //在ios上无法在画完之后取到整个画布内容，加了个settimeout
+                var bigcan = $('canvas')[1];
+                let images = new Image();
+                images.src = bigcan.toDataURL("image/png");
+                images.setAttribute("crossOrigin", 'Anonymous')
+                $('.canimg').attr('src', bigcan.toDataURL("image/png"))
+                $("#canbox").hide();
+            }, 0)
+        }
+
+
+
+    });</script>
+<style type="text/css">
+   /* #canbox {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+    }*/
+
+    .canimg {
+       /* width: 100%;
+        height: 100%;*/
+       /* position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;*/
+    }
+</style>
+<div class="col-md-8 col-lg-9">
+    <div class="page-title pt-4 pt-md-0">
+        <h1 class="h3">推广海报</h1>
+    </div>
+    <div id="qrcode" style="display: none;">
+    </div>
+    <div id="canbox" style="display: block;"  width="315" height="400">
+        <canvas id="myCanvas" width="315" height="400"></canvas>
+    </div>
+    <img class="canimg"  style="display: block;" width="315" height="400" src="" />
+
+</div>
+
+

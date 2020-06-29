@@ -1982,6 +1982,7 @@
     <Content Include="Views\ShoppingCart\Partials\ProxydOrderTotals.cshtml" />
     <Content Include="Views\Customer\CheckinAdd.cshtml" />
     <Content Include="Views\Customer\PointApply.cshtml" />
+    <Content Include="Views\Customer\MyPoster.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
