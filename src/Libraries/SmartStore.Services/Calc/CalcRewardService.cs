@@ -456,7 +456,7 @@ namespace SmartStore.Services.Calc
             var totalPush = 0M;
             totalPush = _detailService.GetTodaySum();
             var totalShare = totalContribution.DecValue;
-            totalContribution.PastTotalOut = ((totalPush+ totalShare) / totalContribution.TotalValue);
+            totalContribution.PastTotalOut = totalContribution.TotalValue== 0M ? 0M: ((totalPush+ totalShare) / totalContribution.TotalValue);
             return totalContribution;
         }
 
