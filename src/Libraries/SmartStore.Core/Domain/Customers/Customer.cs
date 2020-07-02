@@ -90,7 +90,11 @@ namespace SmartStore.Core.Domain.Customers
         /// </summary>
         [NotMapped]
         public int ActiveLines { get; set; }
-
+        /// <summary>
+        /// 当前层数
+        /// </summary>
+        [NotMapped]
+        public int LineLevel { get; set; }
         /// <summary>
         /// 封顶线数
         /// </summary>

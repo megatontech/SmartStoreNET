@@ -303,6 +303,11 @@ namespace SmartStore.Services.Customers
                 result.AddError(T("手机号必填"));
                 return result;
             }
+            if (_customerService.GetCustomerByUsername(request.Username) != null)
+            {
+                result.AddError(T("该昵称已注册"));
+                return result;
+            }
             if (_customerService.GetCustomerByMobile(request.Mobile) != null)
             {
                 result.AddError(T("手机号已注册"));
@@ -320,6 +325,7 @@ namespace SmartStore.Services.Customers
             request.Customer.PasswordFormat = request.PasswordFormat;
             request.Customer.Mobile = request.Mobile;
             request.Customer.ParentMobile = request.ParentMobile;
+            //request.Customer.Level = request.Level+1;
             request.Customer.IsCustomer = true;
             request.Customer.EverHadOrder = false;
             request.Customer.IsLock = false;
@@ -389,6 +395,7 @@ namespace SmartStore.Services.Customers
             {
                 var parent = _customerService.GetCustomerByMobile(request.Customer.ParentMobile);
                 request.Customer.ParentID = parent.Id;
+                request.Customer.Level = parent.Level+1;
                 request.Customer.ParentCustomerGuid = parent.CustomerGuid;
                 request.Customer.ParentMobile = parent.Mobile;
             }

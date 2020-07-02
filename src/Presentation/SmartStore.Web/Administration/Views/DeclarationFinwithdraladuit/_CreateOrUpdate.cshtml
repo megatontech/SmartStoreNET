@@ -12,10 +12,34 @@
 <table class="adminContent">
     <tr>
         <td class="adminTitle">
-            <div class="ctl-label"><label for="Amount">金额</label></div>
+            <div class="ctl-label"><label for="Amount">提现金额</label></div>
         </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Amount)
+        <td class="adminTitle">
+            <div class="ctl-label"><label for=""> @Html.DisplayFor(model => model.Amount)</label></div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label"><label for="Amount">实际到账金额</label></div>
+        </td>
+        <td class="adminTitle">
+            <div class="ctl-label"><label for=""> @Html.DisplayFor(model => model.ExpectAmount)</label></div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label"><label for="Amount">手续费</label></div>
+        </td>
+        <td class="adminTitle">
+            <div class="ctl-label"><label for=""> @Html.DisplayFor(model => model.ToFeeAmount)</label></div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label"><label for="Amount">转积分金额</label></div>
+        </td>
+        <td class="adminTitle">
+            <div class="ctl-label"><label for=""> @Html.DisplayFor(model => model.ToPointAmount)</label></div>
         </td>
     </tr>
     <tr>
@@ -27,11 +51,11 @@
         </td>
     </tr>
     @*<tr>
-        <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.UpdateTime)
-        </td>
-        <td class="adminData">
-            @Html.DisplayFor(model => model.UpdateTime)
-        </td>
-    </tr>*@
+            <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.UpdateTime)
+            </td>
+            <td class="adminData">
+                @Html.DisplayFor(model => model.UpdateTime)
+            </td>
+        </tr>*@
 </table>

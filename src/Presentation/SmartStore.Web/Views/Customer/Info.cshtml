@@ -18,12 +18,20 @@
     {
         @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
     }
-    
+    if (!string.IsNullOrEmpty(Model.Signature))
+    {
+        @Html.ValidationSummary(true, Model.Signature, new { @class = "alert alert-danger" })
+    }
+    if (!string.IsNullOrEmpty(Model.ZipPostalCode))
+    {
+        @Html.ValidationSummary(true, Model.ZipPostalCode, new { @class = "success" })
+    }
+
     <fieldset class="content-group">
         <legend><span>@T("Account.YourPersonalDetails")</span></legend>
 
 
-        @Html.ControlGroupFor(model => model.Username, required: true, breakpoint: "lg")
+        @*@Html.ControlGroupFor(model => model.Username, required: true, breakpoint: "lg")*@
         @Html.ControlGroupFor(model => model.FirstName, required: true, breakpoint: "lg")
         @Html.ControlGroupFor(model => model.VatNumber, required: true, breakpoint: "lg")
         @Html.ControlGroupFor(model => model.VatNumberStatusNote, required: true, breakpoint: "lg")

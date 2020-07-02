@@ -176,21 +176,21 @@ namespace SmartStore.Web.Infrastructure
                 Url = _urlHelper.Action("Info", "Customer", new { area = "" })
             });
 
-            //root.Append(new MenuItem
-            //{
-            //    Id = "addresses",
-            //    Text = T("收货地址"),
-            //    Icon = "fal fa-address-book",
-            //    Url = _urlHelper.Action("Addresses", "Customer", new { area = "" })
-            //});
+            root.Append(new MenuItem
+            {
+                Id = "addresses",
+                Text = T("收货地址"),
+                Icon = "fal fa-address-book",
+                Url = _urlHelper.Action("Addresses", "Customer", new { area = "" })
+            });
 
-            //root.Append(new MenuItem
-            //{
-            //    Id = "orders",
-            //    Text = T("Account.CustomerOrders"),
-            //    Icon = "fal fa-file-invoice",
-            //    Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
-            //});
+            root.Append(new MenuItem
+            {
+                Id = "orders",
+                Text = T("商城订单"),
+                Icon = "fal fa-file-invoice",
+                Url = _urlHelper.Action("Orders", "Customer", new { area = "" })
+            });
 
             //if (_orderSettings.ReturnRequestsEnabled && _orderService.Value.SearchReturnRequests(store.Id, customer.Id, 0, null, 0, 1).TotalCount > 0)
             //{

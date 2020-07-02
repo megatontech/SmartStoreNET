@@ -1,0 +1,171 @@
+﻿@model CustomerWalletModel
+@using SmartStore.Admin.Controllers;
+
+@{
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+
+    //Layout = "_dMyAccount";
+    ViewBag.PageClassToken = "rewardpoints";
+    ViewBag.PageTitle = T("").Text;
+    var nonFreeze = Model.Total + Model.Freeze;
+}
+<style>
+    .alert-info:after {
+        content: "";
+        color: #d7ecfa;
+    }
+</style>
+<script>
+    var currentpage = 1;
+    //获取滚动条当前的位置
+    function getScrollTop() {
+        var scrollTop = 0;
+        if (document.documentElement && document.documentElement.scrollTop) {
+            scrollTop = document.documentElement.scrollTop;
+
+        } else if (document.body) {
+            scrollTop = document.body.scrollTop;
+
+        }
+        return scrollTop;
+
+    }
+
+    //获取当前可视范围的高度
+    function getClientHeight() {
+        var clientHeight = 0;
+        if (document.body.clientHeight && document.documentElement.clientHeight) {
+            clientHeight = Math.min(document.body.clientHeight, document.documentElement.clientHeight);
+
+        } else {
+            clientHeight = Math.max(document.body.clientHeight, document.documentElement.clientHeight);
+
+        }
+        return clientHeight;
+
+    }
+
+    //获取文档完整的高度
+    function getScrollHeight() {
+        return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+    }
+
+    //滚动事件触发
+    window.onscroll = function () {
+        if (getScrollTop() + getClientHeight() == getScrollHeight()) {
+            //
+            console.log(currentpage);
+            $.ajax({
+                cache: false,
+                type: 'POST',
+                global: false,
+                url: "../GetWalletDetail/@Model.CustomId?page=" + (currentpage + 1),
+                //dataType: 'json',
+                success: function (data) {
+
+                    if (data.length > 0) {
+                        $("#page-main").height += 350;
+                        $("#content-wrapper").css("height", document.documentElement.scrollHeight + 50)
+                        currentpage++;
+                        data = data || [];
+                        $.each(data, function (i) {
+                            var tbody = $("#tbody");
+                            var row1 = $('<tr></tr>').appendTo(tbody);
+                            row1.append($('<td>' + data[i].Points + '</td>'));
+                            row1.append($('<td>' + data[i].Message + '</td>'));
+                            row1.append($('<td dir="auto">' + data[i].CreatedOnStr + '</td>'));
+                            tbody.append(row1);
+                        });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.error(thrownError);
+                }
+            });
+        }
+    }
+
+</script>
+<div class="col-md-8 col-lg-9">
+    <div class="title">
+        @T("客户资产")
+        <a href='@Url.Action("List")'>(@T("返回列表"))</a>
+    </div>
+    <div class="page-title pt-4 pt-md-0">
+        <h1 class="h3">可提现额度</h1>
+    </div>
+
+    <div class="alert alert-info" style="">
+        当前总额为：<b> @nonFreeze.ToString("F2")</b> 。
+    </div>
+    <div class="alert alert-info">
+        冻结额度为： <b> @Model.Freeze.ToString("F2")</b> 。
+    </div>
+    <div class="alert alert-info">
+        可提现额度为：<b> @Model.Total.ToString("F2") </b> 。
+    </div>
+    <div class="alert alert-info">
+        购物积分：<b> @Model.TotalShopPoints </b> 。
+    </div>
+
+    @*<div class="alert alert-info">
+                贡献值个数： @Model.TotalPoints。
+            </div>
+        <div class="alert alert-info">
+                直推 @Model.Push.ToString("F2")。
+            </div>
+            <div class="alert alert-info">
+                红包 @Model.Luck.ToString("F2")。
+            </div>
+            <div class="alert alert-info">
+                业绩分红 @Model.DecShare.ToString("F2")。
+            </div>
+            <div class="alert alert-info">
+                商城分红 @Model.StoreShare.ToString("F2")。
+            </div>*@
+    <fieldset class="content-group mt-4">
+        <legend class="mb-0"><span>@T("流水明细")</span></legend>
+        <div class="reward-points-history">
+            <div class="table-responsive" style="min-height:200px">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th class="border-top-0">
+                                @T("数额")
+                            </th>
+                            <th class="border-top-0">
+                                @T("详情")
+                            </th>
+                            <th class="border-top-0">
+                                @T("时间")
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        @for (int i = 0; i < Model.RewardPoints.Count; i++)
+                        {
+                            var item = Model.RewardPoints[i];
+                            <tr>
+                                <td>
+                                    @item.Points.ToString("F2")
+
+                                </td>
+                                <td>
+                                    @item.Message
+                                </td>
+                                <td dir="auto">
+                                    @item.CreatedOn.ToNativeString()
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </fieldset>
+
+
+</div>
+

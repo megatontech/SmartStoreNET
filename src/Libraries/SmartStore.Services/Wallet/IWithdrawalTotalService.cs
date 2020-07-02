@@ -11,6 +11,7 @@ namespace SmartStore.Services.Wallet
         public void Add(WithdrawalTotal entity);
 
         public WithdrawalTotal Get(Customer customer);
+        public decimal GetAllSum();
         public List<WithdrawalTotal> GetAll();
         public List<WithdrawalTotal> GetAll(int start, int length);
         public int GetAllCount();

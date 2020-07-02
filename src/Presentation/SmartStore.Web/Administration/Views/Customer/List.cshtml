@@ -103,6 +103,14 @@
                 .ClientTemplate("<a href=\"Edit/<#= Id #>\" class=\"t-button\">" + T("Admin.Common.Edit").Text + "</a> "
                 )
                 .Title(string.Empty);
+            
+            columns.Bound(x => x.Id)
+                .Centered()
+                 .Template(x => Html.ActionLink(T("客户资产").Text, "Wallet", new { id = x.Id }, new { @class = "t-button" }))
+                .ClientTemplate(
+                "<a href=\"Wallet/<#= Id #>\" class=\"t-button\">" + T("客户资产").Text + "</a>"
+                )
+                .Title(string.Empty);
             columns.Bound(x => x.Id)
                 .Centered()
                  .Template(x => Html.ActionLink(T("团队组织").Text, "MyTeam", new { id = x.Id }, new { @class = "t-button" }))

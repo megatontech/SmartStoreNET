@@ -979,7 +979,7 @@ namespace SmartStore.Admin.Controllers
                 //    model.CustomerEmail, model.OrderGuid, model.OrderNumber, command.Page - 1, command.PageSize, model.CustomerName, model.PaymentMethods.SplitSafe(","));
                 var dorders = _DeclarationOrderService.SearchOrders(model.StoreId, 0, startDateValue, endDateValue, orderStatusIds, paymentStatusIds, shippingStatusIds,
                     model.CustomerEmail, model.OrderGuid, model.OrderNumber, command.Page - 1, command.PageSize, model.CustomerName, model.PaymentMethods.SplitSafe(","));
-
+                //var allCustomer = _customerService.BuildAllTreeWithoutOrder();
                 gridModel.Data = dorders.Select(x =>
                 {
                     var store = Services.StoreService.GetStoreById(x.StoreId);
@@ -1005,6 +1005,7 @@ namespace SmartStore.Admin.Controllers
                         CardNumber = x.CardNumber,
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
                         HasNewPaymentNotification = x.HasNewPaymentNotification,
+                        RedeemedRewardPoints = x.Customer.Level,
                         UpdatedOn =x.PaidDateUtc.Value
                     };
 
@@ -1045,7 +1046,8 @@ namespace SmartStore.Admin.Controllers
                     orderModel.ViaShippingMethod = viaShippingMethodString.FormatInvariant(orderModel.ShippingMethod);
                     orderModel.WithPaymentMethod = withPaymentMethodString.FormatInvariant(orderModel.PaymentMethod);
                     orderModel.FromStore = fromStoreString.FormatInvariant(orderModel.StoreName);
-
+                    
+                    
                     return orderModel;
                 });
 
@@ -1164,8 +1166,8 @@ namespace SmartStore.Admin.Controllers
                         var isBig = false;
                         var product = _dproductService.GetProductById(order.ProductID);
                         if (product.IsEsd) { isBig = true; }
-                        if (isBig ) { customer.Title = "白金会员"; }
-                        else if (customer.Title != "白金会员") { customer.Title = "金卡会员"; }
+                        if (isBig ) { customer.Title = "VIP"; }
+                        else if (customer.Title != "VIP") { customer.Title = "顾客"; }
                         #endregion
                         _customerService.UpdateCustomer(customer);
                         _CalcRewardService.CalcRewardOne(customer, order);

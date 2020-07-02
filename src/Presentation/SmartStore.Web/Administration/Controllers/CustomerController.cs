@@ -44,6 +44,8 @@ using System.Web.Mvc;
 using Telerik.Web.Mvc;
 using SmartStore.Services.Authentication;
 using System.ComponentModel.DataAnnotations;
+using SmartStore.Services.Wallet;
+using SmartStore.Core.Domain.Wallet;
 
 namespace SmartStore.Admin.Controllers
 {
@@ -51,6 +53,7 @@ namespace SmartStore.Admin.Controllers
     public partial class CustomerController : AdminControllerBase
     {
         #region Fields
+        private readonly IDailyCustomerContributionDetailService _iDailyCustomerContributionDetailService;
         private readonly IAuthenticationService _authenticationService;
         private readonly IAddressService _addressService;
         private readonly AddressSettings _addressSettings;
@@ -87,8 +90,10 @@ namespace SmartStore.Admin.Controllers
         private readonly ITaxService _taxService;
         private readonly TaxSettings _taxSettings;
         private readonly IWorkContext _workContext;
+        private readonly IWithdrawalDetailService _detailrule;
+        private readonly IWithdrawalTotalService _total;
         //private readonly CalcRewardService _CalcRewardService;
-
+        private readonly ICustomerPointsTotalService _points;
         #endregion Fields
 
         #region Constructors
@@ -97,15 +102,15 @@ namespace SmartStore.Admin.Controllers
             ICustomerService customerService, IAuthenticationService authenticationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
             IGenericAttributeService genericAttributeService,
-            ICustomerRegistrationService customerRegistrationService,
+            ICustomerRegistrationService customerRegistrationService, ICustomerPointsTotalService points,
             ICustomerReportService customerReportService, IDateTimeHelper dateTimeHelper,
             ILocalizationService localizationService, DateTimeSettings dateTimeSettings,
             TaxSettings taxSettings, RewardPointsSettings rewardPointsSettings,
             ICountryService countryService, IStateProvinceService stateProvinceService,
             IAddressService addressService,
-            CustomerSettings customerSettings, ITaxService taxService,
+            CustomerSettings customerSettings, ITaxService taxService, IWithdrawalTotalService total,
             IWorkContext workContext, IStoreContext storeContext,
-            IPriceFormatter priceFormatter,
+            IPriceFormatter priceFormatter, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
             IOrderService orderService,
             ICustomerActivityService customerActivityService,
             IPriceCalculationService priceCalculationService,
@@ -116,10 +121,11 @@ namespace SmartStore.Admin.Controllers
             AddressSettings addressSettings, IStoreService storeService,
             IEventPublisher eventPublisher,
             PluginMediator pluginMediator,
-            IAffiliateService affiliateService,
+            IAffiliateService affiliateService, IWithdrawalDetailService detailService,
             IMessageModelProvider messageModelProvider,
             Lazy<IGdprTool> gdprTool)
         {
+            _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
             _authenticationService = authenticationService;
             _customerService = customerService;
             _newsLetterSubscriptionService = newsLetterSubscriptionService;
@@ -156,6 +162,9 @@ namespace SmartStore.Admin.Controllers
             _affiliateService = affiliateService;
             _messageModelProvider = messageModelProvider;
             _gdprTool = gdprTool;
+            _detailrule = detailService;
+            _points = points;
+            _total = total;
         }
 
         #endregion Constructors
@@ -721,6 +730,7 @@ namespace SmartStore.Admin.Controllers
                         customer.ParentID = parent.Id;
                         customer.ParentCustomerGuid = parent.CustomerGuid;
                         customer.ParentMobile = parent.Mobile;
+                        customer.Level = parent.Level + 1;
                     }
                 }
                 if (_customerSettings.TitleEnabled)
@@ -910,6 +920,10 @@ namespace SmartStore.Admin.Controllers
                 Active = customer.Active,
                 TimeZoneId = customer.GetAttribute<string>(SystemCustomerAttributeNames.TimeZoneId),
                 VatNumber = customer.GetAttribute<string>(SystemCustomerAttributeNames.VatNumber),
+                CreditCard = customer.CreditCard,
+                CreditCardBank = customer.CreditCardBank,
+                EverHadOrder = customer.EverHadOrder,
+                Title = customer.Title,
                 AffiliateId = customer.AffiliateId
             };
 
@@ -1685,6 +1699,82 @@ namespace SmartStore.Admin.Controllers
             return View(model);
         }
         #endregion
+        #region Wallet
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult Wallet(int id)
+        {
+            var customer = _customerService.GetCustomerById(id);
+
+            var contribution = _iDailyCustomerContributionDetailService.Get(customer.Id, customer.CustomerGuid);
+            var total = _total.Get(customer);
+            //钱包展示总额，可提现，冻结，以及最近入账
+            var entity = _points.GetPoints(customer.Id);
+            var model = new CustomerWalletModel();
+            var detail = _detailrule.GetByCustomId(customer.Id, 5);
+            foreach (var rph in detail)
+            {
+                model.RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
+                {
+
+                    Points = rph.Amount,
+                    Message = GetWithInfo(rph),
+                    CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc)
+                });
+            }
+            model.CustomId = customer.Id;
+            model.TotalShopPoints = entity.Amount.ToString("F2");
+            model.TotalPoints = contribution.TotalPoint;
+            model.Total = total.TotalAmount;
+            model.DecShare = total.TotalDecShareAmount;
+            model.Freeze = total.TotalFreezeAmount;
+            model.StoreShare = total.TotalStoreShareAmount;
+            model.Push = total.TotalPushAmount;
+            model.Luck = total.TotalLuckyAmount;
+
+            
+            ////钱包展示总额，可提现，冻结，以及最近入账
+            //var model = new CustomerTeamModel();
+            //model.Self = customer;
+            //model.Team = new System.Collections.Generic.List<Customer>();
+            //model.Team.AddRange(allcustomer.Where(x => x.ParentID == customer.Id).ToList());
+            //model.Total = model.Team.Count;
+            return View(model);
+        }
+        public string GetWithInfo(WithdrawalDetail detail)
+        {
+            string result = "";
+            if (detail.isOut)
+            {
+                if (detail.WithdrawType == 5) { result = "支出"; }
+                else { result = "提现"; }
+            }
+            else
+            {
+                if (detail.WithdrawType == 1) { result = "分享奖励"; }
+                else if (detail.WithdrawType == 2) { result = "业绩分红"; }
+                else if (detail.WithdrawType == 3) { result = "商城分红"; }
+                else if (detail.WithdrawType == 4) { result = "红包"; }
+
+            }
+            return result;
+        }
+        public ActionResult GetWalletDetail(int page,int id)
+        {
+            var customer = _customerService.GetCustomerById(id);
+            var detail = _detailrule.GetByCustomId(customer.Id, ((page - 1) * 15), 15);
+            List<CustomerWalletModel.RewardPointsHistoryModel> RewardPoints = new List<CustomerWalletModel.RewardPointsHistoryModel>();
+            foreach (var rph in detail)
+            {
+                RewardPoints.Add(new CustomerWalletModel.RewardPointsHistoryModel()
+                {
+                    Points = rph.Amount,
+                    Message = GetWithInfo(rph),
+                    CreatedOnStr = _dateTimeHelper.ConvertToUserTime(rph.WithdrawTime, DateTimeKind.Utc).ToNativeString()
+                });
+            }
+            return Json(RewardPoints,JsonRequestBehavior.AllowGet);
+        }
+        #endregion
         #region Orders
 
         [HttpPost, GridAction(EnableCustomBinding = true)]
@@ -1990,5 +2080,40 @@ namespace SmartStore.Admin.Controllers
         public int Total { get; set; }
         public List<SmartStore.Core.Domain.Customers.Customer> Team { get; set; }
         public SmartStore.Core.Domain.Customers.Customer Self { get; set; }
+    }
+    public partial class CustomerWalletModel : ModelBase
+    {
+        public CustomerWalletModel()
+        {
+            RewardPoints = new List<RewardPointsHistoryModel>();
+        }
+
+        public IList<RewardPointsHistoryModel> RewardPoints { get; set; }
+        public int CustomId { get; set; }
+        public int TotalPoints { get; set; }
+        public decimal Total { get; set; }
+        public string TotalShopPoints { get; set; }
+        public decimal Freeze { get; set; }
+        public decimal DecShare { get; set; }
+        public decimal Luck { get; set; }
+        public decimal StoreShare { get; set; }
+        public decimal Push { get; set; }
+        public DateTime Update { get; set; }
+        #region Nested classes
+        public partial class RewardPointsHistoryModel : EntityModelBase
+        {
+            [SmartResourceDisplayName("金额")]
+            public decimal Points { get; set; }
+
+            [SmartResourceDisplayName("详情")]
+            public string Message { get; set; }
+
+            [SmartResourceDisplayName("时间")]
+            public DateTime CreatedOn { get; set; }
+            [SmartResourceDisplayName("时间")]
+            public string CreatedOnStr { get; set; }
+        }
+
+        #endregion
     }
 }

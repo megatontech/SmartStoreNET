@@ -767,7 +767,7 @@ namespace SmartStore.Web.Controllers
                 //{
                 //    model.Username = model.Username.Trim();
                 //}
-                model.Username = model.Mobile;
+                //model.Username = model.Mobile;
                 bool isApproved = _customerSettings.UserRegistrationType == UserRegistrationType.Standard;
                 var registrationRequest = new CustomerRegistrationRequest(customer, model.Email,
                     _customerSettings.CustomerLoginType != CustomerLoginType.Email ? model.Username : model.Email, model.Password, model.Mobile, model.ParentMobile, _customerSettings.DefaultPasswordFormat, isApproved);
@@ -1215,7 +1215,7 @@ namespace SmartStore.Web.Controllers
             PrepareCustomerInfoModel(model, customer, false);
             model.VatNumber = customer.CreditCard;
             model.VatNumberStatusNote = customer.CreditCardBank;
-
+            //model.Signature = hint;
             return View(model);
         }
 
@@ -1236,7 +1236,7 @@ namespace SmartStore.Web.Controllers
                     customer.CreditCardBank = model.VatNumberStatusNote;
                     //customer.LastName = model.LastName;
                     _customerService.UpdateCustomer(customer);
-                    return RedirectToAction("Info");
+                    return RedirectToAction("NewInfo");
                 }
             }
             catch (Exception ex)
@@ -1827,7 +1827,7 @@ namespace SmartStore.Web.Controllers
                 else { result = "提现"; }
                  }
             else {
-                if (detail.WithdrawType == 1) { result = "推广佣金"; }
+                if (detail.WithdrawType == 1) { result = "分享奖励"; }
                 else if (detail.WithdrawType == 2) { result = "业绩分红"; }
                 else if (detail.WithdrawType == 3) { result = "商城分红"; }
                 else if (detail.WithdrawType == 4) { result = "红包"; }
@@ -1908,9 +1908,18 @@ namespace SmartStore.Web.Controllers
 
             var model = new WithDrawApplyModel();
             var customer = _workContext.CurrentCustomer;
-            var total = _total.Get(customer);
-            model.TotalAmount = total.TotalAmount-total.TotalFreezeAmount;
-            return View(model);
+            model.customer = customer;
+            //if (string.IsNullOrEmpty(customer.FirstName) || string.IsNullOrEmpty(customer.CreditCard) || string.IsNullOrEmpty(customer.CreditCardBank))
+            //{
+            //    return RedirectToAction("Info","需要完善您的资料才能进行提现操作");
+            //}
+            //else 
+            {
+                var total = _total.Get(customer);
+                model.TotalAmount = total.TotalAmount - total.TotalFreezeAmount;
+                return View(model);
+            }
+            
         }
 
         [HttpPost]
@@ -2028,10 +2037,10 @@ namespace SmartStore.Web.Controllers
 
 				if (uploadedFile != null && uploadedFile.FileName.HasValue())
 				{
-					if (uploadedFile.Size > 4000000)
-					{
-						throw new SmartException(T("头像过大", Prettifier.BytesToString(_customerSettings.AvatarMaximumSizeBytes)));
-					}
+					//if (uploadedFile.Size > 4000000000)
+					//{
+					//	throw new SmartException(T("头像过大", Prettifier.BytesToString(_customerSettings.AvatarMaximumSizeBytes)));
+					//}
 
 					var customerAvatar = _pictureService.GetPictureById(customer.GetAttribute<int>(SystemCustomerAttributeNames.AvatarPictureId));
 					if (customerAvatar != null)

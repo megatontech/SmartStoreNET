@@ -15,6 +15,7 @@ namespace SmartStore.Services.Customers
     {
         #region Public Methods
         List<Customer> BuildNoLimitAllTreeWithoutOrder();
+        //List<Customer> BuildAllTreeWithoutOrderLevel(List<Customer> customers);
         List<Customer> BuildAllTreeWithoutOrder();
 
         List<Customer> BuildCurrentTree();

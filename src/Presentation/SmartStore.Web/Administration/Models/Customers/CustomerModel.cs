@@ -74,7 +74,9 @@ namespace SmartStore.Admin.Models.Customers
         [SmartResourceDisplayName("Account.Fields.CustomerNumber")]
         [AllowHtml]
         public string CustomerNumber { get; set; }
-
+        public string CreditCard { get; set; }
+        public string CreditCardBank { get; set; }
+        public bool EverHadOrder { get; set; }
 
         public bool StreetAddressEnabled { get; set; }
         [SmartResourceDisplayName("Admin.Customers.Customers.Fields.StreetAddress")]

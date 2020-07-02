@@ -14,6 +14,7 @@ namespace SmartStore.Services.Wallet
         public List<WithdrawalDetail> GetByCustomId(int id, int count);
         public List<WithdrawalDetail> GetByCustomId(int id,int skip, int count);
         public List<WithdrawalDetail> Get();
+        public decimal GetTodaySum();
         public List<WithdrawalDetail> Get(int start,int length);
         public int GetCount();
 

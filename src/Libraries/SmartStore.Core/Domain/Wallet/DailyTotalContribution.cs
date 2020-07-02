@@ -11,7 +11,6 @@ using SmartStore.Core.Domain.Media;
 using SmartStore.Core.Domain.Security;
 using SmartStore.Core.Domain.Seo;
 using SmartStore.Core.Domain.Stores;
-
 namespace SmartStore.Core.Domain.Wallet
 {
     /// <summary>
@@ -36,6 +35,19 @@ namespace SmartStore.Core.Domain.Wallet
         [DataMember]
         public decimal DecValue { get; set; }
         /// <summary>
+        /// 昨日总拨比
+        /// </summary>
+        [NotMapped]
+        public decimal PastTotalOut { get; set; }
+        /// <summary>
+        /// 可提现额度总量（不算冻结）
+        /// </summary>
+        [NotMapped] public decimal TodayWalletTotal { get; set; }
+        /// <summary>
+        /// 购物积分总量
+        /// </summary>
+        [NotMapped] public decimal TodayPoint { get; set; }
+        /// <summary>
         /// 日期（每天00：00）
         /// </summary>
         [DataMember]
@@ -55,6 +67,10 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember]
         public bool IsCount { get; set; }
+        [NotMapped]
+        public int Total { get; set; }
+        [NotMapped] public List<SmartStore.Core.Domain.Customers.Customer> Team { get; set; }
+        [NotMapped] public SmartStore.Core.Domain.Customers.Customer Self { get; set; }
     }
 }
 

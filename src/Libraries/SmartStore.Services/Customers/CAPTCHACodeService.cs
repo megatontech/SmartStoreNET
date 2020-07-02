@@ -107,12 +107,12 @@ namespace SmartStore.Services.Customers
         private string SendSMS(string mobile, string code)
         {
             string result = "";
-            string appkey = "5fe160ac16a78d2e77b3f68d6963a761"; //配置您申请的appkey
-            string url2 = "http://v.juhe.cn/vercodesms/send.php";
+            string appkey = "613571f65d637c787d9c15d1eb076989"; //配置您申请的appkey
+            string url2 = "http://v.juhe.cn/sms/send";
             var parameters2 = new Dictionary<string, string>();
             parameters2.Add("mobile", mobile); //接收短信的手机号码
-            parameters2.Add("tplId", "66178"); //短信模板ID，请参考个人中心短信模板设置
-            parameters2.Add("tplValue", "#code#=" + code + "&#m#=30"); //变量名和变量值对。如果你的变量名或者变量值中带有#&=中的任意一个特殊符号，请先分别进行urlencode编码后再传递，<a href="http://www.juhe.cn/news/index/id/50" target="_blank">详细说明></a>
+            parameters2.Add("tpl_id", "218664"); //短信模板ID，请参考个人中心短信模板设置
+            parameters2.Add("tpl_value", "#code#=" + code); //变量名和变量值对。如果你的变量名或者变量值中带有#&=中的任意一个特殊符号，请先分别进行urlencode编码后再传递，<a href="http://www.juhe.cn/news/index/id/50" target="_blank">详细说明></a>
             parameters2.Add("key", appkey);//你申请的key
             parameters2.Add("dtype", ""); //返回数据的格式,xml或json，默认json
             result = sendPost(url2, parameters2, "get");

@@ -5,8 +5,75 @@
     ViewBag.Title = T("操盘控制台").Text;
     var singlePointValue = 0M;
     if (Model.ContributionValue != 0) { singlePointValue = Model.DecValue / Model.ContributionValue; }
-
 }
+
+<style>
+    /* Custom chart styling */
+    .jOrgChart {
+        margin: 10px;
+        padding: 20px;
+    }
+
+        /* Custom node styling */
+        .jOrgChart .node {
+            font-size: 14px;
+            background-color: #35363B;
+            border-radius: 8px;
+            border: 5px solid white;
+            color: #F38630;
+            -moz-border-radius: 8px;
+        }
+
+    .node p {
+        font-family: tahoma;
+        font-size: 10px;
+        line-height: 11px;
+        padding: 2px;
+    }
+
+    .alert-info:after {
+        content: "";
+        color: #d7ecfa;
+    }
+</style>
+<script>
+    jQuery(document).ready(function () {
+        $("#org").jOrgChart({
+            chartElement: '#chart'
+            //dragAndDrop: false
+        });
+        setTimeout("window.location.href = window.location.href; ", 120000);
+        
+    });</script>
+<script>
+    jQuery(document).ready(function () {
+
+        /* Custom jQuery for the example */
+        $("#show-list").click(function (e) {
+            e.preventDefault();
+
+            $('#list-html').toggle('fast', function () {
+                if ($(this).is(':visible')) {
+                    $('#show-list').text('Hide underlying list.');
+                    $(".topbar").fadeTo('fast', 0.9);
+                } else {
+                    $('#show-list').text('Show underlying list.');
+                    $(".topbar").fadeTo('fast', 1);
+                }
+            });
+        });
+
+        $('#list-html').text($('#org').html());
+
+        $("#org").bind("DOMSubtreeModified", function () {
+            $('#list-html').text('');
+
+            $('#list-html').text($('#org').html());
+
+            prettyPrint();
+        });
+    });
+</script>
 
 <div class="section-header">
     <div class="title">
@@ -44,6 +111,18 @@
                     <div class="stats-today-item-label">分红金额</div>
                     <div class="stats-today-item-value active" )">@Model.DecValue.ToString("F2")</div>
                 </div>
+                <div class='col-auto stats-today-item")'>
+                    <div class="stats-today-item-label">可提现额度总量</div>
+                    <div class="stats-today-item-value active" )">@Model.TodayWalletTotal.ToString("F2")</div>
+                </div>
+                <div class='col-auto stats-today-item")'>
+                    <div class="stats-today-item-label">购物积分总量</div>
+                    <div class="stats-today-item-value active" )">@Model.TodayPoint.ToString("F2")</div>
+                </div>
+                <div class='col-auto stats-today-item")'>
+                    <div class="stats-today-item-label">总拨比</div>
+                    <div class="stats-today-item-value active" )">@Model.PastTotalOut.ToString("F2")</div>
+                </div>
             </div>
             @*@{ Html.RenderAction("OrderAverageReport", "Order"); }*@
             <div class="row">
@@ -62,13 +141,69 @@
                     @{ Html.RenderAction("OrderIncompleteReport", "DeclarationFinOrder"); }
                 </div>
             </div>
+            <div class="row">
+                <div class="col-xl-12">
+
+                    <div class="card shadow-sm mb-4">
+                        <h6 class="card-header font-weight-medium border-bottom-0">
+                            <i class="fa fa-users pr-2"></i>
+                            @T("整体网络图")
+                        </h6>
+
+                        <div class="table-responsive">
+                            <div class="col-md-8 col-lg-9">
+                                <div class="page-title pt-4 pt-md-0">
+                                    <h1 class="h3"></h1>
+                                </div>
+
+                                <ul id="org" style="display:none">
+                                    <li>
+                                        团队架构
+                                        <ul>
+                                            @foreach (var customer in Model.Team.Where(x => string.IsNullOrEmpty(x.ParentMobile) || !Model.Team.Any(y => y.Mobile == x.ParentMobile)))
+                                            {
+                                                <li id="@customer.Id">
+                                                    @customer.Username - @customer.Mobile
+                                                    @RenderChild(Model.Team, customer.Mobile)
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                                <div id="chart" class="orgChart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
         </div>
 
         @*<div class="col-lg-3 col-xl-2">
-            @{ Html.RenderAction("MarketplaceFeed"); }
-        </div>*@
+                @{ Html.RenderAction("MarketplaceFeed"); }
+            </div>*@
     </div>
 
     @{ Html.RenderWidget("admin_dashboard_bottom"); }
 </div>
 
+
+
+
+@helper RenderChild(List<SmartStore.Core.Domain.Customers.Customer> all, string mobile)
+{
+<ul>
+    @foreach (var item in all.Where(x => x.ParentMobile == mobile))
+    {
+
+    <li id="@item.Id">
+        @item.Username - @item.Mobile
+        @RenderChild(Model.Team, item.Mobile)
+    </li>
+
+    }
+</ul>
+
+}

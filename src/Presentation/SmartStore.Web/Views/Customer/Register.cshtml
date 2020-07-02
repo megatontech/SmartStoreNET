@@ -51,6 +51,7 @@
                             @Html.HoneypotField()
                         </div>
                     }
+                    @Html.ControlGroupFor(model => model.Username, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
                     @Html.ControlGroupFor(model => model.Mobile, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
                     @Html.ControlGroupFor(model => model.MobileCode, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
                     <div class="form-group row">

@@ -116,7 +116,11 @@ namespace SmartStore.Services.Customers
             tree = query.ToList();
             return tree;
         }
-
+        //public List<Customer> BuildAllTreeWithoutOrderLevel(List<Customer> customers) 
+        //{
+        //    List<Customer> tree = new List<Customer>();
+        //    return tree;
+        //}
         public List<Customer> BuildAllTreeWithoutOrder()
         {
             List<Customer> tree = new List<Customer>();

@@ -96,7 +96,10 @@
                     .Width(150)
                     .Title(T("订单编号"))
                     .ClientTemplate("<#= OrderNumber #>");
-
+                columns.Bound(x => x.RedeemedRewardPoints)
+                  .Title(T("代数"))
+                  .ClientTemplate(
+                      "<div><#= RedeemedRewardPoints #></div>");
                 columns.Bound(x => x.CardName)
                    .Title(T("客户姓名"))
                    .ClientTemplate(

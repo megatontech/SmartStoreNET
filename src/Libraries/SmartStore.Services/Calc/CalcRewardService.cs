@@ -30,10 +30,12 @@ namespace SmartStore.Services.Calc
         private readonly List<DeclarationCapRule> _rule;
 
         private readonly IDailyTotalContributionService _totalContributeService;
+        private readonly IWithdrawalDetailService _detailService;
 
         private readonly IWalletService _walletService;
         private readonly IRepository<DeclarationOrder> _declarationOrderRepository;
         private readonly IRepository<Order> _OrderRepository;
+        
         #endregion Private Fields
 
         //private
@@ -42,12 +44,13 @@ namespace SmartStore.Services.Calc
 
         public CalcRewardService(IWalletService walletService, ICustomerService customerService, IDeclarationCapRuleService declarationCapRuleService,
            IDeclarationCalcRuleService calcruleService,
-           IDailyTotalContributionService totalContributeService,
+           IDailyTotalContributionService totalContributeService, IWithdrawalDetailService detailService,
            IRepository<DeclarationOrder> declarationOrderRepository,
            IRepository<Order> orderRepository,
            IDailyCustomerContributionDetailService customerContributeService
            )
         {
+            _detailService = detailService;
             _walletService = walletService;
             _CustomerService = customerService;
             _DeclarationCapRuleService = declarationCapRuleService;
@@ -450,6 +453,10 @@ namespace SmartStore.Services.Calc
                 customerContribution.CountTotalValue = pair.Sum(x => x.Value);
                 _customerContributeService.Update(customerContribution);
             }
+            var totalPush = 0M;
+            totalPush = _detailService.GetTodaySum();
+            var totalShare = totalContribution.DecValue;
+            totalContribution.PastTotalOut = ((totalPush+ totalShare) / totalContribution.TotalValue);
             return totalContribution;
         }
 

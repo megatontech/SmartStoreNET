@@ -1,41 +1,116 @@
 ﻿@{
-	Layout = "_Layout";
-	Html.AddBodyCssClass("home");
+    Layout = "_Layout";
+    Html.AddBodyCssClass("home");
 }
+<script src="~/Content/vendors/jquery/jquery.event.swipe.js"></script>
+
+<script src="~/Content/vendors/jquery/unslider.min.js"></script>
 
 <div class="page home-page">
     <div class="page-body">
-		@{
-			Html.RenderWidget("home_page_top");
+        @{
+            Html.RenderWidget("home_page_top");
 
-			Html.RenderAction("TopicBlock", "Topic", new { systemName = "HomePageText", isLead = true });
-			Html.RenderWidget("home_page_after_intro");
+            Html.RenderAction("TopicBlock", "Topic", new { systemName = "HomePageText", isLead = true });
+            Html.RenderWidget("home_page_after_intro");
+            <div class="ban has-dots" id="b03" style="        overflow: hidden;
+        width: 100%;
+        height: 150px;">
+                <ul style="        width: 500%;
+        position: relative;
+        left: -7.25526%;
+        height: 150px;
+        overflow: hidden;">
+                    <li style="width: 20%;"><img src="../../Content/Images/01.jpg" alt="" width="300" height="150"></li>
+                    <li style="width: 20%;"><img src="../../Content/Images/02.jpg" alt="" width="300" height="150"></li>
+                    <li style="width: 20%;"><img src="../../Content/Images/03.jpg" alt="" width="300" height="150"></li>
+                    <li style="width: 20%;"><img src="../../Content/Images/04.jpg" alt="" width="300" height="150"></li>
+                    <li style="width: 20%;"><img src="../../Content/Images/05.jpg" alt="" width="300" height="150"></li>
+                </ul>
+                <ol class="dots"><li class="dot active">1</li><li class="dot">2</li><li class="dot">3</li><li class="dot">4</li><li class="dot">5</li></ol>
+            </div>
+            <style>
+                .ban {
+                    position: relative;
+                    overflow: auto;
+                }
 
-			Html.RenderAction("HomepageCategories", "Catalog");
-			Html.RenderWidget("home_page_after_categories");
+                    .ban li {
+                        list-style: none;
+                    }
 
-			Html.RenderAction("DHomepageProducts", "Catalog");
-			Html.RenderWidget("home_page_after_products");
+                    .ban ul li {
+                        float: left;
+                    }
+                /*#b03 {
+                    width: 640px;
+                }
 
-			Html.RenderAction("HomepageBestSellers", "Catalog");
-			Html.RenderWidget("home_page_after_bestsellers");
+                    #b03 .dots {
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        bottom: 20px;
+                    }
 
-			Html.RenderAction("HomepageManufacturers", "Catalog");
-			Html.RenderWidget("home_page_after_manufacturers");
+                        #b03 .dots li {
+                            display: inline-block;
+                            width: 10px;
+                            height: 10px;
+                            margin: 0 4px;
+                            text-indent: -999em;
+                            border: 2px solid #fff;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            opacity: .4;
+                            -webkit-transition: background .5s, opacity .5s;
+                            -moz-transition: background .5s, opacity .5s;
+                            transition: background .5s, opacity .5s;
+                        }
 
-			Html.RenderAction("PopularProductTags", "Catalog", new { area = "" });
-			Html.RenderWidget("home_page_after_tags");
+                            #b03 .dots li.active {
+                                background: #fff;
+                                opacity: 1;
+                            }*/
+            </style>
+            <script>
+                $(function () {
+                    $('.ban').unslider({
+                        speed: 500,               //  The speed to animate each slide (in milliseconds)
+                        delay: 3000,              //  The delay between slide animations (in milliseconds)
+                        complete: function () { },  //  A function that gets called after every slide animation
+                        keys: true,               //  Enable keyboard (left, right) arrow shortcuts
+                        dots: true,               //  Display dot navigation
+                        fluid: false              //  Support responsive design. May break non-responsive designs
+                    });
+                });
 
-			Html.RenderAction("HomePageNews", "News");
-			Html.RenderWidget("home_page_after_news");
+            </script>
+            Html.RenderAction("HomepageCategories", "Catalog");
+            Html.RenderWidget("home_page_after_categories");
 
-			Html.RenderAction("HomePagePolls", "Poll");
-			Html.RenderWidget("home_page_after_polls");
+            Html.RenderAction("DHomepageProducts", "Catalog");
+            Html.RenderWidget("home_page_after_products");
 
-			@* TODO: (mc) find more intelligent way of rendering RecentlyViewedProductsBlock globally *@
+            Html.RenderAction("HomepageBestSellers", "Catalog");
+            Html.RenderWidget("home_page_after_bestsellers");
+
+            Html.RenderAction("HomepageManufacturers", "Catalog");
+            Html.RenderWidget("home_page_after_manufacturers");
+
+            Html.RenderAction("PopularProductTags", "Catalog", new { area = "" });
+            Html.RenderWidget("home_page_after_tags");
+
+            Html.RenderAction("HomePageNews", "News");
+            Html.RenderWidget("home_page_after_news");
+
+            Html.RenderAction("HomePagePolls", "Poll");
+            Html.RenderWidget("home_page_after_polls");
+
+            @* TODO: (mc) find more intelligent way of rendering RecentlyViewedProductsBlock globally *@
             Html.RenderAction("RecentlyViewedProductsBlock", "Catalog", new { area = "" });
 
             Html.RenderWidget("home_page_bottom");
-		}
+        }
     </div>
 </div>

@@ -1,5 +1,6 @@
 ﻿using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Wallet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,6 +32,15 @@ namespace SmartStore.Services.Wallet
             _WithdrawalDetailRepository.Insert(entity);
         }
         public int GetCount() { return _WithdrawalDetailRepository.Table.Where(x=> x.Amount != 0M).Count(); }
+        public decimal GetTodaySum() 
+        {
+            var today = DateTime.Now.Date;
+            var tomrrow = DateTime.Now.Date.AddDays(1);
+             var temp =   _WithdrawalDetailRepository.Table.Where(x => x.isOut == false && x.WithdrawType == 1 && x.WithdrawTime >= today && x.WithdrawTime <= tomrrow).ToList();
+            if (temp != null) { return temp.Sum(x => x.Amount); }
+            else { return 0M; }
+            
+        }
         public List<WithdrawalDetail> Get()
         {
            return  _WithdrawalDetailRepository.Table.ToList();

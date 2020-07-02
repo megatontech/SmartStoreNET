@@ -51,7 +51,14 @@ namespace SmartStore.Services.Wallet
             _CustomerPointsTotalRepository.Insert(entity);
 
         }
-
+        public List<CustomerPointsTotal> GetAll() 
+        {
+            return _CustomerPointsTotalRepository.Table.ToList();
+        }
+        public decimal GetAllSum()
+        {
+            return _CustomerPointsTotalRepository.Table.Sum(x=>x.Amount);
+        }
         public CustomerPointsTotal GetPoints(int customerid)
         {
             if (!_CustomerPointsTotalRepository.Table.Any(x=>x.Customer==customerid))

@@ -564,18 +564,18 @@ namespace SmartStore.Services.Orders
                 //skipPaymentWorkflow = cartTotal.TotalAmount.Value == decimal.Zero;
 
                 // Address validations.
-                if (customer.BillingAddress == null)
-                {
-                    warnings.Add(T("Order.BillingAddressMissing"));
-                }
-                else if (!customer.BillingAddress.Email.IsEmail())
-                {
-                    warnings.Add(T("Common.Error.InvalidEmail"));
-                }
-                else if (customer.BillingAddress.Country != null && !customer.BillingAddress.Country.AllowsBilling)
-                {
-                    warnings.Add(T("Order.CountryNotAllowedForBilling", customer.BillingAddress.Country.Name));
-                }
+                //if (customer.BillingAddress == null)
+                //{
+                //    warnings.Add(T("Order.BillingAddressMissing"));
+                //}
+                //else if (!customer.BillingAddress.Email.IsEmail())
+                //{
+                //    warnings.Add(T("Common.Error.InvalidEmail"));
+                //}
+                //else if (customer.BillingAddress.Country != null && !customer.BillingAddress.Country.AllowsBilling)
+                //{
+                //    warnings.Add(T("Order.CountryNotAllowedForBilling", customer.BillingAddress.Country.Name));
+                //}
 
                 if (cart.RequiresShipping())
                 {
@@ -965,9 +965,9 @@ namespace SmartStore.Services.Orders
 					return result;					
 				}
 
-                var billingAddress = !processPaymentRequest.IsRecurringPayment
-                    ? (Address)customer.BillingAddress.Clone()
-                    : (Address)initialOrder.BillingAddress.Clone();
+                //var billingAddress = !processPaymentRequest.IsRecurringPayment
+                //    ? (Address)customer.BillingAddress.Clone()
+                //    : (Address)initialOrder.BillingAddress.Clone();
 
 				Address shippingAddress = null;
 				if (shoppingCartRequiresShipping)
@@ -1164,7 +1164,7 @@ namespace SmartStore.Services.Orders
                             PurchaseOrderNumber = processPaymentRequest.PurchaseOrderNumber,
                             PaymentStatus = processPaymentResult.NewPaymentStatus,
                             PaidDateUtc = null,
-                            BillingAddress = billingAddress,
+                            //BillingAddress = billingAddress,
                             ShippingAddress = shippingAddress,
                             ShippingStatus = shippingStatus,
                             ShippingMethod = shippingMethodName,
@@ -1469,17 +1469,17 @@ namespace SmartStore.Services.Orders
 						_orderService.AddOrderNote(order, T("Admin.OrderNotice.OrderPlaced"));
 						
                         // Send email notifications.
-                        var msg = _messageFactory.SendOrderPlacedStoreOwnerNotification(order, _localizationSettings.DefaultAdminLanguageId);
-                        if (msg?.Email?.Id != null)
-                        {
-							_orderService.AddOrderNote(order, T("Admin.OrderNotice.MerchantEmailQueued", msg.Email.Id));
-                        }
+      //                  var msg = _messageFactory.SendOrderPlacedStoreOwnerNotification(order, _localizationSettings.DefaultAdminLanguageId);
+      //                  if (msg?.Email?.Id != null)
+      //                  {
+						//	_orderService.AddOrderNote(order, T("Admin.OrderNotice.MerchantEmailQueued", msg.Email.Id));
+      //                  }
 
-						msg = _messageFactory.SendOrderPlacedCustomerNotification(order, order.CustomerLanguageId);
-                        if (msg?.Email?.Id != null)
-                        {
-							_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerEmailQueued", msg.Email.Id));
-                        }
+						//msg = _messageFactory.SendOrderPlacedCustomerNotification(order, order.CustomerLanguageId);
+      //                  if (msg?.Email?.Id != null)
+      //                  {
+						//	_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerEmailQueued", msg.Email.Id));
+      //                  }
 
                         // Check order status.
                         CheckOrderStatus(order);
@@ -1516,17 +1516,17 @@ namespace SmartStore.Services.Orders
 
 						#region Newsletter subscription
 
-						if (extraData.ContainsKey("SubscribeToNewsLetter") && _shoppingCartSettings.NewsLetterSubscription != CheckoutNewsLetterSubscription.None)
-						{
-							var addSubscription = extraData["SubscribeToNewsLetter"].ToBool();
+						//if (extraData.ContainsKey("SubscribeToNewsLetter") && _shoppingCartSettings.NewsLetterSubscription != CheckoutNewsLetterSubscription.None)
+						//{
+						//	var addSubscription = extraData["SubscribeToNewsLetter"].ToBool();
 
-							bool? nsResult = _newsLetterSubscriptionService.AddNewsLetterSubscriptionFor(addSubscription, customer.Email, order.StoreId);
+						//	bool? nsResult = _newsLetterSubscriptionService.AddNewsLetterSubscriptionFor(addSubscription, customer.Email, order.StoreId);
 
-							if (nsResult.HasValue)
-							{
-                                _orderService.AddOrderNote(order, T(nsResult.Value ? "Admin.OrderNotice.NewsLetterSubscriptionAdded" : "Admin.OrderNotice.NewsLetterSubscriptionRemoved"));
-							}
-						}
+						//	if (nsResult.HasValue)
+						//	{
+      //                          _orderService.AddOrderNote(order, T(nsResult.Value ? "Admin.OrderNotice.NewsLetterSubscriptionAdded" : "Admin.OrderNotice.NewsLetterSubscriptionRemoved"));
+						//	}
+						//}
 
 						#endregion
 					}

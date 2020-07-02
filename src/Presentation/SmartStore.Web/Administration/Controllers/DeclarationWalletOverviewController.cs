@@ -148,7 +148,7 @@ namespace SmartStore.Admin.Controllers
             }
             else
             {
-                if (detail.WithdrawType == 1) { result = "推广佣金"; }
+                if (detail.WithdrawType == 1) { result = "分享奖励"; }
                 else if (detail.WithdrawType == 2) { result = "业绩分红"; }
                 else if (detail.WithdrawType == 3) { result = "商城分红"; }
                 else if (detail.WithdrawType == 4) { result = "红包"; }

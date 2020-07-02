@@ -884,6 +884,14 @@
     <Content Include="Content\editors\summernote\summernote-bs4.min.js" />
     <Content Include="Content\fontastic\fontastic.css" />
     <Content Include="Content\fontastic\fonts\fontastic.svg" />
+    <Content Include="Content\Images\01.jpg" />
+    <Content Include="Content\Images\02.jpg" />
+    <Content Include="Content\Images\03.jpg" />
+    <Content Include="Content\Images\04.jpg" />
+    <Content Include="Content\Images\05.jpg" />
+    <Content Include="Content\Images\06.jpg" />
+    <Content Include="Content\Images\07.jpg" />
+    <Content Include="Content\Images\08.jpg" />
     <Content Include="Content\Images\grip-h.png" />
     <Content Include="Content\Images\grip-ne.png" />
     <Content Include="Content\Images\grip-se.png" />
@@ -949,6 +957,7 @@
     <Content Include="Content\vendors\datetimepicker\js\tempusdominus-bootstrap-4.min.js" />
     <Content Include="Content\vendors\jquery\jquery.jOrgChart.css" />
     <Content Include="Content\vendors\jquery\jquery.jOrgChart.js" />
+    <Content Include="Content\vendors\jquery\unslider.min.js" />
     <Content Include="Content\vendors\moment\locale\ar-dz.js" />
     <Content Include="Content\vendors\moment\locale\ar-kw.js" />
     <Content Include="Content\vendors\moment\locale\ar-ly.js" />

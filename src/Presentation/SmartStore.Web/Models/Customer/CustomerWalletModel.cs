@@ -15,6 +15,7 @@ namespace SmartStore.Web.Models.Customer
         public IList<RewardPointsHistoryModel> RewardPoints { get; set; }
         public int TotalPoints { get; set; }
         public decimal Total { get; set; }
+        public decimal TotalShopPoints { get; set; }
         public decimal Freeze { get; set; }
         public decimal DecShare { get; set; }
         public decimal Luck { get; set; }

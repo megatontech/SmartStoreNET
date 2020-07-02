@@ -35,7 +35,7 @@ namespace SmartStore.Admin.Controllers
                         var model = new DeclarationProductDispModel();
                         model.Name = x.Name;
                         model.Price = x.Price;
-                        model.Level = x.IsEsd ? "白金产品" : "金卡产品";
+                        model.Level = x.IsEsd ? "顾客" : "VIP";
                         var temp = declarationOrderService.GetOrderTotalByProduct(x.Id);
                         model.Count = temp.Item1;
                         model.Amount = temp.Item2;

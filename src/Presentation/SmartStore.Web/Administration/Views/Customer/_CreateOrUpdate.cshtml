@@ -1,6 +1,6 @@
 ﻿@using SmartStore.Core.Domain.Orders;
 @model CustomerModel
-
+@using System.Linq;
 @Html.ValidationSummary(false)
 
 @if (Model.Id == 0)
@@ -10,25 +10,25 @@
 
 @Html.SmartStore().TabStrip().Name("customer-edit").OnAjaxSuccess("customerEditTab_onAjaxSuccess").Style(TabsStyle.Material).Position(TabsPosition.Top).Items(x =>
 {
-	x.Add().Text(T("Admin.Customers.Customers.Info").Text).Content(TabInfo()).Selected(true);
-	x.Add().Text(T("Admin.Customers.Customers.CustomerRoles").Text).Content(TabCustomerRoles());
+    x.Add().Text(T("Admin.Customers.Customers.Info").Text).Content(TabInfo()).Selected(true);
+    x.Add().Text(T("Admin.Customers.Customers.CustomerRoles").Text).Content(TabCustomerRoles());
 
-	if (Model.Id > 0)
-	{
-		x.Add().Text(T("Admin.Customers.Customers.Orders").Text).Content(TabOrders());
+    //if (Model.Id > 0)
+    //{
+    //    //x.Add().Text(T("Admin.Customers.Customers.Orders").Text).Content(TabOrders());
 
-		if (Model.DisplayRewardPointsHistory)
-		{
-			x.Add().Text(T("Admin.Customers.Customers.RewardPoints").Text).Content(TabRewardPoints());
-		}
-		
-		x.Add().Text(T("Admin.Customers.Customers.Addresses").Text).Content(TabAddresses());
-		x.Add().Text(T("Admin.Customers.Customers.CurrentCart").Text).Content(TabCurrentShoppingCart());
-		x.Add().Text(T("Admin.Customers.Customers.Impersonate").Text).Content(TabImpersonate());
-	}
+    //    //if (Model.DisplayRewardPointsHistory)
+    //    //{
+    //    //    x.Add().Text(T("Admin.Customers.Customers.RewardPoints").Text).Content(TabRewardPoints());
+    //    //}
 
-	//generate an event
-	EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "customer-edit", this.Html, this.Model));
+    //    //x.Add().Text(T("Admin.Customers.Customers.Addresses").Text).Content(TabAddresses());
+    //    //x.Add().Text(T("Admin.Customers.Customers.CurrentCart").Text).Content(TabCurrentShoppingCart());
+    //    //x.Add().Text(T("Admin.Customers.Customers.Impersonate").Text).Content(TabImpersonate());
+    //}
+
+    //generate an event
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "customer-edit", this.Html, this.Model));
 })
 
 @helper TabInfo()
@@ -36,12 +36,12 @@
     <table class="adminContent">
         @if (Model.Id != 0)
         {
-            <tr>
+            <tr style="display:none;">
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.Id)
                 </td>
                 <td class="adminData">
-                    @Html.HiddenFor(model=>model.CustomerGuid)
+                    @Html.HiddenFor(model => model.CustomerGuid)
                     @Html.TextBoxFor(model => model.Id, new { @readonly = "readonly", @class = "form-control-plaintext" })
                     @Html.ValidationMessageFor(model => model.Id)
                 </td>
@@ -49,7 +49,7 @@
         }
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.IsCustomer)
+                <div class="ctl-label"><label for="IsCustomer">是否为报单用户</label></div>
             </td>
             <td class="adminData">
                 <div class="form-control-plaintext form-inline">
@@ -93,13 +93,26 @@
                 </tr>
             }
         }
+
+        @if (Model.PhoneEnabled)
+        {
+            <tr>
+                <td class="adminTitle">
+                    <div class="ctl-label"><label for="Phone">本人电话号码</label></div>
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.Phone)
+                    @Html.ValidationMessageFor(model => model.Phone)
+                </td>
+            </tr>
+        }
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.Email)
+                <div class="ctl-label"><label for="ParentPhone">推荐人电话号码</label></div>
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.Email)
-                @Html.ValidationMessageFor(model => model.Email)
+                @Html.EditorFor(model => model.ParentPhone)
+                @Html.ValidationMessageFor(model => model.ParentPhone)
             </td>
         </tr>
         <tr>
@@ -124,63 +137,9 @@
                 @Html.ValidationMessageFor(model => model.Password)
             </td>
         </tr>
-        @if (Model.Id > 0 && Model.AssociatedExternalAuthRecords.Count > 0)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.AssociatedExternalAuthRecords)
-                </td>
-                <td class="adminData wide">
-                    @(Html.Telerik().Grid<CustomerModel.AssociatedExternalAuthModel>(Model.AssociatedExternalAuthRecords)
-                    .Name("externalauthrecords-grid")
-                    .Columns(columns =>
-                    {
-                        columns.Bound(x => x.AuthMethodName)
-                            .Width(100);
-                        columns.Bound(x => x.Email)
-                             .Width(100);
-                        columns.Bound(x => x.ExternalIdentifier)
-                            .Width(300);
-                    })
-                    .Footer(false))
-                </td>
-            </tr>
-        }
-        @if (Model.TitleEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Title)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Title)
-                    @Html.ValidationMessageFor(model => model.Title)
-                </td>
-            </tr>
-        }
-        @if (Model.GenderEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Gender)
-                </td>
-                <td class="adminData">
-                    <div class="form-control-plaintext form-inline">
-                        <div class="form-check form-check-inline">
-                            @Html.RadioButton("Gender", "M", (Model.Gender == "M"), new { @class = "form-check-input", id = "gender-male" })
-                            <label class="form-check-label" for="gender-male">@T("Admin.Customers.Customers.Fields.Gender.Male")</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            @Html.RadioButton("Gender", "F", (Model.Gender == "F"), new { @class = "form-check-input", id = "gender-female" })
-                            <label class="form-check-label" for="gender-female">@T("Admin.Customers.Customers.Fields.Gender.Female")</label>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        }
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.FirstName)
+                <div class="ctl-label"><label for="FirstName">姓名</label></div>
             </td>
             <td class="adminData">
                 @Html.EditorFor(model => model.FirstName)
@@ -189,245 +148,71 @@
         </tr>
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.LastName)
+                <div class="ctl-label"><label for="CreditCard">银行卡号</label></div>
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.LastName)
-                @Html.ValidationMessageFor(model => model.LastName)
+                @Html.EditorFor(model => model.CreditCard)
+                @Html.ValidationMessageFor(model => model.CreditCard)
             </td>
         </tr>
-        @if (Model.DateOfBirthEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.DateOfBirth)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.DateOfBirth)
-                    @Html.ValidationMessageFor(model => model.DateOfBirth)
-                </td>
-            </tr>
-        }
-        @if (Model.CompanyEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Company)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Company)
-                    @Html.ValidationMessageFor(model => model.Company)
-                </td>
-            </tr>
-        }
-
-        @if (Model.CustomerNumberEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.CustomerNumber)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.CustomerNumber)
-                    @Html.ValidationMessageFor(model => model.CustomerNumber)
-                </td>
-            </tr>
-        }
-
-        @if (Model.StreetAddressEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.StreetAddress)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.StreetAddress)
-                    @Html.ValidationMessageFor(model => model.StreetAddress)
-                </td>
-            </tr>
-        }
-        @if (Model.StreetAddress2Enabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.StreetAddress2)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.StreetAddress2)
-                    @Html.ValidationMessageFor(model => model.StreetAddress2)
-                </td>
-            </tr>
-        }
-        @if (Model.ZipPostalCodeEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.ZipPostalCode)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.ZipPostalCode)
-                    @Html.ValidationMessageFor(model => model.ZipPostalCode)
-                </td>
-            </tr>
-        }
-        @if (Model.CityEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.City)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.City)
-                    @Html.ValidationMessageFor(model => model.City)
-                </td>
-            </tr>
-        }
-        @if (Model.CountryEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.CountryId)
-                </td>
-                <td class="adminData">
-                    @Html.DropDownList("CountryId", Model.AvailableCountries,
-                    new
-                    {
-                        @class = "form-control country-input country-selector",
-                        data_region_control_selector = "#StateProvinceId",
-                        data_states_ajax_url = Url.Action("GetStatesByCountryId", "Country"),
-                        data_addEmptyStateIfRequired = "true"
-                    })
-                </td>
-            </tr>
-        }
-        @if (Model.CountryEnabled && Model.StateProvinceEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.StateProvinceId)
-                </td>
-                <td class="adminData">
-                    @Html.DropDownList("StateProvinceId", Model.AvailableStates)
-                </td>
-            </tr>
-        }
-        @if (Model.PhoneEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Phone)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Phone)
-                    @Html.ValidationMessageFor(model => model.Phone)
-                </td>
-            </tr>
-        }
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.ParentPhone)
+                <div class="ctl-label"><label for="CreditCardBank">开户行</label></div>
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.ParentPhone)
-                @Html.ValidationMessageFor(model => model.ParentPhone)
+                @Html.EditorFor(model => model.CreditCardBank)
+                @Html.ValidationMessageFor(model => model.CreditCardBank)
             </td>
         </tr>
-        @if (Model.FaxEnabled)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.Fax)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.Fax)
-                    @Html.ValidationMessageFor(model => model.Fax)
-                </td>
-            </tr>
-        }
+
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.AdminComment)
+                <div class="ctl-label"><label for="AdminComment">备注（仅后台可见）</label></div>
             </td>
             <td class="adminData">
                 @Html.TextAreaFor(model => model.AdminComment)
                 @Html.ValidationMessageFor(model => model.AdminComment)
             </td>
         </tr>
+
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.IsTaxExempt)
+                <div class="ctl-label"><label for="EverHadOrder">是否曾经报单过</label></div>
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.IsTaxExempt)
-                @Html.ValidationMessageFor(model => model.IsTaxExempt)
+                @*@Html.EditorFor(model => model.EverHadOrder)*@
+                @*@Html.ValidationMessageFor(model => model.EverHadOrder)*@
+                <div class="form-control-plaintext form-inline">
+                    <div class="form-check form-check-inline">
+                        @Html.RadioButton("EverHadOrder", true, (Model.EverHadOrder == true), new { @class = "form-check-input", id = "EverHadOrder-true" })
+                        <label class="form-check-label" for="EverHadOrder-true">@T("是")</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        @Html.RadioButton("EverHadOrder", false, (Model.EverHadOrder == false), new { @class = "form-check-input", id = "EverHadOrder-false" })
+                        <label class="form-check-label" for="EverHadOrder-false">@T("否")</label>
+                    </div>
+                </div>
             </td>
         </tr>
-        @if (Model.AllowCustomersToSetTimeZone)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.TimeZoneId)
-                </td>
-                <td class="adminData">
-                    @Html.DropDownList("TimeZoneId", Model.AvailableTimeZones)
-                    @Html.ValidationMessageFor(model => model.TimeZoneId)
-                </td>
-            </tr>
-        }
-        @if (Model.AffiliateId != 0)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.AffiliateId)
-                </td>
-                <td class="adminData form-control-plaintext">
-                    <a href="@Url.Action("Edit", "Affiliate", new { id = Model.AffiliateId })">@Model.AffiliateFullName</a>
-                </td>
-            </tr>
-        }
-        @if (Model.DisplayVatNumber)
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.VatNumber)
-                </td>
-                <td class="adminData">
-                    @Html.EditorFor(model => model.VatNumber)
-
-                    <div class="font-weight-bold py-3">
-                        @string.Format(T("Admin.Customers.Customers.Fields.VatNumberStatus").Text, Model.VatNumberStatusNote)
-                    </div>
-
-
-                    <button type="submit" name="markVatNumberAsValid" value="markVatNumberAsValid" class="btn btn-secondary">
-                        <span>@T("Admin.Customers.Customers.Fields.VatNumber.MarkAsValid")</span>
-                    </button>
-                    <button type="submit" name="markVatNumberAsInvalid" value="markVatNumberAsInvalid" class="btn btn-secondary">
-                        <span>@T("Admin.Customers.Customers.Fields.VatNumber.MarkAsInvalid")</span>
-                    </button>
-                    @Html.ValidationMessageFor(model => model.VatNumber)
-                </td>
-            </tr>
-        }
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.Active)
+                <div class="ctl-label"><label for="Title">会员等级（顾客或VIP）</label></div>
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.Active)
-                @Html.ValidationMessageFor(model => model.Active)
+                @Html.EditorFor(model => model.Title)
+                @Html.ValidationMessageFor(model => model.Title)
             </td>
         </tr>
         @if (Model.Id > 0)
         {
-            <tr>
+            @*<tr>
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.LastIpAddress)
                 </td>
                 <td class="adminData">
                     @Html.TextBoxFor(model => model.LastIpAddress, new { @readonly = "readonly", @class = "form-control-plaintext" })
                 </td>
-            </tr>
+            </tr>*@
             <tr>
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.CreatedOn)
@@ -450,29 +235,17 @@
             </tr>
         }
 
-        @if (Model.Id > 0 && Model.LastVisitedPage.HasValue())
-        {
-            <tr>
-                <td class="adminTitle">
-                    @Html.SmartLabelFor(model => model.LastVisitedPage)
-                </td>
-                <td class="adminData">
-                    <div class="form-control-plaintext">
-                        <a href="@Model.LastVisitedPage">@Model.LastVisitedPage.Truncate(128, "...")</a>
-                    </div>
-                </td>
-            </tr>
-        }
     </table>
 }
 
 @helper TabCustomerRoles()
 {
-	if (Model.AvailableCustomerRoles != null && Model.AvailableCustomerRoles.Count > 0)
-	{
-		foreach (var customerRole in Model.AvailableCustomerRoles)
-		{
-			<div class="form-check">
+if (Model.AvailableCustomerRoles != null && Model.AvailableCustomerRoles.Count > 0)
+{
+    foreach (var customerRole in Model.AvailableCustomerRoles)
+        {
+
+            <div class="form-check">
 				<input type="checkbox" class="form-check-input" name="SelectedCustomerRoleIds" value="@customerRole.Id" id="customer-role-@customerRole.Id"
 						checked="@(Model.SelectedCustomerRoleIds != null && Model.SelectedCustomerRoleIds.Contains(customerRole.Id))"
 						disabled="@(!Model.AllowManagingCustomerRoles)" />

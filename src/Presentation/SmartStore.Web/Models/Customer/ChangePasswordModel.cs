@@ -31,6 +31,7 @@ namespace SmartStore.Web.Models.Customer
         public decimal Amount { get; set; }
         [SmartResourceDisplayName("可用余额")]
         public decimal TotalAmount { get; set; }
+        public SmartStore.Core.Domain.Customers.Customer customer { get; set; }
     }
     public class ChangePasswordValidator : AbstractValidator<ChangePasswordModel>
     {

@@ -6,7 +6,7 @@
 @{
 	Html.AddTitleParts(T("PageTitle.Account").Text);
 
-	Layout = "_MyAccount";
+	Layout = "_dMyAccount";
 	ViewBag.PageClassToken = "addresses";
 	ViewBag.PageTitle = T("Account.CustomerAddresses").Text;
 }
@@ -37,26 +37,36 @@
             <div class="card-body">
 				<h4 class="card-title">@address.GetFormattedName()</h4>
 
-				<div class="mb-2">
-					<div class="email">
-						@Html.LabelFor(model => model.Addresses[i].Email, new { @class = "m-0" }):
-						@address.Email
-					</div>
-					@if (address.PhoneEnabled)
-					{
-						<div class="phone">
-							@Html.LabelFor(model => model.Addresses[i].PhoneNumber, new { @class = "m-0" }):
-							@address.PhoneNumber
-						</div>
-					}
-					@if (address.FaxEnabled && address.FaxNumber.HasValue())
-					{
-						<div class="fax">
-							@Html.LabelFor(model => model.Addresses[i].FaxNumber, new { @class = "m-0" }):
-							@address.FaxNumber
-						</div>
-					}
-				</div>
+                <div class="mb-2">
+                    @*<div class="email">
+            @Html.LabelFor(model => model.Addresses[i].Email, new { @class = "m-0" }):
+            @address.Email
+        </div>*@
+
+                    <div class="phone">
+                        @Html.LabelFor(model => model.Addresses[i].PhoneNumber, new { @class = "m-0" }):
+                        @address.PhoneNumber
+                    </div>
+                    <div class="phone">
+                        @Html.LabelFor(model => model.Addresses[i].StateProvinceName, new { @class = "m-0" }):
+                        @address.StateProvinceName
+                    </div>
+                    <div class="phone">
+                        @Html.LabelFor(model => model.Addresses[i].City, new { @class = "m-0" }):
+                        @address.City
+                    </div>
+                    <div class="phone">
+                        @Html.LabelFor(model => model.Addresses[i].Address1, new { @class = "m-0" }):
+                        @address.Address1
+                    </div>
+                    @*@if (address.FaxEnabled && address.FaxNumber.HasValue())
+        {
+            <div class="fax">
+                @Html.LabelFor(model => model.Addresses[i].FaxNumber, new { @class = "m-0" }):
+                @address.FaxNumber
+            </div>
+        }*@
+                </div>
 
 				<div>
 					@Html.Raw(address.FormattedAddress)

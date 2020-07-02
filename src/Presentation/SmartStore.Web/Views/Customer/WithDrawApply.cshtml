@@ -9,35 +9,35 @@
     ViewBag.PageClassToken = "changepassword";
     ViewBag.PageTitle = T("提现申请").Text;
 }
-    <script type="text/javascript">
-        function keyPress(ob) {
-            if (!ob.value.match(/^[\+\-]?\d*?\.?\d*?$/)) ob.value = ob.t_value; else ob.t_value = ob.value; if (ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) ob.o_value = ob.value;
-        }
-        function keyUp(ob) {
-            if (!ob.value.match(/^[\+\-]?\d*?\.?\d*?$/)) ob.value = ob.t_value; else ob.t_value = ob.value; if (ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) ob.o_value = ob.value;
-        }
-        function onBlur(ob) {
-            if (!ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?|\.\d*?)?$/)) ob.value = ob.o_value; else { if (ob.value.match(/^\.\d+$/)) ob.value = 0 + ob.value; if (ob.value.match(/^\.$/)) ob.value = 0; ob.o_value = ob.value };
-        }
-        $(function () {
+<script type="text/javascript">
+    function keyPress(ob) {
+        if (!ob.value.match(/^[\+\-]?\d*?\.?\d*?$/)) ob.value = ob.t_value; else ob.t_value = ob.value; if (ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) ob.o_value = ob.value;
+    }
+    function keyUp(ob) {
+        if (!ob.value.match(/^[\+\-]?\d*?\.?\d*?$/)) ob.value = ob.t_value; else ob.t_value = ob.value; if (ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) ob.o_value = ob.value;
+    }
+    function onBlur(ob) {
+        if (!ob.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?|\.\d*?)?$/)) ob.value = ob.o_value; else { if (ob.value.match(/^\.\d+$/)) ob.value = 0 + ob.value; if (ob.value.match(/^\.$/)) ob.value = 0; ob.o_value = ob.value };
+    }
+    $(function () {
+        $("#alert").hide();
+        $("#Amount").keyup(function () { this.value = this.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') })
+
+        $("#Amount").change(function () {
             $("#alert").hide();
-            $("#Amount").keyup(function () { this.value = this.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3') })
-
-            $("#Amount").change(function () {
-                $("#alert").hide();
-                var amount = 0;
-                var totalamount = 0;
-                amount = parseFloat($("#Amount").val());
-                totalamount = parseFloat($("#TotalAmount").val());
-                console.log(amount);
-                console.log(totalamount);
-                if (totalamount >= amount) { $("#alert").hide(); $("#submitbtn").show(); }
-                else { $("#alert").show(); $("#submitbtn").hide(); }
-            });
+            var amount = 0;
+            var totalamount = 0;
+            amount = parseFloat($("#Amount").val());
+            totalamount = parseFloat($("#TotalAmount").val());
+            console.log(amount);
+            console.log(totalamount);
+            if (totalamount >= amount) { $("#alert").hide(); $("#submitbtn").show(); }
+            else { $("#alert").show(); $("#submitbtn").hide(); }
         });
+    });
 
-       
-    </script>
+
+</script>
 @using (Html.BeginForm("WithDrawApply", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
 {
     @Html.AntiForgeryToken()
@@ -45,6 +45,18 @@
     if (!ViewData.ModelState.IsValid)
     {
         @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+    }
+    
+    if (string.IsNullOrEmpty(Model.customer.FirstName) || string.IsNullOrEmpty(Model.customer.CreditCard) || string.IsNullOrEmpty(Model.customer.CreditCardBank))
+    {
+        @Html.ValidationSummary(true, "需要完善您的资料才能进行提现操作", new { @class = "alert alert-danger" })
+<script type="text/javascript">
+    $(function () {
+        $("#submitbtn").remove();
+        alert("需要完善您的资料才能进行提现操作");
+        window.location.href = "Info";
+    });
+</script>
     }
     <div id="alert" class="alert alert-info">
         请输入正确的数值

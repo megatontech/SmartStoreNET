@@ -14,7 +14,7 @@
 	<div class="row">
 		<div class="col-md-8">
 			<div class="row">
-				<div class="col mb-4 mb-lg-0 billinginfo">
+				@*<div class="col mb-4 mb-lg-0 billinginfo">
 					<div class="row sm-gutters">
 						<div class="col">
 							<div class="heading">
@@ -26,7 +26,7 @@
 						</div>
 					</div>
 					@RenderAddress(Model.BillingAddress)
-				</div>
+				</div>*@
 
 				@if (Model.IsShippable && Model.ShippingAddress != null)
 				{
@@ -34,7 +34,7 @@
 						<div class="row sm-gutters">
 							<div class="col">
 								<div class="heading">
-									<h5 class="heading-title font-weight-medium">@T("Order.ShippingAddress")</h5>
+									<h5 class="heading-title font-weight-medium">@T("收货地址")</h5>
 								</div>
 							</div>
 							<div class="col col-auto">
@@ -98,7 +98,7 @@
 	</div>
 
     <div class="row d-none">
-        <div class="billinginfo col-md-6 mb-3">
+        @*<div class="billinginfo col-md-6 mb-3">
             <div class="card">
                 <div class="card-header d-flex flex-nowrap justify-content-between">
                     <h5 class="m-0">@T("Order.BillingAddress")</h5>
@@ -108,7 +108,7 @@
 					@RenderAddress(Model.BillingAddress)
 				</div>
             </div>
-        </div>
+        </div>*@
 
         @if (Model.IsShippable)
         {
@@ -170,12 +170,12 @@
 	var cityStateZip = address.GetFormattedCityStateZip();
 
 	<div class="mb-2">
-		@if (address.CompanyEnabled && address.Company.HasValue())
+		@*@if (address.CompanyEnabled && address.Company.HasValue())
 		{
 			<div class="company">
 				@address.Company
 			</div>
-		}
+		}*@
 		<div class="name">
 			@address.GetFormattedName()
 		</div>
@@ -191,24 +191,24 @@
 				@address.Address2
 			</div>
 		}
-		@if (cityStateZip.HasValue())
+		@*@if (cityStateZip.HasValue())
 		{
 			<div class="city-state-zip">
 				@Html.Raw(cityStateZip)
 			</div>
-		}
-		@if (address.CountryEnabled && address.CountryName.HasValue())
+		}*@
+		@*@if (address.CountryEnabled && address.CountryName.HasValue())
 		{
 			<div class="country">
 				@address.CountryName
 			</div>
-		}
+		}*@
 	</div>
 
-	<div class="email">
+	@*<div class="email">
 		<span class="pr-1">@T("Order.Email"):</span>
 		<span>@address.Email</span>
-	</div>
+	</div>*@
 
 	if (address.PhoneEnabled && address.PhoneNumber.HasValue())
 	{
@@ -217,11 +217,11 @@
 			<span>@address.PhoneNumber</span>
 		</div>
 	}
-	if (address.FaxEnabled && address.FaxNumber.HasValue())
+	@*if (address.FaxEnabled && address.FaxNumber.HasValue())
 	{
 		<div class="fax">
 			<span>@T("Order.Fax"):</span>
 			<span>@address.FaxNumber</span>
 		</div>
-	}
+	}*@
 }

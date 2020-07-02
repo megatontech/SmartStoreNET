@@ -130,7 +130,7 @@ namespace SmartStore.Services.Wallet
                     _IWithdrawalDetailService.Add(new WithdrawalDetail
                     {
                         Amount = amount,
-                        Comment = "推广佣金入账" + amount.ToString("F2"),
+                        Comment = "分享奖励" + amount.ToString("F2"),
                         Customer = customer.Id,
                         isOut = false,
                         WithdrawTime = DateTime.Now,

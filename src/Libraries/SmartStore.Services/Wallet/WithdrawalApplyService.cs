@@ -201,6 +201,7 @@ namespace SmartStore.Services.Wallet
         public void WithdrawalApplyAudit(WithdrawalApply withdrawal,Customer customer,Customer applier)
         {
             //修改WithdrawalApply记录 减冻钱 扣手续费 加积分 写入日志详细
+           // withdrawal.ExpectAmount = withdrawal.Amount - withdrawal.ToFeeAmount - withdrawal.ToPointAmount;
             this._WithdrawalApplyRepository.Update(withdrawal);
             var total = _IWithdrawalTotalService.Get(customer);
             //total.TotalAmount -= withdrawal.Amount;
@@ -253,9 +254,9 @@ namespace SmartStore.Services.Wallet
             var model = new WithdrawalApply()
             {
                 Amount = amount,
-                ExpectAmount = amount * ((100 - _calcrule.WithDrawApplyFeePercent - _calcrule.WithDrawApplyToPointPercent) / 100),
-                ToFeeAmount = amount * (_calcrule.WithDrawApplyFeePercent / 100),
-                ToPointAmount = amount * (_calcrule.WithDrawApplyToPointPercent / 100),
+                ExpectAmount = amount ,//* ((100 - _calcrule.WithDrawApplyFeePercent - _calcrule.WithDrawApplyToPointPercent) / 100),
+                ToFeeAmount = 0M,
+                ToPointAmount = 0M,
                 Comment = "",
                 Customer = customer.Id,
                 CustomerID = customer.CustomerGuid,
@@ -289,9 +290,9 @@ namespace SmartStore.Services.Wallet
             var model = new WithdrawalApply()
             {
                 Amount = amount,
-                ExpectAmount = amount * ((100 - _calcrule.WithDrawApplyFeePercent - _calcrule.WithDrawApplyToPointPercent) / 100),
-                ToFeeAmount = amount * (_calcrule.WithDrawApplyFeePercent / 100),
-                ToPointAmount = amount * (_calcrule.WithDrawApplyToPointPercent / 100),
+                ExpectAmount = (decimal)((float)amount * (float)((float)(100 - _calcrule.WithDrawApplyFeePercent - _calcrule.WithDrawApplyToPointPercent) / 100)),
+                ToFeeAmount = (decimal)((float)amount * (float)((float)_calcrule.WithDrawApplyFeePercent / 100)),
+                ToPointAmount = (decimal)((float)amount * (float)((float)_calcrule.WithDrawApplyToPointPercent / 100)),
                 Comment = "",
                 Customer = customer.Id,
                 CustomerID = customer.CustomerGuid,
