@@ -569,7 +569,7 @@ namespace SmartStore.Web.Controllers
 				return RedirectToAction("ShippingMethod");
             }
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 var address = model.NewAddress.ToEntity();
                 address.CreatedOnUtc = DateTime.Now;

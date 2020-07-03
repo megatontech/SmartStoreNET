@@ -1,13 +1,17 @@
 ﻿using SmartStore.Admin.Models.Stores;
 using SmartStore.Core.Domain.Stores;
+using SmartStore.Core.Plugins;
+using SmartStore.Services.Configuration;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Media;
+using SmartStore.Services.Media.Storage;
 using SmartStore.Services.Security;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Security;
 using System;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using Telerik.Web.Mvc;
 
@@ -18,15 +22,21 @@ namespace SmartStore.Admin.Controllers
     {
         #region Private Fields
 
-        private readonly ICurrencyService _currencyService;
+        private readonly ISettingService _settingService;
 
+        private readonly ICurrencyService _currencyService;
+        private readonly Provider<IMediaStorageProvider> _storageProvider;
+        private readonly IPictureService _pictureService;
         #endregion Private Fields
 
         #region Public Constructors
 
-        public StoreController(ICurrencyService currencyService)
+        public StoreController(ICurrencyService currencyService, IProviderManager providerManager, ISettingService settingService, IPictureService pictureService)
         {
             _currencyService = currencyService;
+            _pictureService = pictureService;
+            _storageProvider = providerManager.GetProvider<IMediaStorageProvider>(FileSystemMediaStorageProvider.SystemName);
+
         }
 
         #endregion Public Constructors
@@ -34,6 +44,82 @@ namespace SmartStore.Admin.Controllers
 
 
         #region Public Methods
+
+        [HttpPost]
+        public ActionResult UploadAvatar01()
+        {
+            var success = false;
+            string avatarUrl = null;
+            var uploadedFile = Request.Files["uploadedFile01-file"].ToPostedFileResult();
+            if (uploadedFile != null && uploadedFile.FileName.HasValue())
+            {
+                avatarUrl = "~/Content/Images/01.jpg";
+                string path = VirtualPathUtility.ToAbsolute(avatarUrl);
+                _storageProvider.Value.Save(path, uploadedFile.Buffer);
+                success =true;
+            }
+            return Json(new { success, avatarUrl });
+        }
+        [HttpPost]
+        public ActionResult UploadAvatar02()
+        {
+            var success = false;
+            string avatarUrl = null;
+            var uploadedFile = Request.Files["uploadedFile02-file"].ToPostedFileResult();
+            if (uploadedFile != null && uploadedFile.FileName.HasValue())
+            {
+                avatarUrl = "~/Content/Images/02.jpg";
+                string path = VirtualPathUtility.ToAbsolute(avatarUrl);
+                _storageProvider.Value.Save(path, uploadedFile.Buffer);
+                success = true;
+            }
+            return Json(new { success, avatarUrl });
+        }
+        [HttpPost]
+        public ActionResult UploadAvatar03()
+        {
+            var success = false;
+            string avatarUrl = null;
+            var uploadedFile = Request.Files["uploadedFile03-file"].ToPostedFileResult();
+            if (uploadedFile != null && uploadedFile.FileName.HasValue())
+            {
+                avatarUrl = "~/Content/Images/03.jpg";
+                string path = VirtualPathUtility.ToAbsolute(avatarUrl);
+                _storageProvider.Value.Save(path, uploadedFile.Buffer);
+                success = true;
+            }
+            return Json(new { success, avatarUrl });
+        }
+        [HttpPost]
+        public ActionResult UploadAvatar04()
+        {
+            var success = false;
+            string avatarUrl = null;
+            var uploadedFile = Request.Files["uploadedFile04-file"].ToPostedFileResult();
+            if (uploadedFile != null && uploadedFile.FileName.HasValue())
+            {
+                avatarUrl = "~/Content/Images/04.jpg";
+                string path = VirtualPathUtility.ToAbsolute(avatarUrl);
+                _storageProvider.Value.Save(path, uploadedFile.Buffer);
+                success = true;
+            }
+            return Json(new { success, avatarUrl });
+        }
+        [HttpPost]
+        public ActionResult UploadAvatar05()
+        {
+            var success = false;
+            string avatarUrl = null;
+            var uploadedFile = Request.Files["uploadedFile05-file"].ToPostedFileResult();
+            if (uploadedFile != null && uploadedFile.FileName.HasValue())
+            {
+                avatarUrl = "~/Content/Images/05.jpg";
+                string path = VirtualPathUtility.ToAbsolute(avatarUrl);
+                _storageProvider.Value.Save(path, uploadedFile.Buffer);
+                success = true;
+            }
+            return Json(new { success, avatarUrl });
+        }
 
         public ActionResult AllStores(string label, int selectedId = 0)
         {
@@ -57,6 +143,16 @@ namespace SmartStore.Admin.Controllers
         }
 
         public ActionResult Create()
+        {
+            if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageStores))
+                return AccessDeniedView();
+
+            var model = new StoreModel();
+            PrepareStoreModel(model, null);
+
+            return View(model);
+        }
+        public ActionResult CreateImage()
         {
             if (!Services.Permissions.Authorize(StandardPermissionProvider.ManageStores))
                 return AccessDeniedView();

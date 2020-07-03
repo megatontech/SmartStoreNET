@@ -584,14 +584,14 @@ namespace SmartStore.Services.Orders
                         warnings.Add(T("Order.ShippingAddressMissing"));
                         throw new SmartException();
                     }
-                    else if (!customer.ShippingAddress.Email.IsEmail())
-                    {
-                        warnings.Add(T("Common.Error.InvalidEmail"));
-                    }
-                    else if (customer.ShippingAddress.Country != null && !customer.ShippingAddress.Country.AllowsShipping)
-                    {
-                        warnings.Add(T("Order.CountryNotAllowedForShipping", customer.ShippingAddress.Country.Name));
-                    }
+                    //else if (!customer.ShippingAddress.Email.IsEmail())
+                    //{
+                    //    warnings.Add(T("Common.Error.InvalidEmail"));
+                    //}
+                    //else if (customer.ShippingAddress.Country != null && !customer.ShippingAddress.Country.AllowsShipping)
+                    //{
+                    //    warnings.Add(T("Order.CountryNotAllowedForShipping", customer.ShippingAddress.Country.Name));
+                    //}
                 }
             }
             else
@@ -1773,15 +1773,15 @@ namespace SmartStore.Services.Orders
 
 			_orderService.AddOrderNote(order, T("Admin.OrderNotice.ShipmentSent", shipment.Id));
 
-            if (notifyCustomer)
-            {
-                //notify customer
-                var msg = _messageFactory.SendShipmentSentCustomerNotification(shipment, order.CustomerLanguageId);
-                if (msg?.Email?.Id != null)
-                {
-					_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerShippedEmailQueued", msg.Email.Id));
-                }
-            }
+     //       if (notifyCustomer)
+     //       {
+     //           //notify customer
+     //           var msg = _messageFactory.SendShipmentSentCustomerNotification(shipment, order.CustomerLanguageId);
+     //           if (msg?.Email?.Id != null)
+     //           {
+					//_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerShippedEmailQueued", msg.Email.Id));
+     //           }
+     //       }
 
             //check order status
             CheckOrderStatus(order);

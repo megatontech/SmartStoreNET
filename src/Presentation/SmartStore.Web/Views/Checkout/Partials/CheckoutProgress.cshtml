@@ -25,7 +25,7 @@
         new {
             Step = CheckoutProgressStep.Shipping,
             StepName = "shipping",
-            Label =  T("Checkout.Progress.Shipping").Text,
+            Label =  T("地址").Text,
             Visited = Model.CheckoutProgressStep > CheckoutProgressStep.Shipping,
             Active = Model.CheckoutProgressStep == CheckoutProgressStep.Shipping,
             Href = Url.Action("ShippingMethod")

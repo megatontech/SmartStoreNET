@@ -714,7 +714,7 @@ namespace SmartStore.Admin.Controllers
                     LastName = model.LastName,
                     AdminComment = model.AdminComment,
                     IsTaxExempt = model.IsTaxExempt,
-                    Active = model.Active,
+                    Active = true,
                     CreatedOnUtc = DateTime.Now,
                     LastActivityDateUtc = DateTime.Now,
                 };
@@ -918,6 +918,9 @@ namespace SmartStore.Admin.Controllers
                 AdminComment = customer.AdminComment,
                 IsTaxExempt = customer.IsTaxExempt,
                 Active = customer.Active,
+                IsCustomer = customer.IsCustomer,
+                Phone = customer.Mobile,
+                ParentPhone = customer.ParentMobile,
                 TimeZoneId = customer.GetAttribute<string>(SystemCustomerAttributeNames.TimeZoneId),
                 VatNumber = customer.GetAttribute<string>(SystemCustomerAttributeNames.VatNumber),
                 CreditCard = customer.CreditCard,
@@ -993,9 +996,12 @@ namespace SmartStore.Admin.Controllers
             {
                 try
                 {
+                    customer.IsCustomer = model.IsCustomer;
+                    customer.Mobile = model.Phone ;
+                    customer.ParentMobile = model.ParentPhone  ;
                     customer.AdminComment = model.AdminComment;
                     customer.IsTaxExempt = model.IsTaxExempt;
-                    customer.Active = model.Active;
+                    customer.Active =true;
                     customer.FirstName = model.FirstName;
                     customer.LastName = model.LastName;
 

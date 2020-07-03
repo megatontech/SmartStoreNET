@@ -11,13 +11,13 @@
 @Html.HiddenFor(model => model.Id)
 @Html.SmartStore().TabStrip().Name("discount-edit").Style(TabsStyle.Material).Items(x =>
 {
-    x.Add().Text(T("Admin.Promotions.Discounts.Info").Text).Content(TabInfo()).Selected(true);
-    x.Add().Text(T("Admin.Promotions.Discounts.Requirements").Text).Content(TabRequirements());
+    x.Add().Text(T("优惠券信息").Text).Content(TabInfo()).Selected(true);
+    //x.Add().Text(T("Admin.Promotions.Discounts.Requirements").Text).Content(TabRequirements());
     if (Model.Id > 0)
     {
-        x.Add().Text(T("Admin.Promotions.Discounts.History").Text).Content(TabHistory());
+        x.Add().Text(T("优惠券使用记录").Text).Content(TabHistory());
     }
-    
+
     //generate an event
     EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "discount-edit", this.Html, this.Model));
 })
@@ -129,7 +129,7 @@
                 }
             </td>
         </tr>
-		<tr id="pnlAppliedToManufacturers">
+		@*<tr id="pnlAppliedToManufacturers">
 			<td class="adminTitle">
 				@Html.SmartLabelFor(model => model.AppliedToManufacturerModels)
 			</td>
@@ -146,7 +146,7 @@
 					<a href="@Url.Action("Edit", "Manufacturer", new { id = manu.ManufacturerId })">@manu.ManufacturerName</a>
 				}
 			</td>
-		</tr>
+		</tr>*@
 
         <tr id="pnlAppliedToProducts">
             <td class="adminTitle">
@@ -219,7 +219,7 @@
                 @Html.ValidationMessageFor(model => model.EndDateUtc)
             </td>
         </tr>
-        <tr>
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.RequiresCouponCode)
             </td>
@@ -227,8 +227,8 @@
 				@Html.CheckBoxFor(model => model.RequiresCouponCode, new { data_toggler_for = "#pnlCouponCode" })
                 @Html.ValidationMessageFor(model => model.RequiresCouponCode)
             </td>
-        </tr>
-        <tr id="pnlCouponCode">
+        </tr>*@
+        @*<tr id="pnlCouponCode">
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.CouponCode)
             </td>
@@ -236,7 +236,7 @@
                 @Html.EditorFor(model => model.CouponCode)
                 @Html.ValidationMessageFor(model => model.CouponCode)
             </td>
-        </tr>
+        </tr>*@
         <tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.DiscountLimitationId)

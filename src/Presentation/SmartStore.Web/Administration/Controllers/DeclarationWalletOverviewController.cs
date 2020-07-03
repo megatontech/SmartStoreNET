@@ -95,7 +95,7 @@ namespace SmartStore.Admin.Controllers
                 {
                     var dispmodel = item.ToModel();
                     var customerModel = customer.FirstOrDefault(x => x.Id == item.CustomerId);
-                    if (customerModel != null) { dispmodel.CustomerName = customerModel.Username; dispmodel.CustomerMobile = customerModel.Mobile; }
+                    if (customerModel != null) { dispmodel.RealName = customerModel.FirstName; dispmodel.CustomerName = customerModel.Username; dispmodel.CustomerMobile = customerModel.Mobile; }
                     modelList.Add(dispmodel);
                 }
                 var products = new PagedList<WithdrawalTotalModel>(modelList.AsEnumerable(), command.Page - 1, command.PageSize, detail.Count());
@@ -124,7 +124,7 @@ namespace SmartStore.Admin.Controllers
                     //item.CustomerName = name;
                     var WithdrawTypeStr = ConvertEnum(item);
                     var mod = item.ToModel();
-                    if (customerModel != null) { mod.CustomerName = customerModel.Username; mod.CustomerMobile = customerModel.Mobile; }
+                    if (customerModel != null) { mod.RealName = customerModel.FirstName; mod.CustomerName = customerModel.Username; mod.CustomerMobile = customerModel.Mobile; }
                     mod.WithdrawTypeStr = WithdrawTypeStr;
                     if (item.Amount != 0M) { modelList.Add(mod); }
                 }

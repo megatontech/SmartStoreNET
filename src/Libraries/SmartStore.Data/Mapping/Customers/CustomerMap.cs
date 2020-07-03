@@ -54,4 +54,12 @@ namespace SmartStore.Data.Mapping.Customers
             this.HasKey(c => c.Id);
         }
     }
+    public partial class CustomerDiscountMap : EntityTypeConfiguration<CustomerDiscount>
+    {
+        public CustomerDiscountMap()
+        {
+            this.ToTable("CustomerDiscount");
+            this.HasKey(c => c.Id);
+        }
+    }
 }

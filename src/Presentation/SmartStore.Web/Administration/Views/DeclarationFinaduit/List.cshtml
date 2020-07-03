@@ -16,7 +16,7 @@
         <div class="options d-flex">
 			@{ Html.RenderWidget("admin_button_toolbar_before"); }
 
-			<div class="input-group d-inline-flex mr-3" style="width: 400px">
+			@*<div class="input-group d-inline-flex mr-3" style="width: 400px">
 				@Html.TextBoxFor(model => Model.GoDirectlyToNumber, new { @class = "form-control", placeholder = T("按订单编号查找") })
 				<div class="input-group-append">
 					<button type="submit" class="btn btn-secondary" id="go-to-order-by-number" name="go-to-order-by-number" value="go-to-order-by-number" title="@T("Admin.Orders.List.GoDirectlyToNumber.Hint")">
@@ -28,7 +28,7 @@
 						<i class="fa fa-angle-double-down"></i>
 					</button>
 				</div>
-			</div>	
+			</div>*@	
 
 			@{ Html.RenderWidget("admin_button_toolbar_after"); }
         </div>
@@ -97,15 +97,19 @@
                     .Title(T("订单编号"))
                     .ClientTemplate("<#= OrderNumber #>");
                 columns.Bound(x => x.RedeemedRewardPoints)
-                  .Title(T("代数"))
+                  .Title(T("所在层数"))
                   .ClientTemplate(
                       "<div><#= RedeemedRewardPoints #></div>");
-                columns.Bound(x => x.CardName)
+                columns.Bound(x => x.CustomerEmail)
                    .Title(T("客户姓名"))
                    .ClientTemplate(
+                       "<div><#= CustomerEmail #></div>");
+                columns.Bound(x => x.CustomerName)
+                   .Title(T("昵称"))
+                   .ClientTemplate(
                        "<div><#= CustomerName #></div>");
-                columns.Bound(x => x.CardNumber)
-                   .Title(T("客户手机"))
+                columns.Bound(x => x.CustomerMobile)
+                   .Title(T("手机号"))
                    .ClientTemplate(
                        "<div><#= CustomerMobile #></div>");
                 columns.Bound(x => x.CreatedOn)

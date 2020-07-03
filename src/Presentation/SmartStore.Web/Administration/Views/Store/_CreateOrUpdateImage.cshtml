@@ -1,0 +1,116 @@
+﻿@model StoreModel
+
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+@{
+        Random rd = new Random();
+    var ran =rd.NextDouble();
+}
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="LogoPictureId">
+                    轮播图1
+                </label>
+            </div>
+        </td>
+        <td class="adminData" id="store-logo-picture">
+            <img src="~/Media/Content/Images/01.jpg?ran=@ran" title="轮播图1" />
+            @(Html.SmartStore().FileUploader()
+            .Name("uploadedFile01")
+            .UploadUrl(Url.Action("UploadAvatar01", "Store"))
+            .AcceptedFileTypes("gif|jpe?g|png")
+            .UploadText(T("Common.FileUploader.Upload"))
+            .OnUploadCompletedHandlerName("onAvatarUploaded")
+            )
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="LogoPictureId">
+                    轮播图2
+                </label>
+            </div>
+        </td>
+        <td class="adminData" id="store-logo-picture">
+            <img src="~/Media/Content/Images/02.jpg?ran=@ran" title="轮播图1" />
+            @(Html.SmartStore().FileUploader()
+            .Name("uploadedFile02")
+            .UploadUrl(Url.Action("UploadAvatar02", "Store"))
+            .AcceptedFileTypes("gif|jpe?g|png")
+            .UploadText(T("Common.FileUploader.Upload"))
+            .OnUploadCompletedHandlerName("onAvatarUploaded")
+            )
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="LogoPictureId">
+                    轮播图3
+                </label>
+            </div>
+        </td>
+        <td class="adminData" id="store-logo-picture">
+            <img src="~/Media/Content/Images/03.jpg?ran=@ran" title="轮播图1" />
+            @(Html.SmartStore().FileUploader()
+            .Name("uploadedFile03")
+            .UploadUrl(Url.Action("UploadAvatar03", "Store"))
+            .AcceptedFileTypes("gif|jpe?g|png")
+            .UploadText(T("Common.FileUploader.Upload"))
+            .OnUploadCompletedHandlerName("onAvatarUploaded")
+            )
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="LogoPictureId">
+                    轮播图4
+                </label>
+            </div>
+        </td>
+        <td class="adminData" id="store-logo-picture">
+            <img src="~/Media/Content/Images/04.jpg?ran=@ran" title="轮播图1" />
+            @(Html.SmartStore().FileUploader()
+            .Name("uploadedFile04")
+            .UploadUrl(Url.Action("UploadAvatar04", "Store"))
+            .AcceptedFileTypes("gif|jpe?g|png")
+            .UploadText(T("Common.FileUploader.Upload"))
+            .OnUploadCompletedHandlerName("onAvatarUploaded")
+            )
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="LogoPictureId">
+                    轮播图5
+                </label>
+            </div>
+        </td>
+        <td class="adminData" id="store-logo-picture">
+            <img src="~/Media/Content/Images/05.jpg?ran=@ran" title="轮播图1" />
+            @(Html.SmartStore().FileUploader()
+            .Name("uploadedFile05")
+            .UploadUrl(Url.Action("UploadAvatar05", "Store"))
+            .AcceptedFileTypes("gif|jpe?g|png")
+            .UploadText(T("Common.FileUploader.Upload"))
+            .OnUploadCompletedHandlerName("onAvatarUploaded")
+            )
+        </td>
+    </tr>
+
+</table>
+<script>
+    window['onAvatarUploaded'] = function (e, el, data) {
+        var result = data.result;
+        if (result.success) {
+            window.location = window.location;
+        }
+    };
+
+
+</script>

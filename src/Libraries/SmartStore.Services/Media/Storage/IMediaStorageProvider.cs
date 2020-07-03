@@ -45,7 +45,7 @@ namespace SmartStore.Services.Media.Storage
         /// <param name="media">Media storage item</param>
         /// <param name="data">New binary data</param>
         Task SaveAsync(MediaItem media, byte[] data);
-
+        public void Save(string filePath, byte[] data);
         #endregion Public Methods
     }
 }

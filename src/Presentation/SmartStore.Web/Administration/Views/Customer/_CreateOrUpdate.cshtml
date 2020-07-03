@@ -12,7 +12,7 @@
 {
     x.Add().Text(T("Admin.Customers.Customers.Info").Text).Content(TabInfo()).Selected(true);
     x.Add().Text(T("Admin.Customers.Customers.CustomerRoles").Text).Content(TabCustomerRoles());
-
+    //x.Add().Text(T("优惠券分发").Text).Content(TabAddresses());
     //if (Model.Id > 0)
     //{
     //    //x.Add().Text(T("Admin.Customers.Customers.Orders").Text).Content(TabOrders());
@@ -49,7 +49,7 @@
         }
         <tr>
             <td class="adminTitle">
-                <div class="ctl-label"><label for="IsCustomer">是否为报单用户</label></div>
+                <div class="ctl-label"><label for="IsCustomer">是否为会员角色</label></div>
             </td>
             <td class="adminData">
                 <div class="form-control-plaintext form-inline">
@@ -177,7 +177,7 @@
 
         <tr>
             <td class="adminTitle">
-                <div class="ctl-label"><label for="EverHadOrder">是否曾经报单过</label></div>
+                <div class="ctl-label"><label for="EverHadOrder">初始化报单（影响佣金结算）</label></div>
             </td>
             <td class="adminData">
                 @*@Html.EditorFor(model => model.EverHadOrder)*@

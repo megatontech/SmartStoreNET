@@ -43,6 +43,11 @@
     }
         function changeOper(isAudit) {
             $("#isAudit").val(isAudit);
+            var vals = [];
+            $('input:checkbox:checked').each(function (index, item) {
+                vals.push($(this).val());
+            });
+            $("#discounts").val(vals.join(","));
             $("#AuditOrderComment").val($("#AddOrderNoteMessage").val());
             
         }
@@ -126,11 +131,37 @@
 
     <tr>
         <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.CustomerId)
+            <div class="ctl-label">
+                <label for="CustomerId">客户姓名</label>
+            </div>
         </td>
         <td class="adminData">
             <div class="form-control-plaintext">
                 @Model.CustomerName
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="CustomerId">昵称</label>
+            </div>
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Model.CustomerEmail
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            <div class="ctl-label">
+                <label for="CustomerId">手机号</label>
+            </div>
+        </td>
+        <td class="adminData">
+            <div class="form-control-plaintext">
+                @Model.CustomerMobile
             </div>
         </td>
     </tr>
@@ -187,7 +218,8 @@
             <hr />
         </td>
     </tr>
-    @if (@Model.HasNewPaymentNotification) {
+    @if (@Model.HasNewPaymentNotification)
+    {
         <tr>
             <td class="adminTitle">
                 <div class="ctl-label">
@@ -210,12 +242,12 @@
             <td class="adminData">
                 <div class="form-control-plaintext">
                     <span class="muted">@Model.OrderTotal</span>
-                    
+
                 </div>
             </td>
         </tr>
     }
-    else 
+    else
     {
         <tr>
             <td class="adminTitle">
@@ -233,7 +265,7 @@
             </td>
         </tr>
     }
-    
+
     <tr>
         <td class="adminTitle">
             @Html.SmartLabelFor(model => model.PaymentMethod)
@@ -241,10 +273,11 @@
         <td class="adminData">
             <div class="form-control-plaintext">
                 @if (@Model.HasNewPaymentNotification)
-                { <span class="muted">余额</span>}
-                else {<span class="muted">转账</span> }
-                    
-                </div>
+                {<span class="muted">余额</span>}
+                else
+                {<span class="muted">转账</span>}
+
+            </div>
         </td>
     </tr>
     <tr>
@@ -283,6 +316,31 @@
     </tr>
     <tr>
         <td colspan="2">
+                <h4>@T("分发优惠券")</h4>
+                <div class="alert alert-info">
+                    @if (Model.AvailableDiscounts != null && Model.AvailableDiscounts.Count > 0)
+                    {
+                        foreach (var discount in Model.AvailableDiscounts)
+                        {
+                            <div class="custom-control custom-checkbox mb-1">
+                                <input type="checkbox" class="custom-control-input" name="SelectedDiscountIds" id="discount-@discount.Id" value="@discount.Id"  />
+                                <label class="custom-control-label" for="discount-@discount.Id">
+                                    @discount.Name
+                                </label>
+                            </div>
+                        }
+                    }
+                </div>
+        </td>
+    </tr>
+    
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
             @if (Model.CustomerComment.HasValue())
             {
                 <h4>@T("客户备注")</h4>
@@ -294,10 +352,10 @@
     </tr>
     <tr id="">
         <td colspan="2">
-                <h4>@T("订单审核备注/快递单号")</h4>
-                <div class="alert alert-info">
-                    @Html.EditorFor(model => model.AddOrderNoteMessage)
-                </div>
+            <h4>@T("订单审核备注/快递单号")</h4>
+            <div class="alert alert-info">
+                @Html.EditorFor(model => model.AddOrderNoteMessage)
+            </div>
         </td>
     </tr>
 </table>

@@ -81,12 +81,9 @@
             //columns.Bound(x => x.Email)
             //	.Template(x => Html.ActionLink(x.Email, "Edit", "Customer", new { id = x.Id }, new { }))
             //	.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Customer/Edit/") + "<#= Id #>\"><#= Email #></a>");
-            columns.Bound(x => x.Username)
-                .Visible(Model.UsernamesEnabled);
-            columns.Bound(x => x.FullName);
             columns.Bound(x => x.CustomerRoleNames);
-            columns.Bound(x => x.Company)
-                .Visible(Model.CompanyEnabled);
+            columns.Bound(x => x.FirstName).Title("客户姓名");
+            columns.Bound(x => x.Username).Title("昵称");
             columns.Bound(x => x.Phone).Title("手机号");
             columns.Bound(x => x.ParentPhone).Title("推荐人手机号");
             columns.Bound(x => x.ZipPostalCode)

@@ -883,6 +883,8 @@
     <Content Include="Views\DeclarationFinaduit\_View.Products.cshtml" />
     <Content Include="Views\DeclarationFinaduit\_View.BillingAndShipment.cshtml" />
     <Content Include="Views\Customer\Wallet.cshtml" />
+    <Content Include="Views\Store\_CreateOrUpdateImage.cshtml" />
+    <Content Include="Views\Store\CreateImage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />

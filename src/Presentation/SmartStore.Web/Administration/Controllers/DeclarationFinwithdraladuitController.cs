@@ -37,6 +37,7 @@ namespace SmartStore.Admin.Controllers
         public ActionResult Audit(int id)
         {
             var model = _withdrawalApplyService.GetByTableID(id);
+            model.customer = _customerService.GetCustomerById(model.Customer);
             return View(model);
         }
 

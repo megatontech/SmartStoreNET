@@ -28,6 +28,7 @@ namespace SmartStore.Admin.Models.Customers
         /// 用户id
         /// </summary>
         public string CustomerName { get; set; }
+        public string RealName { get; set; }
         public string CustomerMobile { get; set; }
         /// <summary>
         /// 操作人ID

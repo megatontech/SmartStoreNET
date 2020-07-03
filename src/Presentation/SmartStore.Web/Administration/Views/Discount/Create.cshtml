@@ -1,13 +1,13 @@
 ﻿@model DiscountModel
 @{
     //page title
-    ViewBag.Title = T("Admin.Promotions.Discounts.AddNew").Text;
+    ViewBag.Title = T("添加优惠券").Text;
 }
 @using (Html.BeginForm())
 {
     <div class="section-header">
         <div class="title">
-            @T("Admin.Promotions.Discounts.AddNew") @Html.ActionLink("(" + T("Admin.Promotions.Discounts.BackToList") + ")", "List")
+            @T("添加优惠券") @Html.ActionLink("(" + T("返回优惠券列表") + ")", "List")
         </div>
         <div class="options">
             <button type="submit" name="save" value="save" class="btn btn-primary">

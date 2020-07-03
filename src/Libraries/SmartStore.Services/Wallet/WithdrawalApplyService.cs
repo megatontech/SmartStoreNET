@@ -209,7 +209,7 @@ namespace SmartStore.Services.Wallet
             total.UpdateTime = DateTime.Now;
             _IWithdrawalTotalService.Update(total);
             var pointVal = 0f;
-            pointVal = (float)withdrawal.Amount * (float)(_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
+            pointVal = (float)withdrawal.Amount * (float)((float)_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
             _ICustomerPointsTotalService.AddPointsToCustomer((int)pointVal, customer.Id);
             _ICustomerPointsDetailService.CreateDetail(new CustomerPointsDetail()
             {

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
+using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Directory;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Localization;
@@ -111,6 +112,7 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember]
         public bool IsCount { get; set; }
+        [NotMapped]public Customer customer { get; set; }
     }
 }
 

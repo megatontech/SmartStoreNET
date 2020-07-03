@@ -26,7 +26,8 @@ namespace SmartStore.Web.Models.Customer
 		public string Email { get; set; }
 
         public bool UsernamesEnabled { get; set; }
-        [SmartResourceDisplayName("Account.Fields.Username")]
+        //[SmartResourceDisplayName("Account.Fields.Username")]
+        [SmartResourceDisplayName("昵称", "昵称")]
         public string Username { get; set; }
 
         public bool CheckUsernameAvailabilityEnabled { get; set; }

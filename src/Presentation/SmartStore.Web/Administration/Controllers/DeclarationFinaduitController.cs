@@ -21,6 +21,7 @@ using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
+using SmartStore.Services.Discounts;
 using SmartStore.Services.Helpers;
 using SmartStore.Services.Localization;
 using SmartStore.Services.Media;
@@ -101,6 +102,9 @@ namespace SmartStore.Admin.Controllers
         private readonly ICalcRewardService _CalcRewardService;
         private readonly IWithdrawalDetailService _detailService;
         private readonly IWithdrawalApplyService _apply;
+        private readonly IDiscountService _discountService;
+        private readonly ICustomerDiscountService _ICustomerDiscountService;
+        
         #endregion Fields
 
         #region Ctor
@@ -115,8 +119,8 @@ namespace SmartStore.Admin.Controllers
             ICurrencyService currencyService,
             IEncryptionService encryptionService,
             IPaymentService paymentService,
-            IMeasureService measureService,
-            IAddressService addressService,
+            IMeasureService measureService, IDiscountService discountService, ICustomerDiscountService ICustomerDiscountService,
+        IAddressService addressService,
             ICountryService countryService,
             IStateProvinceService stateProvinceService,
             IProductService productService,
@@ -150,6 +154,8 @@ namespace SmartStore.Admin.Controllers
            IDeclarationOrderService declarationOrderService
             )
         {
+            _ICustomerDiscountService = ICustomerDiscountService;
+            _discountService = discountService;
             _dproductService = dproductService;
             _detailService = detailService;
             _pictureService = pictureService;
@@ -300,7 +306,10 @@ namespace SmartStore.Admin.Controllers
             model.StoreName = store != null ? store.Name : "".NaIfEmpty();
             model.CustomerId = order.CustomerId;
             model.CustomerName = order.Customer.GetFullName();
-            if (string.IsNullOrEmpty(model.CustomerName)) { model.CustomerName = order.Customer.Mobile; }
+            model.CustomerEmail = order.Customer.Username;
+            model.CustomerMobile = order.Customer.Mobile;
+
+            //if (string.IsNullOrEmpty(model.CustomerName)) { model.CustomerName = order.Customer.Mobile; }
             model.CustomerIp = order.CustomerIp;
             model.VatNumber = order.VatNumber;
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc);
@@ -1000,7 +1009,7 @@ namespace SmartStore.Admin.Controllers
                         ShippingMethod = x.ShippingMethod.NullEmpty() ?? "".NaIfEmpty(),
                         CustomerName = x.Customer.Username,
                         CustomerMobile = x.Customer.Mobile,
-                        CustomerEmail = "",
+                        CustomerEmail = x.Customer.FirstName,
                         CardName = x.CardName,
                         CardNumber = x.CardNumber,
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
@@ -1119,11 +1128,13 @@ namespace SmartStore.Admin.Controllers
                 return RedirectToAction("List");
             var isChangeVal = "";
             var AuditOrderComment = "";
+            var discountstr = "";
             var ChangedVal = 0M;
             isChangeVal = Request["isChangeVal"];
             var isAudit = true;
             isAudit = Request["isAudit"].ToBool();
             AuditOrderComment = Request["AuditOrderComment"];
+            discountstr = Request["discounts"];
             try
             {
                 if (isChangeVal == "true") {
@@ -1171,6 +1182,20 @@ namespace SmartStore.Admin.Controllers
                         #endregion
                         _customerService.UpdateCustomer(customer);
                         _CalcRewardService.CalcRewardOne(customer, order);
+                        //发优惠券
+                        if (string.IsNullOrEmpty(discountstr) || discountstr.Length>1)
+                        {
+                            var strArr = discountstr.Split(',').ToList();
+                            foreach (var item in strArr)
+                            {
+                                if (!string.IsNullOrEmpty(item))
+                                {
+                                    var discounts = _discountService.GetDiscountById(item.ToInt());
+                                    _ICustomerDiscountService.Insert(new Core.Domain.Customers.CustomerDiscount { Customer = order.Customer.Id, Discount= item.ToInt() });
+                                }
+                            }
+                        }
+                        
                     }
                     else 
                     {
@@ -1229,13 +1254,16 @@ namespace SmartStore.Admin.Controllers
             var model = new OrderModel();
             PrepareOrderDetailsModel(model, order);
             var pictureUrl = _pictureService.GetUrl(order.PaymentMethodSystemName.ToInt());
-            if (order.HasNewPaymentNotification) 
+            if (order.HasNewPaymentNotification)
             {
-                var custom= _customerService.GetCustomerById(order.BillingAddressId);
+                var custom = _customerService.GetCustomerById(order.BillingAddressId);
                 model.OrderShippingExclTax = custom.Username;
                 model.OrderShippingInclTax = custom.Mobile;
             }
+            
             model.ShippingAddressGoogleMapsUrl = pictureUrl;
+            var discounts = _discountService.GetAllDiscounts(null, null, true);
+            model.AvailableDiscounts = discounts.ToList();
             return View(model);
         }
         [HttpPost, ActionName("Edit")]

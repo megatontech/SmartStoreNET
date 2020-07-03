@@ -7,15 +7,15 @@
 
 @Html.SmartStore().TabStrip().Name("category-edit").OnAjaxSuccess("categoryEditTab_onAjaxSuccess").Style(TabsStyle.Material).Position(TabsPosition.Left).Items(x => {
 
-	x.Add().Text(T("Admin.Catalog.Categories.Info").Text).Icon("fa fa-pencil-alt fa-lg fa-fw").Content(TabInfo()).Selected(true);
-	x.Add().Text(T("Admin.Common.SEO").Text).Icon("fa fa-search fa-lg fa-fw").Content(TabSeo());
-	x.Add().Text(T("Admin.Catalog.Categories.Products").Text).Icon("fa fa-cube fa-lg fa-fw").Content(TabProducts());
-	x.Add().Text(T("Admin.Catalog.Categories.Discounts").Text).Icon("fa fa-percent fa-lg fa-fw").Content(TabDiscounts());
-	x.Add().Text(T("Admin.Catalog.Categories.Acl").Text).Icon("fa fa-users fa-lg fa-fw").Content(TabAcl());
-	x.Add().Text(T("Admin.Common.Stores").Text).Icon("fa fa-globe fa-lg fa-fw").Content(TabStores());
+    x.Add().Text(T("Admin.Catalog.Categories.Info").Text).Icon("fa fa-pencil-alt fa-lg fa-fw").Content(TabInfo()).Selected(true);
+    //x.Add().Text(T("Admin.Common.SEO").Text).Icon("fa fa-search fa-lg fa-fw").Content(TabSeo());
+    x.Add().Text(T("Admin.Catalog.Categories.Products").Text).Icon("fa fa-cube fa-lg fa-fw").Content(TabProducts());
+    x.Add().Text(T("优惠券").Text).Icon("fa fa-percent fa-lg fa-fw").Content(TabDiscounts());
+    //x.Add().Text(T("Admin.Catalog.Categories.Acl").Text).Icon("fa fa-users fa-lg fa-fw").Content(TabAcl());
+    //x.Add().Text(T("Admin.Common.Stores").Text).Icon("fa fa-globe fa-lg fa-fw").Content(TabStores());
 
-	//generate an event
-	EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "category-edit", this.Html, this.Model));
+    //generate an event
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "category-edit", this.Html, this.Model));
 })
 
 @helper TabInfo()

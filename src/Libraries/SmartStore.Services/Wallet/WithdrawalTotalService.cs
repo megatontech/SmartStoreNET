@@ -55,7 +55,8 @@ namespace SmartStore.Services.Wallet
         }
         public decimal GetAllSum()
         {
-            return _WithdrawalTotalRepository.Table.Sum(x => x.TotalAmount);
+            if (_WithdrawalTotalRepository.Table.Any()) { return _WithdrawalTotalRepository.Table.Sum(x => x.TotalAmount); }
+            else { return 0M; }
         }
         public List<WithdrawalTotal> GetAll()
         {

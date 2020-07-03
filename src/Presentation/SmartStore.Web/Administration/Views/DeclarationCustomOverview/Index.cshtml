@@ -15,8 +15,9 @@
 		.Name("stores-grid")
 		.Columns(columns =>
 		{
-			columns.Bound(x => x.Name).Title("会员名");
-			columns.Bound(x => x.Mobile).Title("手机");
+			columns.Bound(x => x.RealName).Title("客户姓名");
+			columns.Bound(x => x.Name).Title("昵称");
+			columns.Bound(x => x.Mobile).Title("手机号");
 			columns.Bound(x => x.OrderCount).Title("订单量");
 			columns.Bound(x => x.Total).Title("订单金额");
 		})

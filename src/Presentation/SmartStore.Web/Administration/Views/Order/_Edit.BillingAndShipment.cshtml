@@ -3,7 +3,7 @@
 <div class="row">
 	<div class="card-deck card-cols-sm-1 card-cols-lg-3 col-md-12">
 						
-		<div class="card">
+		@*<div class="card">
 			<div class="card-body">
 				<h6 class="card-title">@T("Order.BillingAddress")</h6>
 				@RenderAddress(Model.BillingAddress)
@@ -14,24 +14,48 @@
 					<span>@T("Admin.Common.Edit")</span>
 				</a>
 			</div>
-		</div>
+		</div>*@
 						
 		<div class="card">
 			@if (Model.IsShippable && Model.ShippingAddress != null)
 			{
-				<div class="card-body">
-					<h6 class="card-title">@T("Order.ShippingAddress")</h6>
-					@RenderAddress(Model.ShippingAddress)
-				</div>
+            <div class="card-body">
+                <h6 class="card-title">@T("Order.ShippingAddress")</h6>
+                @*@RenderAddress(Model.ShippingAddress)*@
+                <div class="address-data mt-3">
+                    <div class="name pb-2">
+                        <strong>
+                            <span class="bidi-embed">@Model.ShippingAddress.FirstName </span>
+                            <span class="bidi-embed">@Model.ShippingAddress.PhoneNumber </span>
+                        </strong>
+                    </div>
+                    <div class="phone">
+                        <span>@T("省"):</span>
+                        <span>@Model.ShippingAddress.StateProvinceName</span>
+                    </div>
+                    <div class="email">
+                        <span>@T("城市"):</span>
+                        <span>@Model.ShippingAddress.City</span>
+                    </div>
+                    <div class="fax">
+                        <span>@T("详细地址"):</span>
+                        <span>@Model.ShippingAddress.Address1</span>
+                    </div>
+
+                    @*<div class="address">
+                @Html.Raw(item.FormattedAddress)
+            </div>*@
+                </div>
+            </div>
 				<div class="card-footer d-flex p-0">
-					<a href="@Url.Action("AddressEdit", new { addressId = Model.ShippingAddress.Id, orderId = Model.Id })" class="btn btn-warning btn-lg btn-flat rounded-0">
+					@*<a href="@Url.Action("AddressEdit", new { addressId = Model.ShippingAddress.Id, orderId = Model.Id })" class="btn btn-warning btn-lg btn-flat rounded-0">
 						<i class="far fa-edit"></i>
 						<span>@T("Admin.Common.Edit")</span>
-					</a>
-					<a href="@Html.Raw(Model.ShippingAddressGoogleMapsUrl)" class="btn btn-warning btn-lg btn-flat rounded-0" target="_blank">
+					</a>*@
+					@*<a href="@Html.Raw(Model.ShippingAddressGoogleMapsUrl)" class="btn btn-warning btn-lg btn-flat rounded-0" target="_blank">
 						<i class="fab fa-google"></i>
 						<span>@T("Admin.Orders.Fields.ShippingAddress.ViewOnGoogleMaps")</span>
-					</a>
+					</a>*@
 				</div>
 			}
 			else
@@ -87,7 +111,7 @@
 		<button type="submit" id="btnAddNewShipment" name="btnAddNewShipment" class="btn btn-warning" value="@T("Admin.Orders.Shipments.AddNew")"
 				onclick="javascript:setLocation('@(Url.Action("AddShipment", "Order", new { orderId = Model.Id }))'); return false;">
 			<i class="fa fa-plus"></i>
-			<span>@T("Admin.Orders.Shipments.AddNew")</span>
+			<span>@T("添加发货记录")</span>
 		</button>	
 	}
 }

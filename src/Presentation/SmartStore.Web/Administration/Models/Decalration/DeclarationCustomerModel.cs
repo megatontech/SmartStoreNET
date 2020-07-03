@@ -14,6 +14,9 @@ namespace SmartStore.Admin.Models.Stores
 	{
 		[SmartResourceDisplayName("Admin.Configuration.Stores.Fields.Name")]
 		[AllowHtml]
+		public string RealName { get; set; }
+		[SmartResourceDisplayName("Admin.Configuration.Stores.Fields.Name")]
+		[AllowHtml]
 		public string Name { get; set; }
 
 		[SmartResourceDisplayName("Admin.Configuration.Stores.Fields.Url")]

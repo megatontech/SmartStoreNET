@@ -2141,6 +2141,19 @@
           <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="SendDate" Type="DateTime" Nullable="false" />
         </EntityType>
+        <EntityType Name="CustomerDiscount" customannotation:ClrType="SmartStore.Core.Domain.Customers.CustomerDiscount, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="Discount" Type="Int32" Nullable="false" />
+          <Property Name="IsUsed" Type="Boolean" Nullable="false" />
+          <Property Name="GetDateTime" Type="DateTime" Nullable="false" />
+          <Property Name="UseDateTime" Type="DateTime" Nullable="false" />
+          <Property Name="Order" Type="Int32" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:ClrType="SmartStore.Core.Domain.Declaration.DeclarationCapRule, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -3920,6 +3933,7 @@
           <EntitySet Name="ExportProfiles" EntityType="Self.ExportProfile" />
           <EntitySet Name="CheckIns" EntityType="Self.CheckIn" />
           <EntitySet Name="CAPTCHACodes" EntityType="Self.CAPTCHACode" />
+          <EntitySet Name="CustomerDiscounts" EntityType="Self.CustomerDiscount" />
           <EntitySet Name="DeclarationCapRules" EntityType="Self.DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscriptions" EntityType="Self.BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplates" EntityType="Self.ManufacturerTemplate" />
@@ -6503,6 +6517,20 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="CustomerDiscounts">
+            <EntityTypeMapping TypeName="SmartStore.Data.CustomerDiscount">
+              <MappingFragment StoreEntitySet="CustomerDiscount">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="Discount" ColumnName="Discount" />
+                <ScalarProperty Name="IsUsed" ColumnName="IsUsed" />
+                <ScalarProperty Name="GetDateTime" ColumnName="GetDateTime" />
+                <ScalarProperty Name="UseDateTime" ColumnName="UseDateTime" />
+                <ScalarProperty Name="Order" ColumnName="Order" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="DeclarationCapRules">
             <EntityTypeMapping TypeName="SmartStore.Data.DeclarationCapRule">
               <MappingFragment StoreEntitySet="DeclarationCapRule">
@@ -8640,6 +8668,19 @@
           <Property Name="Content" Type="nvarchar(max)" Nullable="true" />
           <Property Name="SendDate" Type="datetime" Nullable="false" />
         </EntityType>
+        <EntityType Name="CustomerDiscount" customannotation:Index="{ }">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="Discount" Type="int" Nullable="false" />
+          <Property Name="IsUsed" Type="bit" Nullable="false" />
+          <Property Name="GetDateTime" Type="datetime" Nullable="false" />
+          <Property Name="UseDateTime" Type="datetime" Nullable="false" />
+          <Property Name="Order" Type="int" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
+        </EntityType>
         <EntityType Name="DeclarationCapRule" customannotation:Index="{ }">
           <Key>
             <PropertyRef Name="Id" />
@@ -10718,6 +10759,7 @@
           <EntitySet Name="ExportProfile" EntityType="Self.ExportProfile" Schema="dbo" Table="ExportProfile" />
           <EntitySet Name="CheckIn" EntityType="Self.CheckIn" Schema="dbo" Table="CheckIn" />
           <EntitySet Name="CAPTCHACode" EntityType="Self.CAPTCHACode" Schema="dbo" Table="CAPTCHACode" />
+          <EntitySet Name="CustomerDiscount" EntityType="Self.CustomerDiscount" Schema="dbo" Table="CustomerDiscount" />
           <EntitySet Name="DeclarationCapRule" EntityType="Self.DeclarationCapRule" Schema="dbo" Table="DeclarationCapRule" />
           <EntitySet Name="BackInStockSubscription" EntityType="Self.BackInStockSubscription" Schema="dbo" Table="BackInStockSubscription" />
           <EntitySet Name="ManufacturerTemplate" EntityType="Self.ManufacturerTemplate" Schema="dbo" Table="ManufacturerTemplate" />

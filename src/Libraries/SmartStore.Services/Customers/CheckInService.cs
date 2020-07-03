@@ -15,12 +15,10 @@ namespace SmartStore.Services.Customers
     {
         #region Private Fields
 
-        private readonly ICheckInService _checkService;
         private readonly IRepository<CheckIn> _checkRepository;
 
-        public CheckInService(ICheckInService checkService, IRepository<CheckIn> checkRepository)
+        public CheckInService(IRepository<CheckIn> checkRepository)
         {
-            _checkService = checkService;
             _checkRepository = checkRepository;
         }
 

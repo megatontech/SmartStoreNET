@@ -169,10 +169,20 @@ namespace SmartStore.Services.Media.Storage
             }
         }
 
+        public void Save(string filePath, byte[] data)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task SaveAsync(MediaItem media, byte[] data)
         {
             Save(media, data);
             return Task.FromResult(0);
+        }
+
+        public void SaveAsync(string filePath, byte[] data)
+        {
+            throw new System.NotImplementedException();
         }
 
         #endregion Public Methods

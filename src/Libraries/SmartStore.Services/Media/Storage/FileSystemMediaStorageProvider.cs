@@ -180,6 +180,17 @@ namespace SmartStore.Services.Media.Storage
                 _fileSystem.DeleteFile(filePath);
             }
         }
+        public void Save(string filePath, byte[] data)
+        {
+            if (data != null && data.LongLength != 0)
+            {
+                 _fileSystem.WriteAllBytes(filePath, data);
+            }
+            else if (_fileSystem.FileExists(filePath))
+            {
+                _fileSystem.DeleteFile(filePath);
+            }
+        }
 
         public async Task SaveAsync(MediaItem media, byte[] data)
         {

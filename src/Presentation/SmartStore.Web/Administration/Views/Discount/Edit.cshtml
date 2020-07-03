@@ -1,12 +1,12 @@
 ﻿@model DiscountModel
 @{
-    ViewBag.Title = T("Admin.Promotions.Discounts.EditDiscountDetails").Text;
+    ViewBag.Title = T("编辑优惠券").Text;
 }
 @using (Html.BeginForm())
 {
     <div class="section-header">
         <div class="title">
-            @T("Admin.Promotions.Discounts.EditDiscountDetails") - @Model.Name @Html.ActionLink("(" + T("Admin.Promotions.Discounts.BackToList") + ")", "List")
+            @T("编辑优惠券") - @Model.Name @Html.ActionLink("(" + T("返回优惠券列表") + ")", "List")
         </div>
         <div class="options">
 			@{ Html.RenderWidget("admin_button_toolbar_before"); }

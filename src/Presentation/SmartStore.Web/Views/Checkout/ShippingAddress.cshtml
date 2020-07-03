@@ -12,7 +12,7 @@
 
 <div class="page shipping-address-page">
     <div class="page-title">
-        <h1 class="h3">@T("Checkout.ShippingAddress")</h1>
+        <h1 class="h3">@T("收货地址")</h1>
     </div>
     <div class="page-body checkout-data">
         
@@ -21,7 +21,7 @@
         @if (Model.ExistingAddresses.Count > 0)
         {
             <fieldset class="content-group mb-3">
-                <legend><span>@T("Checkout.SelectShippingAddress")</span></legend>
+                <legend><span>@T("选择收货地址")</span></legend>
 
                 <div class="card-deck card-cols-sm-1 card-cols-md-2 card-cols-lg-3 address-list">
                     @foreach (var item in Model.ExistingAddresses)
@@ -35,33 +35,27 @@
                                 
                                 <div class="address-data mt-3">
                                     <div class="name pb-2">
-										<strong>
-											<span class="bidi-embed">@item.FirstName </span>
-											<span class="bidi-embed">@item.LastName</span>
-										</strong>
+                                        <strong>
+                                            <span class="bidi-embed">@item.FirstName </span>
+                                            <span class="bidi-embed">@item.PhoneNumber </span>
+                                        </strong>
+                                    </div>
+                                    <div class="phone">
+                                        <span>@T("省"):</span>
+                                        <span>@item.StateProvinceName</span>
                                     </div>
                                     <div class="email">
-										<span>@T("Address.Fields.Email"):</span>
-										<span>@item.Email</span>
-									</div>
-                                    @if (item.PhoneEnabled)
-                                    {
-                                        <div class="phone">
-											<span>@T("Address.Fields.PhoneNumber"):</span>
-                                            <span>@item.PhoneNumber</span>
-                                        </div>
-                                    }
-                                    @if (item.FaxEnabled && !String.IsNullOrEmpty(item.FaxNumber))
-                                    {
+                                        <span>@T("城市"):</span>
+                                        <span>@item.City</span>
+                                    </div>
                                         <div class="fax">
-											<span>@T("Address.Fields.FaxNumber"):</span>
-											<span>@item.FaxNumber</span>
-                                        </div>
-                                    }
+                                            <span>@T("详细地址"):</span>
+                                            <span>@item.Address1</span>
+                                    </div>
 
-									<div class="address">
-										@Html.Raw(item.FormattedAddress)
-									</div>
+                                    @*<div class="address">
+                                        @Html.Raw(item.FormattedAddress)
+                                    </div>*@
                                 </div>
                             </div>
                         </div>

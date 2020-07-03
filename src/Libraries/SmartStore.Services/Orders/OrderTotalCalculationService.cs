@@ -547,28 +547,28 @@ namespace SmartStore.Services.Orders
         {
             appliedDiscount = null;
             decimal discountAmount = decimal.Zero;
-            if (_catalogSettings.IgnoreDiscounts)
-                return discountAmount;
+   //         if (_catalogSettings.IgnoreDiscounts)
+   //             return discountAmount;
 
-            var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToOrderSubTotal);
-            var allowedDiscounts = new List<Discount>();
-			if (allDiscounts != null)
-			{
-				foreach (var discount in allDiscounts)
-				{
-					if (discount.DiscountType == DiscountType.AssignedToOrderSubTotal && !allowedDiscounts.Any(x => x.Id == discount.Id) && _discountService.IsDiscountValid(discount, customer))
-					{
-						allowedDiscounts.Add(discount);
-					}
-				}
-			}
+   //         var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToOrderSubTotal);
+   //         var allowedDiscounts = new List<Discount>();
+			//if (allDiscounts != null)
+			//{
+			//	foreach (var discount in allDiscounts)
+			//	{
+					//if (discount.DiscountType == DiscountType.AssignedToOrderSubTotal && !allowedDiscounts.Any(x => x.Id == discount.Id) && _discountService.IsDiscountValid(discount, customer))
+			//		{
+			//			allowedDiscounts.Add(discount);
+			//		}
+			//	}
+			//}
 
-            appliedDiscount = allowedDiscounts.GetPreferredDiscount(orderSubTotal);
-            if (appliedDiscount != null)
-                discountAmount = appliedDiscount.GetDiscountAmount(orderSubTotal);
+   //         appliedDiscount = allowedDiscounts.GetPreferredDiscount(orderSubTotal);
+   //         if (appliedDiscount != null)
+   //             discountAmount = appliedDiscount.GetDiscountAmount(orderSubTotal);
 
-            if (discountAmount < decimal.Zero)
-                discountAmount = decimal.Zero;
+   //         if (discountAmount < decimal.Zero)
+   //             discountAmount = decimal.Zero;
 
             return discountAmount;
         }
@@ -871,35 +871,35 @@ namespace SmartStore.Services.Orders
         {
             appliedDiscount = null;
             decimal shippingDiscountAmount = decimal.Zero;
-            if (_catalogSettings.IgnoreDiscounts)
-                return shippingDiscountAmount;
+   //         if (_catalogSettings.IgnoreDiscounts)
+   //             return shippingDiscountAmount;
 
-            var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToShipping);
-            var allowedDiscounts = new List<Discount>();
+   ////         var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToShipping);
+   ////         var allowedDiscounts = new List<Discount>();
 
-			if (allDiscounts != null)
-			{
-				foreach (var discount in allDiscounts)
-				{
-					if (discount.DiscountType == DiscountType.AssignedToShipping && !allowedDiscounts.Any(x => x.Id == discount.Id) && _discountService.IsDiscountValid(discount, customer))
-					{
-						allowedDiscounts.Add(discount);
-					}
-				}
-			}
+			////if (allDiscounts != null)
+			////{
+			////	foreach (var discount in allDiscounts)
+			////	{
+			////		//if (discount.DiscountType == DiscountType.AssignedToShipping && !allowedDiscounts.Any(x => x.Id == discount.Id) && _discountService.IsDiscountValid(discount, customer))
+			////		//{
+			////		//	allowedDiscounts.Add(discount);
+			////		//}
+			////	}
+			////}
 
-            appliedDiscount = allowedDiscounts.GetPreferredDiscount(shippingTotal);
-            if (appliedDiscount != null)
-            {
-                shippingDiscountAmount = appliedDiscount.GetDiscountAmount(shippingTotal);
-            }
+   //         appliedDiscount = allowedDiscounts.GetPreferredDiscount(shippingTotal);
+   //         if (appliedDiscount != null)
+   //         {
+   //             shippingDiscountAmount = appliedDiscount.GetDiscountAmount(shippingTotal);
+   //         }
 
-			if (shippingDiscountAmount < decimal.Zero)
-			{
-				shippingDiscountAmount = decimal.Zero;
-			}
+			//if (shippingDiscountAmount < decimal.Zero)
+			//{
+			//	shippingDiscountAmount = decimal.Zero;
+			//}
 
-            shippingDiscountAmount = shippingDiscountAmount.RoundIfEnabledFor(_workContext.WorkingCurrency);
+   //         shippingDiscountAmount = shippingDiscountAmount.RoundIfEnabledFor(_workContext.WorkingCurrency);
             return shippingDiscountAmount;
         }
 

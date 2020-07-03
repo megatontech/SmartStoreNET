@@ -66,7 +66,7 @@
                 </td>
             </tr>
         }
-        <tr>
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.ProductTypeId)
             </td>
@@ -74,8 +74,8 @@
                 @Html.DropDownListFor(model => model.ProductTypeId, ((ProductType)Model.ProductTypeId).ToSelectList())
                 @Html.ValidationMessageFor(model => model.ProductTypeId)
             </td>
-        </tr>
-        <tr>
+        </tr>*@
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.VisibleIndividually)
             </td>
@@ -83,7 +83,7 @@
                 @Html.EditorFor(model => model.VisibleIndividually)
                 @Html.ValidationMessageFor(model => model.VisibleIndividually)
             </td>
-        </tr>
+        </tr>*@
         @if (Model.Id > 0 && Model.AssociatedToProductId > 0)
         {
             <tr>
@@ -176,7 +176,7 @@
 	))
 
     <table class="adminContent">
-        <tr>
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.Sku)
             </td>
@@ -220,7 +220,7 @@
                 @Html.DropDownListFor(model => model.CountryOfOriginId, Model.AvailableCountries, T("Common.Unspecified"))
                 @Html.ValidationMessageFor(model => model.CountryOfOriginId)
             </td>
-        </tr>
+        </tr>*@
         <tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.AdminComment)
@@ -257,7 +257,7 @@
                 @Html.ValidationMessageFor(model => model.AvailableEndDateTimeUtc)
             </td>
         </tr>
-        <tr>
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.AllowCustomerReviews)
             </td>
@@ -265,7 +265,7 @@
                 @Html.EditorFor(model => model.AllowCustomerReviews)
                 @Html.ValidationMessageFor(model => model.AllowCustomerReviews)
             </td>
-        </tr>
+        </tr>*@
         <tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.ShowOnHomePage)
@@ -327,7 +327,7 @@
                 <hr />
             </td>
         </tr>
-        <tr>
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.RequireOtherProducts)
             </td>
@@ -335,8 +335,8 @@
                 @Html.CheckBoxFor(model => model.RequireOtherProducts, new { data_toggler_for = "#pnlRequireOtherProducts" })
                 @Html.ValidationMessageFor(model => model.RequireOtherProducts)
             </td>
-        </tr>
-        <tbody id="pnlRequireOtherProducts">
+        </tr>*@
+        @*<tbody id="pnlRequireOtherProducts">
             <tr>
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.RequiredProductIds)
@@ -368,10 +368,10 @@
                     @Html.ValidationMessageFor(model => model.AutomaticallyAddRequiredProducts)
                 </td>
             </tr>
-        </tbody>
+        </tbody>*@
     </table>
 
-    <table class="adminContent" id="group-giftcard">
+    @*<table class="adminContent" id="group-giftcard">
         <tr class="adminSeparator">
             <td colspan="2">
                 <hr />
@@ -395,9 +395,9 @@
                 @Html.ValidationMessageFor(model => model.GiftCardTypeId)
             </td>
         </tr>
-    </table>
+    </table>*@
 
-    <table class="adminContent" id="group-recurring">
+    @*<table class="adminContent" id="group-recurring">
         <tr class="adminSeparator">
             <td colspan="2">
                 <hr />
@@ -441,9 +441,9 @@
                 </td>
             </tr>
         </tbody>
-    </table>
+    </table>*@
 
-    <table class="adminContent" id="group-shipping">
+    @*<table class="adminContent" id="group-shipping">
         <tr class="adminSeparator">
             <td colspan="2">
                 <hr />
@@ -569,5 +569,5 @@
                 </td>
             </tr>
         </tbody>
-    </table>
+    </table>*@
 </div>

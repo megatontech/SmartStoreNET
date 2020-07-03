@@ -29,6 +29,7 @@ namespace SmartStore.Admin.Controllers
                     .Select(x =>
                     {
                         var model = new DeclarationCustomerModel();
+                        model.RealName = x.FirstName;
                         model.Name = x.Username;
                         model.Mobile = x.Mobile;
                         model.Total = x.SelfTotal;

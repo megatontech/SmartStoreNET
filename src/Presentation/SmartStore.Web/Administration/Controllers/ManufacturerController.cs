@@ -179,7 +179,7 @@ namespace SmartStore.Admin.Controllers
 
             model.GridPageSize = _adminAreaSettings.GridPageSize;
             model.AvailableStores = _storeService.GetAllStores().ToSelectListItems(model.SelectedStoreIds);
-            model.AvailableDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers, null, true).ToList();
+            //model.AvailableDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers, null, true).ToList();
         }
 
         #endregion Utilities
@@ -334,12 +334,12 @@ namespace SmartStore.Admin.Controllers
                 UpdateLocales(manufacturer, model);
 
                 // discounts
-                var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers, null, true);
-                foreach (var discount in allDiscounts)
-                {
-                    if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
-                        manufacturer.AppliedDiscounts.Add(discount);
-                }
+                //var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers, null, true);
+                //foreach (var discount in allDiscounts)
+                //{
+                //    if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
+                //        manufacturer.AppliedDiscounts.Add(discount);
+                //}
 
                 var hasDiscountsApplied = manufacturer.AppliedDiscounts.Count > 0;
                 if (hasDiscountsApplied)
@@ -439,20 +439,20 @@ namespace SmartStore.Admin.Controllers
                 UpdateLocales(manufacturer, model);
 
                 // discounts
-                var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers, null, true);
-                foreach (var discount in allDiscounts)
-                {
-                    if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
-                    {
-                        if (manufacturer.AppliedDiscounts.Where(d => d.Id == discount.Id).Count() == 0)
-                            manufacturer.AppliedDiscounts.Add(discount);
-                    }
-                    else
-                    {
-                        if (manufacturer.AppliedDiscounts.Where(d => d.Id == discount.Id).Count() > 0)
-                            manufacturer.AppliedDiscounts.Remove(discount);
-                    }
-                }
+                //var allDiscounts = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers, null, true);
+                //foreach (var discount in allDiscounts)
+                //{
+                //    if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
+                //    {
+                //        if (manufacturer.AppliedDiscounts.Where(d => d.Id == discount.Id).Count() == 0)
+                //            manufacturer.AppliedDiscounts.Add(discount);
+                //    }
+                //    else
+                //    {
+                //        if (manufacturer.AppliedDiscounts.Where(d => d.Id == discount.Id).Count() > 0)
+                //            manufacturer.AppliedDiscounts.Remove(discount);
+                //    }
+                //}
 
                 manufacturer.HasDiscountsApplied = manufacturer.AppliedDiscounts.Count > 0;
                 manufacturer.UpdatedOnUtc = DateTime.Now;

@@ -32,9 +32,10 @@
                 //    .Width(50)
                 //    .HtmlAttributes(new { style = "text-align:center" })
                 //    .HeaderHtmlAttributes(new { style = "text-align:center" });
+                columns.Bound(x => x.RealName).Title("客户姓名").Centered();
+                columns.Bound(x => x.CustomerName).Title("昵称").Centered();
                 columns.Bound(x => x.CustomerMobile).Title("手机号").Centered();
                 //columns.Bound(x => x.CustomerId).Title("会员id").Centered();
-                columns.Bound(x => x.CustomerName).Title("会员名字").Centered();
                 columns.Bound(x => x.TotalAmount).Title("可用金额").Centered()
                     .Format("{0:0.00}")
                     .RightAlign();

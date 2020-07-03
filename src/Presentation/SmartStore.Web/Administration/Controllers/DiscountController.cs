@@ -240,14 +240,14 @@ namespace SmartStore.Admin.Controllers
                     categories.Each(x => _categoryService.UpdateHasDiscountsApplied(x));
                 }
 
-                if (prevDiscountType == DiscountType.AssignedToManufacturers && discount.DiscountType != DiscountType.AssignedToManufacturers)
-                {
-                    var manufacturers = discount.AppliedToManufacturers.ToList();
-                    discount.AppliedToManufacturers.Clear();
-                    _discountService.UpdateDiscount(discount);
+                //if (prevDiscountType == DiscountType.AssignedToManufacturers && discount.DiscountType != DiscountType.AssignedToManufacturers)
+                //{
+                //    var manufacturers = discount.AppliedToManufacturers.ToList();
+                //    discount.AppliedToManufacturers.Clear();
+                //    _discountService.UpdateDiscount(discount);
 
-                    manufacturers.Each(x => _manufacturerService.UpdateHasDiscountsApplied(x));
-                }
+                //    manufacturers.Each(x => _manufacturerService.UpdateHasDiscountsApplied(x));
+                //}
 
                 if (prevDiscountType == DiscountType.AssignedToSkus && discount.DiscountType != DiscountType.AssignedToSkus)
                 {

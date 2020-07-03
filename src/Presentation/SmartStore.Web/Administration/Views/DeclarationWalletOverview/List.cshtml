@@ -32,9 +32,9 @@
                 //	.Width(50)
                 //	.HtmlAttributes(new { style = "text-align:center" })
                 //	.HeaderHtmlAttributes(new { style = "text-align:center" });
-
+                columns.Bound(x => x.RealName).Title("客户姓名").Centered();
+                columns.Bound(x => x.CustomerName).Title("昵称").Centered();
                 columns.Bound(x => x.CustomerMobile).Title("手机号").Centered();
-                columns.Bound(x => x.CustomerName).Title("会员名字").Centered();
                 columns.Bound(x => x.Amount).Title("金额")
                     .Format("{0:0.00}")
                     .RightAlign();
@@ -44,7 +44,7 @@
 
                     .Centered();
                 columns.Bound(x => x.WithdrawTime).Title("时间").Centered();
-               
+
             })
             .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
             .DataBinding(dataBinding => dataBinding.Ajax().Select("WalletList", "DeclarationWalletOverview"))

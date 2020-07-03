@@ -23,6 +23,7 @@ using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
+using SmartStore.Services.Discounts;
 using SmartStore.Services.Forums;
 using SmartStore.Services.Helpers;
 using SmartStore.Services.Localization;
@@ -97,7 +98,8 @@ namespace SmartStore.Web.Controllers
         private readonly ICustomerPointsTotalService _points;
         private readonly ICustomerPointsDetailService _pointsDetail;
         private readonly ICAPTCHACodeService _captcha;
-        
+        private readonly IDiscountService _discountService;
+        private readonly ICustomerDiscountService _ICustomerDiscountService;
         //private readonly ICheckInService _checkinService;
         #endregion
 
@@ -110,7 +112,7 @@ namespace SmartStore.Web.Controllers
             ILocalizationService localizationService, ICustomerPointsTotalService points,
             ICAPTCHACodeService captcha,
             IWorkContext workContext, IStoreContext storeContext, ICustomerPointsDetailService pointsDetail,
-
+            IDiscountService discountService, ICustomerDiscountService ICustomerDiscountService,
             ICustomerService customerService, CatalogHelper helper,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
@@ -137,6 +139,8 @@ namespace SmartStore.Web.Controllers
             IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
             )
         {
+            _ICustomerDiscountService = ICustomerDiscountService;
+            _discountService = discountService;
             //_checkinService = checkinService;
             _captcha = captcha;
             _pointsDetail = pointsDetail;
@@ -1801,6 +1805,22 @@ namespace SmartStore.Web.Controllers
             model.Push = total.TotalPushAmount;
             model.Luck = total.TotalLuckyAmount;
             return View(model);
+        }
+        [RewriteUrl(SslRequirement.Yes)]
+        public ActionResult Discount()
+        {
+            if (!IsCurrentUserRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+            List<CustomerDiscount> discounts = new List<CustomerDiscount>();
+            discounts = _ICustomerDiscountService.Get(customer.Id);
+            var all =_discountService.GetAllDiscounts(null,"",true);
+            foreach (var item in discounts)
+            {
+                item.discount = all.FirstOrDefault(x => x.Id == item.Discount);
+            }
+            return View(discounts);
         }
 
         public ActionResult GetWalletDetail(int page) 

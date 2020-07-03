@@ -775,38 +775,38 @@ namespace SmartStore.Services.Catalog
                 }
             }
 
-            // check discounts assigned to manufacturers
-            var discountsAssignedToManufacturers = _discountService.GetAllDiscounts(DiscountType.AssignedToManufacturers);
+            //// check discounts assigned to manufacturers
+            //var discountsAssignedToManufacturers = null;
 
-            if (discountsAssignedToManufacturers != null && discountsAssignedToManufacturers.Any())
-            {
-                IEnumerable<ProductManufacturer> productManufacturers = null;
+            //if (discountsAssignedToManufacturers != null && discountsAssignedToManufacturers.Any())
+            //{
+            //    IEnumerable<ProductManufacturer> productManufacturers = null;
 
-                if (context == null)
-                    productManufacturers = _manufacturerService.GetProductManufacturersByProductId(product.Id);
-                else
-                    productManufacturers = context.ProductManufacturers.GetOrLoad(product.Id);
+            //    if (context == null)
+            //        productManufacturers = _manufacturerService.GetProductManufacturersByProductId(product.Id);
+            //    else
+            //        productManufacturers = context.ProductManufacturers.GetOrLoad(product.Id);
 
-                if (productManufacturers != null)
-                {
-                    foreach (var productManufacturer in productManufacturers)
-                    {
-                        var manu = productManufacturer.Manufacturer;
-                        if (manu.HasDiscountsApplied)
-                        {
-                            var manuDiscounts = manu.AppliedDiscounts;
+            //    if (productManufacturers != null)
+            //    {
+            //        foreach (var productManufacturer in productManufacturers)
+            //        {
+            //            var manu = productManufacturer.Manufacturer;
+            //            if (manu.HasDiscountsApplied)
+            //            {
+            //                var manuDiscounts = manu.AppliedDiscounts;
 
-                            foreach (var discount in manuDiscounts)
-                            {
-                                if (discount.DiscountType == DiscountType.AssignedToManufacturers && !result.Contains(discount) && _discountService.IsDiscountValid(discount, customer))
-                                {
-                                    result.Add(discount);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //                ////foreach (var discount in manuDiscounts)
+            //                ////{
+            //                ////    if (discount.DiscountType == DiscountType.AssignedToManufacturers && !result.Contains(discount) && _discountService.IsDiscountValid(discount, customer))
+            //                ////    {
+            //                ////        result.Add(discount);
+            //                ////    }
+            //                ////}
+            //            }
+            //        }
+            //    }
+            //}
 
             return result;
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web.Mvc;
 using SmartStore.Admin.Models.Common;
 using SmartStore.Core.Domain.Catalog;
+using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
@@ -166,7 +167,7 @@ namespace SmartStore.Admin.Models.Orders
         public string PaymentStatus { get; set; }
         [SmartResourceDisplayName("订单审核备注")]
         public string AuditOrderComment { get; set; }
-        
+        public List<Discount> AvailableDiscounts { get; set; }
         public PaymentStatus StatusPayment { get; set; }
 
 		public bool HasPaymentMethod { get; set; }

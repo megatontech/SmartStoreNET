@@ -49,7 +49,10 @@
     <div class="adminContent">
         <div class="adminRow">
             <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.Price)
+                <div class="adminTitle">
+                    <div class="ctl-label"><label for="Price">销售价格</label><a class="hint" href="#" onclick="return false;" tabindex="-1" title="产品价格"><i class="fa fa-question-circle"></i></a></div>
+                </div>
+                @*@Html.SmartLabelFor(model => model.Price)*@
             </div>
             <div class="adminData">
                 @Html.EditorFor(model => model.Price, new { postfix = Model.PrimaryStoreCurrencyCode })
@@ -67,14 +70,18 @@
         </div>
         <div class="adminRow">
             <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.ProductCost)
+                <div class="ctl-label">
+                    <label for="ProductCost">产品成本</label><a class="hint" href="#" onclick="return false;" tabindex="-1" title="" data-original-title="产品成本。
+"><i class="fa fa-question-circle"></i></a>
+                </div>
             </div>
+           
             <div class="adminData">
                 @Html.EditorFor(model => model.ProductCost, new { postfix = Model.PrimaryStoreCurrencyCode })
                 @Html.ValidationMessageFor(model => model.ProductCost)
             </div>
         </div>
-        <div class="adminRow">
+        @*<div class="adminRow">
             <div class="adminTitle">
                 @Html.SmartLabelFor(model => model.SpecialPrice)
             </div>
@@ -165,59 +172,14 @@
 					@Html.ValidationMessageFor(model => model.MaximumCustomerEnteredPrice)
 				</div>
 			</div>
-		</div>
+		</div>*@
         <div class="adminSeparator">
 			<hr />
         </div>
-        <!-- PAnGV -->
-        <div class="adminRow">
-            <div class="adminTitle">
-                @Html.SmartLabelFor(model => model.BasePriceEnabled)
-            </div>
-            <div class="adminData">
-                @Html.CheckBoxFor(model => model.BasePriceEnabled, new { data_toggler_for = "#pnlBasePriceEnabled" })
-                @Html.ValidationMessageFor(model => model.BasePriceEnabled)
-            </div>
-        </div>
-		<div id="pnlBasePriceEnabled">
-			<div class="adminRow">
-				<div class="adminTitle">
-					@Html.SmartLabelFor(model => model.BasePriceBaseAmount)
-				</div>
-				<div class="adminData">
-					<div class="form-row">
-						<div class="col">
-							@Html.EditorFor(model => model.BasePriceBaseAmount)
-						</div>
-						<div class="col-auto" style="width: 120px">
-							@Html.DropDownListFor(model => model.BasePriceMeasureUnit, Model.AvailableMeasureUnits)
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="adminRow">
-				<div class="adminTitle">
-					@Html.SmartLabelFor(model => model.BasePriceAmount)
-				</div>
-				<div class="adminData">
-					@Html.EditorFor(model => model.BasePriceAmount)
-					<span id="BasePriceAmountInfo" class="d-inline-block text-muted pt-2">@*@T("Admin.Catalog.Products.Fields.BasePriceInfo")*@</span>
-				</div>
-			</div>
-			<div class="adminRow">
-				<div class="adminTitle">
-					&nbsp;
-				</div>
-				<div class="adminData">
-					<div class="alert alert-info">
-						@T("Admin.Products.BasePrice.Hint")
-					</div>
-				</div>
-			</div>
-		</div>   
+        
     </div>
 
-    <div id="TierPriceContainer">
+    @*<div id="TierPriceContainer">
         <h4 class="mb-4">@T("Admin.Catalog.Products.TierPrices")</h4>
 
         @if (Model.Id > 0)
@@ -290,5 +252,5 @@
                 @T("Admin.Catalog.Products.TierPrices.SaveBeforeEdit")
             </div>
         }
-    </div>
+    </div>*@
 </div>
