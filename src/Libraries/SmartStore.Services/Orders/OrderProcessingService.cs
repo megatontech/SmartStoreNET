@@ -30,13 +30,17 @@ using SmartStore.Services.Payments;
 using SmartStore.Services.Security;
 using SmartStore.Services.Shipping;
 using SmartStore.Services.Tax;
+using SmartStore.Services.Wallet;
 
 namespace SmartStore.Services.Orders
 {
     public partial class OrderProcessingService : IOrderProcessingService
     {
         #region Fields
-        
+        private readonly ICustomerPointsTotalService _points;
+        private readonly ICustomerPointsDetailService _pointsDetail;
+        //private readonly IDiscountService _discountService;
+        private readonly ICustomerDiscountService _ICustomerDiscountService;
         private readonly IOrderService _orderService;
         private readonly IWebHelper _webHelper;
         private readonly ILocalizationService _localizationService;
@@ -79,10 +83,11 @@ namespace SmartStore.Services.Orders
         #endregion
 
         #region Ctor
-
+       
         public OrderProcessingService(
-			IOrderService orderService,
-            IWebHelper webHelper,
+			IOrderService orderService, ICustomerPointsTotalService points,
+        ICustomerPointsDetailService pointsDetail,
+            IWebHelper webHelper, ICustomerDiscountService ICustomerDiscountService,
             ILocalizationService localizationService,
             ILanguageService languageService,
             IProductService productService,
@@ -119,6 +124,9 @@ namespace SmartStore.Services.Orders
 			ShoppingCartSettings shoppingCartSettings,
             CatalogSettings catalogSettings)
         {
+            _points = points;
+            _pointsDetail = pointsDetail;
+            _ICustomerDiscountService = ICustomerDiscountService;
             _orderService = orderService;
             _webHelper = webHelper;
             _localizationService = localizationService;
@@ -338,21 +346,21 @@ namespace SmartStore.Services.Orders
             if (prevOrderStatus != OrderStatus.Complete && os == OrderStatus.Complete && notifyCustomer)
             {
                 //notification
-                var msg = _messageFactory.SendOrderCompletedCustomerNotification(order, order.CustomerLanguageId);
-                if (msg?.Email?.Id != null)
-                {
-					_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerCompletedEmailQueued", msg.Email.Id));
-                }
+     //           var msg = _messageFactory.SendOrderCompletedCustomerNotification(order, order.CustomerLanguageId);
+     //           if (msg?.Email?.Id != null)
+     //           {
+					//_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerCompletedEmailQueued", msg.Email.Id));
+     //           }
             }
 
             if (prevOrderStatus != OrderStatus.Cancelled && os == OrderStatus.Cancelled && notifyCustomer)
             {
-                //notification
-                var msg = _messageFactory.SendOrderCancelledCustomerNotification(order, order.CustomerLanguageId);
-                if (msg?.Email?.Id != null)
-                {
-					_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerCancelledEmailQueued", msg.Email.Id));
-                }
+     //           //notification
+     //           var msg = _messageFactory.SendOrderCancelledCustomerNotification(order, order.CustomerLanguageId);
+     //           if (msg?.Email?.Id != null)
+     //           {
+					//_orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerCancelledEmailQueued", msg.Email.Id));
+     //           }
             }
 
             //reward points
@@ -717,7 +725,12 @@ namespace SmartStore.Services.Orders
             {
                 processPaymentRequest.OrderGuid = Guid.NewGuid();
             }
-
+            //订单实际总金额
+            var OrderTotalVal = extraData["OrderTotalVal"].ToDecimal();
+            //用了多少积分，需要从用户扣除
+            var UsePointsTotalVal = extraData["UsePointsTotalVal"].ToInt();
+            //用了优惠券的id
+            var UseDiscountVal = extraData["UseDiscountVal"].ToInt();
             var result = new PlaceOrderResult();
 			var utcNow = DateTime.Now;
 
@@ -1128,7 +1141,7 @@ namespace SmartStore.Services.Orders
                             TaxRates = taxRates,
                             OrderTax = orderTaxTotal,
                             OrderTotalRounding = cartTotal.RoundingAmount,
-                            OrderTotal = cartTotal.TotalAmount.Value,
+                            OrderTotal = OrderTotalVal,
                             RefundedAmount = decimal.Zero,
                             OrderDiscount = cartTotal.DiscountAmount,
 							CreditBalance = cartTotal.CreditBalance,
@@ -1179,6 +1192,24 @@ namespace SmartStore.Services.Orders
 						}
 
                         _orderService.InsertOrder(order);
+
+                        if (UsePointsTotalVal>0) 
+                        {
+                            _points.RemovePointsFromCustomer(UsePointsTotalVal,order.CustomerId);
+                            _pointsDetail.CreateDetail(new Core.Domain.Wallet.CustomerPointsDetail
+                            {
+                                Comment = "购物使用积分，订单号"+ order.Id,
+                                Amount = UsePointsTotalVal,
+                                Customer = order.CustomerId,
+                                CustomerID = order.Customer.CustomerGuid,
+                                isOut = true,
+                                PointGetType = Core.Domain.Wallet.PointGetType.Shop,
+                                PointUseType = Core.Domain.Wallet.PointUseType.Shop
+                                  , IsCount = true,
+                                UpdateTime = DateTime.Now
+                            }); ;
+                        }
+                        if (UseDiscountVal > 0) {_ICustomerDiscountService.Use(new CustomerDiscount { Id= UseDiscountVal }); }
 
                         result.PlacedOrder = order;
 

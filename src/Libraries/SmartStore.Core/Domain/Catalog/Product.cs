@@ -1127,7 +1127,7 @@ namespace SmartStore.Core.Domain.Catalog
         public virtual ICollection<Discount> AppliedDiscounts
         {
             get { return _appliedDiscounts ?? (_appliedDiscounts = new HashSet<Discount>()); }
-            protected set { _appliedDiscounts = value; }
+             set { _appliedDiscounts = value; }
         }
 
         /// <summary>

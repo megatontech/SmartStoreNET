@@ -40,7 +40,7 @@
 										   value="@(paymentMethod.PaymentMethodSystemName)" />
 
 									<label class="form-check-label" for="paymentmethod_@(i)">
-										<span class="opt-name">@paymentMethod.Name</span>
+										<span class="opt-name">线下支付</span>
 									</label>
 								</div>
 								@if (paymentMethod.Fee.HasValue())
@@ -51,9 +51,10 @@
 
 							@if (description.HasValue())
 							{
-								<div class="opt-info-item payment-method-description" @Html.LanguageAttributes(paymentMethod.FullDescription)>
-									@Html.Raw(description)
-								</div>
+                        <div class="opt-info-item payment-method-description" @Html.LanguageAttributes(paymentMethod.FullDescription)>
+                            @*@Html.Raw(description)*@
+                            <b>线下支付：可以使用积分抵扣部分金额，如果拥有与商品对应的优惠券，每个订单可以使用一张</b>
+                        </div>
 							}
 
 							@if (!paymentMethod.RequiresInteraction || (paymentMethod.Selected && infoRoute != null))

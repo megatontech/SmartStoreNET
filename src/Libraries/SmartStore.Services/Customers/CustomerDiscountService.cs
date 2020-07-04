@@ -35,6 +35,7 @@ namespace SmartStore.Services.Customers
         }
         public void Use(CustomerDiscount model)
         {
+            model = _checkRepository.Table.Where(x => x.Id == model.Id).FirstOrDefault();
             model.UseDateTime = DateTime.Now;
             model.IsUsed = true;
             _checkRepository.Update(model);

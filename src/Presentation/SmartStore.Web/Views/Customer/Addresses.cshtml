@@ -48,8 +48,9 @@
                         @address.PhoneNumber
                     </div>
                     <div class="phone">
-                        @Html.LabelFor(model => model.Addresses[i].StateProvinceName, new { @class = "m-0" }):
-                        @address.StateProvinceName
+                        @*@Html.LabelFor(model => model.Addresses[i].Company, new { @class = "m-0" }):*@
+                        <label class = "m-0">省份</label>
+                        @address.Company
                     </div>
                     <div class="phone">
                         @Html.LabelFor(model => model.Addresses[i].City, new { @class = "m-0" }):

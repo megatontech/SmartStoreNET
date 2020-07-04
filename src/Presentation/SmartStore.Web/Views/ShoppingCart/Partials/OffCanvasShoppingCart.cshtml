@@ -46,7 +46,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 				<span @Html.LanguageAttributes(currentItem.ProductName)>
-					@Html.Raw(T("ShoppingCart.Mini.AddedItemToCart", "<strong>" + currentItem.ProductName.Value.Truncate(50, "...") + "</strong>").Text)
+					@Html.Raw(T("已加入购物车", "<strong>" + currentItem.ProductName.Value.Truncate(50, "...") + "</strong>").Text)
 				</span>
 			</div>
         }

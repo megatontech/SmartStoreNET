@@ -1219,7 +1219,7 @@ namespace SmartStore.Admin.Controllers
                 }
             }
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 MapModelToProduct(model, product, form);
                 UpdateDataOfExistingProduct(product, model, true);

@@ -26,7 +26,13 @@
     //    //x.Add().Text(T("Admin.Customers.Customers.CurrentCart").Text).Content(TabCurrentShoppingCart());
     //    //x.Add().Text(T("Admin.Customers.Customers.Impersonate").Text).Content(TabImpersonate());
     //}
-
+    var selItems = new List<SelectListItem> { new SelectListItem { Text = "无", Value = "" }, new SelectListItem { Text = "顾客", Value = "顾客" }, new SelectListItem { Text = "VIP", Value = "VIP" } };
+    foreach (var item in selItems)
+    {
+        if (item.Value == Model.Title) { item.Selected = true; }
+    }
+    ViewBag.selItem = selItems;
+    
     //generate an event
     EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "customer-edit", this.Html, this.Model));
 })
@@ -200,6 +206,8 @@
             </td>
             <td class="adminData">
                 @Html.EditorFor(model => model.Title)
+               @* @Html.DropDownListFor(model => model.Title, ViewBag.selItem as IEnumerable<SelectListItem>)*@
+                
                 @Html.ValidationMessageFor(model => model.Title)
             </td>
         </tr>

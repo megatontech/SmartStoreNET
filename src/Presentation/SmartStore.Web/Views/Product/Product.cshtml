@@ -107,20 +107,20 @@
 						}
 
 						<!-- social share -->
-						@if (Model.ProductShareCode.HasValue())
+						@*@if (Model.ProductShareCode.HasValue())
 						{
 							<div class="pd-share d-flex justify-content-@(Model.ProductType == ProductType.GroupedProduct ? "start mt-4" : "center mt-3")">
 								@Html.Raw(Model.ProductShareCode)
 							</div>
-						}
+						}*@
 
-						@if (Model.DisplayAdminLink)
+						@*@if (Model.DisplayAdminLink)
 						{
 							<a class="btn btn-secondary btn-flat btn-edit-product" href="@Url.Action("Edit", "Product", new { id = Model.Id, area = "admin" })" target="admin-product" rel="nofollow">
 								<i class="fa fa-cog"></i>
 								<span>@T("Common.Catalog.EditProduct")</span>
 							</a>
-						}
+						}*@
 
                         @{ Html.RenderWidget("productdetails_info_bottom"); }
 					</aside>

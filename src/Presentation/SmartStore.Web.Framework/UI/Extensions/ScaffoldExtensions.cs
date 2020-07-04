@@ -36,7 +36,7 @@ namespace SmartStore.Web.Framework.UI
                 namePart = "<span><#= {0} #></span>".FormatInvariant(name);
             }
 
-            string result = "<span class='badge badge-<#= {0} #> mr-1'><#= {1} #></span>{2}".FormatInvariant(typeLabelHint, typeName, namePart);
+            string result = "<span class='badge hide badge-<#= {0} #> mr-1'><#= {1} #></span>{2}".FormatInvariant(typeLabelHint, typeName, namePart);
 
             return "<# if({0} && {0}.length > 0) {{ #>{1}<# }} #>".FormatInvariant(name, result);
         }

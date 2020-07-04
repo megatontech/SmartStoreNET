@@ -205,13 +205,13 @@ namespace SmartStore.Web.Infrastructure
 
             //if (!_customerSettings.HideDownloadableProductsTab)
             //{
-            //    root.Append(new MenuItem
-            //    {
-            //        Id = "downloads",
-            //        Text = T("Account.DownloadableProducts"),
-            //        Icon = "fal fa-download",
-            //        Url = _urlHelper.Action("DownloadableProducts", "Customer", new { area = "" })
-            //    });
+            root.Append(new MenuItem
+            {
+                Id = "downloads",
+                Text = T("优惠券"),
+                Icon = "fal fa-bell",
+                Url = _urlHelper.Action("Discount", "Customer", new { area = "" })
+            });
             //}
 
             //if (!_customerSettings.HideBackInStockSubscriptionsTab)

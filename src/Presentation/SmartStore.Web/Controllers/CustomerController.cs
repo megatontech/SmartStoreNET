@@ -1815,6 +1815,7 @@ namespace SmartStore.Web.Controllers
             var customer = _workContext.CurrentCustomer;
             List<CustomerDiscount> discounts = new List<CustomerDiscount>();
             discounts = _ICustomerDiscountService.Get(customer.Id);
+            discounts.Remove(x=>x.IsUsed==true);
             var all =_discountService.GetAllDiscounts(null,"",true);
             foreach (var item in discounts)
             {

@@ -110,6 +110,15 @@ namespace SmartStore
 
 			return defaultValue;
         }
+		public static decimal ToDecimal(this string value, decimal defaultValue = 0M)
+		{
+			if (CommonHelper.TryConvert(value, out decimal result))
+			{
+				return result;
+			}
+
+			return defaultValue;
+		}
 
 		public static char ToChar(this string value, bool unescape = false, char defaultValue = '\0')
 		{

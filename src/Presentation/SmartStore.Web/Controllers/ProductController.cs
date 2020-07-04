@@ -134,25 +134,25 @@ namespace SmartStore.Web.Controllers
 				return HttpNotFound();
 
 			// Is product individually visible?
-			if (!product.VisibleIndividually)
-			{
-				// Find parent grouped product.
-				var parentGroupedProduct = _productService.GetProductById(product.ParentGroupedProductId);
-				if (parentGroupedProduct == null)
-					return HttpNotFound();
+			//if (!product.VisibleIndividually)
+			//{
+			//	// Find parent grouped product.
+			//	var parentGroupedProduct = _productService.GetProductById(product.ParentGroupedProductId);
+			//	if (parentGroupedProduct == null)
+			//		return HttpNotFound();
 
-                var seName = parentGroupedProduct.GetSeName();
-                if (seName.IsEmpty())
-                    return HttpNotFound();
+   //             var seName = parentGroupedProduct.GetSeName();
+   //             if (seName.IsEmpty())
+   //                 return HttpNotFound();
 
-                var routeValues = new RouteValueDictionary();
-				routeValues.Add("SeName", seName);
+   //             var routeValues = new RouteValueDictionary();
+			//	routeValues.Add("SeName", seName);
 
-				// Add query string parameters.
-				Request.QueryString.AllKeys.Each(x => routeValues.Add(x, Request.QueryString[x]));
+			//	// Add query string parameters.
+			//	Request.QueryString.AllKeys.Each(x => routeValues.Add(x, Request.QueryString[x]));
 
-				return RedirectToRoute("Product", routeValues);
-			}
+			//	return RedirectToRoute("Product", routeValues);
+			//}
 
 			// Prepare the view model
 			var model = _helper.PrepareProductDetailsPageModel(product, query);

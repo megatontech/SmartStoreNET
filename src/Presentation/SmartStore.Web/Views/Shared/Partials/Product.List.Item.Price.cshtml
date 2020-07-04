@@ -55,7 +55,7 @@
 
 	<div class="art-price-block">
 		<span class="@artPriceClasses">
-            @(Model.Price.SavingAmount.HasValue() ? "% " : "")@Model.Price.Price
+            @(Model.Price.SavingAmount.HasValue() ? "券后价 " : "")@Model.Price.Price
 		</span>
 		@if (Model.Price.RegularPrice.HasValue())
 		{

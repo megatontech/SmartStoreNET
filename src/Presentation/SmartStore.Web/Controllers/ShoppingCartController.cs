@@ -43,13 +43,15 @@ using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Infrastructure.Cache;
 using SmartStore.Web.Models.Media;
 using SmartStore.Web.Models.ShoppingCart;
+using SmartStore.Services.Wallet;
+using SmartStore.Core.Domain.Wallet;
 
 namespace SmartStore.Web.Controllers
 {
     public partial class ShoppingCartController : PublicControllerBase
     {
         #region Fields
-
+        private readonly IDailyCustomerContributionDetailService _iDailyCustomerContributionDetailService;
         private readonly IProductService _productService;
         private readonly IDeclarationProductService _dproductService;
         private readonly IWorkContext _workContext;
@@ -100,7 +102,10 @@ namespace SmartStore.Web.Controllers
         private readonly ICompareProductsService _compareProductsService;
         private readonly ProductUrlHelper _productUrlHelper;
         private readonly RewardPointsSettings _rewardPointsSettings;
-
+        private readonly ICustomerDiscountService _ICustomerDiscountService;
+        private readonly ICustomerPointsTotalService _points;
+        private readonly IDeclarationCalcRuleService _calcruleService;
+        private readonly DeclarationCalcRule _calcrule;
         #endregion Fields
 
         #region Constructors
@@ -108,9 +113,9 @@ namespace SmartStore.Web.Controllers
         public ShoppingCartController(
             IProductService productService, IDeclarationProductService dproductService, IDeclarationShoppingCartService dshoppingCartService,
             IWorkContext workContext,
-            IStoreContext storeContext,
-            IShoppingCartService shoppingCartService,
-            IPictureService pictureService,
+            IStoreContext storeContext, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
+            IShoppingCartService shoppingCartService, ICustomerDiscountService ICustomerDiscountService,
+            IPictureService pictureService, ICustomerPointsTotalService points,
             ILocalizationService localizationService,
             IProductAttributeService productAttributeService,
             IProductAttributeFormatter productAttributeFormatter,
@@ -151,15 +156,19 @@ namespace SmartStore.Web.Controllers
             IMeasureService measureService,
             MeasureSettings measureSettings,
             ICompareProductsService compareProductsService,
-            ProductUrlHelper productUrlHelper,
+            ProductUrlHelper productUrlHelper, IDeclarationCalcRuleService calcruleService,
             RewardPointsSettings rewardPointsSettings)
         {
+            _calcruleService = calcruleService;
+            _calcrule = _calcruleService.GetDeclarationCalcRule();
+            _ICustomerDiscountService = ICustomerDiscountService;
+            _iDailyCustomerContributionDetailService = iDailyCustomerContributionDetailService;
             _productService = productService;
             _dshoppingCartService = dshoppingCartService;
             _dproductService = dproductService;
             _workContext = workContext;
-            _storeContext = storeContext;
-            _shoppingCartService = shoppingCartService;
+            _storeContext = storeContext; _points = points;
+             _shoppingCartService = shoppingCartService;
             _pictureService = pictureService;
             _localizationService = localizationService;
             _productAttributeService = productAttributeService;
@@ -377,7 +386,7 @@ namespace SmartStore.Web.Controllers
             var customer = _workContext.CurrentCustomer;
 
             product.MergeWithCombination(item.AttributesXml);
-
+            product.AppliedDiscounts.Clear();
             var model = new ShoppingCartModel.ShoppingCartItemModel
             {
                 Id = item.Id,
@@ -2307,12 +2316,28 @@ namespace SmartStore.Web.Controllers
         {
             var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
             var model = new ShoppingCartModel();
+            var customer = _workContext.CurrentCustomer;
 
             PrepareShoppingCartModel(model, cart,
                 isEditable: false,
                 prepareEstimateShippingIfEnabled: false,
                 prepareAndDisplayOrderReviewData: prepareAndDisplayOrderReviewData.HasValue ? prepareAndDisplayOrderReviewData.Value : false);
-
+            model.DiscountBox = new ShoppingCartModel.DiscountBoxModel();
+            List<CustomerDiscount> discounts = new List<CustomerDiscount>();
+            var allMydiscounts = _ICustomerDiscountService.Get(customer.Id);
+            var all = _discountService.GetAllDiscounts(null, "", true);
+            foreach (var item in allMydiscounts)
+            {
+                item.discount = all.FirstOrDefault(x => x.Id == item.Discount);
+                var productids = cart.Select(x => x.Item.Product.Id).ToList();
+                var cataids = cart.Select(x => x.Item.Product.ProductCategories.FirstOrDefault().CategoryId).ToList();
+                if (item.discount.AppliedToCategories.Any(x => cataids.Contains(x.Id))|| item.discount.AppliedToProducts.Any(x=> productids.Contains(x.Id))) { discounts.Add(item); }
+            }
+            model.DiscountBox.discounts = discounts.OrderByDescending(x=>x.discount.DiscountAmount).ToList();
+            model.RewardPoints = new ShoppingCartModel.RewardPointsBoxModel();
+            var entity = _points.GetPoints(customer.Id);
+            model.RewardPoints.RewardPointsBalance = _calcrule.WithDrawToPointPercent;
+            model.RewardPoints.RewardPointsAmount = entity.Amount.ToString("F0");
             return PartialView(model);
         }
 
@@ -2538,7 +2563,7 @@ namespace SmartStore.Web.Controllers
 
         [HttpPost, ActionName("Cart")]
         [FormValueRequired("applyrewardpoints")]
-        public ActionResult ApplyRewardPoints(bool useRewardPoints, ProductVariantQuery query)
+        public ActionResult ApplyRewardPoints(bool useRewardPoints,string usepointval, ProductVariantQuery query)
         {
             var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
@@ -2546,10 +2571,10 @@ namespace SmartStore.Web.Controllers
 
             var model = new ShoppingCartModel();
             model.RewardPoints.UseRewardPoints = useRewardPoints;
-
+            model.RewardPoints.RewardPointsAmount = usepointval;
             _genericAttributeService.SaveAttribute(Services.WorkContext.CurrentCustomer,
                 SystemCustomerAttributeNames.UseRewardPointsDuringCheckout, useRewardPoints, Services.StoreContext.CurrentStore.Id);
-
+            
             PrepareShoppingCartModel(model, cart);
             return View(model);
         }

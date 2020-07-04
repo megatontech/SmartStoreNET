@@ -10,6 +10,7 @@ using SmartStore.Web.Models.Media;
 using SmartStore.Web.Models.Catalog;
 using SmartStore.Services.Catalog.Modelling;
 using SmartStore.Services.Localization;
+using SmartStore.Core.Domain.Customers;
 
 namespace SmartStore.Web.Models.ShoppingCart
 {
@@ -43,8 +44,10 @@ namespace SmartStore.Web.Models.ShoppingCart
         public bool TermsOfServiceEnabled { get; set; }
         public EstimateShippingModel EstimateShipping { get; set; }
         public DiscountBoxModel DiscountBox { get; set; }
+
         public GiftCardBoxModel GiftCardBox { get; set; }
         public RewardPointsBoxModel RewardPoints { get; set; }
+
         public OrderReviewDataModel OrderReviewData { get; set; }
 
         public int MediaDimensions { get; set; }
@@ -187,7 +190,9 @@ namespace SmartStore.Web.Models.ShoppingCart
             public string Message { get; set; }
             public string CurrentCode { get; set; }
 			public bool IsWarning { get; set; }
-		}
+            public List<CustomerDiscount> discounts { get; set; }
+
+        }
 
         public partial class GiftCardBoxModel : ModelBase
         {

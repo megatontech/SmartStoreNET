@@ -838,7 +838,7 @@ namespace SmartStore.Web.Controllers
 			var store = _storeContext.CurrentStore;
 			var customer = _workContext.CurrentCustomer;
 			var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
-
+            
             if (cart.Count == 0)
             {
                 return RedirectToRoute("ShoppingCart");
@@ -883,7 +883,11 @@ namespace SmartStore.Web.Controllers
 				placeOrderExtraData["SubscribeToNewsLetter"] = form["SubscribeToNewsLetter"];
 				placeOrderExtraData["AcceptThirdPartyEmailHandOver"] = form["AcceptThirdPartyEmailHandOver"];
 
-				placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest, placeOrderExtraData);
+				placeOrderExtraData["OrderTotalVal"] = form["OrderTotalVal"];
+				placeOrderExtraData["UsePointsTotalVal"] = form["UsePointsTotalVal"];
+                placeOrderExtraData["UseDiscountVal"] = form["UseDiscountVal"];
+                
+                placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest, placeOrderExtraData);
 
                 if (!placeOrderResult.Success)
                 {

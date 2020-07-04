@@ -3,17 +3,17 @@
 @using SmartStore.Web.Models.ShoppingCart;
 
 @{ 
-	if (!Model.Display)
-	{
-		return;
-	}
+    //if (!Model.Display)
+    //{
+    //	return;
+    //}
 
-	var isExpanded = Model.Message.HasValue() || Model.CurrentCode.HasValue();
+    var isExpanded = Model.Message.HasValue() || Model.CurrentCode.HasValue();
 }
 
 <div class="cart-action cart-action-coupon">
     <h5 class="cart-action-title@(isExpanded ? "" : " collapsed")" data-toggle="collapse" data-target="#cart-action-coupon-body" aria-controls="cart-action-coupon-body" aria-expanded="@isExpanded">
-		@T("ShoppingCart.DiscountCouponCode")
+		@T("优惠券")
 	</h5>
         
     <div class="cart-action-body collapse@(isExpanded ? " show" : "")" id="cart-action-coupon-body" aria-expanded="@isExpanded">
@@ -27,30 +27,71 @@
 
         <div class="coupon-code form-group">
             <div class="input-group@(Model.CurrentCode.HasValue() ? " has-success" : "")">
-                <input name="discountcouponcode" type="text" class="form-control form-control-success discount-coupon-code" value="@Model.CurrentCode" placeholder="@T("ShoppingCart.DiscountCouponCode.Tooltip")" />
-				<span class="input-group-btn input-group-append">
-					@if (Model.CurrentCode.HasValue())
-					{
-						<button type="submit"
-								class="btn btn-danger remove-discount-button"
-								name="removediscountcouponcode"
-								value="removediscountcouponcode">
-							<span>@T("Common.Remove")</span>
-						</button>
-					}
-					else
-					{
-						<button type="submit"
-								class="btn btn-primary apply-discount-coupon-code-button"
-								title="@T("ShoppingCart.DiscountCouponCode.Button")"
-								name="applydiscountcouponcode"
-								value="applydiscountcouponcode">
-							<i class="fa fa-check"></i>
-							<span>@T("ShoppingCart.DiscountCouponCode.Button")</span>
-						</button>
-					}
-				</span>
+                @*@if (Model.discounts!=null&&Model.discounts.Count > 0)
+                {
+                    var descStr = "";
+
+                    if (Model.discounts[0].discount.UsePercentage)
+                    {
+                        descStr = "商品折扣" + Model.discounts[0].discount.DiscountPercentage + "%";
+                    }
+                    else
+                    {
+                        descStr = "商品立减" + Model.discounts[0].discount.DiscountAmount.ToString("F2") + "元";
+                    }
+                    <label class="form-control form-control-success discount-coupon-code">@descStr</label>
+
+                }*@
+                <select name="discountcouponcode" id="discountcouponcode" class="form-control form-control-success discount-coupon-code" value="@Model.CurrentCode" placeholder="@T("请选择要使用的优惠券")">
+                    @for (int i = 0; i < Model.discounts.Count; i++)
+                    {
+                        var descStr = "";
+
+                        if (Model.discounts[i].discount.UsePercentage)
+                        {
+                            descStr = "商品折扣" + Model.discounts[i].discount.DiscountPercentage + "%";
+                        }
+                        else
+                        {
+                            descStr = "商品立减" + Model.discounts[i].discount.DiscountAmount.ToString("F2") + "元";
+                        }
+                        <option data-val="@Model.discounts[i].discount.DiscountAmount" value="@Model.discounts[i].Id">@descStr </option>
+                    }
+                </select>
+                <span class="input-group-btn input-group-append">
+                    @*@if (Model.CurrentCode.HasValue())
+            {
+                <button type="submit"
+                        class="btn btn-danger remove-discount-button"
+                        name="removediscountcouponcode"
+                        value="removediscountcouponcode">
+                    <span>@T("Common.Remove")</span>
+                </button>
+            }
+            else
+            {*@
+                    @*<button type="submit" id="applydiscountcouponcode"
+                    class="btn btn-primary apply-discount-coupon-code-button"
+                    title="@T("ShoppingCart.DiscountCouponCode.Button")"
+                    name="applydiscountcouponcode"
+                    value="applydiscountcouponcode">
+                <i class="fa fa-check"></i>
+                <span>@T("使用该优惠券")</span>
+            </button>*@
+                    @*}  *@
+                </span>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $(function () {
+        if (parseFloat($("#discountcouponcode").val()) > 0) { $("#applydiscountcouponcode").show(); }
+        else { $("#applydiscountcouponcode").hide(); }
+        $("#discountcouponcode").change(function () {
+            if (parseFloat($("#discountcouponcode").val()) > 0) { calcTotal(); $("#applydiscountcouponcode").show(); }
+            else { $("#applydiscountcouponcode").hide(); }
+        });
+    });
+
+</script>

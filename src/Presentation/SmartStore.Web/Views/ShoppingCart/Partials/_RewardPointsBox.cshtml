@@ -3,34 +3,69 @@
 @using SmartStore.Web.Models.ShoppingCart;
 
 @{
-    if (!Model.DisplayRewardPoints)
-    {
-        return;
-    }
+    //if (!Model.DisplayRewardPoints)
+    //{
+    //    return;
+    //}
 
     var isExpanded = Model.UseRewardPoints;
 }
 
 <div class="cart-action cart-action-rewardpoints">
     <h5 class="cart-action-title@(isExpanded ? "" : " collapsed")" data-toggle="collapse" data-target="#cart-action-rewardpoints-body" aria-controls="cart-action-rewardpoints-body" aria-expanded="@isExpanded">
-        @T("ShoppingCart.RewardPoints")
+        @T("购物积分")
     </h5>
 
     <div class="cart-action-body collapse@(isExpanded ? " show" : "")" id="cart-action-rewardpoints-body" aria-expanded="@isExpanded">
         <div class="reward-points alert alert-info">
             <div class="form-check">
-				@Html.CheckBoxFor(model => model.UseRewardPoints, new { @class = "form-check-input" })
-                <label class="form-check-label" for="@Html.IdFor(model => model.UseRewardPoints)"> 
-                    @Html.Raw(string.Format(T("Checkout.UseRewardPoints").Text, "<strong>" + Model.RewardPointsBalance + "</strong>", "<strong>" + Model.RewardPointsAmount + "</strong>"))
+                @Html.CheckBoxFor(model => model.UseRewardPoints, new { @class = "form-check-input", @checked= "checked" })
+                <label class="form-check-label" for="@Html.IdFor(model => model.RewardPointsAmount)">
+                    使用积分抵扣订单金额，可用积分 @Model.RewardPointsAmount
+                    @*@Model.RewardPointsAmount*@
+                    @*@Html.Raw(string.Format(T("Checkout.UseRewardPoints").Text, "<strong>" + Model.RewardPointsBalance + "</strong>", "<strong>" + Model.RewardPointsAmount + "</strong>"))*@
                 </label>
             </div>
         </div>
-
+        <div class="coupon-code form-group">
+            <div class="input-group">
+                <input type="hidden" id="RewardPointsBalance" value="@Model.RewardPointsAmount" />
+                <input id="usepointval" name="usepointval" type="text" value="0" class="form-control form-control-success discount-coupon-code" placeholder="在这里输入使用积分数">
+                <span class="input-group-btn input-group-append">
+                    @*<button type="submit" name="applyrewardpoints" value="applyrewardpoints" class="btn btn-primary">
+                        <i class="fa fa-check"></i>
+                        <span>@T("使用积分抵扣")</span>
+                    </button>*@
+                </span>
+            </div>
+        </div>
         <div class="form-group">
-            <button type="submit" name="applyrewardpoints" value="applyrewardpoints" class="btn btn-primary">
-                <i class="fa fa-check"></i>
-                <span>@T("ShoppingCart.RewardPoints.Button")</span>
-            </button>
+            
         </div>
     </div>
 </div>
+<script>
+    $(function () {
+        calcTotal();
+        $("#usepointval").attr("disabled", "disabled");
+        $("#UseRewardPoints").change(function () {
+            if ($("#UseRewardPoints").prop("checked")) {
+                calcTotal();
+                $("#usepointval").removeAttr("disabled");;
+            } else { calcTotal();$("#usepointval").val(0);$("#usepointval").attr("disabled", "disabled"); }
+        });
+        $("#usepointval").change(function () {
+            $("#usepointval").val($("#usepointval").val().replace(/\D/g, ''));
+            var input = parseFloat($("#usepointval").val());
+            var limit = parseFloat($("#RewardPointsBalance").val());
+            if (isNaN(input)) { $("#usepointval").val(0);}
+            if (input >= limit) {
+                $("#usepointval").val($("#RewardPointsBalance").val());
+            }
+            if ($("#UseRewardPoints").prop("checked")) {
+                calcTotal();
+            }
+        });
+    });
+
+</script>

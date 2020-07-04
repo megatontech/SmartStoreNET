@@ -17,7 +17,7 @@
     {
         x.Add().Text(T("优惠券使用记录").Text).Content(TabHistory());
     }
-
+    Model.UsePercentage = false;
     //generate an event
     EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "discount-edit", this.Html, this.Model));
 })
@@ -174,7 +174,7 @@
 				}
             </td>
         </tr>
-        <tr>
+        <tr  style="display:none;">
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.UsePercentage)
             </td>
@@ -192,7 +192,7 @@
                 @Html.ValidationMessageFor(model => model.DiscountAmount)
             </td>
         </tr>
-        <tr id="pnlDiscountPercentage">
+        <tr id="pnlDiscountPercentage" style="display:none;">
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.DiscountPercentage)
             </td>

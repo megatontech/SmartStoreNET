@@ -385,7 +385,7 @@ namespace SmartStore.Services.Customers
         {
             var query = from cr in _customerRoleRepository.Table
                         orderby cr.Name
-                        where (showHidden || cr.Active) && cr.Name!= "超级管理员" && cr.SystemName != "Registered"
+                        where (showHidden || cr.Active) //&& cr.Name!= "超级管理员" && cr.SystemName != "Registered"
                         select cr;
 
             var customerRoles = query.ToListCached();
