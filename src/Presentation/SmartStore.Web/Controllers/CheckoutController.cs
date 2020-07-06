@@ -526,12 +526,12 @@ namespace SmartStore.Web.Controllers
             if (_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed)
                 return new HttpUnauthorizedResult();
 
-            if (!cart.RequiresShipping())
-            {
-                _workContext.CurrentCustomer.ShippingAddress = null;
-                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-                return RedirectToAction("ShippingMethod");
-            }
+            //if (!cart.RequiresShipping())
+            //{
+            //    _workContext.CurrentCustomer.ShippingAddress = null;
+            //    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+            //    return RedirectToAction("ShippingMethod");
+            //}
 
             var model = PrepareShippingAddressModel();
             return View(model);
@@ -607,12 +607,12 @@ namespace SmartStore.Web.Controllers
                 return new HttpUnauthorizedResult();
             }
 
-            if (!cart.RequiresShipping())
-            {
-				_genericAttributeService.SaveAttribute<ShippingOption>(customer, SystemCustomerAttributeNames.SelectedShippingOption, null, store.Id);
+    //        if (!cart.RequiresShipping())
+    //        {
+				//_genericAttributeService.SaveAttribute<ShippingOption>(customer, SystemCustomerAttributeNames.SelectedShippingOption, null, store.Id);
 
-                return RedirectToAction("PaymentMethod");
-            }
+    //            return RedirectToAction("PaymentMethod");
+    //        }
 
             var response = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "", store.Id);
             var options = response.ShippingOptions;

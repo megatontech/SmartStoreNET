@@ -1051,7 +1051,7 @@ namespace SmartStore.Admin.Controllers
                 }
             }
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 var product = new Product();
 
@@ -1222,6 +1222,7 @@ namespace SmartStore.Admin.Controllers
             //if (ModelState.IsValid)
             {
                 MapModelToProduct(model, product, form);
+                product.VisibleIndividually = true;
                 UpdateDataOfExistingProduct(product, model, true);
 
                 // activity log

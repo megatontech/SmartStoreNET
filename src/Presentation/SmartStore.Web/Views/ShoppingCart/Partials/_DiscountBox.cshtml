@@ -43,7 +43,9 @@
 
                 }*@
                 <select name="discountcouponcode" id="discountcouponcode" class="form-control form-control-success discount-coupon-code" value="@Model.CurrentCode" placeholder="@T("请选择要使用的优惠券")">
-                    @for (int i = 0; i < Model.discounts.Count; i++)
+                    @if (Model.discounts != null)
+                    {
+                    for (int i = 0; i < Model.discounts.Count; i++)
                     {
                         var descStr = "";
 
@@ -56,7 +58,7 @@
                             descStr = "商品立减" + Model.discounts[i].discount.DiscountAmount.ToString("F2") + "元";
                         }
                         <option data-val="@Model.discounts[i].discount.DiscountAmount" value="@Model.discounts[i].Id">@descStr </option>
-                    }
+                    }}
                 </select>
                 <span class="input-group-btn input-group-append">
                     @*@if (Model.CurrentCode.HasValue())
