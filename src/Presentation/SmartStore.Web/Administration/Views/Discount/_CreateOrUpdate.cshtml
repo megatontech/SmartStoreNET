@@ -43,11 +43,11 @@
                 	$('#pnlAppliedToManufacturers').hide();
                     $('#pnlAppliedToProducts').hide();
                 }
-            	else if (selectedDiscountTypeId == '@((int)DiscountType.AssignedToManufacturers)') {
+            	@*else if (selectedDiscountTypeId == '@((int)DiscountType.AssignedToManufacturers)') {
             		$('#pnlAppliedToCategories').hide();
             		$('#pnlAppliedToManufacturers').show();
             		$('#pnlAppliedToProducts').hide();
-            	}
+            	}*@
                 else if (selectedDiscountTypeId == '@((int)DiscountType.AssignedToSkus)') {
                 	$('#pnlAppliedToCategories').hide();
                 	$('#pnlAppliedToManufacturers').hide();

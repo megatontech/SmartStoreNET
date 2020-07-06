@@ -13,7 +13,7 @@
 	var actions = Model.ActionItems.Values.Where(x => !x.IsPrimary).OrderBy(x => x.Priority).ToList();
 }
 
-<div class="pd-actions-container">
+<div class="pd-actions-container hide">
 	@if (primaryActions.Count > 0)
 	{
 		<div class="pd-actions-primary">

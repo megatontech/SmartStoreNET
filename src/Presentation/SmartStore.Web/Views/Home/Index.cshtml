@@ -87,12 +87,14 @@
                 });
 
             </script>
-            Html.RenderAction("HomepageCategories", "Catalog");
-            Html.RenderWidget("home_page_after_categories");
+
 
             Html.RenderAction("DHomepageProducts", "Catalog");
             Html.RenderWidget("home_page_after_products");
+            Html.RenderAction("HomepageCategories", "Catalog");
+            Html.RenderWidget("home_page_after_categories");
 
+            Html.RenderAction("HomepageProducts", "Catalog");
             Html.RenderAction("HomepageBestSellers", "Catalog");
             Html.RenderWidget("home_page_after_bestsellers");
 

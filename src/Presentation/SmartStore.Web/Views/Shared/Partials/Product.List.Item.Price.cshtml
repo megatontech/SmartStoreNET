@@ -54,10 +54,18 @@
 {
 
 	<div class="art-price-block">
-		<span class="@artPriceClasses">
-            @(Model.Price.SavingAmount.HasValue() ? "券后价 " : "")@Model.Price.Price
-		</span>
-		@if (Model.Price.RegularPrice.HasValue())
+        <span class="@artPriceClasses">
+            @(Model.Price.SavingAmount.HasValue() ? " " : "") 
+            @if (Model.Price.RegularPrice.HasValue())
+            {
+                @Model.Price.RegularPrice
+            }
+           else
+            {
+                @Model.Price.Price
+            }
+        </span>
+		@*@if (Model.Price.RegularPrice.HasValue())
 		{
 			if (list.ViewMode == ProductSummaryViewMode.List)
 			{
@@ -79,7 +87,7 @@
 			{
 				<span class="art-oldprice">@Model.Price.RegularPrice</span>
 			}
-		}
+		}*@
 
 		@if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
 		{

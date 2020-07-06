@@ -75,14 +75,14 @@
 	<div class="artlist-actions artlist-actions--top d-flex flex-wrap">
 		@if (Model.AllowSorting || Model.AllowFiltering)
 		{
-			<div class="artlist-action-group artlist-action-group--filtersort">
+			<div class="artlist-action-group artlist-action-group--filtersort" style="display:none;">
 				@{ Html.RenderPartial("Product.List.FilterSort", Model); }
 			</div>
 		}
 
 		@if (pagerHtml.HasValue() || Model.AllowViewModeChanging)
 		{
-			<div class="artlist-action-group artlist-action-group--page">
+			<div class="artlist-action-group artlist-action-group--page"  style="display:none;">
 				@* ViewMode *@
 				@if (Model.AllowViewModeChanging && Model.ViewMode == ProductSummaryViewMode.Grid || Model.ViewMode == ProductSummaryViewMode.List)
 				{

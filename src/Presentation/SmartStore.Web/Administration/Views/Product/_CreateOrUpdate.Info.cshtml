@@ -221,7 +221,7 @@
                 @Html.ValidationMessageFor(model => model.CountryOfOriginId)
             </td>
         </tr>*@
-        <tr>
+        @*<tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.AdminComment)
             </td>
@@ -238,7 +238,7 @@
                 @Html.ListBoxFor(model => model.ProductTags, Model.AvailableProductTags, new { multiple = "multiple", data_tags = "true" })
                 @Html.ValidationMessageFor(model => model.ProductTags)
             </td>
-        </tr>
+        </tr>*@
         <tr>
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.AvailableStartDateTimeUtc)

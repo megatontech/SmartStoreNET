@@ -5,7 +5,8 @@
 @Html.ValidationSummary(false)
 @Html.HiddenFor(model => model.Id)
 
-@Html.SmartStore().TabStrip().Name("category-edit").OnAjaxSuccess("categoryEditTab_onAjaxSuccess").Style(TabsStyle.Material).Position(TabsPosition.Left).Items(x => {
+@Html.SmartStore().TabStrip().Name("category-edit").OnAjaxSuccess("categoryEditTab_onAjaxSuccess").Style(TabsStyle.Material).Position(TabsPosition.Left).Items(x =>
+{
 
     x.Add().Text(T("Admin.Catalog.Categories.Info").Text).Icon("fa fa-pencil-alt fa-lg fa-fw").Content(TabInfo()).Selected(true);
     //x.Add().Text(T("Admin.Common.SEO").Text).Icon("fa fa-search fa-lg fa-fw").Content(TabSeo());
@@ -20,19 +21,19 @@
 
 @helper TabInfo()
 {
-	if (Model.Id != 0)
-	{
-		<table class="adminContent">
-			<tr>
-				<td class="adminTitle">
-					@Html.SmartLabelFor(model => model.Id)
-				</td>
-				<td class="adminData">
-					@Html.TextBoxFor(model => model.Id, new { @readonly = "readonly", @class = "form-control-plaintext" })
-					@Html.ValidationMessageFor(model => model.Id)
-				</td>
-			</tr>
-            <tr>
+    if (Model.Id != 0)
+    {
+        <table class="adminContent">
+            <tr style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Id)
+                </td>
+                <td class="adminData">
+                    @Html.TextBoxFor(model => model.Id, new { @readonly = "readonly", @class = "form-control-plaintext" })
+                    @Html.ValidationMessageFor(model => model.Id)
+                </td>
+            </tr>
+            <tr style="display:none;">
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.ExternalLink)
                 </td>
@@ -46,18 +47,18 @@
                     @Html.SmartLabelFor(model => model.ParentCategoryId)
                 </td>
                 <td class="adminData">
-				    @Html.DropDownListFor(model => model.ParentCategoryId,
-				    Model.ParentCategoryId == null ? Enumerable.Empty<SelectListItem>() : new List<SelectListItem> {
-					    new SelectListItem { Text = Model.ParentCategoryBreadcrumb, Value = Model.ParentCategoryId.ToString() }
-				    },
-				    new
-				    {
-					    placeholder = "[" + T("Common.Unspecified") + "]",
-					    data_select = true,
-					    data_select_lazy = true,
-					    data_select_init_text = Model.ParentCategoryBreadcrumb,
-					    data_select_url = Url.Action("Allcategories", "Category", new { selectedId =  Model.ParentCategoryId })
-				    })
+                    @Html.DropDownListFor(model => model.ParentCategoryId,
+                    Model.ParentCategoryId == null ? Enumerable.Empty<SelectListItem>() : new List<SelectListItem> {
+                        new SelectListItem { Text = Model.ParentCategoryBreadcrumb, Value = Model.ParentCategoryId.ToString() }
+                    },
+                    new
+                    {
+                        placeholder = "[" + T("Common.Unspecified") + "]",
+                        data_select = true,
+                        data_select_lazy = true,
+                        data_select_init_text = Model.ParentCategoryBreadcrumb,
+                        data_select_url = Url.Action("Allcategories", "Category", new { selectedId = Model.ParentCategoryId })
+                    })
                     @Html.ValidationMessageFor(model => model.ParentCategoryId)
                 </td>
             </tr>
@@ -88,11 +89,11 @@
                     @Html.ValidationMessageFor(model => model.ShowOnHomePage)
                 </td>
             </tr>
-		</table>
-	}
+        </table>
+    }
 
     @(Html.LocalizedEditor<CategoryModel, CategoryLocalizedModel>("category-info-localized",
-		@<table class="adminContent">
+		@<table class="adminContent"  style="display:none;">
             <tr>
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.Locales[item].Name)
@@ -123,7 +124,7 @@
                     @Html.ValidationMessageFor(model => model.Locales[item].Description)
                 </td>
             </tr>
-            <tr class="description-container d-none">
+            <tr class="description-container d-none"  style="display:none;">
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.Locales[item].BottomDescription)
                 </td>
@@ -132,7 +133,7 @@
                     @Html.ValidationMessageFor(model => model.Locales[item].BottomDescription)
                 </td>
             </tr>
-            <tr>
+            <tr  style="display:none;">
                 <td class="adminTitle">
                 </td>
                 <td class="adminData">
@@ -142,7 +143,7 @@
 					</button>
                 </td>
             </tr>
-            <tr>
+            <tr  style="display:none;">
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.Locales[item].BadgeText)
                 </td>
@@ -172,7 +173,7 @@
                     @Html.ValidationMessageFor(model => model.FullName)
                 </td>
             </tr>
-            <tr class="description-container">
+            <tr class="description-container"  style="display:none;">
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.Description)
                 </td>
@@ -181,7 +182,7 @@
                     @Html.ValidationMessageFor(model => model.Description)
                 </td>
             </tr>
-            <tr class="description-container d-none">
+            <tr class="description-container d-none"  style="display:none;">
                 <td class="adminTitle">
                     @Html.SmartLabelFor(model => model.BottomDescription)
                 </td>
@@ -190,7 +191,7 @@
                     @Html.ValidationMessageFor(model => model.BottomDescription)
                 </td>
             </tr>
-			<tr>
+			<tr  style="display:none;">
 				<td class="adminTitle"></td>
 				<td class="adminData">
 					<button type="button" class="btn btn-secondary description-toggle-button">
@@ -199,8 +200,8 @@
 					</button>
 				</td>
 			</tr>
-                <tr>
-                    <td class="adminTitle">
+                <tr  style="display:none;">
+                    <td class="adminTitle" >
                         @Html.SmartLabelFor(model => model.BadgeText)
                     </td>
                     <td class="adminData">
@@ -212,16 +213,16 @@
 	))
 
     <table class="adminContent">
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.BadgeStyle)
-            </td>
-            <td class="adminData">
-                @Html.DropDownListFor(model => model.BadgeStyle, Model.AvailableBadgeStyles)
-                @Html.ValidationMessageFor(model => model.BadgeStyle)
-            </td>
-        </tr>
-        <tr>
+        <tr  style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.BadgeStyle)
+                </td>
+                <td class="adminData">
+                    @Html.DropDownListFor(model => model.BadgeStyle, Model.AvailableBadgeStyles)
+                    @Html.ValidationMessageFor(model => model.BadgeStyle)
+                </td>
+            </tr>
+        <tr style="display:none;">
             <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.PictureId)
             </td>
@@ -230,92 +231,92 @@
                 @Html.ValidationMessageFor(model => model.PictureId)
             </td>
         </tr>
-        <tr>
+        <tr style="display:none;">
             <td colspan="2"><hr /></td>
         </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.DefaultViewMode)
-            </td>
-            <td class="adminData">
-                @Html.DropDownListFor(model => model.DefaultViewMode, Model.AvailableDefaultViewModes, T("Common.Unspecified"))
-                @Html.ValidationMessageFor(model => model.DefaultViewMode)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.AllowCustomersToSelectPageSize)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(x => x.AllowCustomersToSelectPageSize)
-                @Html.ValidationMessageFor(model => model.AllowCustomersToSelectPageSize)
-            </td>
-        </tr>
-        <tr id="pnlPageSize">
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.PageSize)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(x => x.PageSize)
-                @Html.ValidationMessageFor(model => model.PageSize)
-            </td>
-        </tr>
-        <tr id="pnlPageSizeOptions">
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.PageSizeOptions)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(x => x.PageSizeOptions)
-                @Html.ValidationMessageFor(model => model.PageSizeOptions)
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2"><hr /></td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.Alias)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(model => model.Alias)
-                @Html.ValidationMessageFor(model => model.Alias)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.CategoryTemplateId)
-            </td>
-            <td class="adminData">
-                @Html.DropDownListFor(model => model.CategoryTemplateId, Model.AvailableCategoryTemplates)
-                @Html.ValidationMessageFor(model => model.CategoryTemplateId)
-            </td>
-        </tr>
-		@if (Model.CreatedOn.HasValue)
-		{
-			<tr>
-				<td class="adminTitle">
-					@Html.SmartLabelFor(model => model.CreatedOn)
-				</td>
-				<td class="adminData">
-					<div class="form-control-plaintext">
-						@Html.DisplayFor(model => model.CreatedOn)
-					</div>
-				</td>
-			</tr>
-		}
-		@if (Model.UpdatedOn.HasValue)
-		{
-			<tr>
-				<td class="adminTitle">
-					@Html.SmartLabelFor(model => model.UpdatedOn)
-				</td>
-				<td class="adminData">
-					<div class="form-control-plaintext">
-						@Html.DisplayFor(model => model.UpdatedOn)
-					</div>
-				</td>
-			</tr>
-		}
+        <tr style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.DefaultViewMode)
+                </td>
+                <td class="adminData">
+                    @Html.DropDownListFor(model => model.DefaultViewMode, Model.AvailableDefaultViewModes, T("Common.Unspecified"))
+                    @Html.ValidationMessageFor(model => model.DefaultViewMode)
+                </td>
+            </tr>
+            <tr style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.AllowCustomersToSelectPageSize)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(x => x.AllowCustomersToSelectPageSize)
+                    @Html.ValidationMessageFor(model => model.AllowCustomersToSelectPageSize)
+                </td>
+            </tr>
+            @*<tr id="pnlPageSize" style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.PageSize)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(x => x.PageSize)
+                    @Html.ValidationMessageFor(model => model.PageSize)
+                </td>
+            </tr>
+            <tr id="pnlPageSizeOptions" style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.PageSizeOptions)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(x => x.PageSizeOptions)
+                    @Html.ValidationMessageFor(model => model.PageSizeOptions)
+                </td>
+            </tr>*@
+            <tr style="display:none;">
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.Alias)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.Alias)
+                    @Html.ValidationMessageFor(model => model.Alias)
+                </td>
+            </tr>
+            <tr style="display:none;">
+                <td class="adminTitle">
+                    @Html.SmartLabelFor(model => model.CategoryTemplateId)
+                </td>
+                <td class="adminData">
+                    @Html.DropDownListFor(model => model.CategoryTemplateId, Model.AvailableCategoryTemplates)
+                    @Html.ValidationMessageFor(model => model.CategoryTemplateId)
+                </td>
+            </tr>
+            @if (Model.CreatedOn.HasValue)
+            {
+                <tr style="display:none;">
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.CreatedOn)
+                    </td>
+                    <td class="adminData">
+                        <div class="form-control-plaintext">
+                            @Html.DisplayFor(model => model.CreatedOn)
+                        </div>
+                    </td>
+                </tr>
+            }
+            @if (Model.UpdatedOn.HasValue)
+            {
+                <tr style="display:none;">
+                    <td class="adminTitle">
+                        @Html.SmartLabelFor(model => model.UpdatedOn)
+                    </td>
+                    <td class="adminData">
+                        <div class="form-control-plaintext">
+                            @Html.DisplayFor(model => model.UpdatedOn)
+                        </div>
+                    </td>
+                </tr>
+            }
     </table>
 }
 
@@ -411,10 +412,10 @@
 
 @helper TabProducts()
 {
-	if (Model.Id > 0)
-	{
-		<div>
-			@(Html.Telerik().Grid<CategoryModel.CategoryProductModel>()
+    if (Model.Id > 0)
+    {
+        <div>
+            @(Html.Telerik().Grid<CategoryModel.CategoryProductModel>()
 					.Name("products-grid")
 					.DataKeys(keys => { keys.Add(x => x.Id); })
 					.DataBinding(dataBinding =>
@@ -457,19 +458,19 @@
 					.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
 					.PreserveGridState()
 					.EnableCustomBinding(true))
-		</div>
-	}
-	else
-	{
-		<p class="muted">
-			@T("Admin.SaveBeforeEdit")
-		</p>
-	}
+        </div>
+    }
+    else
+    {
+        <p class="muted">
+            @T("Admin.SaveBeforeEdit")
+        </p>
+    }
 }
 
 @helper CategoryProductsGridCommands(Grid<CategoryModel.CategoryProductModel> grid)
 {
-	@(Html.SmartStore().EntityPicker()
+    @(Html.SmartStore().EntityPicker()
 		.IconCssClass("fa fa-plus")
 		.HtmlAttribute("class", "t-button t-grid-add")
 		.Caption(T("Admin.Catalog.Categories.Products.AddNew").Text.EncodeJsString('\'', false))
@@ -478,38 +479,38 @@
 
 @helper TabDiscounts()
 {
-	if (Model.AvailableDiscounts != null && Model.AvailableDiscounts.Count > 0)
-	{
-		foreach (var discount in Model.AvailableDiscounts)
-		{
-			<div class="custom-control custom-checkbox mb-1">
-				<input type="checkbox" name="SelectedDiscountIds" id="discount-@discount.Id"
-					   class="custom-control-input" value="@discount.Id" checked="@(Model.SelectedDiscountIds != null && Model.SelectedDiscountIds.Contains(discount.Id))">
-				<label class="custom-control-label" for="discount-@discount.Id">@discount.Name</label>	
-			</div>
-		}
-	}
-	else
-	{
-		<div class="alert alert-info">
-			@T("Admin.Promotions.Discounts.NoDiscountsAvailable")
-		</div>
-	}
+    if (Model.AvailableDiscounts != null && Model.AvailableDiscounts.Count > 0)
+    {
+        foreach (var discount in Model.AvailableDiscounts)
+        {
+            <div class="custom-control custom-checkbox mb-1">
+                <input type="checkbox" name="SelectedDiscountIds" id="discount-@discount.Id"
+                       class="custom-control-input" value="@discount.Id" checked="@(Model.SelectedDiscountIds != null && Model.SelectedDiscountIds.Contains(discount.Id))">
+                <label class="custom-control-label" for="discount-@discount.Id">@discount.Name</label>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">
+            @T("Admin.Promotions.Discounts.NoDiscountsAvailable")
+        </div>
+    }
 }
 
 @helper TabAcl()
-{    
+{
     @Html.Partial("AclSelector", Model)
-	
-	<div class="mt-4">
-		<div class="alert alert-danger">
-			@T("Admin.Configuration.Category.Acl.AssignToSubCategoriesAndProducts.Hint")
-		</div>
-		<a href="@Url.Action("InheritAclIntoChildren", "Category", new { categoryId = Model.Id })" name="inherit-acl-into-children" class="btn btn-danger">
-			<i class="fa fa-bolt"></i>
-			<span>@T("Admin.Configuration.Category.Acl.AssignToSubCategoriesAndProducts")</span>
-		</a>
-	</div>
+
+    <div class="mt-4">
+        <div class="alert alert-danger">
+            @T("Admin.Configuration.Category.Acl.AssignToSubCategoriesAndProducts.Hint")
+        </div>
+        <a href="@Url.Action("InheritAclIntoChildren", "Category", new { categoryId = Model.Id })" name="inherit-acl-into-children" class="btn btn-danger">
+            <i class="fa fa-bolt"></i>
+            <span>@T("Admin.Configuration.Category.Acl.AssignToSubCategoriesAndProducts")</span>
+        </a>
+    </div>
 }
 
 @helper TabStores()
@@ -525,7 +526,7 @@
 	$(function () {
 	    $("#@Html.FieldIdFor(model => model.AllowCustomersToSelectPageSize)").change(togglePageSize);
 	    togglePageSize();
-	
+
 		// toggle top\bottom description
 		$('.description-toggle-button').click(function() {
 			$('.description-container').toggleClass("d-none");

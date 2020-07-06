@@ -979,8 +979,8 @@ namespace SmartStore.Admin.Controllers
                         ShippingStatus = x.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext),
                         StatusShipping = x.ShippingStatus,
                         ShippingMethod = x.ShippingMethod.NullEmpty() ?? "".NaIfEmpty(),
-                        CustomerName = x.BillingAddress.GetFullName(),
-                        CustomerEmail = x.BillingAddress.Email,
+                        CustomerName = x.Customer.Username,
+                        CustomerEmail = x.Customer.Mobile,
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
                         HasNewPaymentNotification = x.HasNewPaymentNotification
                     };
