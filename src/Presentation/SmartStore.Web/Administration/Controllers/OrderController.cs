@@ -508,30 +508,30 @@ namespace SmartStore.Admin.Controllers
 
             #region Billing & shipping info
 
-            model.BillingAddress = order.BillingAddress.ToModel(_addressService);
-            model.BillingAddress.FirstNameEnabled = true;
-            model.BillingAddress.FirstNameRequired = true;
-            model.BillingAddress.LastNameEnabled = true;
-            model.BillingAddress.LastNameRequired = true;
-            model.BillingAddress.EmailEnabled = true;
-            model.BillingAddress.EmailRequired = true;
-            model.BillingAddress.ValidateEmailAddress = _addressSettings.ValidateEmailAddress;
-            model.BillingAddress.CompanyEnabled = _addressSettings.CompanyEnabled;
-            model.BillingAddress.CompanyRequired = _addressSettings.CompanyRequired;
-            model.BillingAddress.CountryEnabled = _addressSettings.CountryEnabled;
-            model.BillingAddress.StateProvinceEnabled = _addressSettings.StateProvinceEnabled;
-            model.BillingAddress.CityEnabled = _addressSettings.CityEnabled;
-            model.BillingAddress.CityRequired = _addressSettings.CityRequired;
-            model.BillingAddress.StreetAddressEnabled = _addressSettings.StreetAddressEnabled;
-            model.BillingAddress.StreetAddressRequired = _addressSettings.StreetAddressRequired;
-            model.BillingAddress.StreetAddress2Enabled = _addressSettings.StreetAddress2Enabled;
-            model.BillingAddress.StreetAddress2Required = _addressSettings.StreetAddress2Required;
-            model.BillingAddress.ZipPostalCodeEnabled = _addressSettings.ZipPostalCodeEnabled;
-            model.BillingAddress.ZipPostalCodeRequired = _addressSettings.ZipPostalCodeRequired;
-            model.BillingAddress.PhoneEnabled = _addressSettings.PhoneEnabled;
-            model.BillingAddress.PhoneRequired = _addressSettings.PhoneRequired;
-            model.BillingAddress.FaxEnabled = _addressSettings.FaxEnabled;
-            model.BillingAddress.FaxRequired = _addressSettings.FaxRequired;
+            //model.BillingAddress = order.BillingAddress.ToModel(_addressService);
+            //model.BillingAddress.FirstNameEnabled = true;
+            //model.BillingAddress.FirstNameRequired = true;
+            //model.BillingAddress.LastNameEnabled = true;
+            //model.BillingAddress.LastNameRequired = true;
+            //model.BillingAddress.EmailEnabled = true;
+            //model.BillingAddress.EmailRequired = true;
+            //model.BillingAddress.ValidateEmailAddress = _addressSettings.ValidateEmailAddress;
+            //model.BillingAddress.CompanyEnabled = _addressSettings.CompanyEnabled;
+            //model.BillingAddress.CompanyRequired = _addressSettings.CompanyRequired;
+            //model.BillingAddress.CountryEnabled = _addressSettings.CountryEnabled;
+            //model.BillingAddress.StateProvinceEnabled = _addressSettings.StateProvinceEnabled;
+            //model.BillingAddress.CityEnabled = _addressSettings.CityEnabled;
+            //model.BillingAddress.CityRequired = _addressSettings.CityRequired;
+            //model.BillingAddress.StreetAddressEnabled = _addressSettings.StreetAddressEnabled;
+            //model.BillingAddress.StreetAddressRequired = _addressSettings.StreetAddressRequired;
+            //model.BillingAddress.StreetAddress2Enabled = _addressSettings.StreetAddress2Enabled;
+            //model.BillingAddress.StreetAddress2Required = _addressSettings.StreetAddress2Required;
+            //model.BillingAddress.ZipPostalCodeEnabled = _addressSettings.ZipPostalCodeEnabled;
+            //model.BillingAddress.ZipPostalCodeRequired = _addressSettings.ZipPostalCodeRequired;
+            //model.BillingAddress.PhoneEnabled = _addressSettings.PhoneEnabled;
+            //model.BillingAddress.PhoneRequired = _addressSettings.PhoneRequired;
+            //model.BillingAddress.FaxEnabled = _addressSettings.FaxEnabled;
+            //model.BillingAddress.FaxRequired = _addressSettings.FaxRequired;
 
             model.ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext);
             model.StatusShipping = order.ShippingStatus;

@@ -885,6 +885,7 @@
     <Content Include="Views\Customer\Wallet.cshtml" />
     <Content Include="Views\Store\_CreateOrUpdateImage.cshtml" />
     <Content Include="Views\Store\CreateImage.cshtml" />
+    <Content Include="Views\DeclarationFinaduit\OrderManageList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Category\Create.cshtml" />

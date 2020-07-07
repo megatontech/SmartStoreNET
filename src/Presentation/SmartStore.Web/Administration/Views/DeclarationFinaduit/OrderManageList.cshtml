@@ -138,9 +138,9 @@
                      .RightAlign()
                      //.Hidden(x=>x.OrderStatus > 10)
                      .ClientTemplate(
-                    "<# if(StatusPayment==10){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>处理</a><# } #>"+
-                    "<# if(StatusPayment==30){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Edit/<#= Id #>'><i class='fa fa-check'></i>发货</a><# } #>" +
-                    "<# if(StatusPayment==30){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/View/<#= Id #>'><i class='fa fa-check'></i>分润</a><# } #>"
+                    //"<# if(StatusPayment==10){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>处理</a><# } #>"+
+                    "<# if(StatusPayment==30){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Edit/<#= Id #>'><i class='fa fa-check'></i>发货</a><# } #>" 
+                    //"<# if(StatusPayment==30){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/View/<#= Id #>'><i class='fa fa-check'></i>分润</a><# } #>"
                     //+
                     //"<a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"
                     //"<a class=\"t-button\" href='/Admin/DeclarationFinaduit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +

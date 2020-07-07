@@ -7,6 +7,7 @@ using SmartStore.Core;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Discounts;
+using SmartStore.Core.Domain.Logging;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
@@ -25,6 +26,7 @@ using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Filters;
 using SmartStore.Web.Framework.Plugins;
 using SmartStore.Web.Framework.Security;
+using SmartStore.Web.Infrastructure;
 using SmartStore.Web.Models.Checkout;
 using SmartStore.Web.Models.Common;
 
@@ -825,13 +827,51 @@ namespace SmartStore.Web.Controllers
                 return new HttpUnauthorizedResult();
 
             var model = PrepareConfirmOrderModel(cart);
-
-			//if (TempData["ConfirmOrderWarnings"] != null)
-			//	model.Warnings.AddRange(TempData["ConfirmOrderWarnings"] as IList<string>);
+            
+            //if (TempData["ConfirmOrderWarnings"] != null)
+            //	model.Warnings.AddRange(TempData["ConfirmOrderWarnings"] as IList<string>);
 
             return View(model);
         }
+        public JsonResult InitPay(string total_fee,string productname) 
+        {
+            //string openid = Request.QueryString["openid"];
+            //string total_fee = Request.QueryString["total_fee"];
+            //检测是否给当前页面传递了相关参数
+            //if (string.IsNullOrEmpty(openid) || string.IsNullOrEmpty(total_fee))
+            //{
+            //    Response.Write("<span style='color:#FF0000;font-size:20px'>" + "页面传参出错,请返回重试" + "</span>");
+            //    Logger.Error(this.GetType().ToString(), "This page have not get params, cannot be inited, exit...");
+            //    submit.Visible = false;
+            //    return;
+            //}
+            //https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
+            //若传递了相关参数，则调统一下单接口，获得后续相关接口的入口参数
+            JsApiPay jsApiPay = new JsApiPay(Request);
+            jsApiPay.openid = "";
+            jsApiPay.total_fee = int.Parse(total_fee);
 
+            //JSAPI支付预处理
+            try
+            {
+                WxPayData unifiedOrderResult = jsApiPay.GetUnifiedOrderResult("娇典商城商品：" + productname);
+                var wxJsApiParam = jsApiPay.GetJsApiParameters();//获取H5调起JS API参数        
+                ViewBag["wxJsApiParam"] = wxJsApiParam;
+                Infrastructure.Log.Debug(this.GetType().ToString(), "wxJsApiParam : " + wxJsApiParam);
+                return Json(wxJsApiParam, JsonRequestBehavior.AllowGet);
+                //在页面上显示订单信息
+                //Response.Write("<span style='color:#00CD00;font-size:20px'>订单详情：</span><br/>");
+                // Response.Write("<span style='color:#00CD00;font-size:20px'>" + unifiedOrderResult.ToPrintStr() + "</span>");
+
+            }
+            catch (Exception ex)
+            {
+                Infrastructure.Log.Error(this.GetType().ToString(), "wxJsApiParam : " + ex.StackTrace);
+                // Response.Write("<span style='color:#FF0000;font-size:20px'>" + "下单失败，请返回重试" + "</span>");
+                // submit.Visible = false;
+                return Json("", JsonRequestBehavior.AllowGet);
+            }
+        }
         [HttpPost, ActionName("Confirm")]
         public ActionResult ConfirmOrder(FormCollection form)
         {

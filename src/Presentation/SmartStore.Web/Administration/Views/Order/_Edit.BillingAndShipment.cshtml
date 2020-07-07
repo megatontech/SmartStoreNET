@@ -17,8 +17,8 @@
 		</div>*@
 						
 		<div class="card">
-			@if (Model.IsShippable && Model.ShippingAddress != null)
-			{
+			@*@if (Model.IsShippable && Model.ShippingAddress != null)
+			{*@
             <div class="card-body">
                 <h6 class="card-title">@T("Order.ShippingAddress")</h6>
                 @*@RenderAddress(Model.ShippingAddress)*@
@@ -57,13 +57,13 @@
 						<span>@T("Admin.Orders.Fields.ShippingAddress.ViewOnGoogleMaps")</span>
 					</a>*@
 				</div>
-			}
+			@*}
 			else
 			{
 				<div class="card-body">
 					@T("Admin.Orders.ShippingInfo.NotRequired")
 				</div>
-			}
+			}*@
 		</div>
 
 		<div class="card border-0">

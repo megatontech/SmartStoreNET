@@ -532,3 +532,4 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartSt
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\obj\Debug\SmartStore.Web.csproj.CopyComplete
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\obj\Debug\SmartStore.Web.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\obj\Debug\SmartStore.Web.pdb
+C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\LitJSON.dll

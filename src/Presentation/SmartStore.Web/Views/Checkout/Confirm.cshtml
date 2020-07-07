@@ -4,22 +4,23 @@
 @using SmartStore.Core.Domain.Orders;
 
 @{
-	Layout = "_Checkout";
-	Html.AddTitleParts(T("PageTitle.Checkout").Text);
-	Html.AddBodyCssClass("no-offcanvas-cart");
+    Layout = "_Checkout";
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+    Html.AddBodyCssClass("no-offcanvas-cart");
 
-	var termsLinkTemplate = "<a class='terms-trigger read' href='{0}' data-toggle='modal' data-target='#terms-of-service-modal'>";
-	var termsLink = termsLinkTemplate.FormatInvariant(Url.Topic("conditionsofuse", true));
-	var disclaimerLink = termsLinkTemplate.FormatInvariant(Url.Topic("disclaimer", true));
-	var privacyLink = termsLinkTemplate.FormatInvariant(Url.Topic("privacyinfo", true));
-	var terms = string.Format(T("Checkout.TermsOfService.IAccept"), termsLink, "</a>", disclaimerLink, privacyLink);
+    var termsLinkTemplate = "<a class='terms-trigger read' href='{0}' data-toggle='modal' data-target='#terms-of-service-modal'>";
+    var termsLink = termsLinkTemplate.FormatInvariant(Url.Topic("conditionsofuse", true));
+    var disclaimerLink = termsLinkTemplate.FormatInvariant(Url.Topic("disclaimer", true));
+    var privacyLink = termsLinkTemplate.FormatInvariant(Url.Topic("privacyinfo", true));
+    var terms = string.Format(T("Checkout.TermsOfService.IAccept"), termsLink, "</a>", disclaimerLink, privacyLink);
 
-	var consentZoneContent = Html.Widget("checkout_submit_data_consent", false).ToHtmlString();
-	var consentZoneHasValue = consentZoneContent.HasValue();
+    var consentZoneContent = Html.Widget("checkout_submit_data_consent", false).ToHtmlString();
+    var consentZoneHasValue = consentZoneContent.HasValue();
 }
 
 @section orderProgress{
     @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Confirm }); }
+    var param = ViewBag["wxJsApiParam"];
 }
 
 <div class="page checkout-confirm-page">
@@ -152,7 +153,7 @@
 
 @if (!Model.MinOrderTotalWarning.HasValue())
 {
-	<script>
+    <script>
         $(function () {
             var buyButton = $(".btn-buy");
 
@@ -171,12 +172,12 @@
 
                 if (_.isTrue(customerAgreed)) {
                     // Reverse apply. We do that just to indicate that no entered data is lost.
-                    $("#CustomerComment").val($("#customercommenthidden").val());                    
+                    $("#CustomerComment").val($("#customercommenthidden").val());
                 }
                 else {
                     $("#customercommenthidden").val($("#CustomerComment").val());
                 }
-                
+
 				// Terms of services.
                 @if (Model.TermsOfServiceEnabled)
                 {
@@ -269,7 +270,7 @@
                     var str = '<div class="alert alert-danger mb-3"><ul>';
                     if (_.isArray(e.message)) {
                         $.each(e.message, function (index, value) {
-                            str += '<li>' + value + '</li>';  
+                            str += '<li>' + value + '</li>';
                         });
                     }
                     else {
@@ -289,9 +290,38 @@
                 }
             });
         });
-	</script>
+    </script>
 }
 <div class="" style="height:30px;">
 </div>
 <div class="" style="height:30px;">
 </div>
+<script>
+    //function onBridgeReady() {
+    //    WeixinJSBridge.invoke(
+    //        'getBrandWCPayRequest', {
+    //        "appId": "wx2421b1c4370ec43b",     //公众号名称，由商户传入
+    //            "timeStamp": new Date().valueOf(),         //时间戳，自1970年以来的秒数
+    //        "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
+    //        "package": "prepay_id=u802345jgfjsdfgsdg888",
+    //        "signType": "MD5",         //微信签名方式：
+    //        "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+    //    },
+    //        function (res) {
+    //            if (res.err_msg == "get_brand_wcpay_request:ok") {
+    //                // 使用以上方式判断前端返回,微信团队郑重提示：
+    //                //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+    //            }
+    //        });
+    //}
+    //if (typeof WeixinJSBridge == "undefined") {
+    //    if (document.addEventListener) {
+    //        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+    //    } else if (document.attachEvent) {
+    //        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+    //        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+    //    }
+    //} else {
+    //    onBridgeReady();
+    //}
+</script>

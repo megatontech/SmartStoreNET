@@ -144,6 +144,9 @@
     <Reference Include="LibSassHost, Version=1.2.2.0, Culture=neutral, PublicKeyToken=3e24e88796a38e46, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LibSassHost.1.2.2\lib\net45\LibSassHost.dll</HintPath>
     </Reference>
+    <Reference Include="LitJSON, Version=0.16.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LitJson.0.16.0\lib\net45\LitJSON.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
@@ -300,10 +303,31 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\business\DownloadBill.cs" />
+    <Compile Include="Infrastructure\business\JsApiPay.cs" />
+    <Compile Include="Infrastructure\business\MicroPay.cs" />
+    <Compile Include="Infrastructure\business\NativeNotify.cs" />
+    <Compile Include="Infrastructure\business\NativePay.cs" />
+    <Compile Include="Infrastructure\business\OrderQuery.cs" />
+    <Compile Include="Infrastructure\business\Refund.cs" />
+    <Compile Include="Infrastructure\business\RefundQuery.cs" />
+    <Compile Include="Infrastructure\business\ResultNotify.cs" />
     <Compile Include="Infrastructure\Cache\ModelCacheEventConsumer.cs" />
     <Compile Include="Infrastructure\DefaultBundles.cs" />
     <Compile Include="Infrastructure\DefaultWidgetSelector.cs" />
     <Compile Include="Infrastructure\DependencyRegistrar.cs" />
+    <Compile Include="Infrastructure\JsApiPay.cs" />
+    <Compile Include="Infrastructure\lib\Config.cs" />
+    <Compile Include="Infrastructure\lib\Data.cs" />
+    <Compile Include="Infrastructure\lib\DemoConfig.cs" />
+    <Compile Include="Infrastructure\lib\Exception.cs" />
+    <Compile Include="Infrastructure\lib\HttpService.cs" />
+    <Compile Include="Infrastructure\lib\IConfig.cs" />
+    <Compile Include="Infrastructure\lib\Log.cs" />
+    <Compile Include="Infrastructure\lib\Notify.cs" />
+    <Compile Include="Infrastructure\lib\RandomGenerator.cs" />
+    <Compile Include="Infrastructure\lib\SafeXmlDocument.cs" />
+    <Compile Include="Infrastructure\lib\WxPayApi.cs" />
     <Compile Include="Infrastructure\Menus\MainMenuInvalidator.cs" />
     <Compile Include="Infrastructure\Menus\MyAccountMenu.cs" />
     <Compile Include="Infrastructure\Routes\2_DefaultRoutes.cs" />

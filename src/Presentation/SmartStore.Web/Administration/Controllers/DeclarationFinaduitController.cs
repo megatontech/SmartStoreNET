@@ -915,6 +915,55 @@ namespace SmartStore.Admin.Controllers
         {
             return RedirectToAction("List");
         }
+        
+         public ActionResult OrderManageList(OrderListModel model)
+        {
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
+            //{
+            //    return AccessDeniedView();
+            //}
+
+            var allStores = Services.StoreService.GetAllStores();
+            var paymentMethods = _paymentService.LoadAllPaymentMethods();
+
+            model.AvailableOrderStatuses = OrderStatus.Pending.ToSelectList(false).ToList();
+            model.AvailablePaymentStatuses = PaymentStatus.Pending.ToSelectList(false).ToList();
+            model.AvailableShippingStatuses = ShippingStatus.NotYetShipped.ToSelectList(false).ToList();
+
+            model.AvailableStores = allStores
+                .Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() })
+                .ToList();
+
+            model.AvailablePaymentMethods = paymentMethods
+                .Select(x => new SelectListItem
+                {
+                    Text = _pluginMediator.GetLocalizedFriendlyName(x.Metadata).NullEmpty() ?? x.Metadata.FriendlyName.NullEmpty() ?? x.Metadata.SystemName,
+                    Value = x.Metadata.SystemName
+                })
+                .ToList();
+
+            var paymentMethodsCounts = model.AvailablePaymentMethods
+                .GroupBy(x => x.Text)
+                .Select(x => new { Name = x.Key.EmptyNull(), Count = x.Count() })
+                .ToDictionarySafe(x => x.Name, x => x.Count);
+
+            model.AvailablePaymentMethods = model.AvailablePaymentMethods
+                .OrderBy(x => x.Text)
+                .Select(x =>
+                {
+                    if (paymentMethodsCounts[x.Text] > 1)
+                    {
+                        x.Text = "{0} ({1})".FormatInvariant(x.Text, x.Value);
+                    }
+
+                    return x;
+                })
+                .ToList();
+
+            model.GridPageSize = _adminAreaSettings.GridPageSize;
+
+            return View(model);
+        }
 
         public ActionResult List(OrderListModel model)
         {
@@ -1927,7 +1976,7 @@ namespace SmartStore.Admin.Controllers
             //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             //    return AccessDeniedView();
 
-            var order = _orderService.GetOrderById(id);
+            var order = _DeclarationOrderService.GetOrderById(id);
             if (order == null || order.Deleted)
                 return RedirectToAction("List");
 

@@ -3,7 +3,7 @@
 <div class="row">
 	<div class="card-deck card-cols-sm-1 card-cols-lg-3 col-md-12">
 						
-		<div class="card">
+		@*<div class="card">
 			<div class="card-body">
 				<h6 class="card-title">@T("Order.BillingAddress")</h6>
 				@RenderAddress(Model.BillingAddress)
@@ -14,44 +14,44 @@
 					<span>@T("Admin.Common.Edit")</span>
 				</a>
 			</div>
-		</div>
+		</div>*@
 						
-		<div class="card">
-			@if (Model.IsShippable && Model.ShippingAddress != null)
-			{
-				<div class="card-body">
-					<h6 class="card-title">@T("Order.ShippingAddress")</h6>
-					@RenderAddress(Model.ShippingAddress)
-				</div>
-				<div class="card-footer d-flex p-0">
-					<a href="@Url.Action("AddressEdit", new { addressId = Model.ShippingAddress.Id, orderId = Model.Id })" class="btn btn-warning btn-lg btn-flat rounded-0">
-						<i class="far fa-edit"></i>
-						<span>@T("Admin.Common.Edit")</span>
-					</a>
-					<a href="@Html.Raw(Model.ShippingAddressGoogleMapsUrl)" class="btn btn-warning btn-lg btn-flat rounded-0" target="_blank">
-						<i class="fab fa-google"></i>
-						<span>@T("Admin.Orders.Fields.ShippingAddress.ViewOnGoogleMaps")</span>
-					</a>
-				</div>
-			}
-			else
-			{
-				<div class="card-body">
-					@T("Admin.Orders.ShippingInfo.NotRequired")
-				</div>
-			}
-		</div>
+        <div class="card">
+            @*@if (Model.IsShippable && Model.ShippingAddress != null)*@
+            @* { *@
+            <div class="card-body">
+                <h6 class="card-title">收货地址</h6>
+                @*@RenderAddress(Model.ShippingAddress)*@
+            </div>
+            @*<div class="card-footer d-flex p-0">
+                <a href="@Url.Action("AddressEdit", new { addressId = Model.ShippingAddress.Id, orderId = Model.Id })" class="btn btn-warning btn-lg btn-flat rounded-0">
+                    <i class="far fa-edit"></i>
+                    <span>@T("Admin.Common.Edit")</span>
+                </a>
+                <a href="@Html.Raw(Model.ShippingAddressGoogleMapsUrl)" class="btn btn-warning btn-lg btn-flat rounded-0" target="_blank">
+                    <i class="fab fa-google"></i>
+                    <span>@T("Admin.Orders.Fields.ShippingAddress.ViewOnGoogleMaps")</span>
+                </a>
+            </div>*@
+            @*}
+        else
+        {
+            <div class="card-body">
+                @T("Admin.Orders.ShippingInfo.NotRequired")
+            </div>
+        }*@
+        </div>
 
-		<div class="card border-0">
-			@if (Model.IsShippable)
-			{
-				<h6>@T("Admin.Orders.Fields.ShippingMethod")</h6>
-				<p>@Model.ShippingMethod</p>
+        <div class="card border-0">
+            @*@if (Model.IsShippable)
+        {*@
+            <h6>@T("Admin.Orders.Fields.ShippingMethod")</h6>
+            <p>@Model.ShippingMethod</p>
 
-				<h6>@T("Admin.Orders.Fields.ShippingStatus")</h6>
-				<p>@Model.ShippingStatus</p>
-			}
-		</div>
+            <h6>@T("Admin.Orders.Fields.ShippingStatus")</h6>
+            <p>@Model.ShippingStatus</p>
+            @*}  *@
+        </div>
 	</div>
 </div>
 
@@ -95,22 +95,22 @@
 @helper RenderAddress(AddressModel address)
 {
 	<div class="mb-2">
-		@Html.Raw(address.FormattedAddress)
+		@*@Html.Raw(address.FormattedAddress)*@
 	</div>
 
 	<div class="email">
-		@T("Order.Email"): @address.Email
+		@*@T("Order.Email"): @address.Email*@
 	</div>
-	if (address.PhoneEnabled && address.PhoneNumber.HasValue())
-	{
+//if (address.PhoneEnabled && address.PhoneNumber.HasValue())
+{
 		<div class="phone">
-			@T("Order.Phone"): @address.PhoneNumber
+			@*@T("Order.Phone"): @address.PhoneNumber*@
 		</div>
-	}
-	if (address.FaxEnabled && address.FaxNumber.HasValue())
-	{
+}
+//if (address.FaxEnabled && address.FaxNumber.HasValue())
+{
 		<div class="fax">
-			@T("Order.Fax"): @address.FaxNumber
+			@*@T("Order.Fax"): @address.FaxNumber*@
 		</div>
 	}
 }
