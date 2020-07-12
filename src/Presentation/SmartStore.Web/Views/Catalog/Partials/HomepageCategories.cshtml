@@ -12,7 +12,7 @@
 
 <div class="product-grid product-grid-home-page block">
     <div class="heading heading-center">
-        <h3 class="heading-title fs-h1">@T("全部产品类别")</h3>
+        @*<h3 class="heading-title fs-h1">@T("全部产品类别")</h3>*@
     </div>
 
     <div class="block-body pt-3 artlist-no-separators">
@@ -21,29 +21,37 @@
 </div>
 
 <div class="artlist artlist-grid artlist-6-cols artlist-boxed artlist-homepage-categories">
+    <table style="width: 100%">
+        <tr>
 
+            @foreach (var item in Model)
+            {
+                count++;
+                var picture = item.PictureModel;
+                <td width="20%">
+                    <article class="art1" data-id="@item.Id">
+                        <div class="art-picture-block" style=" -webkit-border-radius: 5.0em; -moz-border-radius:5.0em; -o-border-radius:5.0em; -ms-border-radius:5.0em; border-radius:5.0em; ">
+                            @if (picture != null && picture.ImageUrl.HasValue())
+                            {
+                                <a class="art-picture img-center-container" href="@item.Url" title="@picture.Title">
+                                    <img src="@picture.ImageUrl" alt="@picture.AlternateText" />
+                                </a>
+                            }
+                        </div>
+                        <div class="art-genericname">
+                            <a href="@item.Url" title="@item.Name">
+                                <span @Html.LanguageAttributes(item.Name)>@item.Name</span>
+                            </a>
+                        </div>
+                    </article>
+                </td>
 
-    @foreach (var item in Model)
-    {
-        count++;
-        var picture = item.PictureModel;
-        <article class="art" data-id="@item.Id">
-            <div class="art-picture-block">
-                @if (picture != null && picture.ImageUrl.HasValue())
+                if (count % 5 == 0)
                 {
-                    <a class="art-picture img-center-container" href="@item.Url" title="@picture.Title">
-                        <img src="@picture.ImageUrl" alt="@picture.AlternateText" />
-                    </a>
+                @:</tr><tr>
                 }
-            </div>
-            <div class="art-genericname">
-                <a href="@item.Url" title="@item.Name">
-                    <span @Html.LanguageAttributes(item.Name)>@item.Name</span>
-                </a>
-            </div>
-        </article>
-        if (count % 5 == 0)
-        { <br/>
-        }
-    }
+            }
+
+        </tr>
+    </table>
 </div>
