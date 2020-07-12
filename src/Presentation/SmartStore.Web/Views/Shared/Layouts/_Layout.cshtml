@@ -47,7 +47,10 @@
                         }
                     </div>
                 </div>
-                <div  class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
+                <div  style="
+    /* color: red; */
+    background-color: #e03636;
+" class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
                     <div class="container shopbar-container">
                         @{
                             Html.RenderAction("ShopBar", "Common", new { area = "" });

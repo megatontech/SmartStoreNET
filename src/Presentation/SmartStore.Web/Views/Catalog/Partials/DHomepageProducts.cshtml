@@ -7,12 +7,19 @@
 		return;
 	}
 }
+<style>
 
-<div class="product-grid product-grid-home-page block">
-	<div class="heading heading-center">
-		<h3 class="heading-title fs-h1">@T("抗衰区")</h3>
-	</div>
-
+    .heading-center:before {
+        background: none !important;
+    }
+</style>
+<div class="product-grid product-grid-home-page block"  style="background: #fff; border-color: #ddd; box-shadow: 0 0 3px rgba(0, 0, 0, 0.1); margin: 0 0.5rem 1rem 0.5rem; -webkit-border-radius: 1em; -moz-border-radius: 1em; -o-border-radius: 1em; -ms-border-radius: 1em;  border-radius: 1em; ">
+    <div class="heading heading-center" style=" background: none; text-align: left; left: 5px; ">
+        <h3 class="heading-title fs-h1" style="        color: #c51d1d; font-weight: bold; font-family: fantasy; ">
+            <b style=" font-size: 25px; "><i class="icm icm-bag"></i>&nbsp; 抗衰区</b>
+        </h3>
+        <h5 style=" display: inline-block; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;更多 &gt;</h5>
+    </div>
     <div class="block-body pt-3 artlist-no-separators">
 		@{ 
 			Html.RenderPartial("DProduct.List", Model);

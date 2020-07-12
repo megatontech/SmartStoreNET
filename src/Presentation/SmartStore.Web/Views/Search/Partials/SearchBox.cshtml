@@ -12,12 +12,19 @@
         labelStyle += " btn-flat";
     }
 }
-<form action="@Model.SearchUrl" class="instasearch-form" method="get">
-	<input type="text"
+<form action="@Model.SearchUrl" class="instasearch-form" method="get"  style="
+    -webkit-border-radius: 1em;
+    -moz-border-radius:1em;
+    -o-border-radius:1em;
+    -ms-border-radius:1em;
+    background-color: #FFFFFF;
+    -ms-border-radius:1.0em;
+" >
+	<input type="text" style="border:none;"
 			class="instasearch-term form-control"
 			name="q"
 			value="@Model.CurrentQuery"
-			placeholder="@Model.InputPlaceholder"
+			placeholder="搜索商品"
 		    data-instasearch="@(Model.InstantSearchEnabled ? "true" : "false")"
 			data-minlength="@(Model.SearchTermMinimumLength.ToString())"
 			data-showthumbs="@(Model.ShowThumbsInInstantSearch.ToString().ToLower())"

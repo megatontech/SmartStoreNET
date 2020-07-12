@@ -43,6 +43,7 @@
         var colspan = (int)Model.GridColumnSpan;
         listCssClasses.Add("artlist-{0}-cols".FormatInvariant(colspan));
     }
+    var count = 0;
 }
 
 @if (Model.ViewMode != ProductSummaryViewMode.List && paddingTop.HasValue())
@@ -73,26 +74,26 @@
 @if (Model.PagedList.TotalCount > 0 && hasActions)
 {
 	<div class="artlist-actions artlist-actions--top d-flex flex-wrap">
-		@if (Model.AllowSorting || Model.AllowFiltering)
+		@*@if (Model.AllowSorting || Model.AllowFiltering)
 		{
 			<div class="artlist-action-group artlist-action-group--filtersort">
 				@{ Html.RenderPartial("Product.List.FilterSort", Model); }
 			</div>
-		}
+		}*@
 
 		@if (pagerHtml.HasValue() || Model.AllowViewModeChanging)
 		{
 			<div class="artlist-action-group artlist-action-group--page">
 				@* ViewMode *@
 				@if (Model.AllowViewModeChanging && Model.ViewMode == ProductSummaryViewMode.Grid || Model.ViewMode == ProductSummaryViewMode.List)
-				{
-					Html.RenderPartial("Product.List.ViewMode", Model);
-				}
+                {
+                    //Html.RenderPartial("Product.List.ViewMode", Model);
+                }
 
 				@* Pager *@
 				@if (pagerHtml.HasValue())
 				{
-					@Html.Raw(pagerHtml)
+					@*@Html.Raw(pagerHtml)*@
 				}
 			</div>
 		}
@@ -106,19 +107,24 @@
 
 @if (Model.PagedList.TotalCount > 0)
 {
-	<div id="@id" class='@String.Join(" ", listCssClasses)'>
-		@foreach (var product in Model.Items)
-		{
-			Html.RenderPartial("DProduct.List.Item", product);
-		}
-	</div>
+<div id="@id" class='@String.Join(" ", listCssClasses)'>
+    @foreach (var product in Model.Items)
+    {
+        count++;
+
+        Html.RenderPartial("DProduct.List.Item", product);
+        if (count % 2 == 0)
+        {<br />
+        }
+    }
+</div>
 }
 
-@if (Model.PagedList.TotalPages > 1 && pagerHtml.HasValue())
+@*@if (Model.PagedList.TotalPages > 1 && pagerHtml.HasValue())
 {
 	<div class="artlist-actions artlist-actions--bottom">
 		<div class="artlist-action-group artlist-action-group--page">
 			@Html.Raw(pagerHtml)
 		</div>
 	</div>
-}
+}*@

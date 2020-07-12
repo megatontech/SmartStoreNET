@@ -8,18 +8,25 @@
 		return;
 	}
 }
-
-<div class="product-grid recently-viewed-product-grid block block-boxed">
-	<div class="block-title">
-		<h3>@T("Products.RecentlyViewedProducts")</h3>
-	</div>
-	<div class="block-body pt-0">
-		<div class="artlist-carousel">
-			@{
-				// TODO: (mc) Find a generic/smart way to make thumbnails for some mini carousel lists smaller (padding-top: 50% instead of 100% (?))
-				Html.RenderPartial("Product.List", Model);
-			}
-		</div>
-	</div>
-</div>
+    <div class="product-grid recently-viewed-product-grid block block-boxed" style="background: #fff; border-color: #ddd; box-shadow: 0 0 3px rgba(0, 0, 0, 0.1); margin: 0 0.5rem 1rem 0.5rem; -webkit-border-radius: 1em; -moz-border-radius: 1em; -o-border-radius: 1em; -ms-border-radius: 1em;  border-radius: 1em; ">
+        <div class="heading heading-center" style=" background: none; text-align: left; left: 5px; ">
+            <h3 class="heading-title fs-h1" style="color: #c51d1d; font-weight: bold; font-family: fantasy; ">
+                <b style=" font-size: 25px; "><i class="icm icm-bag"></i>&nbsp; @T("Products.RecentlyViewedProducts") </b>
+            </h3>
+            <h5 style=" display: inline-block; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;更多 &gt;</h5>
+        </div>
+        
+        @*<div class="product-grid recently-viewed-product-grid block block-boxed">
+            <div class="block-title">
+                <h3>@T("Products.RecentlyViewedProducts")</h3>
+            </div>*@
+            <div class="block-body pt-0">
+                <div class="artlist-carousel">
+                    @{
+                        // TODO: (mc) Find a generic/smart way to make thumbnails for some mini carousel lists smaller (padding-top: 50% instead of 100% (?))
+                        Html.RenderPartial("Product.List", Model);
+                    }
+                </div>
+            </div>
+        </div>
 

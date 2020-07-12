@@ -7,6 +7,7 @@
     {
         return;
     }
+    var count = 0;
 }
 
 <div class="product-grid product-grid-home-page block">
@@ -24,6 +25,7 @@
 
     @foreach (var item in Model)
     {
+        count++;
         var picture = item.PictureModel;
         <article class="art" data-id="@item.Id">
             <div class="art-picture-block">
@@ -40,5 +42,8 @@
                 </a>
             </div>
         </article>
+        if (count % 5 == 0)
+        { <br/>
+        }
     }
 </div>
