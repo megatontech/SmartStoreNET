@@ -39,7 +39,7 @@
 				.Hidden(Model.AvailableStores.Count <= 1)
 				.Centered();
 		})
-		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "CheckoutAttribute"))
 		.ClientEvents(events => events.OnRowDataBound("checkoutAttributesGrid_onRowDataBound"))
 		.EnableCustomBinding(true))

@@ -536,7 +536,7 @@ namespace SmartStore.Admin.Controllers
             model.ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext);
             model.StatusShipping = order.ShippingStatus;
 
-            if (order.ShippingStatus != ShippingStatus.ShippingNotRequired)
+            //if (order.ShippingStatus != ShippingStatus.ShippingNotRequired)
             {
                 model.ShippingAddress = order.ShippingAddress.ToModel(_addressService);
                 model.ShippingAddress.FirstNameEnabled = true;
@@ -2117,12 +2117,12 @@ namespace SmartStore.Admin.Controllers
             foreach (var orderItem in order.OrderItems)
             {
                 // We can ship only shippable products.
-                if (!orderItem.Product.IsShipEnabled)
-                    continue;
+                //if (!orderItem.Product.IsShipEnabled)
+                //    continue;
 
-                // Eensure that this product can be added to a shipment
-                if (orderItem.GetItemsCanBeAddedToShipmentCount() <= 0)
-                    continue;
+                //// Eensure that this product can be added to a shipment
+                //if (orderItem.GetItemsCanBeAddedToShipmentCount() <= 0)
+                //    continue;
 
                 var itemModel = PrepareShipmentItemModel(order, orderItem, null, baseDimension, baseWeight);
                 model.Items.Add(itemModel);

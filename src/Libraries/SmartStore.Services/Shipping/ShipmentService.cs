@@ -132,7 +132,16 @@ namespace SmartStore.Services.Shipping
 
 			return map;
 		}
+        public virtual ICollection<Shipment> GetShipmentsByDOrderId(int dorderId) 
+        {
+            var query =
+                    from x in _shipmentRepository.TableUntracked.Expand(x => x.ShipmentItems)
+                    where x.DOrderId== dorderId
+                    select x;
 
+            
+            return query.ToList();
+        }
         /// <summary>
         /// Gets a shipment
         /// </summary>

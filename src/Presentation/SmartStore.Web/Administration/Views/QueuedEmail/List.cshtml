@@ -109,7 +109,7 @@
 				columns.Bound(x => x.SentOn);
 				columns.Bound(x => x.CreatedOn);
 			})
-			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("QueuedEmailList", "QueuedEmail"))
 			.ClientEvents(events => events.OnDataBinding("onDataBinding").OnDataBound("onDataBound").OnRowDataBound("onRowDataBound"))
 			.PreserveGridState()

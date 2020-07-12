@@ -298,7 +298,7 @@ if (Model.AvailableCustomerRoles != null && Model.AvailableCustomerRoles.Count >
 				.Title(String.Empty);
 
 		})
-		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding =>
 		{
 			dataBinding.Ajax().Select("OrderList", "Customer", new { customerId = Model.Id });

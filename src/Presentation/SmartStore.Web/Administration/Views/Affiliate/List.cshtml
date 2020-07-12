@@ -41,7 +41,7 @@
 				.ClientTemplate("<a class\"btn btn-warning\" href=\"Edit/<#= Id #>\">" + T("Admin.Common.Edit").Text + "</a>")
 				.Title(T("Admin.Common.Edit").Text);
 		})
-		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Affiliate"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

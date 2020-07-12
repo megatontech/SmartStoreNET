@@ -85,7 +85,7 @@
 				dataBinding.Ajax()
 					.Select("ListActivityLogs", "ActivityLog");
 			})
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 			.PreserveGridState()
 			.EnableCustomBinding(true))
 	</div>

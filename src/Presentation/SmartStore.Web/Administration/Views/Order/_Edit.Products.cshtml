@@ -120,7 +120,7 @@
 						<td style="width: 25%;" class="align-top">
 							<div>
 								<div class="mb-2">
-									@Html.LabeledProductName(item.ProductId, item.ProductName, item.ProductTypeName, item.ProductTypeLabelHint)
+									@Html.LabeledProductName(item.ProductId, item.ProductName, "", item.ProductTypeLabelHint)
 								</div>
 
 								@if (!String.IsNullOrEmpty(item.AttributeInfo))
@@ -361,7 +361,7 @@
 
 						<td class="omega text-truncate align-top" style="width: 27%;">
 
-							@if (item.IsReturnRequestPossible)
+							@*@if (item.IsReturnRequestPossible)
 							{
 								<input type="submit" name="btnAddReturnRequest@(item.Id)" value="@T("Admin.Orders.Products.ReturnRequest.Create")" id="btnAddReturnRequest@(item.Id)"
 									   class="btn btn-secondary" onclick='return confirm(@T("Admin.Common.AskToProceed").JsText);' />
@@ -377,7 +377,7 @@
 								   class="btn btn-warning save-order-item-button d-none" data-id="@(item.Id)" data-url="@Url.Action("EditOrderItem")" />
 
 							<input type="submit" name="btnCancelOrderItem@(item.Id)" value="@T("Admin.Common.Cancel")" id="btnCancelOrderItem@(item.Id)"
-								   class="btn btn-secondary d-none" onclick="toggleOrderItemEdit(@(item.Id), false);return false;" />
+								   class="btn btn-secondary d-none" onclick="toggleOrderItemEdit(@(item.Id), false);return false;" />*@
 						</td>
 					</tr>
 			}

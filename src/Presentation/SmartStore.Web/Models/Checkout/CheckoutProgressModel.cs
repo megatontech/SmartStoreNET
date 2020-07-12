@@ -20,6 +20,7 @@ namespace SmartStore.Web.Models.Checkout
     public enum dCheckoutProgressStep
     {
         Confirm,
+        Shipping,
         Payment,
         Complete
     }

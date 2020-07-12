@@ -136,7 +136,7 @@
 						.Centered();
 					columns.Bound(x => x.AdminComment);
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))
@@ -171,7 +171,7 @@
 						.Format("{0:0.00}")
 						.RightAlign();
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))
@@ -208,7 +208,7 @@
 						.ClientTemplate(@Html.SymbolForBool("LimitedToStores"))
 						.Centered();
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))
@@ -243,7 +243,7 @@
 						.ClientTemplate(@Html.SymbolForBool("LimitedToStores"))
 						.Centered();
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))
@@ -277,7 +277,7 @@
 					columns.Bound(x => x.CreatedOn);
 					columns.Bound(x => x.LastActivityDate);
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))
@@ -307,7 +307,7 @@
 					columns.Bound(x => x.StoreName);
 					columns.Bound(x => x.CreatedOn);
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))
@@ -343,7 +343,7 @@
 					columns.Bound(x => x.StoreName);
 					columns.Bound(x => x.CreatedOn);
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("PreviewList", "Export", new { id = Model.Id }))
 				.ClientEvents(events => events.OnDataBound("OnDataBound"))
 				.EnableCustomBinding(true))

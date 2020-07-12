@@ -84,7 +84,7 @@
 				columns.Bound(x => x.Language)
 					.Width(200);
 			})
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "UrlRecord"))
 			.ClientEvents(events => events.OnDataBinding("onDataBinding").OnDataBound("onDataBound").OnRowDataBound("onRowDataBound"))
 			.EnableCustomBinding(true))

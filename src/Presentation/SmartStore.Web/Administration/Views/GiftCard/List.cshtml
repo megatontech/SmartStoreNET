@@ -59,7 +59,7 @@
 					.Title(String.Empty)
 					.HtmlAttributes(new { align = "right", @class = "omega" });
 			})
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("GiftCardList", "GiftCard", Model))
 			.PreserveGridState()
 			.EnableCustomBinding(true))

@@ -50,7 +50,7 @@
 			columns.Bound(x => x.EndDate)
 				.Width(180);
 		})
-		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Poll"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

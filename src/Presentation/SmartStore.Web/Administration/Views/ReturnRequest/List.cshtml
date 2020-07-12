@@ -72,7 +72,7 @@
 					.Title(String.Empty)
 					.HtmlAttributes(new { align = "right", @class = "omega" });
 			})
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "ReturnRequest"))
 			.ClientEvents(events => events.OnDataBinding("returnRequestGrid_onDataBinding"))
 			.PreserveGridState()

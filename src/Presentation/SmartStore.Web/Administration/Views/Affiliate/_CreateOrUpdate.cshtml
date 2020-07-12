@@ -88,7 +88,7 @@
 			dataBinding.Ajax().Select("AffiliatedCustomerList", "Affiliate", new { affiliateId = Model.Id });
 			dataBinding.Ajax().Update("Edit", "Customer", new { id = 0 });
 		})
-		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 		.PreserveGridState()
 		.EnableCustomBinding(true))
 }
@@ -109,7 +109,7 @@
 			columns.Bound(x => x.OrderTotal)
 				.RightAlign();
 		})
-		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding =>
 		{
 			dataBinding.Ajax().Select("AffiliatedOrderList", "Affiliate", new { affiliateId = Model.Id });

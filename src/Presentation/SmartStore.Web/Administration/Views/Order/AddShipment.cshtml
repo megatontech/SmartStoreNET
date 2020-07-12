@@ -24,7 +24,9 @@
     <table class="adminContent mb-5">
         <tr>
             <td class="adminTitle">
-                @Html.SmartLabelFor(model => model.TrackingNumber)
+                <div class="ctl-label"><label for="TrackingNumber">快递单号</label>
+				<a class="hint" href="#" onclick="return false;" tabindex="-1" title="" data-original-title="设置当前发货的快递单号。">
+					<i class="fa fa-question-circle"></i></a></div>
             </td>
             <td class="adminData">
                 @Html.EditorFor(model => model.TrackingNumber)
@@ -60,7 +62,7 @@
 				{
 					<tr>
 						<td style="width: 50%;">
-							@Html.LabeledProductName(item.ProductId, item.ProductName, item.ProductTypeName, item.ProductTypeLabelHint)
+							@Html.LabeledProductName(item.ProductId, item.ProductName, "", item.ProductTypeLabelHint)
 							@if (!String.IsNullOrEmpty(item.AttributeInfo))
 							{
 								<br />

@@ -48,7 +48,7 @@
 					commands.Delete().Localize(T);
 				}).Width(90);
 			})
-			.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding =>
 			{
 				var settingBuilder = dataBinding.Ajax();

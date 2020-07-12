@@ -69,7 +69,7 @@
 				.Hidden(Model.AvailableStores.Count <= 1)
 				.Centered();
 		})
-		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Manufacturer"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

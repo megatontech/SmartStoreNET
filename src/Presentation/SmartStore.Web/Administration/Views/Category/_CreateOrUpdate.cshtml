@@ -455,7 +455,7 @@
 						.Width("15%");
 					})
 					.ToolBar(commands => commands.Template(CategoryProductsGridCommands))
-					.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+					.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 					.PreserveGridState()
 					.EnableCustomBinding(true))
         </div>

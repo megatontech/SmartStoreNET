@@ -31,7 +31,7 @@
 				.Width(150);
 			columns.Bound(x => x.LastVisitedPage);
 		})
-		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "OnlineCustomer"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

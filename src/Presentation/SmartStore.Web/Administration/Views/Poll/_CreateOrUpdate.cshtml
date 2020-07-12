@@ -173,7 +173,7 @@
                     columns.Bound(x => x.AnswerName);
                     columns.Bound(x => x.CreatedOn);
                 })
-                .Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+                .Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
                 .DataBinding(dataBinding => dataBinding.Ajax().Select("VotingRecords", "Poll", new { pollId = Model.Id }))
                 .EnableCustomBinding(true))
         </div>

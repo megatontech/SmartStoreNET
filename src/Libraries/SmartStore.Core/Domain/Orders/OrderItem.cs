@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using SmartStore.Core.Domain.Catalog;
 
@@ -151,6 +152,11 @@ namespace SmartStore.Core.Domain.Orders
         /// </summary>
 		[DataMember]
 		public virtual Product Product { get; set; }
+        /// <summary>
+        /// Gets the product
+        /// </summary>
+		[NotMapped]
+        public virtual DeclarationProduct dProduct { get; set; }
 
         /// <summary>
         /// Gets or sets the associated gift card

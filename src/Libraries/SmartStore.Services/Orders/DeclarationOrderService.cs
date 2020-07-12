@@ -12,6 +12,7 @@ using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Core.Events;
 using SmartStore.Data.Caching;
+using SmartStore.Services.Catalog;
 
 namespace SmartStore.Services.Orders
 {
@@ -25,16 +26,18 @@ namespace SmartStore.Services.Orders
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<ReturnRequest> _returnRequestRepository;
         private readonly IEventPublisher _eventPublisher;
-
+        private readonly  IDeclarationProductService _dproductservice;
         public DeclarationOrderService(IRepository<DeclarationOrder> orderRepository,
             IRepository<OrderItem> orderItemRepository,
             IRepository<OrderNote> orderNoteRepository,
-			IRepository<Product> productRepository,
+            IRepository<Product> productRepository,
             IRepository<RecurringPayment> recurringPaymentRepository,
-            IRepository<Customer> customerRepository, 
+            IRepository<Customer> customerRepository,
             IRepository<ReturnRequest> returnRequestRepository,
+            IDeclarationProductService dproductservice,
             IEventPublisher eventPublisher)
         {
+            _dproductservice = dproductservice;
             _orderRepository = orderRepository;
             _orderItemRepository = orderItemRepository;
             _orderNoteRepository = orderNoteRepository;
@@ -50,7 +53,13 @@ namespace SmartStore.Services.Orders
             if (orderId == 0)
                 return null;
 
-            return _orderRepository.GetByIdCached(orderId, "db.order.id-" + orderId);
+            var result= _orderRepository.GetByIdCached(orderId, "db.dorder.id-" + orderId);
+            result.OrderItems = new List<OrderItem>();
+            var product= _dproductservice.GetProductById(result.ProductID);
+            result.OrderItems.Add(new OrderItem { Id=result.Id,
+                ProductId  =result.Id,
+                dProduct= product, PriceExclTax=product.Price,PriceInclTax = product.Price, Quantity=1  });
+            return result;
         }
 
         public virtual IList<DeclarationOrder> GetOrdersByIds(int[] orderIds)

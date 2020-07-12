@@ -65,7 +65,7 @@
 			.HtmlAttributes(new { align = "right", @class = "omega" })
 			.Width(220);
 		})
-		.Pageable(settings => settings.Total(Model.NewsLetterSubscriptions.Total).PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.Total(Model.NewsLetterSubscriptions.Total).PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax()
 			.Select("SubscriptionList", "NewsLetterSubscription")
 			.Update("SubscriptionUpdate", "NewsLetterSubscription")

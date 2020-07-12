@@ -27,7 +27,7 @@
         </div>
     </div>
 
-	<div class="row mt-3 grid-filter">
+	@*<div class="row mt-3 grid-filter">
 		<div class="col-sm-6 col-lg-4 col-xl-3 form-group">
 			@Html.SmartLabelFor(model => model.StartDate)
 			@Html.EditorFor(model => model.StartDate)
@@ -48,44 +48,44 @@
 				<span>@T("Admin.Common.Search")</span>
 			</button>
 		</div>
-	</div>
+	</div>*@
 
 
 <div>
 	@(Html.Telerik().Grid<ShipmentModel>()
-		.Name("shipments-grid")
-		.ClientEvents(events => events
-			.OnDataBinding("onDataBinding")
-			.OnDataBound("onDataBound"))
-		.Columns(columns =>
-		{
-			columns.Bound(x => x.Id)
-			.ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
-			.Title("<input id='mastercheckbox' type='checkbox'/>")
-			.Width(50)
-			.HtmlAttributes(new { style = "text-align:center" })
-			.HeaderHtmlAttributes(new { style = "text-align:center" });
-			columns.Bound(x => x.Id);
-			columns.Bound(x => x.OrderId)
-				.Width(80)
-				.Centered()
-				.Template(x => Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = x.OrderId }, new { }))
-				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/Edit/") + "<#= OrderId #>\"><#= OrderId #></a>");
-			columns.Bound(x => x.TrackingNumber);
-			columns.Bound(x => x.TotalWeight);
-			columns.Bound(x => x.ShippedDate);
-			columns.Bound(x => x.DeliveryDate);
-			columns.Bound(x => x.Id)
-				.Template(x => Html.ActionLink(T("Admin.Common.View").Text, "ShipmentDetails", "Order", new { id = x.Id }, new { @class = "t-button" }))
-				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/ShipmentDetails/") + "<#= Id #>\" class=\"t-button\">" + T("Admin.Common.View").Text + "</a>")
-				.Width(50)
-				.Centered()
-				.Title(String.Empty);
-		})
-		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
-		.DataBinding(dataBinding => dataBinding.Ajax().Select("ShipmentListSelect", "Order"))
-		.PreserveGridState()
-		.EnableCustomBinding(true))
+        .Name("shipments-grid")
+        .ClientEvents(events => events
+            .OnDataBinding("onDataBinding")
+            .OnDataBound("onDataBound"))
+        .Columns(columns =>
+        {
+            columns.Bound(x => x.Id)
+            .ClientTemplate("<input type='checkbox' name='checkedRecords' value='<#= Id #>' class='checkboxGroups'/>")
+            .Title("<input id='mastercheckbox' type='checkbox'/>")
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:center" })
+            .HeaderHtmlAttributes(new { style = "text-align:center" });
+            columns.Bound(x => x.Id);
+            columns.Bound(x => x.OrderId)
+                .Width(80)
+                .Centered()
+                .Template(x => Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = x.OrderId }, new { }))
+                .ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/Edit/") + "<#= OrderId #>\"><#= OrderId #></a>");
+            columns.Bound(x => x.TrackingNumber).Title("快递单号");
+            //columns.Bound(x => x.TotalWeight);
+            columns.Bound(x => x.ShippedDate);
+            //columns.Bound(x => x.DeliveryDate);
+            columns.Bound(x => x.Id)
+                .Template(x => Html.ActionLink(T("Admin.Common.View").Text, "ShipmentDetails", "Order", new { id = x.Id }, new { @class = "t-button" }))
+                .ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/ShipmentDetails/") + "<#= Id #>\" class=\"t-button\">" + T("Admin.Common.View").Text + "</a>")
+                .Width(50)
+                .Centered()
+                .Title(String.Empty);
+        })
+        .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
+        .DataBinding(dataBinding => dataBinding.Ajax().Select("ShipmentListSelect", "Order"))
+        .PreserveGridState()
+        .EnableCustomBinding(true))
 </div>
 
     

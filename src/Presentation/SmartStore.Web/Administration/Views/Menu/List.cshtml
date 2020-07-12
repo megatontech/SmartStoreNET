@@ -57,7 +57,7 @@
 			})
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Menu"))
 			.ClientEvents(events => events.OnDataBinding("onDataBinding").OnRowDataBound("onRowDataBound"))
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 			.PreserveGridState()
 			.EnableCustomBinding(true))
 </div>

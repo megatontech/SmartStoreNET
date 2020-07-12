@@ -537,12 +537,12 @@ namespace SmartStore.Web.Controllers
             if (_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed)
                 return new HttpUnauthorizedResult();
 
-            if (!cart.RequiresShipping())
-            {
-                _workContext.CurrentCustomer.ShippingAddress = null;
-                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-                return RedirectToAction("ShippingMethod");
-            }
+            //if (!cart.RequiresShipping())
+            //{
+            //    _workContext.CurrentCustomer.ShippingAddress = null;
+            //    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+            //    return RedirectToAction("ShippingMethod");
+            //}
 
             var model = PrepareShippingAddressModel();
             return View(model);
@@ -557,7 +557,7 @@ namespace SmartStore.Web.Controllers
             _workContext.CurrentCustomer.ShippingAddress = address;
             _customerService.UpdateCustomer(_workContext.CurrentCustomer);
 
-			return RedirectToAction("ShippingMethod");
+			return RedirectToAction("Confirm");
         }
 
         [HttpPost, ActionName("ShippingAddress")]
@@ -567,33 +567,33 @@ namespace SmartStore.Web.Controllers
             //validation
 			var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
-			if (cart.Count == 0)
-                return RedirectToRoute("ShoppingCart");
+			//if (cart.Count == 0)
+   //             return RedirectToRoute("ShoppingCart");
 
             if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
                 return new HttpUnauthorizedResult();
 
-            if (!cart.RequiresShipping())
-            {
-                _workContext.CurrentCustomer.ShippingAddress = null;
-                _customerService.UpdateCustomer(_workContext.CurrentCustomer);
-				return RedirectToAction("ShippingMethod");
-            }
+    //        if (!cart.RequiresShipping())
+    //        {
+    //            _workContext.CurrentCustomer.ShippingAddress = null;
+    //            _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+				//return RedirectToAction("ShippingMethod");
+    //        }
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 var address = model.NewAddress.ToEntity();
                 address.CreatedOnUtc = DateTime.Now;
                 //some validation
-                if (address.CountryId == 0)
-                    address.CountryId = null;
-                if (address.StateProvinceId == 0)
-                    address.StateProvinceId = null;
+                //if (address.CountryId == 0)
+                //    address.CountryId = null;
+                //if (address.StateProvinceId == 0)
+                //    address.StateProvinceId = null;
                 _workContext.CurrentCustomer.Addresses.Add(address);
                 _workContext.CurrentCustomer.ShippingAddress = address;
                 _customerService.UpdateCustomer(_workContext.CurrentCustomer);
 
-				return RedirectToAction("ShippingMethod");
+				return RedirectToAction("Confirm");
             }
 
 
@@ -983,6 +983,9 @@ namespace SmartStore.Web.Controllers
                 return new HttpUnauthorizedResult();
             var subtotalBase = cart.Sum(x => x.dItem.CustomerEnteredPrice * x.dItem.Quantity);
             var product = _dproductService.GetProductById(cart.FirstOrDefault().dItem.Product.Id);
+            Address shippingAddress = null;
+                shippingAddress = (Address)customer.ShippingAddress.Clone();
+            var addid =customer.ShippingAddress.Id;
             var order = new DeclarationOrder
             {
                 StoreId = 0,
@@ -1041,8 +1044,9 @@ namespace SmartStore.Web.Controllers
                 PaymentStatus = PaymentStatus.Pending,
                 PaidDateUtc = DateTime.Now,
                 //BillingAddress = new Address(),
-                //ShippingAddress = new Address(),
-                //ShippingStatus = ShippingStatus.NotYetShipped,
+                ShippingAddress = shippingAddress,
+                ShippingAddressId = addid,
+                ShippingStatus = ShippingStatus.NotYetShipped,
                 ShippingMethod = string.Empty,
                 ShippingRateComputationMethodSystemName = string.Empty,
                 VatNumber = string.Empty,

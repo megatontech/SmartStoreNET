@@ -567,7 +567,7 @@ namespace SmartStore.Admin
         public static AddressModel ToModel(this Address entity, IAddressService addressService)
         {
             var addressModel = Mapper.Map<Address, AddressModel>(entity);
-            addressModel.EmailMatch = entity.Email;
+            //addressModel.EmailMatch = entity.Email;
 
             if (addressService != null)
                 addressModel.FormattedAddress = addressService.FormatAddress(entity, true);

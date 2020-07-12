@@ -96,10 +96,11 @@
                     .Width(150)
                     .Title(T("订单编号"))
                     .ClientTemplate("<#= OrderNumber #>");
-                columns.Bound(x => x.RedeemedRewardPoints)
-                  .Title(T("所在层数"))
-                  .ClientTemplate(
-                      "<div><#= RedeemedRewardPoints #></div>");
+
+                //columns.Bound(x => x.RedeemedRewardPoints)
+                //  .Title(T("所在层数"))
+                //  .ClientTemplate(
+                //      "<div><#= RedeemedRewardPoints #></div>");
                 columns.Bound(x => x.CustomerEmail)
                    .Title(T("客户姓名"))
                    .ClientTemplate(
@@ -126,25 +127,17 @@
                     .Width(100)
                     .Title(T("订单审核状态"))
                     .ClientTemplate("<span class='<#= OrderStatusLabelClass #>'><#= OrderStatus #></span>");
-                columns.Bound(x => x.OrderTotal)
-                    .Width(200)
-                    .RightAlign()
-                    .ClientTemplate(
-                        "<div class='pr-2'><big style='font-weight:600'><#= OrderTotal #></big> <i class='<#= PaymentStatusLabelClass #>' title='<#= PaymentStatus #>'></i></div>" +
-                        "");
-
+                columns.Bound(x => x.ShippingStatus)
+                .Title(T("发货状态"))
+                .ClientTemplate(
+                    "<div><i class='<#= ShippingStatusLabelClass #>' title='<#= ShippingStatus #>'></i> " +
+                    "</div>");
                 columns.Bound(x => x.Id)
                      .Width(200)
-                     .RightAlign()
+                     //.RightAlign()
                      //.Hidden(x=>x.OrderStatus > 10)
                      .ClientTemplate(
-                    //"<# if(StatusPayment==10){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>处理</a><# } #>"+
-                    "<# if(StatusPayment==30){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Edit/<#= Id #>'><i class='fa fa-check'></i>发货</a><# } #>" 
-                    //"<# if(StatusPayment==30){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/View/<#= Id #>'><i class='fa fa-check'></i>分润</a><# } #>"
-                    //+
-                    //"<a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Audit/<#= Id #>'><i class='fa fa-check'></i>审核</a>" + "&nbsp;"
-                    //"<a class=\"t-button\" href='/Admin/DeclarationFinaduit/Deny/<#= Id #>'><i class='fa fa-times'></i>驳回</a>" + "&nbsp;" +
-                    //"<a class=\"t-button\" href='/Admin/DeclarationFinaduit/View/<#= Id #>'><i class='fa fa-eye'></i>查看</a>"
+                    "<# if(StatusShipping==20){ #><a  class=\"t-button\" href='/Admin/DeclarationFinaduit/Edit/<#= Id #>'><i class='fa fa-check'></i>发货</a><# } #>"
                     ).Title("操作");
 
             })

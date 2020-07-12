@@ -534,195 +534,94 @@ namespace SmartStore.Admin.Controllers
 
             #region Billing & shipping info
 
-            //model.BillingAddress = order.BillingAddress.ToModel(_addressService);
-            //model.BillingAddress.FirstNameEnabled = true;
-            //model.BillingAddress.FirstNameRequired = true;
-            //model.BillingAddress.LastNameEnabled = true;
-            //model.BillingAddress.LastNameRequired = true;
-            //model.BillingAddress.EmailEnabled = true;
-            //model.BillingAddress.EmailRequired = true;
-            //model.BillingAddress.ValidateEmailAddress = _addressSettings.ValidateEmailAddress;
-            //model.BillingAddress.CompanyEnabled = _addressSettings.CompanyEnabled;
-            //model.BillingAddress.CompanyRequired = _addressSettings.CompanyRequired;
-            //model.BillingAddress.CountryEnabled = _addressSettings.CountryEnabled;
-            //model.BillingAddress.StateProvinceEnabled = _addressSettings.StateProvinceEnabled;
-            //model.BillingAddress.CityEnabled = _addressSettings.CityEnabled;
-            //model.BillingAddress.CityRequired = _addressSettings.CityRequired;
-            //model.BillingAddress.StreetAddressEnabled = _addressSettings.StreetAddressEnabled;
-            //model.BillingAddress.StreetAddressRequired = _addressSettings.StreetAddressRequired;
-            //model.BillingAddress.StreetAddress2Enabled = _addressSettings.StreetAddress2Enabled;
-            //model.BillingAddress.StreetAddress2Required = _addressSettings.StreetAddress2Required;
-            //model.BillingAddress.ZipPostalCodeEnabled = _addressSettings.ZipPostalCodeEnabled;
-            //model.BillingAddress.ZipPostalCodeRequired = _addressSettings.ZipPostalCodeRequired;
-            //model.BillingAddress.PhoneEnabled = _addressSettings.PhoneEnabled;
-            //model.BillingAddress.PhoneRequired = _addressSettings.PhoneRequired;
-            //model.BillingAddress.FaxEnabled = _addressSettings.FaxEnabled;
-            //model.BillingAddress.FaxRequired = _addressSettings.FaxRequired;
-
-            //model.ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext);
-            //model.StatusShipping = order.ShippingStatus;
-
-            //if (order.ShippingStatus != ShippingStatus.ShippingNotRequired)
-            //{
-            //    model.ShippingAddress = order.ShippingAddress.ToModel(_addressService);
-            //    model.ShippingAddress.FirstNameEnabled = true;
-            //    model.ShippingAddress.FirstNameRequired = true;
-            //    model.ShippingAddress.LastNameEnabled = true;
-            //    model.ShippingAddress.LastNameRequired = true;
-            //    model.ShippingAddress.EmailEnabled = true;
-            //    model.ShippingAddress.EmailRequired = true;
-            //    model.ShippingAddress.ValidateEmailAddress = _addressSettings.ValidateEmailAddress;
-            //    model.ShippingAddress.CompanyEnabled = _addressSettings.CompanyEnabled;
-            //    model.ShippingAddress.CompanyRequired = _addressSettings.CompanyRequired;
-            //    model.ShippingAddress.CountryEnabled = _addressSettings.CountryEnabled;
-            //    model.ShippingAddress.StateProvinceEnabled = _addressSettings.StateProvinceEnabled;
-            //    model.ShippingAddress.CityEnabled = _addressSettings.CityEnabled;
-            //    model.ShippingAddress.CityRequired = _addressSettings.CityRequired;
-            //    model.ShippingAddress.StreetAddressEnabled = _addressSettings.StreetAddressEnabled;
-            //    model.ShippingAddress.StreetAddressRequired = _addressSettings.StreetAddressRequired;
-            //    model.ShippingAddress.StreetAddress2Enabled = _addressSettings.StreetAddress2Enabled;
-            //    model.ShippingAddress.StreetAddress2Required = _addressSettings.StreetAddress2Required;
-            //    model.ShippingAddress.ZipPostalCodeEnabled = _addressSettings.ZipPostalCodeEnabled;
-            //    model.ShippingAddress.ZipPostalCodeRequired = _addressSettings.ZipPostalCodeRequired;
-            //    model.ShippingAddress.PhoneEnabled = _addressSettings.PhoneEnabled;
-            //    model.ShippingAddress.PhoneRequired = _addressSettings.PhoneRequired;
-            //    model.ShippingAddress.FaxEnabled = _addressSettings.FaxEnabled;
-            //    model.ShippingAddress.FaxRequired = _addressSettings.FaxRequired;
-
-            //    model.IsShippable = true;
-            //    model.ShippingMethod = order.ShippingMethod;
-            //    model.CanAddNewShipments = order.CanAddItemsToShipment();
-
-            //    var googleAddressQuery = string.Concat(
-            //        order.ShippingAddress.Address1,
-            //        " ",
-            //        order.ShippingAddress.ZipPostalCode,
-            //        " ",
-            //        order.ShippingAddress.City,
-            //        " ",
-            //        order.ShippingAddress.Country != null ? order.ShippingAddress.Country.Name : "");
-
-            //    var googleMapsUrl = CommonHelper.GetAppSetting<string>("g:MapsUrl");
-
-            //    model.ShippingAddressGoogleMapsUrl = googleMapsUrl.FormatInvariant(language.UniqueSeoCode.EmptyNull().ToLower(), Server.UrlEncode(googleAddressQuery));
-            //}
+            model.ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext);
+            model.StatusShipping = order.ShippingStatus;
+            {
+                order.ShippingAddress = _addressService.GetAddressById(order.ShippingAddressId.Value);
+                model.ShippingAddress = order.ShippingAddress.ToModel(_addressService);
+                model.ShippingAddress.FirstNameEnabled = true;
+                model.ShippingAddress.FirstNameRequired = true;
+                model.ShippingAddress.LastNameEnabled = true;
+                model.ShippingAddress.LastNameRequired = true;
+                model.ShippingAddress.EmailEnabled = true;
+                model.ShippingAddress.EmailRequired = true;
+                model.ShippingAddress.CompanyEnabled = _addressSettings.CompanyEnabled;
+                model.ShippingAddress.CompanyRequired = _addressSettings.CompanyRequired;
+                model.ShippingAddress.CountryEnabled = _addressSettings.CountryEnabled;
+                model.ShippingAddress.StateProvinceEnabled = _addressSettings.StateProvinceEnabled;
+                model.ShippingAddress.CityEnabled = _addressSettings.CityEnabled;
+                model.ShippingAddress.CityRequired = _addressSettings.CityRequired;
+                model.ShippingAddress.StreetAddressEnabled = _addressSettings.StreetAddressEnabled;
+                model.ShippingAddress.StreetAddressRequired = _addressSettings.StreetAddressRequired;
+                model.ShippingAddress.StreetAddress2Enabled = _addressSettings.StreetAddress2Enabled;
+                model.ShippingAddress.StreetAddress2Required = _addressSettings.StreetAddress2Required;
+                model.ShippingAddress.ZipPostalCodeEnabled = _addressSettings.ZipPostalCodeEnabled;
+                model.ShippingAddress.ZipPostalCodeRequired = _addressSettings.ZipPostalCodeRequired;
+                model.ShippingAddress.PhoneEnabled = _addressSettings.PhoneEnabled;
+                model.ShippingAddress.PhoneRequired = _addressSettings.PhoneRequired;
+                model.ShippingAddress.FaxEnabled = _addressSettings.FaxEnabled;
+                model.ShippingAddress.FaxRequired = _addressSettings.FaxRequired;
+                model.IsShippable = true;
+                model.ShippingMethod = order.ShippingMethod;
+                model.CanAddNewShipments = true;
+            }
 
             #endregion Billing & shipping info
 
             #region Products
 
-            //model.CheckoutAttributeInfo = HtmlUtils.ConvertPlainTextToTable(HtmlUtils.ConvertHtmlToPlainText(order.CheckoutAttributeDescription));
-            //model.CheckoutAttributeInfo = order.CheckoutAttributeDescription;
-            //model.CheckoutAttributeInfo = _checkoutAttributeFormatter.FormatAttributes(_workContext.CurrentCustomer.CheckoutAttributes, _workContext.CurrentCustomer, "", false);
-            //var hasDownloadableItems = false;
-            //foreach (var orderItem in order.OrderItems)
-            //{
-            //    if (orderItem.Product.IsDownload)
-            //        hasDownloadableItems = true;
+            var hasDownloadableItems = false;
+            foreach (var orderItem in order.OrderItems)
+            {
+                //if (orderItem.Product.IsDownload)
+                //    hasDownloadableItems = true;
 
-            //    orderItem.Product.MergeWithCombination(orderItem.AttributesXml);
-            //    var orderItemModel = new OrderModel.OrderItemModel
-            //    {
-            //        Id = orderItem.Id,
-            //        ProductId = orderItem.ProductId,
-            //        ProductName = orderItem.Product.GetLocalized(x => x.Name),
-            //        Sku = orderItem.Product.Sku,
-            //        ProductType = orderItem.Product.ProductType,
-            //        ProductTypeName = orderItem.Product.GetProductTypeLabel(_localizationService),
-            //        ProductTypeLabelHint = orderItem.Product.ProductTypeLabelHint,
-            //        Quantity = orderItem.Quantity,
-            //        IsDownload = orderItem.Product.IsDownload,
-            //        DownloadCount = orderItem.DownloadCount,
-            //        DownloadActivationType = orderItem.Product.DownloadActivationType,
-            //        IsDownloadActivated = orderItem.IsDownloadActivated,
-            //        LicenseDownloadId = orderItem.LicenseDownloadId
-            //    };
+                //orderItem.Product.MergeWithCombination(orderItem.AttributesXml);
+                var orderItemModel = new OrderModel.OrderItemModel
+                {
+                    Id = orderItem.Id,
+                    ProductId = orderItem.ProductId,
+                    ProductName = orderItem.dProduct.Name,
+                    //Sku = orderItem.Product.Sku,
+                    //ProductType = orderItem.Product.ProductType,
+                    //ProductTypeName = orderItem.Product.GetProductTypeLabel(_localizationService),
+                    //ProductTypeLabelHint = orderItem.Product.ProductTypeLabelHint,
+                    Quantity = orderItem.Quantity,
+                    //IsDownload = orderItem.Product.IsDownload,
+                    //DownloadCount = orderItem.DownloadCount,
+                   // DownloadActivationType = orderItem.Product.DownloadActivationType,
+                    //IsDownloadActivated = orderItem.IsDownloadActivated,
+                   // LicenseDownloadId = orderItem.LicenseDownloadId
+                };
 
-            //    if (orderItem.Product.ProductType == ProductType.BundledProduct && orderItem.BundleData.HasValue())
-            //    {
-            //        var bundleData = orderItem.GetBundleData();
+               
+                // Unit price.
+                //orderItemModel.UnitPriceInclTaxValue = orderItem.PriceExclTax;
+                //orderItemModel.UnitPriceExclTaxValue = orderItem.PriceExclTax;
+                //orderItemModel.TaxRate = orderItem.TaxRate;
+                //orderItemModel.UnitPriceInclTax = _priceFormatter.FormatPrice(orderItem.UnitPriceInclTax, true, currency, language, true, true);
+                //orderItemModel.UnitPriceExclTax = _priceFormatter.FormatPrice(orderItem.UnitPriceExclTax, true, currency, language, false, true);
+                //// Discounts.
+                //orderItemModel.DiscountInclTaxValue = orderItem.DiscountAmountInclTax;
+                //orderItemModel.DiscountExclTaxValue = orderItem.DiscountAmountExclTax;
+                //orderItemModel.DiscountInclTax = _priceFormatter.FormatPrice(orderItem.DiscountAmountInclTax, true, currency, language, true, true);
+                //orderItemModel.DiscountExclTax = _priceFormatter.FormatPrice(orderItem.DiscountAmountExclTax, true, currency, language, false, true);
+                // Subtotal.
+                orderItemModel.SubTotalInclTax = _priceFormatter.FormatPrice(orderItem.PriceInclTax, true, currency, language, true, true);
+                //orderItemModel.SubTotalExclTaxValue = orderItem.PriceExclTax;
+                //orderItemModel.SubTotalInclTax = _priceFormatter.FormatPrice(orderItem.PriceInclTax, true, currency, language, true, true);
+                //orderItemModel.SubTotalExclTax = _priceFormatter.FormatPrice(orderItem.PriceExclTax, true, currency, language, false, true);
 
-            //        orderItemModel.BundlePerItemPricing = orderItem.Product.BundlePerItemPricing;
-            //        orderItemModel.BundlePerItemShoppingCart = bundleData.Any(x => x.PerItemShoppingCart);
+                //orderItemModel.AttributeInfo = orderItem.AttributeDescription;
+                //if (orderItem.Product.IsRecurring)
+                //{
+                //    orderItemModel.RecurringInfo = string.Format(_localizationService.GetResource("Admin.Orders.Products.RecurringPeriod"),
+                //        orderItem.Product.RecurringCycleLength, orderItem.Product.RecurringCyclePeriod.GetLocalizedEnum(_localizationService, _workContext));
+                //}
 
-            //        foreach (var bundleItem in bundleData)
-            //        {
-            //            var bundleItemModel = new OrderModel.BundleItemModel
-            //            {
-            //                ProductId = bundleItem.ProductId,
-            //                Sku = bundleItem.Sku,
-            //                ProductName = bundleItem.ProductName,
-            //                ProductSeName = bundleItem.ProductSeName,
-            //                VisibleIndividually = bundleItem.VisibleIndividually,
-            //                Quantity = bundleItem.Quantity,
-            //                DisplayOrder = bundleItem.DisplayOrder,
-            //                AttributeInfo = bundleItem.AttributesInfo
-            //            };
 
-            //            if (orderItemModel.BundlePerItemShoppingCart)
-            //            {
-            //                bundleItemModel.PriceWithDiscount = _priceFormatter.FormatPrice(bundleItem.PriceWithDiscount, true, currency, language, false);
-            //            }
-
-            //            orderItemModel.BundleItems.Add(bundleItemModel);
-            //        }
-            //    }
-
-            //    // Unit price.
-            //    orderItemModel.UnitPriceInclTaxValue = orderItem.UnitPriceInclTax;
-            //    orderItemModel.UnitPriceExclTaxValue = orderItem.UnitPriceExclTax;
-            //    orderItemModel.TaxRate = orderItem.TaxRate;
-            //    orderItemModel.UnitPriceInclTax = _priceFormatter.FormatPrice(orderItem.UnitPriceInclTax, true, currency, language, true, true);
-            //    orderItemModel.UnitPriceExclTax = _priceFormatter.FormatPrice(orderItem.UnitPriceExclTax, true, currency, language, false, true);
-            //    // Discounts.
-            //    orderItemModel.DiscountInclTaxValue = orderItem.DiscountAmountInclTax;
-            //    orderItemModel.DiscountExclTaxValue = orderItem.DiscountAmountExclTax;
-            //    orderItemModel.DiscountInclTax = _priceFormatter.FormatPrice(orderItem.DiscountAmountInclTax, true, currency, language, true, true);
-            //    orderItemModel.DiscountExclTax = _priceFormatter.FormatPrice(orderItem.DiscountAmountExclTax, true, currency, language, false, true);
-            //    // Subtotal.
-            //    orderItemModel.SubTotalInclTaxValue = orderItem.PriceInclTax;
-            //    orderItemModel.SubTotalExclTaxValue = orderItem.PriceExclTax;
-            //    orderItemModel.SubTotalInclTax = _priceFormatter.FormatPrice(orderItem.PriceInclTax, true, currency, language, true, true);
-            //    orderItemModel.SubTotalExclTax = _priceFormatter.FormatPrice(orderItem.PriceExclTax, true, currency, language, false, true);
-
-            //    orderItemModel.AttributeInfo = orderItem.AttributeDescription;
-            //    if (orderItem.Product.IsRecurring)
-            //    {
-            //        orderItemModel.RecurringInfo = string.Format(_localizationService.GetResource("Admin.Orders.Products.RecurringPeriod"),
-            //            orderItem.Product.RecurringCycleLength, orderItem.Product.RecurringCyclePeriod.GetLocalizedEnum(_localizationService, _workContext));
-            //    }
-
-            //    // Return requests.
-            //    orderItemModel.ReturnRequests = _orderService.SearchReturnRequests(0, 0, orderItem.Id, null, 0, int.MaxValue).Select(x =>
-            //    {
-            //        return new OrderModel.ReturnRequestModel
-            //        {
-            //            Id = x.Id,
-            //            Quantity = x.Quantity,
-            //            Status = x.ReturnRequestStatus,
-            //            StatusString = x.ReturnRequestStatus.GetLocalizedEnum(_localizationService, _workContext)
-            //        };
-            //    })
-            //        .ToList();
-
-            //    // Gift cards.
-            //    orderItemModel.PurchasedGiftCardIds = _giftCardService.GetGiftCardsByPurchasedWithOrderItemId(orderItem.Id)
-            //        .Select(gc => gc.Id).ToList();
-
-            //    model.Items.Add(orderItemModel);
-            //}
-
-            //model.HasDownloadableProducts = hasDownloadableItems;
-
-            //model.AutoUpdateOrderItem.Caption = T("Admin.Orders.EditOrderDetails");
-            //model.AutoUpdateOrderItem.ShowUpdateTotals = (order.OrderStatusId <= (int)OrderStatus.Pending);
-            //// UpdateRewardPoints only visible for unpending orders (see RewardPointsSettingsValidator).
-            //model.AutoUpdateOrderItem.ShowUpdateRewardPoints = (order.OrderStatusId > (int)OrderStatus.Pending && order.RewardPointsWereAdded);
-            //model.AutoUpdateOrderItem.UpdateTotals = model.AutoUpdateOrderItem.ShowUpdateTotals;
-            //model.AutoUpdateOrderItem.UpdateRewardPoints = order.RewardPointsWereAdded;
-
-            //model.AutoUpdateOrderItemInfo = TempData[AutoUpdateOrderItemContext.InfoKey] as string;
-
+                model.Items.Add(orderItemModel);
+            }
             #endregion Products
         }
 
@@ -731,55 +630,55 @@ namespace SmartStore.Admin.Controllers
         {
             var baseWeight = _measureService.GetMeasureWeightById(_measureSettings.BaseWeightId);
             var baseDimension = _measureService.GetMeasureDimensionById(_measureSettings.BaseDimensionId);
-            var orderStoreId = shipment.Order.StoreId;
+            //var orderStoreId = shipment.Order.StoreId;
 
             var model = new ShipmentModel
             {
                 Id = shipment.Id,
-                OrderId = shipment.OrderId,
-                StoreId = orderStoreId,
-                LanguageId = shipment.Order.CustomerLanguageId,
-                OrderNumber = shipment.Order.GetOrderNumber(),
-                PurchaseOrderNumber = shipment.Order.PurchaseOrderNumber,
-                ShippingMethod = shipment.Order.ShippingMethod,
+                //OrderId = shipment.OrderId,
+                //StoreId = orderStoreId,
+                //LanguageId = shipment.Order.CustomerLanguageId,
+                //OrderNumber = shipment.Order.GetOrderNumber(),
+                //PurchaseOrderNumber = shipment.Order.PurchaseOrderNumber,
+                //ShippingMethod = shipment.Order.ShippingMethod,
                 TrackingNumber = shipment.TrackingNumber,
-                TotalWeight = shipment.TotalWeight.HasValue ? string.Format("{0:F2} [{1}]", shipment.TotalWeight, baseWeight?.Name ?? "") : "",
+                //TotalWeight = shipment.TotalWeight.HasValue ? string.Format("{0:F2} [{1}]", shipment.TotalWeight, baseWeight?.Name ?? "") : "",
                 ShippedDate = shipment.ShippedDateUtc.HasValue ? _dateTimeHelper.ConvertToUserTime(shipment.ShippedDateUtc.Value, DateTimeKind.Utc).ToString() : _localizationService.GetResource("Admin.Orders.Shipments.ShippedDate.NotYet"),
-                CanShip = !shipment.ShippedDateUtc.HasValue,
-                DeliveryDate = shipment.DeliveryDateUtc.HasValue ? _dateTimeHelper.ConvertToUserTime(shipment.DeliveryDateUtc.Value, DateTimeKind.Utc).ToString() : _localizationService.GetResource("Admin.Orders.Shipments.DeliveryDate.NotYet"),
-                CanDeliver = shipment.ShippedDateUtc.HasValue && !shipment.DeliveryDateUtc.HasValue,
-                DisplayPdfPackagingSlip = _pdfSettings.Enabled,
-                ShowSku = _catalogSettings.ShowProductSku
+                //CanShip = !shipment.ShippedDateUtc.HasValue,
+                //DeliveryDate = shipment.DeliveryDateUtc.HasValue ? _dateTimeHelper.ConvertToUserTime(shipment.DeliveryDateUtc.Value, DateTimeKind.Utc).ToString() : _localizationService.GetResource("Admin.Orders.Shipments.DeliveryDate.NotYet"),
+                //CanDeliver = shipment.ShippedDateUtc.HasValue && !shipment.DeliveryDateUtc.HasValue,
+                //DisplayPdfPackagingSlip = _pdfSettings.Enabled,
+                //ShowSku = _catalogSettings.ShowProductSku
             };
 
-            if (prepareAddresses)
-            {
-                model.ShippingAddress = shipment.Order.ShippingAddress;
+            //if (prepareAddresses)
+            //{
+            //    model.ShippingAddress = shipment.Order.ShippingAddress;
 
-                var store = Services.StoreService.GetStoreById(orderStoreId) ?? Services.StoreContext.CurrentStore;
-                var companyInfoSettings = Services.Settings.LoadSetting<CompanyInformationSettings>(store.Id);
-                model.MerchantCompanyInfo = companyInfoSettings;
+            //    //var store = Services.StoreService.GetStoreById(orderStoreId) ?? Services.StoreContext.CurrentStore;
+            //    //var companyInfoSettings = Services.Settings.LoadSetting<CompanyInformationSettings>(store.Id);
+            //    //model.MerchantCompanyInfo = companyInfoSettings;
 
-                if (model.ShippingAddress != null)
-                {
-                    model.FormattedShippingAddress = _addressService.FormatAddress(model.ShippingAddress, true);
-                }
+            //    if (model.ShippingAddress != null)
+            //    {
+            //        model.FormattedShippingAddress = _addressService.FormatAddress(model.ShippingAddress, true);
+            //    }
 
-                model.FormattedMerchantAddress = _addressService.FormatAddress(model.MerchantCompanyInfo, true);
-            }
+            //    model.FormattedMerchantAddress = _addressService.FormatAddress(model.MerchantCompanyInfo, true);
+            //}
 
-            if (prepareProducts)
-            {
-                foreach (var shipmentItem in shipment.ShipmentItems)
-                {
-                    var orderItem = _orderService.GetOrderItemById(shipmentItem.OrderItemId);
-                    if (orderItem == null)
-                        continue;
+            //if (prepareProducts)
+            //{
+            //    foreach (var shipmentItem in shipment.ShipmentItems)
+            //    {
+            //        var orderItem = _orderService.GetOrderItemById(shipmentItem.OrderItemId);
+            //        if (orderItem == null)
+            //            continue;
 
-                    var itemModel = PrepareShipmentItemModel(shipment.Order, orderItem, shipmentItem, baseDimension, baseWeight);
-                    model.Items.Add(itemModel);
-                }
-            }
+            //        //var itemModel = PrepareShipmentItemModel(shipment.Order, orderItem, shipmentItem, baseDimension, baseWeight);
+            //        //model.Items.Add(itemModel);
+            //    }
+            //}
 
             return model;
         }
@@ -834,61 +733,61 @@ namespace SmartStore.Admin.Controllers
         }
 
         private ShipmentModel.ShipmentItemModel PrepareShipmentItemModel(
-                            Order order,
+                            DeclarationOrder order,
             OrderItem orderItem,
             ShipmentItem shipmentItem,
             MeasureDimension baseDimension,
             MeasureWeight baseWeight)
         {
-            orderItem.Product.MergeWithCombination(orderItem.AttributesXml);
+            //orderItem.Product.MergeWithCombination(orderItem.AttributesXml);
 
             var language = Services.WorkContext.WorkingLanguage;
-            var maxQtyToAdd = orderItem.GetItemsCanBeAddedToShipmentCount();
-            var qtyInAllShipments = orderItem.GetShipmentItemsCount();
+            //var maxQtyToAdd = orderItem.GetItemsCanBeAddedToShipmentCount();
+            //var qtyInAllShipments = orderItem.GetShipmentItemsCount();
 
             var model = new ShipmentModel.ShipmentItemModel
             {
                 Id = shipmentItem?.Id ?? 0,
                 OrderItemId = orderItem.Id,
                 ProductId = orderItem.ProductId,
-                ProductName = orderItem.Product.Name,
-                ProductType = orderItem.Product.ProductType,
-                ProductTypeName = orderItem.Product.GetProductTypeLabel(_localizationService),
-                ProductTypeLabelHint = orderItem.Product.ProductTypeLabelHint,
-                Sku = orderItem.Product.Sku,
-                Gtin = orderItem.Product.Gtin,
-                AttributeInfo = orderItem.AttributeDescription,
-                ItemWeight = orderItem.ItemWeight.HasValue ? string.Format("{0:F2} [{1}]", orderItem.ItemWeight, baseWeight?.Name ?? "") : "",
-                ItemDimensions = string.Format("{0:F2} x {1:F2} x {2:F2} [{3}]", orderItem.Product.Length, orderItem.Product.Width, orderItem.Product.Height, baseDimension?.Name ?? ""),
+                ProductName = orderItem.dProduct.Name,
+                //ProductType = orderItem.dProduct.ProductType,
+               // ProductTypeName = orderItem.dProduct.GetProductTypeLabel(_localizationService),
+               // ProductTypeLabelHint = orderItem.dProduct.ProductTypeLabelHint,
+               // Sku = orderItem.dProduct.Sku,
+               // Gtin = orderItem.dProduct.Gtin,
+                //AttributeInfo = orderItem.AttributeDescription,
+                //ItemWeight = orderItem.ItemWeight.HasValue ? string.Format("{0:F2} [{1}]", orderItem.ItemWeight, baseWeight?.Name ?? "") : "",
+                //ItemDimensions = string.Format("{0:F2} x {1:F2} x {2:F2} [{3}]", orderItem.Product.Length, orderItem.Product.Width, orderItem.Product.Height, baseDimension?.Name ?? ""),
                 QuantityOrdered = orderItem.Quantity,
-                QuantityInThisShipment = shipmentItem?.Quantity ?? 0,
-                QuantityInAllShipments = qtyInAllShipments,
-                QuantityToAdd = maxQtyToAdd
+                //QuantityInThisShipment = shipmentItem?.Quantity ?? 0,
+                //QuantityInAllShipments = qtyInAllShipments,
+                //QuantityToAdd = maxQtyToAdd
             };
 
-            if (orderItem.Product.ProductType == ProductType.BundledProduct && orderItem.BundleData.HasValue())
-            {
-                var bundleData = orderItem.GetBundleData();
+            //if (orderItem.Product.ProductType == ProductType.BundledProduct && orderItem.BundleData.HasValue())
+            //{
+            //    var bundleData = orderItem.GetBundleData();
 
-                model.BundlePerItemPricing = orderItem.Product.BundlePerItemPricing;
-                model.BundlePerItemShoppingCart = bundleData.Any(x => x.PerItemShoppingCart);
+            //    model.BundlePerItemPricing = orderItem.Product.BundlePerItemPricing;
+            //    model.BundlePerItemShoppingCart = bundleData.Any(x => x.PerItemShoppingCart);
 
-                foreach (var bundleItem in bundleData)
-                {
-                    var bundleItemModel = new ShipmentModel.BundleItemModel
-                    {
-                        Sku = bundleItem.Sku,
-                        ProductName = bundleItem.ProductName,
-                        ProductSeName = bundleItem.ProductSeName,
-                        VisibleIndividually = bundleItem.VisibleIndividually,
-                        Quantity = bundleItem.Quantity,
-                        DisplayOrder = bundleItem.DisplayOrder,
-                        AttributeInfo = bundleItem.AttributesInfo
-                    };
+            //    foreach (var bundleItem in bundleData)
+            //    {
+            //        var bundleItemModel = new ShipmentModel.BundleItemModel
+            //        {
+            //            Sku = bundleItem.Sku,
+            //            ProductName = bundleItem.ProductName,
+            //            ProductSeName = bundleItem.ProductSeName,
+            //            VisibleIndividually = bundleItem.VisibleIndividually,
+            //            Quantity = bundleItem.Quantity,
+            //            DisplayOrder = bundleItem.DisplayOrder,
+            //            AttributeInfo = bundleItem.AttributesInfo
+            //        };
 
-                    model.BundleItems.Add(bundleItemModel);
-                }
-            }
+            //        model.BundleItems.Add(bundleItemModel);
+            //    }
+            //}
 
             return model;
         }
@@ -1053,8 +952,8 @@ namespace SmartStore.Admin.Controllers
                         PaymentStatus = x.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext),
                         StatusPayment = x.PaymentStatus,
                         IsShippable = true,
-                        ShippingStatus = ShippingStatus.Delivered.GetLocalizedEnum(_localizationService, _workContext),
-                        StatusShipping = ShippingStatus.Delivered,
+                        ShippingStatus = x.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext),
+                        StatusShipping = x.ShippingStatus,
                         ShippingMethod = x.ShippingMethod.NullEmpty() ?? "".NaIfEmpty(),
                         CustomerName = x.Customer.Username,
                         CustomerMobile = x.Customer.Mobile,
@@ -1973,16 +1872,23 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Edit(int id)
         {
-            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
-            //    return AccessDeniedView();
 
             var order = _DeclarationOrderService.GetOrderById(id);
             if (order == null || order.Deleted)
                 return RedirectToAction("List");
-
             var model = new OrderModel();
-            //PrepareOrderDetailsModel(model, order);
+            PrepareOrderDetailsModel(model, order);
+            var pictureUrl = _pictureService.GetUrl(order.PaymentMethodSystemName.ToInt());
+            if (order.HasNewPaymentNotification)
+            {
+                var custom = _customerService.GetCustomerById(order.BillingAddressId);
+                model.OrderShippingExclTax = custom.Username;
+                model.OrderShippingInclTax = custom.Mobile;
+            }
 
+            model.ShippingAddressGoogleMapsUrl = pictureUrl;
+            var discounts = _discountService.GetAllDiscounts(null, null, true);
+            model.AvailableDiscounts = discounts.ToList();
             return View(model);
         }
 
@@ -2308,7 +2214,7 @@ namespace SmartStore.Admin.Controllers
             //    return AccessDeniedView();
             //}
 
-            var order = _orderService.GetOrderById(orderId);
+            var order = _DeclarationOrderService.GetOrderById(orderId);
             if (order == null)
             {
                 return RedirectToAction("List");
@@ -2325,12 +2231,12 @@ namespace SmartStore.Admin.Controllers
             foreach (var orderItem in order.OrderItems)
             {
                 // We can ship only shippable products.
-                if (!orderItem.Product.IsShipEnabled)
-                    continue;
+                //if (!orderItem.Product.IsShipEnabled)
+                //    continue;
 
-                // Eensure that this product can be added to a shipment
-                if (orderItem.GetItemsCanBeAddedToShipmentCount() <= 0)
-                    continue;
+                //// Eensure that this product can be added to a shipment
+                //if (orderItem.GetItemsCanBeAddedToShipmentCount() <= 0)
+                //    continue;
 
                 var itemModel = PrepareShipmentItemModel(order, orderItem, null, baseDimension, baseWeight);
                 model.Items.Add(itemModel);
@@ -2346,10 +2252,11 @@ namespace SmartStore.Admin.Controllers
             //if (!_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             //    return AccessDeniedView();
 
-            var order = _orderService.GetOrderById(orderId);
+            var order = _DeclarationOrderService.GetOrderById(orderId);
             if (order == null)
                 return RedirectToAction("List");
-
+            order.ShippingStatus = ShippingStatus.Shipped;
+            _DeclarationOrderService.UpdateOrder(order);
             var quantities = new Dictionary<int, int>();
             var trackingNumber = form["TrackingNumber"];
 
@@ -2365,7 +2272,7 @@ namespace SmartStore.Admin.Controllers
                 }
             }
 
-            var shipment = _orderProcessingService.AddShipment(order, trackingNumber, quantities);
+            var shipment = _orderProcessingService.AddDorderShipment(order, trackingNumber, quantities);
 
             if (shipment != null)
             {
@@ -2599,9 +2506,10 @@ namespace SmartStore.Admin.Controllers
 
             //if (_permissionService.Authorize(StandardPermissionProvider.ManageOrders))
             {
-                var order = _orderService.GetOrderById(orderId);
+                var order = _DeclarationOrderService.GetOrderById(orderId);
 
                 var shipmentModels = new List<ShipmentModel>();
+                order.Shipments = _orderProcessingService.GetShipmentsByDorderid(order.Id);
                 var shipments = order.Shipments.OrderBy(s => s.CreatedOnUtc).ToList();
 
                 foreach (var shipment in shipments)

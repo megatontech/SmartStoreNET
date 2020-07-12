@@ -1313,6 +1313,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="OrderId" Type="Int32" Nullable="false" />
+          <Property Name="DOrderId" Type="Int32" Nullable="false" />
           <Property Name="TrackingNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="TotalWeight" Type="Decimal" Precision="18" Scale="4" />
           <Property Name="ShippedDateUtc" Type="DateTime" />
@@ -5673,6 +5674,7 @@
               <MappingFragment StoreEntitySet="Shipment">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="OrderId" ColumnName="OrderId" />
+                <ScalarProperty Name="DOrderId" ColumnName="DOrderId" />
                 <ScalarProperty Name="TrackingNumber" ColumnName="TrackingNumber" />
                 <ScalarProperty Name="TotalWeight" ColumnName="TotalWeight" />
                 <ScalarProperty Name="ShippedDateUtc" ColumnName="ShippedDateUtc" />
@@ -7876,6 +7878,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="OrderId" Type="int" customannotation:Index="{ Name: IX_OrderId, Order: 0 }" Nullable="false" />
+          <Property Name="DOrderId" Type="int" Nullable="false" />
           <Property Name="TrackingNumber" Type="nvarchar(max)" Nullable="true" />
           <Property Name="TotalWeight" Type="decimal" Precision="18" Scale="4" Nullable="true" />
           <Property Name="ShippedDateUtc" Type="datetime" Nullable="true" />

@@ -2171,7 +2171,7 @@ namespace SmartStore.Web.Controllers
             //return Redirect("~/DeclarationCheckout/Confirm");
             return Json(new
             {
-                redirect = "../../DeclarationCheckout/Confirm"
+                redirect = "../../DeclarationCheckout/ShippingAddress"
             });
             //return RedirectToAction("~/DeclarationCheckout/PaymentMethod?productid=" + product.Id);
             //if (_shoppingCartSettings.DisplayCartAfterAddingProduct)

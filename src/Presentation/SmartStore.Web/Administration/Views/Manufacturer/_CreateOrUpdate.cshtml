@@ -308,7 +308,7 @@
 					.HtmlAttributes(new { align = "right" })
 					.Width("15%");
 				})
-				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
 				.PreserveGridState()
 				.ToolBar(commands => commands.Template(ManufacturerGridCommands))
 				.EnableCustomBinding(true))

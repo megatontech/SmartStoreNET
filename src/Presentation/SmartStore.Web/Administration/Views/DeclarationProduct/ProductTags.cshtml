@@ -39,7 +39,7 @@
 					.Delete("ProductTagDelete", "Product");
 			})
 			.Filterable()
-			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.PreserveGridState()
 			.EnableCustomBinding(true))
 

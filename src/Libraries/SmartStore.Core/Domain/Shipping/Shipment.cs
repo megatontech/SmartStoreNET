@@ -18,6 +18,8 @@ namespace SmartStore.Core.Domain.Shipping
         /// </summary>
 		[DataMember]
 		public int OrderId { get; set; }
+        [DataMember]
+        public int DOrderId { get; set; }
         
         /// <summary>
         /// Gets or sets the tracking number of this shipment

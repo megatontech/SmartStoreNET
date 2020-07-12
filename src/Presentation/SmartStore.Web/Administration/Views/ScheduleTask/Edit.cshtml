@@ -243,7 +243,7 @@
                 .Width(200)
                 .HtmlAttributes(new { align = "right" });
             })
-            .Pageable(settings => settings.PageSize((int)ViewBag.GridPageSize).Position(GridPagerPosition.Both))
+            .Pageable(settings => settings.PageSize((int)ViewBag.GridPageSize).Position(GridPagerPosition.Bottom))
             .PreserveGridState()
             .EnableCustomBinding(true))
     </div>

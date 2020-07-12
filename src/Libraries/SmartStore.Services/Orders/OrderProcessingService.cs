@@ -983,7 +983,7 @@ namespace SmartStore.Services.Orders
                 //    : (Address)initialOrder.BillingAddress.Clone();
 
 				Address shippingAddress = null;
-				if (shoppingCartRequiresShipping)
+				//if (shoppingCartRequiresShipping)
 				{
                     shippingAddress = !processPaymentRequest.IsRecurringPayment
                         ? (Address)customer.ShippingAddress.Clone()
@@ -1115,10 +1115,10 @@ namespace SmartStore.Services.Orders
                         #region Save order details
 
                         var shippingStatus = ShippingStatus.NotYetShipped;
-						if (!shoppingCartRequiresShipping)
-						{
-							shippingStatus = ShippingStatus.ShippingNotRequired;
-						}
+						//if (!shoppingCartRequiresShipping)
+						//{
+						//	shippingStatus = ShippingStatus.ShippingNotRequired;
+						//}
                         
                         var order = new Order
                         {
@@ -2733,8 +2733,8 @@ namespace SmartStore.Services.Orders
 
 			foreach (var orderItem in order.OrderItems)
 			{
-				if (!orderItem.Product.IsShipEnabled)
-					continue;
+				//if (!orderItem.Product.IsShipEnabled)
+				//	continue;
 
 				//ensure that this product can be shipped (have at least one item to ship)
 				var maxQtyToAdd = orderItem.GetItemsCanBeAddedToShipmentCount();
@@ -2798,6 +2798,84 @@ namespace SmartStore.Services.Orders
 			return null;
 		}
 
+        public virtual Shipment AddDorderShipment(DeclarationOrder order, string trackingNumber, Dictionary<int, int> quantities)
+        {
+            Guard.NotNull(order, nameof(order));
+
+            Shipment shipment = null;
+            decimal? totalWeight = null;
+
+            foreach (var orderItem in order.OrderItems)
+            {
+                //if (!orderItem.Product.IsShipEnabled)
+                //	continue;
+
+                //ensure that this product can be shipped (have at least one item to ship)
+                //var maxQtyToAdd = orderItem.GetItemsCanBeAddedToShipmentCount();
+                //if (maxQtyToAdd <= 0)
+                //    continue;
+
+                //var qtyToAdd = 0;
+
+                //if (quantities != null && quantities.ContainsKey(orderItem.Id))
+                //    qtyToAdd = quantities[orderItem.Id];
+                //else if (quantities == null)
+                //    qtyToAdd = maxQtyToAdd;
+
+                //if (qtyToAdd <= 0)
+                //    continue;
+
+                //if (qtyToAdd > maxQtyToAdd)
+                //    qtyToAdd = maxQtyToAdd;
+
+                //var orderItemTotalWeight = orderItem.ItemWeight.HasValue ? orderItem.ItemWeight * qtyToAdd : null;
+                //if (orderItemTotalWeight.HasValue)
+                //{
+                //    if (!totalWeight.HasValue)
+                //        totalWeight = 0;
+
+                //    totalWeight += orderItemTotalWeight.Value;
+                //}
+
+                if (shipment == null)
+                {
+                    shipment = new Shipment
+                    {
+                        OrderId = 0,
+                        DOrderId = order.Id,
+                        Order = null,      // otherwise order updated event would not be fired during InsertShipment
+                        TrackingNumber = trackingNumber,
+                        TotalWeight = null,
+                        ShippedDateUtc = DateTime.Now,
+                        DeliveryDateUtc = null,
+                        CreatedOnUtc = DateTime.Now,
+                    };
+                }
+
+                var shipmentItem = new ShipmentItem
+                {
+                    OrderItemId = orderItem.Id,
+                    Quantity = 1
+                };
+
+                shipment.ShipmentItems.Add(shipmentItem);
+            }
+
+            if (shipment != null && shipment.ShipmentItems.Count > 0)
+            {
+                //shipment.TotalWeight = totalWeight;
+
+                _shipmentService.InsertShipment(shipment);
+
+                return shipment;
+            }
+
+            return null;
+        }
+        public ICollection<Shipment> GetShipmentsByDorderid(int id)
+        {
+            return _shipmentService.GetShipmentsByDOrderId(id);
+        }
         #endregion
     }
 }

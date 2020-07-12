@@ -30,7 +30,7 @@
 				.Width(200)
 				.Centered();
 		})
-		.Pageable(settings => settings.PageSize((int)ViewData["GridPageSize"]).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize((int)ViewData["GridPageSize"]).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "ProductAttribute"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

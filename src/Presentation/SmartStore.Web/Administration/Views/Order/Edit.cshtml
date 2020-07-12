@@ -39,16 +39,16 @@
     @Html.ValidationSummary(false)
 
     @Html.SmartStore().TabStrip().Name("order-edit").Style(TabsStyle.Material).Items(x =>
-	{
-		x.Add().Text(T("Admin.Orders.Info").Text).Content(TabInfo()).Selected(true);
-		x.Add().Text(T("Admin.Orders.BillingAndShipment").Text).Content(TabBillingAndShipment());
-		x.Add().Text(T("Admin.Orders.Products").Text).Content(TabProducts());
-		x.Add().Text(T("Admin.Orders.OrderNotes").Text).Content(TabOrderNotes());
-		x.Add().Text(T("Admin.Common.GenericAttributes").Text).Content(TabOrderAttributes());
-	
-		//generate an event
-		EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "order-edit", this.Html, this.Model));
-	})
+{
+    x.Add().Text(T("Admin.Orders.Info").Text).Content(TabInfo()).Selected(true);
+    x.Add().Text(T("订单发货").Text).Content(TabBillingAndShipment());
+    x.Add().Text(T("Admin.Orders.Products").Text).Content(TabProducts());
+    x.Add().Text(T("订单处理备注").Text).Content(TabOrderNotes());
+    //x.Add().Text(T("Admin.Common.GenericAttributes").Text).Content(TabOrderAttributes());
+
+    //generate an event
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(new TabStripCreated(x, "order-edit", this.Html, this.Model));
+})
 }
 
 @Html.DeleteConfirmation("order-delete")

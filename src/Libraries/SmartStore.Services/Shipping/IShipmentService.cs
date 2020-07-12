@@ -42,6 +42,7 @@ namespace SmartStore.Services.Shipping
 		/// <param name="orderIds">Order identifiers</param>
 		/// <returns>Shipments</returns>
 		Multimap<int, Shipment> GetShipmentsByOrderIds(int[] orderIds);
+        ICollection<Shipment> GetShipmentsByDOrderId(int dorderId);
 
         /// <summary>
         /// Gets a shipment

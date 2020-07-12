@@ -123,7 +123,7 @@
 			</div>
 		</td>
 	</tr>
-	<tr>
+	@*<tr>
 		<td class="adminTitle">
 			@Html.SmartLabelFor(model => model.StoreName)
 		</td>
@@ -132,7 +132,7 @@
 				@Model.StoreName
 			</div>
 		</td>
-	</tr>
+	</tr>*@
 	@if (Model.AffiliateId != 0)
 	{
 		<tr>
@@ -210,7 +210,7 @@
 			</td>
 		</tr>
 	}
-	@if (Model.AllowCustomersToSelectTaxDisplayType || Model.TaxDisplayType == TaxDisplayType.ExcludingTax)
+	@*@if (Model.AllowCustomersToSelectTaxDisplayType || Model.TaxDisplayType == TaxDisplayType.ExcludingTax)
 	{
 		<tr>
 			<td class="adminTitle">
@@ -222,7 +222,7 @@
 				</div>
 			</td>
 		</tr>
-	}
+	}*@
 	@if ((Model.AllowCustomersToSelectTaxDisplayType || Model.TaxDisplayType == TaxDisplayType.IncludingTax) && !String.IsNullOrEmpty(Model.OrderSubTotalDiscountInclTax))
 	{
 		<tr>
@@ -262,7 +262,7 @@
 			</td>
 		</tr>
 	}
-	@if (Model.AllowCustomersToSelectTaxDisplayType || Model.TaxDisplayType == TaxDisplayType.ExcludingTax)
+	@*@if (Model.AllowCustomersToSelectTaxDisplayType || Model.TaxDisplayType == TaxDisplayType.ExcludingTax)
 	{
 		<tr>
 			<td class="adminTitle">
@@ -300,8 +300,8 @@
 				</div>
 			</td>
 		</tr>
-	}
-	@if (Model.DisplayTaxRates)
+	}*@
+	@*@if (Model.DisplayTaxRates)
 	{
 		foreach (var tr in Model.TaxRates)
 		{
@@ -329,7 +329,7 @@
 				</div>
 			</td>
 		</tr>
-	}
+	}*@
 	@if (!String.IsNullOrEmpty(Model.OrderTotalDiscount))
 	{
 		<tr>
@@ -523,7 +523,7 @@
 	</tr>
 	<tr>
 		<td>
-			<button type="submit" name="btnEditOrderTotals" onclick="toggleOrderTotals(true);return false;" id="btnEditOrderTotals" class="btn btn-secondary">
+			@*<button type="submit" name="btnEditOrderTotals" onclick="toggleOrderTotals(true);return false;" id="btnEditOrderTotals" class="btn btn-secondary">
 				<i class="far fa-edit"></i>
 				<span>@T("Admin.Orders.Fields.EditOrderTotals")</span>
 			</button>
@@ -533,7 +533,7 @@
 			</button>
 			<button type="submit" name="btnCancelOrderTotals" onclick="toggleOrderTotals(false);return false;" id="btnCancelOrderTotals" class="btn btn-secondary">
 				<span>@T("Admin.Common.Cancel")</span>
-			</button>
+			</button>*@
 
 			@{ Html.RenderWidget("admin_order_total_edit_buttons_after"); }
 		</td>
@@ -830,7 +830,7 @@
 			</td>
 		</tr>
 	}
-	<tr>
+	@*<tr>
 		<td class="adminTitle">
 			@Html.SmartLabelFor(model => model.PaymentMethod)
 		</td>
@@ -843,7 +843,7 @@
 				}
 			</div>
 		</td>
-	</tr>
+	</tr>*@
 	<tr>
 		<td class="adminTitle">
 			@Html.SmartLabelFor(model => model.PaymentStatus)
@@ -851,7 +851,7 @@
 		<td class="adminData wide">
 			<span class="pr-1 font-weight-medium form-control-plaintext d-inline-block" style="width: auto;">@Model.PaymentStatus</span>
 
-			@if (Model.CanMarkOrderAsPaid)
+			@*@if (Model.CanMarkOrderAsPaid)
 			{
 				<input type="submit" name="markorderaspaid" value="@T("Admin.Orders.Fields.MarkAsPaid")" id="markorderaspaid" class="btn btn-secondary ask-to-proceed" title="@T("Admin.Orders.Fields.MarkAsPaid.Hint")" />
 			}
@@ -886,7 +886,7 @@
 			@if (Model.CanVoidOffline)
 			{
 				<input type="submit" name="voidorderoffline" value="@T("Admin.Orders.Fields.VoidOffline")" id="voidorderoffline" class="btn btn-secondary ask-to-proceed" title="@T("Admin.Orders.Fields.VoidOffline.Hint")" />
-			}
+			}*@
 
 			@{ Html.RenderWidget("admin_order_edit_payment_buttons_after"); }
 		</td>
@@ -916,7 +916,7 @@
 			<hr />
 		</td>
 	</tr>
-	<tr>
+	@*<tr>
 		<td class="adminTitle">
 			@Html.SmartLabelFor(model => model.AcceptThirdPartyEmailHandOver)
 		</td>
@@ -925,7 +925,7 @@
 				@(Model.AcceptThirdPartyEmailHandOver ? T("Common.Yes") : T("Common.No"))
 			</div>
 		</td>
-	</tr>
+	</tr>*@
 	<tr>
 		<td colspan="2">
 			@if (Model.CustomerComment.HasValue())

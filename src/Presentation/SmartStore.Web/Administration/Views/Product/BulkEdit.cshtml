@@ -108,7 +108,7 @@
 			})
 			.ClientEvents(events => events.OnDataBinding("Grid_onDataBinding").OnError("Grid_onError").OnSubmitChanges("Grid_onSubmitChanges"))
 			.Editable(editing => editing.Mode(GridEditMode.InCell))
-			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(Model.GridPageSize).Position(GridPagerPosition.Bottom))
         )
 	</div>
 

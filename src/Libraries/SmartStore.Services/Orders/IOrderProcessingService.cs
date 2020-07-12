@@ -304,5 +304,9 @@ namespace SmartStore.Services.Orders
 		/// <param name="quantities">Quantities by order item identifiers. <c>null</c> to use the remaining total number of products for each order item.</param>
 		/// <returns>New shipment, <c>null</c> if no shipment was added</returns>
 		Shipment AddShipment(Order order, string trackingNumber, Dictionary<int, int> quantities);
+		Shipment AddDorderShipment(DeclarationOrder order, string trackingNumber, Dictionary<int, int> quantities);
+         ICollection<Shipment> GetShipmentsByDorderid(int id);
+
+
     }
 }

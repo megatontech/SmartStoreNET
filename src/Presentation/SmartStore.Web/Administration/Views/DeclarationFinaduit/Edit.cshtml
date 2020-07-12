@@ -10,26 +10,11 @@
     <div class="section-header">
         <div class="title">
             @T("Admin.Orders.EditOrderDetails") - @Model.OrderNumber 
-			<a href='@Url.Action("List")'>(@T("Admin.Orders.BackToList"))</a>
+			<a href='@Url.Action("OrderManageList")'>(@T("Admin.Orders.BackToList"))</a>
         </div>
         <div class="options">
 			@{ Html.RenderWidget("admin_button_toolbar_before"); }
-
-            <a href="@Url.Action("Print", new { orderId = Model.Id, pdf = false })" target="print" class="btn btn-secondary print-order-button" rel="nofollow">
-                <i class="fa fa-print"></i>
-                <span>@T("Order.Print")</span>
-            </a>
-            @if (Model.DisplayPdfInvoice)
-            {
-                <a href="@Url.Action("Print", new { orderId = Model.Id, pdf = true })" class="btn btn-secondary">
-					<i class="far fa-file-pdf"></i>
-					<span>@T("Admin.Orders.PdfInvoice")</span>
-				</a>
-            }
-            <button type="submit" id="order-delete" class="btn btn-danger">
-				<i class="far fa-trash-alt"></i>
-				<span>@T("Admin.Common.Delete")</span>
-			</button>
+          
             <input type="submit" id="btnRefreshPage" name="btnRefreshPage" class="d-none" />
 
 			@{ Html.RenderWidget("admin_button_toolbar_after"); }
@@ -40,7 +25,7 @@
 
     @Html.SmartStore().TabStrip().Name("order-edit").Style(TabsStyle.Material).Items(x =>
 {
-    x.Add().Text(T("Admin.Orders.Info").Text).Content(TabInfo()).Selected(true);
+    x.Add().Text(T("订单信息").Text).Content(TabInfo()).Selected(true);
     x.Add().Text(T("发货").Text).Content(TabBillingAndShipment());
     x.Add().Text(T("Admin.Orders.Products").Text).Content(TabProducts());
     //x.Add().Text(T("Admin.Orders.OrderNotes").Text).Content(TabOrderNotes());
@@ -68,14 +53,5 @@
 	@Html.Partial("_Edit.Products")
 }
 
-@helper TabOrderNotes()
-{
-	@Html.Partial("_Edit.OrderNotes")
-}
-
-@helper TabOrderAttributes()
-{
-    @Html.Action("GenericAttributes", "Common", new { entityName = "Order", entityId = Model.Id })
-}
 
 @{ Html.RenderPartial("_AutoUpdateOrderItem", Model.AutoUpdateOrderItem); }

@@ -70,19 +70,19 @@
 				.Width(80)
 				.Centered()
 				.Template(x => Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = x.OrderId }, new { }))
-				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/Edit/") + "<#= OrderId #>\"><#= OrderId #></a>");
+				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/DeclarationFinaduit/Edit/") + "<#= OrderId #>\"><#= OrderId #></a>");
 			columns.Bound(x => x.TrackingNumber);
 			columns.Bound(x => x.TotalWeight);
 			columns.Bound(x => x.ShippedDate);
 			columns.Bound(x => x.DeliveryDate);
 			columns.Bound(x => x.Id)
 				.Template(x => Html.ActionLink(T("Admin.Common.View").Text, "ShipmentDetails", "Order", new { id = x.Id }, new { @class = "t-button" }))
-				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/Order/ShipmentDetails/") + "<#= Id #>\" class=\"t-button\">" + T("Admin.Common.View").Text + "</a>")
+				.ClientTemplate("<a href=\"" + @Url.Content("~/Admin/DeclarationFinaduit/ShipmentDetails/") + "<#= Id #>\" class=\"t-button\">" + T("Admin.Common.View").Text + "</a>")
 				.Width(50)
 				.Centered()
 				.Title(String.Empty);
 		})
-		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("ShipmentListSelect", "Order"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

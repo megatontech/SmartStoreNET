@@ -38,7 +38,7 @@
 			columns.Bound(x => x.EndDate);
 			columns.Bound(x => x.CreatedOn);
 		})
-		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Blog"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

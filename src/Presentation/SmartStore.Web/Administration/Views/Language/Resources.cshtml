@@ -67,7 +67,7 @@
 			x.Mode(GridEditMode.InLine);
 		})
 		.Filterable()
-		.Pageable(settings => settings.PageSize(gridPageSize).Total(Model.Total).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.PageSize(gridPageSize).Total(Model.Total).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding =>
 		{
 			dataBinding.Ajax().Select("Resources", "Language")

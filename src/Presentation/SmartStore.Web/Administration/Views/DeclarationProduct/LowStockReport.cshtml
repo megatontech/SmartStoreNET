@@ -47,7 +47,7 @@
 					.HtmlAttributes(new { align = "right", @class = "omega" })
 					.Title(String.Empty);
 			})
-			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("LowStockReportList", "Product"))
 			.PreserveGridState()
 			.EnableCustomBinding(true))

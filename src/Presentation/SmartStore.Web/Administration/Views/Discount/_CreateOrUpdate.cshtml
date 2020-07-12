@@ -485,7 +485,7 @@
             }).Width(100).Title(T("Admin.Common.Delete").Text);
 
         })
-        .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+        .Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
         .DataBinding(dataBinding =>
         {
             dataBinding.Ajax().Select("UsageHistoryList", "Discount", new { discountId = Model.Id })

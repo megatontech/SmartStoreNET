@@ -11,7 +11,15 @@
             Label =  T("Checkout.Progress.Confirm").Text,
             Visited = Model.dCheckoutProgressStep > dCheckoutProgressStep.Confirm,
             Active = Model.dCheckoutProgressStep == dCheckoutProgressStep.Confirm,
-            Href = Url.Action("Confirm")
+            Href = "javascript:void(0)"
+        },
+        new {
+            Step = CheckoutProgressStep.Shipping,
+            StepName = "shipping",
+            Label =  T("地址").Text,
+            Visited = Model.dCheckoutProgressStep > dCheckoutProgressStep.Shipping,
+            Active = Model.dCheckoutProgressStep == dCheckoutProgressStep.Shipping,
+            Href = "javascript:void(0)"
         },
         // Payment
         new {
@@ -20,7 +28,7 @@
             Label =  T("Checkout.Progress.Payment").Text,
             Visited = Model.dCheckoutProgressStep > dCheckoutProgressStep.Payment,
             Active = Model.dCheckoutProgressStep == dCheckoutProgressStep.Payment,
-            Href = Url.Action("PaymentMethod")
+            Href = "javascript:void(0)"
         },
        
         // Complete

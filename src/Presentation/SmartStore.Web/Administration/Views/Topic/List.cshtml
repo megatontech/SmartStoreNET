@@ -90,7 +90,7 @@
 			})
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "Topic"))
 			.ClientEvents(events => events.OnDataBinding("onDataBinding"))
-			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.PreserveGridState()
 			.EnableCustomBinding(true))
 </div>

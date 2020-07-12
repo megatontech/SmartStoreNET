@@ -25,7 +25,7 @@ namespace SmartStore.Core.Domain.Orders
         //private ICollection<GiftCardUsageHistory> _giftCardUsageHistory;
         private ICollection<OrderNote> _orderNotes;
         private ICollection<OrderItem> _orderItems;
-        //private ICollection<Shipment> _shipments;
+        public ICollection<Shipment> _shipments;
 
         #region Utilities
 
@@ -489,18 +489,18 @@ namespace SmartStore.Core.Domain.Orders
         [DataMember]
         public virtual Customer Customer { get; set; }
 
-  //      /// <summary>
-  //      /// Gets or sets the billing address
-  //      /// </summary>
-		//[NotMapped]
-  //      public virtual Address BillingAddress { get; set; }
+        //      /// <summary>
+        //      /// Gets or sets the billing address
+        //      /// </summary>
+        //[NotMapped]
+        //      public virtual Address BillingAddress { get; set; }
 
-  //      /// <summary>
-  //      /// Gets or sets the shipping address
-  //      /// </summary>
-		//[NotMapped]
-  //      public virtual Address ShippingAddress { get; set; }
-        
+        /// <summary>
+        /// Gets or sets the shipping address
+        /// </summary>
+        [NotMapped]
+        public virtual Address ShippingAddress { get; set; }
+
         ///// <summary>
         ///// Gets or sets the reward points history record
         ///// </summary>
@@ -551,18 +551,18 @@ namespace SmartStore.Core.Domain.Orders
         public virtual ICollection<OrderItem> OrderItems
         {
 			get { return _orderItems ?? (_orderItems = new HashSet<OrderItem>()); }
-            protected set { _orderItems = value; }
+             set { _orderItems = value; }
         }
 
-  //      /// <summary>
-  //      /// Gets or sets shipments
-  //      /// </summary>
-		//[DataMember]
-		//public virtual ICollection<Shipment> Shipments
-  //      {
-		//	get { return _shipments ?? (_shipments = new HashSet<Shipment>()); }
-  //          protected set { _shipments = value; }
-  //      }
+        /// <summary>
+        /// Gets or sets shipments
+        /// </summary>
+		[NotMapped]
+        public virtual ICollection<Shipment> Shipments
+        {
+            get { return _shipments ?? (_shipments = new HashSet<Shipment>()); }
+            set { _shipments = value; }
+        }
 
         #endregion
 
@@ -602,21 +602,21 @@ namespace SmartStore.Core.Domain.Orders
         }
         [DataMember]
         public int ProductID { get; set; }
-        //      /// <summary>
-        //      /// Gets or sets the shipping status
-        //      /// </summary>
-        //[DataMember]
-        //public ShippingStatus ShippingStatus
-        //      {
-        //          get
-        //          {
-        //              return (ShippingStatus)this.ShippingStatusId;
-        //          }
-        //          set
-        //          {
-        //              this.ShippingStatusId = (int)value;
-        //          }
-        //      }
+        /// <summary>
+        /// Gets or sets the shipping status
+        /// </summary>
+        [NotMapped]
+        public ShippingStatus ShippingStatus
+        {
+            get
+            {
+                return (ShippingStatus)this.ShippingStatusId;
+            }
+            set
+            {
+                this.ShippingStatusId = (int)value;
+            }
+        }
 
         //      /// <summary>
         //      /// Gets or sets the customer tax display type

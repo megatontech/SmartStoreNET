@@ -44,7 +44,7 @@
 						.Template(x => @Html.LabeledProductName(x.ProductId, x.ProductName, x.ProductTypeName, x.ProductTypeLabelHint))
 						.ClientTemplate(@Html.LabeledProductName("ProductId", "ProductName"));
 				})
-				.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+				.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 				.DataBinding(dataBinding => dataBinding.Ajax().Select("NeverSoldReportList", "Order"))
 				.PreserveGridState()
 				.EnableCustomBinding(true))

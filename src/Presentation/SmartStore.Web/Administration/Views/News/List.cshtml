@@ -80,7 +80,7 @@
 					.Centered();
 				columns.Bound(x => x.CreatedOn);
 			})
-			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "News"))
 			.ClientEvents(events => events.OnDataBinding("onDataBinding").OnDataBound("onDataBound").OnRowDataBound("onRowDataBound"))
 			.PreserveGridState()

@@ -50,7 +50,7 @@
 				.Title(String.Empty)
 				.HtmlAttributes(new { align = "right" });
 		})
-		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "RecurringPayment"))
 		.PreserveGridState()
 		.EnableCustomBinding(true))

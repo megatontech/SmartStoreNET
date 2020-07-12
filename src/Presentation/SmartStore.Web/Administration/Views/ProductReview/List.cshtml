@@ -90,7 +90,7 @@
 					.Title(String.Empty)
 					.HtmlAttributes(new { align = "right" });
 			})
-			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Both))
+			.Pageable(settings => settings.PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 			.DataBinding(dataBinding => dataBinding.Ajax().Select("List", "ProductReview"))
 			.PreserveGridState()
 			.EnableCustomBinding(true))

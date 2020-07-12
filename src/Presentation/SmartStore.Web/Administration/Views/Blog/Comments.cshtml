@@ -49,7 +49,7 @@
 			.Width(90)
 			.HtmlAttributes(new { align = "right" }); ;
 		})
-		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Both))
+		.Pageable(settings => settings.Total(Model.Total).PageSize(gridPageSize).Position(GridPagerPosition.Bottom))
 		.DataBinding(dataBinding =>
 		{
 			var settingBuilder = dataBinding.Ajax();
