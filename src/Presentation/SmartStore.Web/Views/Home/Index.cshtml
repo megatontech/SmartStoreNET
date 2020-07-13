@@ -3,6 +3,9 @@
     Html.AddBodyCssClass("home");
     //var path = CommonHelper.MapPath("~" + basePath, false);
 }
+@{
+//Html.AddScriptParts("~/bundles/smart-gallery");
+}
 <script src="~/Content/vendors/jquery/jquery.event.swipe.js"></script>
 
 <script src="~/Content/vendors/jquery/unslider.min.js"></script>
@@ -14,21 +17,20 @@
 
             Html.RenderAction("TopicBlock", "Topic", new { systemName = "HomePageText", isLead = true });
             Html.RenderWidget("home_page_after_intro");
-            <div class="ban has-dots" id="b03" style="        overflow: hidden;
-        width: 100%;
-        height: 150px;">
-                <ul style="        width: 500%;
-        position: relative;
-        left: -7.25526%;
-        height: 150px;
-        overflow: hidden;">
+
+
+
+        
+
+            <div class="ban has-dots" id="b03" style="overflow: hidden; width: 100%; height: 150px;">
+                <ul style="width: 500%; position: relative; left: -7.25526%; height: 150px; overflow: hidden;">
                     <li style="width: 20%;"><img src="~/Media/Content/Images/01.jpg" alt="" width="300" height="150"></li>
                     <li style="width: 20%;"><img src="~/Media/Content/Images/02.jpg" alt="" width="300" height="150"></li>
                     <li style="width: 20%;"><img src="~/Media/Content/Images/03.jpg" alt="" width="300" height="150"></li>
                     <li style="width: 20%;"><img src="~/Media/Content/Images/04.jpg" alt="" width="300" height="150"></li>
                     <li style="width: 20%;"><img src="~/Media/Content/Images/05.jpg" alt="" width="300" height="150"></li>
                 </ul>
-                <ol class="dots"><li class="dot active">1</li><li class="dot">2</li><li class="dot">3</li><li class="dot">4</li><li class="dot">5</li></ol>
+                @*<ol class="dots"><li class="dot active">1</li><li class="dot">2</li><li class="dot">3</li><li class="dot">4</li><li class="dot">5</li></ol>*@
             </div>
             <style>
                 .ban {
@@ -82,7 +84,7 @@
                         complete: function () { },  //  A function that gets called after every slide animation
                         keys: true,               //  Enable keyboard (left, right) arrow shortcuts
                         dots: true,               //  Display dot navigation
-                        fluid: false              //  Support responsive design. May break non-responsive designs
+                        fluid: true              //  Support responsive design. May break non-responsive designs
                     });
                 });
 
@@ -127,13 +129,13 @@
     .small_price {
         font-size: 14px;
     }
-    </style>
+</style>
 
-    <script type="text/javascript" >
-    $(function(){
-// 价格显示
-        $(".art-price").each(function(){
-        $(this).html('<span class="big_price">' + $(this).html().split('.').join('.</span><span class="small_price">')  + '</span>');
-    });
-})
-        </script>
+<script type="text/javascript">
+    $(function () {
+        // 价格显示
+        $(".art-price").each(function () {
+            $(this).html('<span class="big_price">' + $(this).html().split('.').join('.</span><span class="small_price">') + '</span>');
+        });
+    })
+</script>

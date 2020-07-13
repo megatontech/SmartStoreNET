@@ -17,7 +17,8 @@
         <div class="shopbar-tool d-lg-none" id="shopbar-menu">
             <a class="shopbar-button" href="/" data-autohide="true" data-placement="@(isRtl ? "right" : "left")" data-fullscreen="false" data-disablescrolling="true" data-target="#offcanvas-menu">
                 <span class="shopbar-button-icon">
-                    <i class="icm icm-home"></i>
+                    @*<i class="icm icm-home"></i>*@
+                    <img src='@Url.Content("~/Content/Images/icons/design3.png")'  class="icm"  style="height:25px;"  alt="" />
                 </span>
                 <span class="shopbar-button-label-sm">
                     @T("首页")
@@ -34,7 +35,8 @@
                 <a href="@Url.RouteUrl("ShoppingCart")" class="shopbar-button navbar-toggler" data-toggle="offcanvas" data-summary-href="@Url.Action("CartSummary", "ShoppingCart", new { cart = true })"
                    data-autohide="true" data-placement="@(isRtl ? "left" : "right")" data-fullscreen="false" data-disablescrolling="true" data-target="#offcanvas-cart">
                     <span class="shopbar-button-icon">
-                        <i class="icm icm-cart"></i>
+                        @*<i class="icm icm-cart"></i>*@
+                        <img src='@Url.Content("~/Content/Images/icons/design17.png")'  class="icm"  style="height:25px;"  alt="" />
                         <span class='badge badge-pill label-cart-amount badge-@(labelStyle)' style="@(Model.CartItemsCount == 0 ? "display:none" : "")" data-bind-to="CartItemsCount">
                             @Model.CartItemsCount
                         </span>
@@ -53,7 +55,8 @@
         <div class="shopbar-tool d-lg-none" id="shopbar-user">
             <a class="shopbar-button" href="@accountUrl">
                 <span class="shopbar-button-icon">
-                    <i class="icm icm-user"></i>
+                    @*<i class="icm icm-user"></i>*@
+                    <img src='@Url.Content("~/Content/Images/icons/design5.png")' class="icm"  style="height:25px;" alt="" />
                 </span>
                 <span class="shopbar-button-label-sm">
                     @T(Model.IsAuthenticated ? "我的" : "Account.Login")
