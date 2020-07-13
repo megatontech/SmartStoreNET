@@ -848,7 +848,7 @@ namespace SmartStore.Web.Controllers
             //https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
             //若传递了相关参数，则调统一下单接口，获得后续相关接口的入口参数
             JsApiPay jsApiPay = new JsApiPay(Request);
-            jsApiPay.openid = "";
+            jsApiPay.openid = "wx8953723b60205284";
             jsApiPay.total_fee = int.Parse(total_fee);
 
             //JSAPI支付预处理
@@ -856,7 +856,7 @@ namespace SmartStore.Web.Controllers
             {
                 WxPayData unifiedOrderResult = jsApiPay.GetUnifiedOrderResult("娇典商城商品：" + productname);
                 var wxJsApiParam = jsApiPay.GetJsApiParameters();//获取H5调起JS API参数        
-                ViewBag["wxJsApiParam"] = wxJsApiParam;
+                //ViewBag["wxJsApiParam"] = wxJsApiParam;
                 Infrastructure.Log.Debug(this.GetType().ToString(), "wxJsApiParam : " + wxJsApiParam);
                 return Json(wxJsApiParam, JsonRequestBehavior.AllowGet);
                 //在页面上显示订单信息

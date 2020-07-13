@@ -565,7 +565,7 @@ namespace SmartStore.Admin.Controllers
 
                 model.IsShippable = true;
                 model.ShippingMethod = order.ShippingMethod;
-                model.CanAddNewShipments = order.CanAddItemsToShipment();
+                //model.CanAddNewShipments = order.CanAddItemsToShipment();
 
                 var googleAddressQuery = string.Concat(
                     order.ShippingAddress.Address1,
@@ -576,9 +576,9 @@ namespace SmartStore.Admin.Controllers
                     " ",
                     order.ShippingAddress.Country != null ? order.ShippingAddress.Country.Name : "");
 
-                var googleMapsUrl = CommonHelper.GetAppSetting<string>("g:MapsUrl");
+               // var googleMapsUrl = CommonHelper.GetAppSetting<string>("g:MapsUrl");
 
-                model.ShippingAddressGoogleMapsUrl = googleMapsUrl.FormatInvariant(language.UniqueSeoCode.EmptyNull().ToLower(), Server.UrlEncode(googleAddressQuery));
+               // model.ShippingAddressGoogleMapsUrl = googleMapsUrl.FormatInvariant(language.UniqueSeoCode.EmptyNull().ToLower(), Server.UrlEncode(googleAddressQuery));
             }
 
             #endregion Billing & shipping info

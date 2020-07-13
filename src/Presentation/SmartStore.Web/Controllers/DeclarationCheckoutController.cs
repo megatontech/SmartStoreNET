@@ -529,7 +529,7 @@ namespace SmartStore.Web.Controllers
 
         public ActionResult ShippingAddress()
         {
-			var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+			var cart = _workContext.CurrentCustomer.GetdCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
 
 			if (cart.Count == 0)
                 return RedirectToRoute("ShoppingCart");
@@ -1067,7 +1067,8 @@ namespace SmartStore.Web.Controllers
             OrderItems.Add(new OrderItem()
             {
                 ProductId = product.Id,
-                OrderId = neworder.Id,
+                OrderId =0,
+                DeliveryTimeId  = neworder.Id,
                 OrderItemGuid = Guid.NewGuid(),
                 Quantity = cart.FirstOrDefault().dItem.Quantity,
                 ProductCost = product.Price

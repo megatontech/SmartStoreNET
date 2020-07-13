@@ -16,11 +16,12 @@
 
     var consentZoneContent = Html.Widget("checkout_submit_data_consent", false).ToHtmlString();
     var consentZoneHasValue = consentZoneContent.HasValue();
+    var param = ViewBag.wxJsApiParam;
 }
 
 @section orderProgress{
     @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Confirm }); }
-    var param = ViewBag["wxJsApiParam"];
+    
 }
 
 <div class="page checkout-confirm-page">
@@ -138,12 +139,16 @@
 
             @if (!Model.MinOrderTotalWarning.HasValue())
             {
-                <div class="col-sm-6 col-lg-4 ml-lg-auto">
-                    <button class="btn btn-danger btn-lg btn-block btn-buy" onclick="return false;">
-                        <span>@T("Checkout.ConfirmButton")</span>
-                        <i class="fa fa-angle-right ml-3"></i>
-                    </button>
-                </div>
+        <div class="col-sm-6 col-lg-4 ml-lg-auto">
+            <button class="btn btn-danger btn-lg btn-block btn-buy hide" id="confirmbtn" style="display:none;" onclick="return false;">
+                <span>@T("Checkout.ConfirmButton")</span>
+                <i class="fa fa-angle-right ml-3"></i>
+            </button>
+            <button class="btn btn-danger btn-lg btn-block btn-buy" id="pay" onclick="return false;">
+                <span>@T("支付")</span>
+                <i class="fa fa-angle-right ml-3"></i>
+            </button>
+        </div>
             }
         </div>
 
@@ -297,31 +302,49 @@
 <div class="" style="height:30px;">
 </div>
 <script>
-    //function onBridgeReady() {
-    //    WeixinJSBridge.invoke(
-    //        'getBrandWCPayRequest', {
-    //        "appId": "wx2421b1c4370ec43b",     //公众号名称，由商户传入
-    //            "timeStamp": new Date().valueOf(),         //时间戳，自1970年以来的秒数
-    //        "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
-    //        "package": "prepay_id=u802345jgfjsdfgsdg888",
-    //        "signType": "MD5",         //微信签名方式：
-    //        "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
-    //    },
-    //        function (res) {
-    //            if (res.err_msg == "get_brand_wcpay_request:ok") {
-    //                // 使用以上方式判断前端返回,微信团队郑重提示：
-    //                //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-    //            }
-    //        });
-    //}
-    //if (typeof WeixinJSBridge == "undefined") {
-    //    if (document.addEventListener) {
-    //        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
-    //    } else if (document.attachEvent) {
-    //        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
-    //        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
-    //    }
-    //} else {
-    //    onBridgeReady();
-    //}
+    $("#pay").click(function () {
+        $.ajax({
+                cache:false,
+                type: "POST",
+                url: "@(Url.Action("InitPay", "Checkout"))",
+            data: { "total_fee": 12345, "productname": "公众号产品" },
+            success: function (data) {
+                console.log(data);
+                    onBridgeReady();
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    alert('Failed to add order note.')
+				},
+				complete: function () {
+					$('#addrecord-window').modal('hide');
+				}
+            });
+    });
+    function onBridgeReady() {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', {
+            "appId": "wx2421b1c4370ec43b",     //公众号名称，由商户传入
+                "timeStamp": new Date().valueOf(),         //时间戳，自1970年以来的秒数
+            "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
+            "package": "prepay_id=u802345jgfjsdfgsdg888",
+            "signType": "MD5",         //微信签名方式：
+            "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+        },
+            function (res) {
+                if (res.err_msg == "get_brand_wcpay_request:ok") {
+                    // 使用以上方式判断前端返回,微信团队郑重提示：
+                    //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                }
+            });
+    }
+    if (typeof WeixinJSBridge == "undefined") {
+        if (document.addEventListener) {
+            document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+        } else if (document.attachEvent) {
+            document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+            document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+        }
+    } else {
+        onBridgeReady();
+    }
 </script>
