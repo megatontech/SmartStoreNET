@@ -80,8 +80,8 @@
             <span class="art-price badge badge-success">@Model.Price.RegularPrice</span>
         }
     }*@
-    <span class="art-price badge badge-success">@Model.Price.RegularPrice</span>
-    @if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
+    <span class="art-price badge badge-success" style="color: #ff0303;background-color:#fff">￥@Model.Price.RegularPrice</span>
+    @*@if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
     {
         <div class="art-shipsurcharge">
             @Html.Raw(Model.TransportSurcharge)
@@ -93,7 +93,7 @@
         <div class="art-pangv" @Html.Attr("title", Model.BasePriceInfo, Model.BasePriceInfo.HasValue())>
             @Html.Raw(LocalizedValue.FixBrackets(Model.BasePriceInfo, WorkContext.WorkingLanguage) ?? "&nbsp;")
         </div>
-    }
+    }*@
 </div>
 
     Html.RenderWidget("productbox_add_info"); 

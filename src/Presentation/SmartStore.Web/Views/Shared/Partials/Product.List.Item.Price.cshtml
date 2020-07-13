@@ -54,15 +54,15 @@
 {
 
 	<div class="art-price-block">
-        <span class="@artPriceClasses">
+        <span class="@artPriceClasses"  style="color: #ff0303;background-color:#fff">
             @(Model.Price.SavingAmount.HasValue() ? " " : "") 
             @if (Model.Price.RegularPrice.HasValue())
             {
-                @Model.Price.RegularPrice
+                @Model.Price.RegularPrice.Replace(",","").Replace("¥", "￥ ")
             }
            else
             {
-                @Model.Price.Price
+                @Model.Price.Price.Replace(",", "").Replace("¥", "￥ ")
             }
         </span>
 		@*@if (Model.Price.RegularPrice.HasValue())
@@ -89,7 +89,7 @@
 			}
 		}*@
 
-		@if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
+		@*@if (list.ShowShippingSurcharge && Model.TransportSurcharge.HasValue())
 		{
 			<div class="art-shipsurcharge">
 				@Html.Raw(Model.TransportSurcharge)
@@ -101,7 +101,7 @@
 			<div class="art-pangv" @Html.Attr("title", Model.BasePriceInfo, Model.BasePriceInfo.HasValue())>
 				@Html.Raw(LocalizedValue.FixBrackets(Model.BasePriceInfo, WorkContext.WorkingLanguage) ?? "&nbsp;")
 			</div>
-		}
+		}*@
 	</div>
 
     Html.RenderWidget("productbox_add_info"); 

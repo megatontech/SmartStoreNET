@@ -2,17 +2,28 @@
     Layout = "_Layout";
     Html.AddBodyCssClass("myaccount-page");
 }
-    
+<style>
+    .shopbar-col-group-brand {
+    display:none;
+    }
+</style>    
 <div class="page page-myaccount page-myaccount-@ViewBag.PageClassToken">
 	<div class="page-body">
-        <div class="row">
-            <div class="col-md-4 col-lg-3 d-print-none">
+        <div class="row" style="background-color: #f7f4f4; margin-top: -30px;">
+            <div class="col-md-4 col-lg-3 d-print-none" style="        display: inline-flex;color:#fff;
+        -webkit-border-radius: 0em 0em 5.0em 5.0em;
+        -moz-border-radius: 0em 0em 5.0em 5.0em;
+        -o-border-radius: 0em 0em 5.0em 5.0em;
+        -ms-border-radius: 0em 0em 5.0em 5.0em;
+        border-radius: 0em 0em 4.0em 4.0em;
+        background-color: rgb(224, 54, 54);
+    ">
                 <div class="mb-2" style="text-align:center">
                     @{
-                            Model.Avatar.AvatarColor = "light";
+                        Model.Avatar.AvatarColor = "light";
                     }
                     <div class="@(Model.Avatar.Large ? "customer-avatar-lg" : "customer-avatar")">
-                            @Avatar()
+                        @Avatar()
                     </div>
 
                     @helper Avatar()
@@ -31,27 +42,171 @@
                         }
                     }
                 </div>
-                <fieldset class="content-group1" style="text-align:center">
-                    <legend>@Model.Username <span>@Model.Title</span></legend>
+                <fieldset class="content-group1" style="text-align:center;margin:2rem;">
+                    <legend>@Model.Username <span><b>@Model.Title</b></span></legend>
                 </fieldset>
+                <div style="height:200px;"></div>
             </div>
-                <div class="col-md-4 col-lg-3 d-print-none">
-                    @{ Html.RenderWidget("myaccount_menu_before"); }
+            <div class="col-md-4 col-lg-3 d-print-none" style="margin:10px;margin-top:-50px;">
+                <div class="cms-menu cms-menu-listgroup" data-menu-name="myaccount">
+                    <div class="card">
+                        <h5 class="card-header" style="border-bottom: none;background-color: rgba(216, 126, 126, 0.03);">
+                            我的帐户
+                        </h5>
+                        <div class="list-group list-group-flush has-icons" style=" display: inline-block; ">
+                            <div style="float:left;width: 49%;display: inline-block;">
+                                <a href="/Customer/ContributePoints" class="list-group-item list-group-item-action menu-link" style="display:table;">
+                                    <div style="text-align:center;"><i class="fal fa-fw fal fa-lightbulb list-group-item-icon" style="margin-right:0px;"></i></div>
+                                    <div style="text-align:center;"><span>贡献值数量</span></div>
+                                </a>
+                            </div>
+                            <div style="width: 2%; display: inline-block; "><b style="font-size: x-large; color: #a9a9a9; ">|</b></div>
+                            <div style="float: right;width: 49%;display: inline-block;">
+                                <a href="/Customer/Wallet" class="list-group-item list-group-item-action menu-link" style="display:table;">
+                                    <div style="text-align:center;"><i class="fal fa-fw fal fa-money-bill-alt list-group-item-icon" style="margin-right:0px;"></i></div>
+                                    <div style="text-align:center;"><span>可提现额度</span></div>
+                                </a>
+                            </div>
 
-                    @{ Html.SmartStore().Menu().Name("MyAccount").Template("ListGroup").Render(); }
 
-                    @{ Html.RenderWidget("myaccount_menu_after"); }
 
-                    @{ Html.RenderAction("PollBlock", "Poll", new { systemKeyword = "MyAccountMenu", area = "" }); }
-                </div>
-                <div class="col-md-8 col-lg-9">
-                    <div class="page-title pt-4 pt-md-0">
-                        <h1 class="h3">@ViewBag.PageTitle</h1>
+                        </div>
                     </div>
-
-                    @RenderBody()
                 </div>
             </div>
+            <div class="col-md-4 col-lg-3 d-print-none" style="margin:10px;">
+                <div class="cms-menu cms-menu-listgroup" data-menu-name="myaccount">
+                    <div class="card">
+                        <div class="list-group list-group-flush has-icons" style=" display: inline-block; ">
+                            <div style=" display: inline-block;width:24%; ">
+                                <a href="/Customer/RewardPoints" class="list-group-item list-group-item-action menu-link" style="display:table;border:none;">
+                                    
+                                    
+                                    <div style="text-align:center;"><i class="fal fa-fw fal fa-heart list-group-item-icon"></i></div>
+                                    <div style="        text-align: center;
+        white-space: nowrap;
+"><span>购物积分</span></div>
+                                </a>
+                            </div>
+                            <div style="        display: inline-block;
+        width: 24%;">
+                                <a href="/Customer/dOrders" class="list-group-item list-group-item-action menu-link" style="        display: table;
+        border: none;
+">
+                                    
+                                    
+                                    <div style="text-align:center;"><i class="fal fa-fw fal fa-folder list-group-item-icon"></i></div>
+                                    <div style="        text-align: center;
+        white-space: nowrap;
+"><span>报单订单</span></div>
+                                </a>
+                            </div>
+                            <div  style="        display: inline-block;
+        width: 24%;
+"><a href="/Customer/ProxyOrders" class="list-group-item list-group-item-action menu-link" style="        display: table;
+        border: none;
+">
+    
+    
+    <div style="text-align:center;"><i class="fal fa-fw fal fa-flag list-group-item-icon"></i></div>
+    <div style="        text-align: center;
+        white-space: nowrap;
+"><span>代客报单</span></div>
+</a></div>
+                            <div  style="        display: inline-block;
+        width: 24%;
+"><a href="/Customer/MyTeam" class="list-group-item list-group-item-action menu-link" style="        display: table;
+        border: none;
+">
+    <div style="text-align:center;"><i class="fal fa-fw fal fa-handshake list-group-item-icon"></i></div>
+    <div style="        text-align: center;
+        white-space: nowrap;
+"><span>我的团队</span></div>
+</a></div>
+                            <div style="        display: inline-block;
+        width: 24%;
+">
+                                <a href="/Customer/MyPoster" class="list-group-item list-group-item-action menu-link" style="        display: table;
+        border: none;
+">
+                                    <div style="text-align:center;"><i class="fal fa-fw fal fa-image list-group-item-icon"></i></div>
+                                    <div style="        text-align: center;
+        white-space: nowrap;
+"><span>推广海报</span></div>
+                                </a>
+                            </div>
+                           
+                            <div style="        display: inline-block; width: 24%;">
+                                <a href="/Customer/Orders" class="list-group-item list-group-item-action menu-link" style="        display: table;
+        border: none;
+">
+                                    <div style="text-align:center;"><i class="fal fa-fw fal fa-file-invoice list-group-item-icon"></i></div>
+                                    <div style="        text-align: center;
+        white-space: nowrap;
+"><span>商城订单</span></div>
+                                </a></div>
+                            <div style="        display: inline-block;
+        width: 24%;
+"><a href="/Customer/Discount" class="list-group-item list-group-item-action menu-link" style="        display: table;
+        border: none;
+">
+    <div style="text-align:center;"><i class="fal fa-fw fal fa-bell list-group-item-icon"></i></div>
+    <div style="text-align:center;white-space:nowrap;"><span>优惠券</span></div>
+</a></div>
+                           
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 d-print-none" style="margin:10px;">
+                <div class="cms-menu cms-menu-listgroup" data-menu-name="myaccount">
+                    <div class="card">
+
+                        <div class="list-group list-group-flush has-icons">
+                            <a href="/Customer/Info" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
+                                <i class="fal fa-fw fal fa-user list-group-item-icon"></i>
+                                <span>我的资料</span>
+                                <div style="float:right;">&gt;</div>
+                            </a>
+                            <a href="/Customer/Addresses" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
+                                <i class="fal fa-fw fal fa-address-book list-group-item-icon"></i>
+                                <span>收货地址</span><div style="float:right;">&gt;</div>
+                            </a>
+
+                            <a href="/Customer/ChangePassword" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
+                                <i class="fal fa-fw fal fa-unlock-alt list-group-item-icon"></i>
+                                <span>修改密码</span><div style="float:right;">&gt;</div>
+                            </a>
+                            <a href="/Customer/Avatar" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
+                                <i class="fal fa-fw fal fa-user-circle list-group-item-icon"></i>
+                                <span>修改头像</span><div style="float:right;">&gt;</div>
+                            </a>
+                            <a href="/logout" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
+                                <i class="fal fa-fw fal fa-sign-out-alt fa-fw list-group-item-icon"></i>
+                                <span>注销</span><div style="float:right;">&gt;</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="col-md-4 col-lg-3 d-print-none">
+                @{ Html.RenderWidget("myaccount_menu_before"); }
+
+                @{ Html.SmartStore().Menu().Name("MyAccount").Template("ListGroup").Render(); }
+
+                @{ Html.RenderWidget("myaccount_menu_after"); }
+
+                @{ Html.RenderAction("PollBlock", "Poll", new { systemKeyword = "MyAccountMenu", area = "" }); }
+            </div>*@
+            <div class="col-md-8 col-lg-9">
+                <div class="page-title pt-4 pt-md-0">
+                    <h1 class="h3">@ViewBag.PageTitle</h1>
+                </div>
+
+                @RenderBody()
+            </div>
+        </div>
         </div>
 </div>
 

@@ -117,3 +117,23 @@
         }
     </div>
 </div>
+
+
+<style>
+    .big_price {
+        font-size: 18px;
+    }
+
+    .small_price {
+        font-size: 14px;
+    }
+    </style>
+
+    <script type="text/javascript" >
+    $(function(){
+// 价格显示
+        $(".art-price").each(function(){
+        $(this).html('<span class="big_price">' + $(this).html().split('.').join('.</span><span class="small_price">')  + '</span>');
+    });
+})
+        </script>

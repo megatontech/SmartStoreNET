@@ -2,10 +2,11 @@
 @using SmartStore.Web.Models.Catalog;
 
 @{ 
-	if (Model.PagedList.TotalCount == 0)
-	{
-		return;
-	}
+    if (Model.PagedList.TotalCount == 0)
+    {
+        return;
+    }
+    Model.Items = Model.Items.Take(4).ToList();
 }
 <style>
 
@@ -18,11 +19,12 @@
         <h3 class="heading-title fs-h1" style="        color: #c51d1d; font-weight: bold; font-family: fantasy; ">
             <b style=" font-size: 25px; "><i class="icm icm-bag"></i>&nbsp; 抗衰区</b>
         </h3>
-        <h5 style=" display: inline-block; ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;更多 &gt;</h5>
+        <div style="width: 40%;display: inline-block;"></div>
+        <h5 style=" display: inline-block; ">更多 &gt;</h5>
     </div>
     <div class="block-body pt-3 artlist-no-separators">
 		@{ 
-			Html.RenderPartial("DProduct.List", Model);
+            Html.RenderPartial("DProduct.List", Model);
 		}
     </div>
 </div>
