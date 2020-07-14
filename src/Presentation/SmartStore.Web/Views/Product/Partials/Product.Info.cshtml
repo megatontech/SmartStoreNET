@@ -1,59 +1,174 @@
 ﻿@model ProductDetailsModel
-
+@using SmartStore.Core.Domain.Catalog;
+@using SmartStore.Web;
+@using System.Globalization;
+@using SmartStore.Services.Localization;
 @using SmartStore.Web.Models.Catalog;
 
-@{
-	var brand = Model.Manufacturers == null ? null : Model.Manufacturers.FirstOrDefault();
-}
 
-<div class="pd-info pd-group">
-	<!-- Brand -->
-	@if (brand != null)
-	{
-		<div class="pd-brand-block">
-			<a class="pd-brand" href="@Url.RouteUrl("Manufacturer", new { SeName = brand.SeName })">
-				@if (brand.Picture != null && brand.Picture.ImageUrl.HasValue() && brand.Picture.PictureId != 0)
-				{
-					<img class="pd-brand-picture" src="@brand.Picture.ImageUrl" alt="@brand.Picture.AlternateText" title="@brand.Picture.Title" />
-				}
-				else
-				{
-					<span @Html.LanguageAttributes(brand.Name)>@brand.Name</span>
-				}
-			</a>
-			<meta itemprop="brand" content="@brand.Name.Value">
-		</div>
-	}
+<div class="pd-offer" style="padding:0px;" @Html.Raw(!Model.ProductPrice.CallForPrice ? "itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\"" : "")>
+    <meta itemprop="itemCondition" content="http://schema.org/NewCondition" />
 
-	<!-- Title -->
-	<div class="page-title">
-		<h1 @Html.LanguageAttributes(Model.Name) class="pd-name pd-name-sm" itemprop="name">
-			@if (Model.IsAssociatedProduct && Model.VisibleIndividually)
-			{
-				<a href="@Url.RouteUrl("Product", new { SeName = Model.SeName })" title="@T("Products.Details")">@Model.Name</a>
-			}
-			else
-			{
-				@Model.Name
-			}	
-		</h1>
-	</div>
+    <div class="pd-offer-price-container" data-partial="Price">
+        @*@{ Html.RenderPartial("Product.Offer.Price", Model); }*@
 
-	<!-- Short description -->
-	@if (Model.ShortDescription.Value.HasValue())
-	{
-		<div @Html.LanguageAttributes(Model.ShortDescription) class="pd-description" itemprop="description">
-			@Html.Raw(Model.ShortDescription)
-		</div>
-	}
+        <div class="pd-offer-price">
+
+            @{
+                var isBundleItem = Model.IsBundlePart;
+                var priceModel = Model.ProductPrice;
+                var currentPrice = priceModel.PriceWithDiscount.NullEmpty() ?? priceModel.Price;
+                var currentPriceValue = priceModel.PriceWithDiscountValue > 0 ? priceModel.PriceWithDiscountValue : priceModel.PriceValue;
+                var currentPriceLabel = priceModel.NoteWithDiscount;
+
+                var oldPrice1 = priceModel.OldPrice;
+                var oldPrice1Label = T("Products.Price.OldPrice").Text;
+
+                var oldPrice2 = priceModel.PriceWithDiscountValue < priceModel.PriceValue ? priceModel.Price : "";
+                var oldPrice2Label = priceModel.NoteWithoutDiscount;
+
+                var basePriceEnabled = isBundleItem ? priceModel.BundleItemShowBasePrice : Model.IsBasePriceEnabled;
+
+                if (oldPrice2.HasValue() && !oldPrice1.HasValue())
+                {
+                    oldPrice1 = oldPrice2;
+                    oldPrice2 = null;
+                    oldPrice2Label = null;
+                }
+
+                if (priceModel.PriceValue == 0 && Model.DisplayTextForZeroPrices)
+                {
+                    currentPrice = T("Products.Free").Text;
+                    oldPrice1 = null;
+                    oldPrice2 = null;
+                    oldPrice2Label = null;
+                }
+
+                var blocksHaveLabel = currentPriceLabel.HasValue() && oldPrice2Label.HasValue();
+
+                var artPriceClasses = "pd-price";
+                if (isBundleItem)
+                {
+                    artPriceClasses += " pd-price-sm";
+                }
+                if (priceModel.OldPrice.HasValue())
+                {
+                    artPriceClasses += " pd-price--offer";
+                }
+
+                var badgeClasses = "";
+                if (Model.PriceDisplayStyle == PriceDisplayStyle.BadgeAll || (Model.PriceDisplayStyle == PriceDisplayStyle.BadgeFreeProductsOnly && priceModel.PriceValue == 0))
+                {
+                    badgeClasses = Model.PriceDisplayStyle == PriceDisplayStyle.BadgeAll && priceModel.SavingAmount.HasValue() ? "text-danger1" : "text-success1";
+                }
+
+                <!-- Current price -->
+                <div class="pd-group clearfix">
+                    <div class="row sm-gutters pd-price-group">
+                        <div class="col-auto pd-price-block" style="width: 100%; border-radius: 0.5em 0.5em 0em 0em; ">
+                            @if (!isBundleItem)
+                            {
+                                <meta itemprop="priceCurrency" content="@WorkContext.WorkingCurrency.CurrencyCode" />
+                            }
+                            @if (blocksHaveLabel)
+                            {
+                                <div class="pd-price-label">@currentPriceLabel</div>
+                            }
+                            <div class="@artPriceClasses" style="        background-color: #FE5D42; border-radius: 0.5em 0.5em 0em 0em;
+">
+                                @if (!priceModel.CallForPrice && !isBundleItem)
+                                {
+                                    <meta itemprop="price" content="@currentPriceValue.ToString("F", CultureInfo.InvariantCulture)" />
+                                }
+                                @*<b></b>*@
+                                <span class="@badgeClasses art-price" style="color:#fff;padding-left:10px;">
+                                    ￥ @Html.Raw(currentPrice)
+                                </span>
+                            </div>
+                        </div>
+                        @*@if (oldPrice2.HasValue())
+                            {
+                                <div class="col-auto pd-price-block">
+                                    @if (blocksHaveLabel)
+                                    {
+                                        <div class="pd-price-label">@oldPrice2Label</div>
+                                    }
+                                    <div class="pd-price@(isBundleItem ? " pd-price-sm" : "")">
+                                        @Html.Raw(oldPrice2)
+                                    </div>
+                                </div>
+                            }*@
+                    </div>
+
+                    <!-- Regular price -->
+                    @if (oldPrice1.HasValue() || priceModel.SavingAmount.HasValue())
+                    {
+                        if (oldPrice1.HasValue())
+                        {
+                            <div class="pd-oldprice-line d-flex">
+                                @if (oldPrice1Label.HasValue())
+                                {
+                                    @*<span>@Html.Raw(oldPrice1Label):</span>*@
+                                }
+                                @*<span class="pd-oldprice pl-1">@Html.Raw(oldPrice1)</span>*@
+                            </div>
+                        }
+                    }
+
+                    @{ Html.RenderWidget("productdetails_add_info{0}".FormatWith(isBundleItem ? "_bundle" : "")); }
+
+                </div>
+
+
+            }
+        </div>
+    </div>
+    <div class="pd-info pd-group">
+        <!-- Brand -->
+        <!-- Title -->
+        <div class="page-title">
+            <h1 @Html.LanguageAttributes(Model.Name) class="pd-name pd-name-sm" itemprop="name">
+                @Model.Name
+            </h1>
+        </div>
+
+        <!-- Short description -->
+        @if (Model.ShortDescription.Value.HasValue())
+        {
+            <div @Html.LanguageAttributes(Model.ShortDescription) class="pd-description" itemprop="description">
+                @Html.Raw(Model.ShortDescription)
+            </div>
+        }
+    </div>
+
+    <div class="pd-offer-actions-container" data-partial="OfferActions">
+        @{
+            var dataDictAddToCart = new ViewDataDictionary();
+            dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = string.Format("addtocart_{0}", Model.Id);
+            Html.RenderPartial("Product.Offer.Actions", Model, dataDictAddToCart);
+        }
+    </div>
+
+
 </div>
 
-<!-- Review Overview -->
-@if (!Model.IsAssociatedProduct && Model.DisplayProductReviews)
-{
-	Html.RenderAction("ReviewSummary", new { id = Model.Id });
-}
+<style>
+    .big_price {
+        font-size: 18px;
+    }
 
+    .small_price {
+        font-size: 14px;
+    }
+</style>
 
+<script type="text/javascript">
+    $(function () {
+        // 价格显示
+        $(".art-price").each(function () {
+            $(this).html('<span class="big_price">' + $(this).html().split('.').join('.</span><span class="small_price">') + '</span>');
+        });
+    })
+</script>
 
 

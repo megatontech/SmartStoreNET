@@ -39,7 +39,7 @@
         }
         else
         {
-            <header id="header">
+            <header id="header" style="background-color:#fff">
                 <div class="menubar-section d-none d-lg-block @(GetThemeVariable<bool>("inverse-menubar") ? "menubar-inverse" : "menubar-light")">
                     <div class="container menubar-container">
                         @{
@@ -47,10 +47,10 @@
                         }
                     </div>
                 </div>
-                <div  style="
-    /* color: red; */
-    background-color: #e03636;
-" class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
+                <div  style="    /* color: red; */
+        background-color: #e03636;
+        background-image: url(/Content/Images/icons/design18.png);
+    " class="shopbar-section @(GetThemeVariable<bool>("inverse-shopbar") ? "shopbar-inverse" : "shopbar-light")">
                     <div class="container shopbar-container">
                         @{
                             Html.RenderAction("ShopBar", "Common", new { area = "" });
@@ -64,10 +64,11 @@
                         </div>
                     </nav>
                 </div>
+                <img src='@Url.Content("~/Content/Images/icons/design18.png")' style="margin-right: 0px; width: 100%; background-color: #fff; margin-top: -100px; z-index: -99;" alt="" />
             </header>
         }
 
-        <div id="content-wrapper">
+        <div id="content-wrapper" style=" margin-top: -90px;">
             @{
                 Html.RenderAction("JavaScriptDisabledWarning", "Common", new { area = "" });
                 Html.RenderWidget("content_before");

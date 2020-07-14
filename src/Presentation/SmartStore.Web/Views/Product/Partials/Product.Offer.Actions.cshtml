@@ -32,14 +32,14 @@
 			<div class="col flex-grow-1">
 				<a class="btn btn-primary btn-lg btn-block btn-add-to-cart ajax-cart-link"
 					href="#"
-					rel="nofollow"
+					rel="nofollow" style="background-color: #FFB502;"
 					data-href='@Url.Action("AddProduct", "ShoppingCart", new { productId = Model.AddToCart.ProductId, shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart })'
 					data-form-selector="#pd-form"
 					data-type="cart"
 					data-action="add"
 					data-toggle="offcanvas" data-target="#offcanvas-cart">
 					<i class="fa fa-cart-arrow-down"></i>
-					<span>@(Model.AddToCart.AvailableForPreOrder ? T("ShoppingCart.PreOrder") : T("ShoppingCart.AddToCart"))</span>
+                    <span>@T("立刻下单")</span>
 				</a>
 			</div>
 		}

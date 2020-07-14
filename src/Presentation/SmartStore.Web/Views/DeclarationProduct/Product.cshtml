@@ -6,51 +6,51 @@
 @using SmartStore.Web;
 
 @{
-	Layout = "_Layout";
+    Layout = "_LayoutSimple";
 
-	Html.AddTitleParts(Model.MetaTitle.Value.NullEmpty() ?? Model.Name);
-	Html.AddMetaDescriptionParts(Model.MetaDescription.Value);
-	Html.AddMetaKeywordParts(Model.MetaKeywords.Value);
+    Html.AddTitleParts(Model.MetaTitle.Value.NullEmpty() ?? Model.Name);
+    Html.AddMetaDescriptionParts(Model.MetaDescription.Value);
+    Html.AddMetaKeywordParts(Model.MetaKeywords.Value);
 
-	var canonicalUrl = Url.RouteUrl("Product", new { SeName = Model.SeName }, this.Request.Url.Scheme);
-	if (Model.CanonicalUrlsEnabled)
-	{
-		Html.AddCanonicalUrlParts(canonicalUrl);
-	}
+    var canonicalUrl = Url.RouteUrl("Product", new { SeName = Model.SeName }, this.Request.Url.Scheme);
+    if (Model.CanonicalUrlsEnabled)
+    {
+        Html.AddCanonicalUrlParts(canonicalUrl);
+    }
 
-	string updateUrl = Url.Action("UpdateProductDetails", "DeclarationProduct", new
-	{
-		productId = Model.Id,
-		bundleItemId = Model.BundleItem.Id,
-		itemType = (string)null // TODO: (mc) WTF!?
-	});
+    string updateUrl = Url.Action("UpdateProductDetails", "DeclarationProduct", new
+    {
+        productId = Model.Id,
+        bundleItemId = Model.BundleItem.Id,
+        itemType = (string)null // TODO: (mc) WTF!?
+    });
 
-	var shortDescription = Model.ShortDescription.Value.HasValue() ? Model.ShortDescription : Model.MetaDescription;
+    var shortDescription = Model.ShortDescription.Value.HasValue() ? Model.ShortDescription : Model.MetaDescription;
 
-	// FB OpenGraph og:*
-	Html.AddCustomHeadParts("<meta property='og:site_name' content='{0}' />".FormatInvariant(CommonServices.StoreContext.CurrentStore.Name));
-	Html.AddCustomHeadParts("<meta property='og:type' content='{0}' />".FormatInvariant(Model.ProductType == ProductType.SimpleProduct ? "product" : "product.group"));
-	Html.AddCustomHeadParts("<meta property='og:url' content='{0}' />".FormatInvariant(canonicalUrl));
-	Html.AddCustomHeadParts("<meta property='og:site' content='{0}' />".FormatInvariant(Url.RouteUrl("HomePage", null, this.Request.Url.Scheme)));
-	Html.AddCustomHeadParts("<meta property='og:title' content='{0}' />".FormatInvariant(Model.Name.Value));
-	if (shortDescription.Value.HasValue())
-	{
-		Html.AddCustomHeadParts("<meta property='og:description' content='{0}' />".FormatInvariant(shortDescription.Value));
-	}
+    // FB OpenGraph og:*
+    Html.AddCustomHeadParts("<meta property='og:site_name' content='{0}' />".FormatInvariant(CommonServices.StoreContext.CurrentStore.Name));
+    Html.AddCustomHeadParts("<meta property='og:type' content='{0}' />".FormatInvariant(Model.ProductType == ProductType.SimpleProduct ? "product" : "product.group"));
+    Html.AddCustomHeadParts("<meta property='og:url' content='{0}' />".FormatInvariant(canonicalUrl));
+    Html.AddCustomHeadParts("<meta property='og:site' content='{0}' />".FormatInvariant(Url.RouteUrl("HomePage", null, this.Request.Url.Scheme)));
+    Html.AddCustomHeadParts("<meta property='og:title' content='{0}' />".FormatInvariant(Model.Name.Value));
+    if (shortDescription.Value.HasValue())
+    {
+        Html.AddCustomHeadParts("<meta property='og:description' content='{0}' />".FormatInvariant(shortDescription.Value));
+    }
 
-	// Twitter card
-	Html.AddCustomHeadParts("<meta property='twitter:card' content='product' />");
-	Html.AddCustomHeadParts("<meta property='twitter:title' content='{0}' />".FormatInvariant(Model.Name));
-	if (shortDescription.Value.HasValue())
-	{
-		Html.AddCustomHeadParts("<meta property='twitter:description' content='{0}' />".FormatInvariant(shortDescription.Value));
-	}
-
-	/* TODO: (mc)
-	 * - Badges
-	 * - GTIN: user must specifiy the GTIN type on product level (gtin12, gtin13 etc.). See https://schema.org/Offer
-	 * - FIXME (mg) > no (discount) badges shown in products lists (with bundled products & PricePerBundleItems ON)
-	 */
+    // Twitter card
+    Html.AddCustomHeadParts("<meta property='twitter:card' content='product' />");
+    Html.AddCustomHeadParts("<meta property='twitter:title' content='{0}' />".FormatInvariant(Model.Name));
+    if (shortDescription.Value.HasValue())
+    {
+        Html.AddCustomHeadParts("<meta property='twitter:description' content='{0}' />".FormatInvariant(shortDescription.Value));
+    }
+    ViewBag.PageTitle = Model.Name;
+    /* TODO: (mc)
+     * - Badges
+     * - GTIN: user must specifiy the GTIN type on product level (gtin12, gtin13 etc.). See https://schema.org/Offer
+     * - FIXME (mg) > no (discount) badges shown in products lists (with bundled products & PricePerBundleItems ON)
+     */
 }
 
 <div class="page product-details-page">
@@ -94,11 +94,11 @@
 
                             <!-- Product attributes (SKU, EAN, Weight etc.) -->
                             <div class="pd-attrs-container" data-partial="Attrs">
-                                @{ Html.RenderPartial("Product.Attrs", Model); }
+                                @*@{ Html.RenderPartial("Product.Attrs", Model); }*@
                             </div>
 
                             <!-- Offer box -->
-                            Html.RenderPartial("Product.Offer", Model);
+                            //Html.RenderPartial("Product.Offer", Model);
                         }
 
                         @*@if (Model.ProductType == ProductType.GroupedProduct)

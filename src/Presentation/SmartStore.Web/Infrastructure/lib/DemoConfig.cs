@@ -17,10 +17,10 @@ namespace SmartStore.Web.Infrastructure
         */
 
         public string GetAppID(){
-            return "";
+            return "wx8953723b60205284";
         }
         public string GetMchID(){
-            return "";
+            return "1600594495";
         }
         public string GetKey(){
             return "";

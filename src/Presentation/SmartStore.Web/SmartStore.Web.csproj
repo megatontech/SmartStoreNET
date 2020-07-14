@@ -937,6 +937,7 @@
     <Content Include="Content\Images\icons\design7.png" />
     <Content Include="Content\Images\icons\design8.png" />
     <Content Include="Content\Images\icons\design9.png" />
+    <Content Include="Content\Images\icons\design18.png" />
     <Content Include="Content\placeholder.txt" />
     <Content Include="Content\print-rtl.css" />
     <Content Include="Content\vendors\aos\js\aos.js" />

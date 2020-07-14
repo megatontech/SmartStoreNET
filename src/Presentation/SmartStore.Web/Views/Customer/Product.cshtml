@@ -94,12 +94,12 @@
 
 							<!-- Product attributes (SKU, EAN, Weight etc.) -->
 							<div class="pd-attrs-container" data-partial="Attrs">
-								@{ Html.RenderPartial("Product.Attrs", Model); }
+								@*@{ Html.RenderPartial("Product.Attrs", Model); }*@
 							</div>
 
 							<!-- Offer box -->
-							Html.RenderPartial("Product.Offer", Model);
-						}
+                            //Html.RenderPartial("Product.Offer", Model);
+                        }
 
 						@*@if (Model.ProductType == ProductType.GroupedProduct)
 						{
