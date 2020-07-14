@@ -381,7 +381,6 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartSt
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\HtmlSanitizer.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\AngleSharp.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\NuGet.Core.dll
-C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\log4net.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\System.Linq.Dynamic.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\Microsoft.SqlServer.ConnectionInfo.dll
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\Microsoft.SqlServer.Smo.dll

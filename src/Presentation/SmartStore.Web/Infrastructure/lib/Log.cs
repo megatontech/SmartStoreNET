@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Web;
 using System.IO;
+using SmartStore.Core;
+using SmartStore.Core.Logging;
 
 namespace SmartStore.Web.Infrastructure
 {
     public class Log
     {
-  
 
+        public ILogger Logger { get; set; }
         /**
          * 向日志写入调试信息
          * @param className 类名
@@ -61,7 +63,7 @@ namespace SmartStore.Web.Infrastructure
             string write_content = time + " " + type + " " + className + ": " + content;
             //需要用户自定义日志实现形式
             Console.WriteLine(write_content);
-
+            NullLogger.Instance.Error(write_content);
         }
     }
 }

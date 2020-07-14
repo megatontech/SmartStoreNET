@@ -9,6 +9,8 @@ using System.Text;
 using System.Net;
 using System.Web.Security;
 using LitJson;
+using SmartStore.Core.Logging;
+using SmartStore.Core.Infrastructure;
 
 namespace SmartStore.Web.Infrastructure
 {
@@ -43,7 +45,7 @@ namespace SmartStore.Web.Infrastructure
         {
             this.page = page;
         }
-
+        //private readonly Logger _logger;
 
         /**
         * 
@@ -79,7 +81,7 @@ namespace SmartStore.Web.Infrastructure
                 try
                 {
                     //触发微信返回code码         
-                   // Response.Redirect(url);//Redirect函数会抛出ThreadAbortException异常，不用处理这个异常
+                    //Response.Redirect(url);//Redirect函数会抛出ThreadAbortException异常，不用处理这个异常
                 }
                 catch(System.Threading.ThreadAbortException ex)
                 {
@@ -127,7 +129,9 @@ namespace SmartStore.Web.Infrastructure
 
                 //获取用户openid
                 openid = (string)jd["openid"];
-
+                var logger = EngineContext.Current.Resolve<ILogger>();
+                logger.Warn(openid);
+                logger.Warn(access_token);
                 Log.Debug(this.GetType().ToString(), "Get openid : " + openid);
                 Log.Debug(this.GetType().ToString(), "Get access_token : " + access_token);
             }

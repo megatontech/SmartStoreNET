@@ -23,10 +23,10 @@ namespace SmartStore.Web.Infrastructure
             return "1600594495";
         }
         public string GetKey(){
-            return "";
+            return "395961fb512110ca555e2fd07ece8ce0";
         }
         public string GetAppSecret(){
-            return "";
+            return "395961fb512110ca555e2fd07ece8ce0";
         }
 
 
@@ -50,7 +50,7 @@ namespace SmartStore.Web.Infrastructure
         /* 支付结果通知回调url，用于商户接收支付结果
         */
         public string GetNotifyUrl(){
-            return "";
+            return "http://www.michat520.cn/Checkout/Completed";
         }
 
         //=======【商户系统后台机器IP】===================================== 

@@ -12,6 +12,7 @@ using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Payments;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Core.Html;
+using SmartStore.Core.Infrastructure;
 using SmartStore.Core.Logging;
 using SmartStore.Services.Catalog;
 using SmartStore.Services.Common;
@@ -833,7 +834,7 @@ namespace SmartStore.Web.Controllers
 
             return View(model);
         }
-        public JsonResult InitPay(string total_fee,string productname) 
+        public JsonResult InitPay(string total_fee,string productname,string code) 
         {
             //string openid = Request.QueryString["openid"];
             //string total_fee = Request.QueryString["total_fee"];
@@ -848,7 +849,13 @@ namespace SmartStore.Web.Controllers
             //https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
             //若传递了相关参数，则调统一下单接口，获得后续相关接口的入口参数
             JsApiPay jsApiPay = new JsApiPay(Request);
-            jsApiPay.openid = "wx8953723b60205284";
+            jsApiPay.GetOpenidAndAccessTokenFromCode(code);
+            Infrastructure.Log.Debug("code", code);
+            var logger = EngineContext.Current.Resolve<ILogger>();
+            logger.Info(code);
+            logger.Info(jsApiPay.openid);
+            Infrastructure.Log.Debug(this.GetType().ToString(), "jsApiPay : " + jsApiPay.openid);
+            //jsApiPay.openid = "";
             jsApiPay.total_fee = int.Parse(total_fee);
 
             //JSAPI支付预处理
@@ -866,10 +873,11 @@ namespace SmartStore.Web.Controllers
             }
             catch (Exception ex)
             {
+                logger.ErrorsAll(ex);
                 Infrastructure.Log.Error(this.GetType().ToString(), "wxJsApiParam : " + ex.StackTrace);
                 // Response.Write("<span style='color:#FF0000;font-size:20px'>" + "下单失败，请返回重试" + "</span>");
                 // submit.Visible = false;
-                return Json("", JsonRequestBehavior.AllowGet);
+                return Json(ex.StackTrace+ex.Message, JsonRequestBehavior.AllowGet);
             }
         }
         [HttpPost, ActionName("Confirm")]
