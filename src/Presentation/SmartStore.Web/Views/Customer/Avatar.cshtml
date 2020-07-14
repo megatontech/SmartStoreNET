@@ -2,11 +2,11 @@
 @using SmartStore.Web.Framework.UI;
 @model CustomerAvatarEditModel
 @{
-	Layout = "_dMyAccount";
+	Layout = "_LayoutSimple";
 	ViewBag.PageClassToken = "avatar";
 	ViewBag.PageTitle = T("Account.Avatar").Text;
 
-	Html.AddTitleParts(T("PageTitle.Account").Text);
+	Html.AddTitleParts(T("Account.Avatar").Text);
 }
 
 @if (!ViewData.ModelState.IsValid)

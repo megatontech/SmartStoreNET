@@ -6,7 +6,7 @@
 @{
 	Html.AddTitleParts(T("PageTitle.Account").Text);
 
-	Layout = "_dMyAccount";
+	Layout = "_LayoutSimple";
 	ViewBag.PageClassToken = "addresses";
 	ViewBag.PageTitle = T("Account.CustomerAddresses").Text;
 }
@@ -16,12 +16,7 @@
 	<div class="alert alert-warning">@T("Account.CustomerAddresses.NoAddresses")</div>
 }
 
-<div class="add-address">
-	<a class="btn btn-primary btn-lg add-address-button mb-4" href="@Url.Action("AddressAdd")" rel="nofollow">
-		<i class="fa fa-plus"></i>
-		<span>@T("Common.AddNew")</span>
-	</a>
-</div>
+
 
 @if (Model.Addresses.Count == 0)
 {
@@ -49,15 +44,13 @@
                     </div>
                     <div class="phone">
                         @*@Html.LabelFor(model => model.Addresses[i].Company, new { @class = "m-0" }):*@
-                        <label class = "m-0">省份</label>
+                        <label class="m-0">省份</label>
                         @address.Company
-                    </div>
-                    <div class="phone">
                         @Html.LabelFor(model => model.Addresses[i].City, new { @class = "m-0" }):
                         @address.City
                     </div>
                     <div class="phone">
-                        @Html.LabelFor(model => model.Addresses[i].Address1, new { @class = "m-0" }):
+                        <label class="m-0" for="Addresses_1__Address1">详细地址</label>
                         @address.Address1
                     </div>
                     @*@if (address.FaxEnabled && address.FaxNumber.HasValue())
@@ -69,19 +62,28 @@
         }*@
                 </div>
 
-				<div>
+				@*<div>
 					@Html.Raw(address.FormattedAddress)
-				</div>
+				</div>*@
             </div>
                 
 			<div class="card-footer d-flex p-0">
-                <a class="btn btn-secondary btn-lg btn-flat rounded-0 edit-address-button" href="@Url.Action("AddressEdit", new { id = address.Id })">
+                @*<a class="btn btn-secondary btn-lg btn-flat rounded-0 edit-address-button" href="@Url.Action("AddressEdit", new { id = address.Id })">
 					<span>@T("Common.Edit")</span>
-				</a>
+				</a>*@
                 <a class="btn btn-danger btn-lg btn-flat rounded-0 delete-address-button" href="@Url.Action("AddressDelete", new { id = address.Id })" onclick='return confirm(@T("Common.AreYouSure").JsText);'>
 					<span>@T("Common.Delete")</span>
 				</a>
             </div>
         </div>
     }
+</div>
+<div class="add-address">
+    <a class="btn btn-primary btn-lg add-address-button mb-4" href="@Url.Action("AddressAdd")" rel="nofollow" style="
+    width: 100%;
+    background-color: #fd803d;
+">
+        <i class="fa fa-plus"></i>
+        <span>@T("Common.AddNew")</span>
+    </a>
 </div>

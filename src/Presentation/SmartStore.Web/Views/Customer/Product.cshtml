@@ -129,9 +129,12 @@
 		</div>
 
 		<!-- Bottom Content: Full Description, Specification, Review etc. -->
-		<section class="pd-section pd-section-bottom">
-			@{
+        <section class="pd-section pd-section-bottom">
+            @{
                 <!-- Tabs -->
+                <div itemprop='description' class='text-body html-editor-content'>
+                    @Html.Raw(Model.FullDescription);
+                </div>
                 //Html.RenderPartial("Product.Tabs", Model);
                 Html.RenderWidget("productdetail_tabs_after");
 
@@ -143,7 +146,7 @@
                 //Html.RenderAction("ProductsAlsoPurchased", new { productId = Model.Id });
                 Html.RenderWidget("productdetail_also_purchased_after");
             }
-		</section>
+        </section>
 	</article>
 
 	@{ Html.RenderWidget("productdetails_bottom"); }

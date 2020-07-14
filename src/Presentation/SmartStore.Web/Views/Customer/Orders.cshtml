@@ -1,11 +1,11 @@
 ﻿@using SmartStore.Web.Models.Customer;
 @model CustomerOrderListModel
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("商城订单").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "orders";
-    ViewBag.PageTitle = T("Account.CustomerOrders").Text;
+    ViewBag.PageTitle = T("商城订单").Text;
 }
 
 @if (Model.RecurringOrders.Count > 0)
@@ -111,17 +111,37 @@
     @foreach (var order in Model.Orders)
     {
         <div class="card shadow-sm order-item">
-			<div class="card-body">
-				<h4 class="card-title mb-4">@T("Order.Order#"): @order.OrderNumber</h4>
-				<dl class="row mb-0">
-					<dt class="col-sm-3 font-weight-400 text-muted">@T("Order.OrderStatus")</dt>
-					<dd class="col-sm-9">@order.OrderStatus</dd>
-					<dt class="col-sm-3 font-weight-400 text-muted">@T("Order.OrderDate")</dt>
-					<dd class="col-sm-9">@order.CreatedOn.ToNativeString()</dd>
-					<dt class="col-sm-3 font-weight-400 text-muted">@T("Order.OrderTotal")</dt>
-					<dd class="col-sm-9 price">@order.OrderTotal</dd>
-				</dl>
-			</div>
+            <div class="card-body">
+                <div style="        display: inline-block;
+        border-bottom: 1px;
+        border-block-end-color: inherit;
+        border-bottom-style: groove;
+        display: flow-root;
+">
+                    <div>
+                        <h4 style="margin-bottom:0px;" class="card-title mb-4222">@T("Order.Order#"): @order.OrderNumber</h4>
+                    </div>
+                    <div style="    float: right;
+        width: 20%;
+        border-radius: 0em 0.5em 0em 1.2em;
+        text-align: center;
+        background-color: #ff7c43;
+        /* right: 10px; */
+        margin-left: 80px;
+    ">
+                        <b>@order.OrderStatus</b>
+                    </div>
+                </div>
+                <!--<h4 class="card-title mb-4">-->@*@T("Order.Order#"): @order.OrderNumber*@<!--</h4>-->
+                <dl class="row mb-0">
+                    @*<dt class="col-sm-3 font-weight-400 text-muted">@T("Order.OrderStatus")</dt>
+                    <dd class="col-sm-9">@order.OrderStatus</dd>*@
+                    <dt class="col-sm-3 font-weight-400 text-muted" style="width:40%">@T("Order.OrderDate")</dt>
+                    <dd class="col-sm-9" style="width:60%">@order.CreatedOn.ToNativeString()</dd>
+                    <dt class="col-sm-3 font-weight-400 text-muted" style="width:40%">@T("Order.OrderTotal")</dt>
+                    <dd class="col-sm-9 price" style="width:60%">@order.OrderTotal</dd>
+                </dl>
+            </div>
 
 			<div class="card-footer d-flex p-0">
 				<a class="btn btn-secondary btn-flat rounded-0" href="@Url.Action("Details", "Order", new { id = order.Id })" rel="nofollow">

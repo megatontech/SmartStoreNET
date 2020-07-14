@@ -2,17 +2,17 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("代客报单").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "rewardpoints";
-    ViewBag.PageTitle = T("").Text;
+    ViewBag.PageTitle = T("代客报单").Text;
 }
 
     <div class="col-md-8 col-lg-9">
-        <div class="page-title pt-4 pt-md-0">
+        @*<div class="page-title pt-4 pt-md-0">
             <h1 class="h3">代客报单</h1>
-        </div>
+        </div>*@
         @{Html.RenderAction("ProxyDHomepageProducts", "Catalog");
             Html.RenderWidget("home_page_after_products");
         }

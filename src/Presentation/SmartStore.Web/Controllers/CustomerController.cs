@@ -1378,7 +1378,7 @@ namespace SmartStore.Web.Controllers
             var customer = _workContext.CurrentCustomer;
 
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 var address = model.Address.ToEntity();
                 address.CreatedOnUtc = DateTime.Now;
@@ -1419,7 +1419,7 @@ namespace SmartStore.Web.Controllers
             var model = new CustomerAddressEditModel();
             model.Address.PrepareModel(address, false, _addressSettings, _localizationService,  _stateProvinceService, () => _countryService.GetAllCountries());
 
-            return View(model);
+            return RedirectToAction("NewInfo");
         }
 
         [HttpPost]
@@ -1435,7 +1435,7 @@ namespace SmartStore.Web.Controllers
                 //address is not found
 				return RedirectToAction("Addresses");
 
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
             {
                 address = model.Address.ToEntity(address);
                 _addressService.UpdateAddress(address);
@@ -1444,7 +1444,7 @@ namespace SmartStore.Web.Controllers
 
             // If we got this far, something failed, redisplay form
             model.Address.PrepareModel(address, true, _addressSettings, _localizationService, _stateProvinceService, () => _countryService.GetAllCountries());
-            return View(model);
+            return RedirectToAction("NewInfo"); 
         }
 
         #endregion

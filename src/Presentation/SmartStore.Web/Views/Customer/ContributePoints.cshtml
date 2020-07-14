@@ -3,9 +3,9 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("贡献值数量").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "rewardpoints";
     ViewBag.PageTitle = T("贡献值数量").Text;
     var nonFreeze = Model.Total + Model.Freeze;
@@ -102,8 +102,9 @@
         <div class="alert alert-info">
             您的可提现额度为： @Model.Total.ToString("F2") 。<a href="@Url.Action("WithDrawApply", "Customer", new { })" rel="nofollow"><strong>提现</strong></a>
         </div>*@
-        <div class="alert alert-info">
-            贡献值个数： @Model.TotalPoints。
+        <div class="card" style=" display: inline-block; width: 100%;padding:20px; ">
+            <img src="/Content/Images/icons/design16.png" style="margin-right: 0px; display: inline-block; " alt="">
+            <p style="margin-right: 0px; display: inline-block; " >贡献值个数</p><p style="margin-right: 0px;width:60%; text-align:center;display: inline-block; " ><b> @Model.TotalPoints</b></p> 
         </div>
         @*<div class="alert alert-info">
             直推 @Model.Push.ToString("F2")。

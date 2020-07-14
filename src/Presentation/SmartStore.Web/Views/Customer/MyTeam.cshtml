@@ -2,14 +2,14 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("我的团队").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "rewardpoints";
-    ViewBag.PageTitle = T("").Text;
+    ViewBag.PageTitle = T("我的团队").Text;
 }
 
-<style>
+@*<style>
     /* Custom chart styling */
     .jOrgChart {
         margin: 10px;
@@ -72,25 +72,34 @@
             prettyPrint();
         });
     });
-</script>
+</script>*@
 <div class="col-md-8 col-lg-9">
-    <div class="page-title pt-4 pt-md-0">
-        <h1 class="h3">我的团队</h1>
-    </div>
+    @*<div class="page-title pt-4 pt-md-0">
+            <h1 class="h3"></h1>
+        </div>*@
 
-    <ul id="org" style="display:block">
+    @*<ul id="org" style="display:block">
         <li>
             @Model.Self.Username 团队人数： @Model.Total
             <ul>
                 @foreach (var customer in Model.Team)
                 {
+                    <div class="card" style=" display: inline-block; width: 100%;padding:20px; ">
+                        <img src="/Content/Images/icons/design9.png" style="margin-right: 0px; display: inline-block; " alt="">
+                        <p style="margin-right: 0px; display: inline-block; ">购物积分</p><p style="margin-right: 0px;width:60%; text-align:center;display: inline-block; "><b> @Model.RewardPointsBalance</b></p>
+                    </div>
                     <li id="@customer.Id">@customer.Username - @customer.Mobile</li>
                 }
             </ul>
         </li>
-    </ul>
-
-    <div id="chart" class="orgChart"></div>
+    </ul>*@
+    @foreach (var customer in Model.Team)
+    {
+        <div class="card" style=" display: inline-block; width: 100%;padding:20px; ">
+            <p style="margin-right: 0px; display: inline-block; ">@customer.Username</p><p style="margin-right: 0px;width:60%; text-align:center;display: inline-block; "><b> @customer.Mobile</b></p>
+        </div>
+    }
+    @*<div id="chart" class="orgChart"></div>*@
 
 </div>
 

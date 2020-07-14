@@ -2,11 +2,11 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("推广海报").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "rewardpoints";
-    ViewBag.PageTitle = T("").Text;
+    ViewBag.PageTitle = T("推广海报").Text;
 }
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 <style>
@@ -47,7 +47,7 @@
         $("#qrcode").qrcode({
             width: 100, //宽度
             height: 100, //高度
-            text: localhostPaht +"/register?parentmobile="+ @Model.Self.Mobile, //任意内容
+            text: localhostPaht +"/register?parentmobile=@Model.Self.Mobile" , //任意内容
         });
         //画海报
         var width = document.getElementById("canbox").offsetWidth; //宽度
@@ -65,7 +65,7 @@
         var mycans = $('canvas')[0];//二维码所在的canvas
         var codeimg = convertCanvasToImage(mycans)
         var xw = width - 130
-        var xh = height - 160
+        var xh = height - 250
         //首先画上背景图
         var img = new Image();
         img.src = "../../Content/Images/10856.jpg";
@@ -76,7 +76,7 @@
             ctx.width = width;
             ctx.height = height;
             ctx.drawImage(img, 0, 0, width, height); //绘制图像进行拉伸
-            ctx.fillText('@Model.Self.Username', 170, x_bot);
+           // ctx.fillText('@Model.Self.Username', 170, x_bot);
             ctx.drawImage(codeimg, xw, xh, 100, 100);
             //绘制完成,转为图片
             setTimeout(function () { //在ios上无法在画完之后取到整个画布内容，加了个settimeout
@@ -111,16 +111,16 @@
         left: 0;*/
     }
 </style>
-<div class="col-md-8 col-lg-9">
-    <div class="page-title pt-4 pt-md-0">
+<div class="col-md-8 col-lg-9" style="width:100%;">
+    @*<div class="page-title pt-4 pt-md-0">
         <h1 class="h3">推广海报</h1>
-    </div>
+    </div>*@
     <div id="qrcode" style="display: none;">
     </div>
-    <div id="canbox" style="display: block;"  width="315" height="400">
-        <canvas id="myCanvas" width="315" height="400"></canvas>
+    <div id="canbox" style="display: block;width:100%;height:600px;"  >
+        <canvas id="myCanvas"  style="display: block;width:100%;height:600px;" ></canvas>
     </div>
-    <img class="canimg"  style="display: block;" width="315" height="400" src="" />
+    <img class="canimg"  style="display: block;width:100%;height:100%;" src="" />
 
 </div>
 

@@ -3,11 +3,11 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("签到").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "changepassword";
-    ViewBag.PageTitle = T("Account.ChangePassword").Text;
+    ViewBag.PageTitle = T("签到").Text;
 }
 
 @using (Html.BeginForm("CheckInModel", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))

@@ -153,7 +153,11 @@
 		<section class="pd-section pd-section-bottom">
 			@{
                 <!-- Tabs -->
-                Html.RenderPartial("Product.Tabs", Model);
+                //Html.Raw("<div " + " itemprop='description' class='text-body html-editor-content'>" + Html.CollapsedText() + "</div>");
+            <div itemprop='description' class='text-body html-editor-content'>
+                @Html.Raw(Model.FullDescription);
+            </div>
+                //Html.RenderPartial("Product.Tabs", Model);
                 Html.RenderWidget("productdetail_tabs_after");
 
                 <!-- Tags -->
@@ -167,8 +171,8 @@
                 <!-- Products also purchased -->
                 Html.RenderAction("ProductsAlsoPurchased", new { productId = Model.Id });
                 Html.RenderWidget("productdetail_also_purchased_after");
-            }
-		</section>
+                }
+</section>
 	</article>
 
 	@{ Html.RenderWidget("productdetails_bottom"); }

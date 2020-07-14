@@ -3,11 +3,11 @@
 @using SmartStore.Web.Models.Customer;
 
 @{
-    Html.AddTitleParts(T("PageTitle.Account").Text);
+    Html.AddTitleParts(T("我的资料").Text);
 
-    Layout = "_dMyAccount";
+    Layout = "_LayoutSimple";
     ViewBag.PageClassToken = "info";
-    ViewBag.PageTitle = T("Account.CustomerInfo").Text;
+    ViewBag.PageTitle = T("我的资料").Text;
 }
 
 @using (Html.BeginForm("Info", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
@@ -28,7 +28,7 @@
     }
 
     <fieldset class="content-group">
-        <legend><span>@T("Account.YourPersonalDetails")</span></legend>
+        @*<legend><span>@T("Account.YourPersonalDetails")</span></legend>*@
 
 
         @*@Html.ControlGroupFor(model => model.Username, required: true, breakpoint: "lg")*@
@@ -93,7 +93,10 @@
 
     <div class="form-group row">
         <div class="col">
-            <button type="submit" name="save-info-button" class="btn btn-primary btn-lg save-customer-info-button">
+            <button type="submit" name="save-info-button" style="
+    width: 100%;
+    background-color: #fd803d;
+" class="btn btn-primary btn-lg save-customer-info-button">
                 <i class="fa fa-check"></i>
                 <span>@T("Common.Save")</span>
             </button>
