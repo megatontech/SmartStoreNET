@@ -1,7 +1,7 @@
 ﻿@model RegisterModel
 @using SmartStore.Web.Models.Customer;
 @{
-    Layout = "_Layout";
+    Layout = "_LayoutFlat";
     Html.AddTitleParts(T("PageTitle.Register").Text);
 }
 <script>
@@ -29,22 +29,28 @@
 {
     @Html.AntiForgeryToken()
 
-    <div class="page registration-page">
-        <div class="page-title">
-            <h1 class="h3">@T("Account.Register")</h1>
-        </div>
+<div class="page registration-page">
+    
+    <div class="page-body row" style="margin-top: 30px;">
 
-        <div class="page-body row">
-
-            <div class="col-12 col-lg-9 col-xl-8">
+        <div class="col-12 col-lg-9 col-xl-8">
+            <div class="card shadow-sm p-4 mb-5 mb-md-0 login-box" >
+                <div class="h4 mb-0" style="text-align:center;">
+                    <h1>@T("注册")</h1>
+                </div>
                 @if (!ViewData.ModelState.IsValid)
                 {
                     @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
                 }
                 @{ Html.RenderPartial("_ExternalAuthentication.AssociateMessage"); }
 
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    @Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text, new { @class = "alert alert-danger" })
+                }
+
                 <fieldset class="content-group">
-                    <legend><span>@T("Account.YourPersonalDetails")</span></legend>
+                    <!--<legend><span>-->@*@T("Account.YourPersonalDetails")*@<!--</span></legend>-->
                     @if (this.EnableHoneypotProtection)
                     {
                         <div class="d-none">
@@ -56,7 +62,8 @@
                     @Html.ControlGroupFor(model => model.MobileCode, editorType: InputEditorType.TextBox, required: true, breakpoint: "md")
                     <div class="form-group row">
                         <div class="col">
-                            <button type="button" onclick="showtime(120)" class="btn btn-primary btn-lg" id="sendcode" name="sendcode-button">
+                            <button type="button" onclick="showtime(120)" class="btn btn-primary btn-lg" style="border-radius: 1em;
+        background-color: #ffcf1f;" id="sendcode" name="sendcode-button">
                                 @T("获取验证码")
                             </button>
                         </div>
@@ -65,7 +72,7 @@
                     @{ Html.RenderWidget("gdpr_consent"); }
                 </fieldset>
                 <fieldset class="content-group">
-                    <legend><span>@T("Account.YourPassword")</span></legend>
+                    @*<legend><span>@T("Account.YourPassword")</span></legend>*@
 
                     @Html.ControlGroupFor(model => model.Password, editorType: InputEditorType.Password, required: true, breakpoint: "md")
                     @Html.ControlGroupFor(model => model.ConfirmPassword, editorType: InputEditorType.Password, required: true, breakpoint: "md")
@@ -79,7 +86,6 @@
                         </div>
                     }
                 </fieldset>
-
                 <div class="form-group row">
                     <div class="col-12 text-muted">
                         @T("Common.FormFields.Required.Hint")
@@ -88,21 +94,31 @@
 
                 <div class="form-group row">
                     <div class="col">
-                        <button type="submit" id="register" onclick="checkPhone()" class="btn btn-primary btn-lg" name="register-button">
-                            @T("Account.Register.Button")
+                        <button type="submit" id="register" onclick="checkPhone()" class="btn btn-primary btn-lg" name="register-button" style="background-color: #e04343; width:100%; border-radius: 1em;
+">
+                            @T("确认")
                         </button>
                     </div>
                 </div>
-                <fieldset class="content-group" style="height:60px;">
-                    <legend><span></span></legend>
-                    <div class="form-group row">
-                        <div class="captcha-box col-md-9 offset-md-3">
-                        </div>
-                    </div>
-                </fieldset>
             </div>
         </div>
     </div>
+
+    <div class="row mt-4">
+        <div class="col-12 col-md-7 col-lg-6 col-xl-5 order-md-last">
+            
+        </div>
+        <div class="col-12 col-md-5 col-lg-6 col-xl-7 order-md-first">
+            <div class="page-info">
+                @{
+                    Html.RenderPartial("_ExternalAuthentication.AssociateMessage");
+                    Html.RenderAction("TopicBlock", "Topic", new { systemName = "LoginRegistrationInfo", bodyOnly = true, isLead = true });
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
 }
 <script>
     function showtime(t) {

@@ -2046,6 +2046,7 @@
     <Content Include="Views\Customer\MyPoster.cshtml" />
     <Content Include="Views\Customer\Discount.cshtml" />
     <Content Include="Views\Shared\Layouts\_LayoutSimple.cshtml" />
+    <Content Include="Views\Shared\Layouts\_LayoutFlat.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
