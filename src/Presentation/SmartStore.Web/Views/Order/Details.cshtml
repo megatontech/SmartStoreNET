@@ -21,7 +21,7 @@
                 </div>*@
                 <div class="">
                     <div class="row">
-                        <table class="cart-summary">
+                        <table class="cart-summary" style="margin:10px;">
                             <tr class="cart-summary-subtotal">
                                 <td class="cart-summary-label">@T("订单号"):</td>
                                 <td class="cart-summary-value">@Model.OrderNumber</td>
@@ -36,7 +36,7 @@
             
                 <div class="card card-body order-details-box"><div class="">
     <div class="row">
-        <table class="cart-summary">
+        <table class="cart-summary" style="margin:10px;">
             <tr class="cart-summary-subtotal">
                 <td class="cart-summary-label">@T("订单日期"):</td>
                 <td class="cart-summary-value">@Model.CreatedOn.ToShortDateString().ReplaceNativeDigits()</td>
@@ -52,7 +52,7 @@
                   <div class="card card-body order-details-box">
                       <div class="">
                           <div class="row">
-                              <table class="cart-summary">
+                              <table class="cart-summary"  style="margin:10px;">
                                   <tr class="cart-summary-subtotal">
                                       <td class="cart-summary-label">@T("订单状态"):</td>
                                       <td class="cart-summary-value" style="color:red;">@Model.OrderStatus</td>
