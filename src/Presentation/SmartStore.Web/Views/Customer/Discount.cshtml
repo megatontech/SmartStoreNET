@@ -58,13 +58,29 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex p-0">
-                            <span>@T("指定类别可用")</span>
-                            <span>@T("指定产品可用")</span>
-                            @item.discount.AppliedToCategories
-                            @item.discount.AppliedToProducts
-                            @item.discount.DiscountRequirements
+                            <div>
+                                      <b>@T("购买非报单产品可用")</b><br /> 
+                                      <b>@T("每个订单可用一张")</b><br /> 
+                                    @if (item.discount.AppliedToCategories != null && item.discount.AppliedToCategories.Count > 0)
+                                    {
+                                        foreach (var cata in @item.discount.AppliedToCategories)
+                                        {
+                            
+                                <b>@T("类别")@cata.Name@T("可用此券")</b>
+                                <br />
+                                }
+                                }
+                                @if (item.discount.AppliedToProducts != null && item.discount.AppliedToProducts.Count > 0)
+                                {
+                                    foreach (var pro in @item.discount.AppliedToProducts)
+                                    {
+                                        <b>@T("产品")@pro.Name@T("可用此券")</b>
+                                        <br />
 
-                        </div>
+                                    }
+                                }
+</div>
+                    </div>
                     </div>
                     }
                       
@@ -296,7 +312,7 @@ img {
 }
 .style-one .info-box:before,.style-one .info-box:after,.style-one .get-btn:before,.style-one .get-btn:after,.style-two .info-box:before,.style-two .info-box:after,.style-two .get-btn:before,.style-two .get-btn:after {
 	content:"";
-	width:1.4rem;
+/*	width:1.4rem;*/
 	height:2rem;
 	position:absolute;
 	z-index:9;
@@ -398,7 +414,7 @@ img {
 	background-color:#ed008c;
 }
 .style-two .get-btn span,.style-three .get-btn span,.style-six .get-btn span,.style-seven .get-btn span {
-	width:4rem;
+/*	width:4rem;*/
 	font-size:1.8rem;
 	word-break:break-all;
 }
