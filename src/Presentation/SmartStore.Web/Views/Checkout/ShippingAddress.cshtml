@@ -4,10 +4,11 @@
     Layout = "_Checkout";
     Html.AddTitleParts(T("PageTitle.Checkout").Text);
     Html.AddBodyCssClass("no-offcanvas-cart");
+    ViewBag.PageTitle = T("收货地址").Text;
 }
 
 @section orderProgress{
-    @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Address }); }
+    @{ Html.RenderAction("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Shipping }); }
 }
 
 <div class="page shipping-address-page">
@@ -28,7 +29,10 @@
                     {
                         <div class="card card-body address-list-item">
                             <div class="address-item">
-                                <button class="btn btn-warning btn-block select-shipping-address-button" onclick="setLocation('@Url.Action("SelectShippingAddress", new { addressId = item.Id })')">
+                                <button  style="        width: 100%;
+        background-color: #FF5002;
+        border-radius: 1em;
+"   class="btn btn-warning btn-block select-shipping-address-button" onclick="setLocation('@Url.Action("SelectShippingAddress", new { addressId = item.Id })')">
                                     <span>@T("Checkout.ShipToThisAddress")</span>
                                     <i class="fa fa-angle-right"></i>
                                 </button>
@@ -85,13 +89,16 @@
                     </div>
 
                     <div class="buttons">
-                        <a class="btn btn-secondary btn-lg" href="@Url.Action("BillingAddress")">
+                        @*<a class="btn btn-secondary btn-lg" href="@Url.Action("BillingAddress")">
                             <i class="fa fa-angle-left"></i>
                             <span>@T("Common.Back")</span>
-                        </a>
+                        </a>*@
                         <input type="submit" id="nextstep" name="nextstep" class="d-none" />
 
-                        <button class="btn btn-warning btn-lg new-address-next-step-button" onclick="$('#nextstep').trigger('click');return false;">
+                        <button  style="        width: 100%;
+        background-color: #FF5002;
+        border-radius: 1em;
+" class="btn btn-warning btn-lg new-address-next-step-button" onclick="$('#nextstep').trigger('click');return false;">
                             <span>@T("Checkout.NextButton")</span>
                             <i class="fa fa-angle-right"></i>
                         </button>

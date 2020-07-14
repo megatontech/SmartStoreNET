@@ -214,9 +214,15 @@
        
         
         $(function () {
-            first("selectp", "selectc", 0, 0); $("#Address_Company").hide(); $("#Address_City").hide();
+            first("selectp", "selectc", 0, 0);
+            $("#Address_Company").hide();
+            $("#Address_City").hide();
             $("#selectp").change(function () { $("#Address_Company").val($("#selectp").find("option:selected").text()); });
             $("#selectc").change(function () { $("#Address_City").val($("#selectc").find("option:selected").text()); });
+            $("#NewAddress_Company").hide();
+            $("#NewAddress_City").hide();
+            $("#selectp").change(function () { $("#NewAddress_Company").val($("#selectp").find("option:selected").text()); });
+            $("#selectc").change(function () { $("#NewAddress_City").val($("#selectc").find("option:selected").text()); });
         });
     </script>
 
@@ -298,7 +304,7 @@
         <label class="col-lg-3 col-form-label" for="Address_StateProvinceId">省份</label>
         @*@Html.LabelFor(model => model.StateProvinceId, new { @class = "col-{0}-3 col-form-label{1}".FormatInvariant(breakpoint, Model.StateProvinceRequired ? " required" : "") })*@
         <div class="col-lg-9">
-              <select name="selectp" id="selectp"  onchange="selectcityarea('selectp','selectc');">
+              <select name="selectp" id="selectp" class="form-control"  onchange="selectcityarea('selectp','selectc');">
                         <option value="0" selected="">选择省份</option>
                     </select>
 
@@ -311,7 +317,7 @@
         <label class="col-lg-3 col-form-label" for="Address_StateProvinceId">城市</label>
         @*@Html.LabelFor(model => model.City, new { @class = "col-{0}-3 col-form-label".FormatInvariant(breakpoint) + (Model.CityRequired ? " required" : "") })*@
     <div class="col-lg-9">
-        <select id="selectc"  name="selectc">
+        <select id="selectc"  class="form-control"  name="selectc">
             <option value="0" selected="">选择城市</option>
 
         </select>

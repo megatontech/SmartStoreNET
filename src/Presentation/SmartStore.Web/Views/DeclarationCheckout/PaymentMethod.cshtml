@@ -92,15 +92,18 @@
             if (Model.PaymentMethods.Count > 0)
             {
     <div class="buttons">
-        <a class="btn btn-secondary btn-lg" href="@Url.Action("Confirm")">
+        @*<a class="btn btn-secondary btn-lg" href="@Url.Action("Confirm")">
             <i class="fa fa-angle-left"></i>
             <span>@T("Common.Back")</span>
-        </a>
+        </a>*@
         <input type="hidden" id="CustomerComment" value="@Model.CustomerComment" />
         <input type="hidden" id="Mobile" value="@Model.Mobile" />
         <input type="submit" name="nextstep" id="nextstep" class="d-none" />
 
-        <button id="checkout" class="btn btn-warning btn-lg payment-method-next-step-button" onclick="$('#nextstep').trigger('click');return false;">
+        <button id="checkout"  style="        width: 100%;
+        background-color: #FF5002;
+        border-radius: 1em;
+"  class="btn btn-warning btn-lg payment-method-next-step-button" onclick="$('#nextstep').trigger('click');return false;">
             <span>@T("Checkout.NextButton")</span>
             <i class="fa fa-angle-right"></i>
         </button>

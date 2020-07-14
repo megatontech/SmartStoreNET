@@ -4,6 +4,7 @@
     Layout = "_Checkout";
     Html.AddTitleParts(T("PageTitle.Checkout").Text);
     Html.AddBodyCssClass("no-offcanvas-cart");
+    ViewBag.PageTitle = T("订单完成").Text;
 }
 
 @section orderProgress{
@@ -29,11 +30,13 @@
                 </p>
             </div>
             <p class="pt-3 mb-5">
-				<a href="@Url.Action("Details", "Order", new { id = Model.OrderId })" class="btn btn-warning" rel="nofollow">
+				<a href="@Url.Action("Details", "Order", new { id = Model.OrderId })" style="        width: 100%;
+        background-color: #FF5502;" class="btn btn-warning" rel="nofollow">
 					@*<i class="far fa-list-alt"></i>*@
 					<span>@T("Checkout.PlacedOrderDetails")</span>
 				</a>
-                <a href="@Url.RouteUrl("HomePage")" class="btn btn-secondary order-completed-continue-button">
+                <a href="@Url.RouteUrl("HomePage")" style="        width: 100%;
+        background-color: #FF5502;" class="btn btn-secondary order-completed-continue-button">
                     @*<i class="fa fa-home"></i>*@
                     <span>@T("Checkout.Continue")</span>
                 </a>
