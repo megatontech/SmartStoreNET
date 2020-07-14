@@ -915,6 +915,7 @@
     <Content Include="Content\Images\05.jpg" />
     <Content Include="Content\Images\06.jpg" />
     <Content Include="Content\Images\08.jpg" />
+    <Content Include="Content\Images\10856.jpg" />
     <Content Include="Content\Images\grip-h.png" />
     <Content Include="Content\Images\grip-ne.png" />
     <Content Include="Content\Images\grip-se.png" />
@@ -2043,6 +2044,7 @@
     <Content Include="Views\Customer\PointApply.cshtml" />
     <Content Include="Views\Customer\MyPoster.cshtml" />
     <Content Include="Views\Customer\Discount.cshtml" />
+    <Content Include="Views\Shared\Layouts\_LayoutSimple.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
