@@ -751,8 +751,8 @@ namespace SmartStore.Web.Controllers
 					return RedirectToAction("ShippingMethod");
 				}
 
-				return RedirectToAction("Confirm");
-                //return Redirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8953723b60205284&redirect_uri=http://www.michat520.cn/Checkout/Confirm&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect");
+				//return RedirectToAction("Confirm");
+                return Redirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8953723b60205284&redirect_uri=http://www.michat520.cn/Checkout/Confirm&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect");
             }
 
             checkoutState.IsPaymentSelectionSkipped = false;
