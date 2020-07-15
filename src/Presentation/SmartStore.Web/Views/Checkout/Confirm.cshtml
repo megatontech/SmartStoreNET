@@ -39,10 +39,13 @@
             </p>
 
             <input type="hidden" id="customercommenthidden" name="customercommenthidden" />
+            //实际订单总价
+            <input type="hidden" id="RealOrderTotalVal" name="RealOrderTotalVal" value="0" />
+            //实际支付
             <input type="hidden" id="OrderTotalVal" name="OrderTotalVal" value="0" />
             <input type="hidden" id="UsePointsTotalVal" name="UsePointsTotalVal" value="0" />
             <input type="hidden" id="UseDiscountVal" name="UseDiscountVal" value="0" />
-           
+
             <div id="confirm-warnings" class="confirm-order">
                 @if (Model.Warnings.Any())
                 {
@@ -81,26 +84,23 @@
 
             @if (!Model.MinOrderTotalWarning.HasValue())
             {
-            <div class="col-sm-6 col-lg-4 ml-lg-auto">
-                <button class="btn btn-danger btn-lg btn-block btn-buy hide" id="confirmbtn" style="display:none;" onclick="return false;">
-                    <span>@T("Checkout.ConfirmButton")</span>
-                    <i class="fa fa-angle-right ml-3"></i>
-                </button>
-                <button class="btn btn-danger btn-lg btn-block btn-pay" style="        width: 100%;
-        background-color: #FF5502;
-        border-radius: 1em;
-" id="pay" onclick="return false;">
-                    <span>@T("支付")</span>
-                    <i class="fa fa-angle-right ml-3"></i>
-                </button>
-                @*<button class="btn btn-danger btn-lg btn-block btn-pay" style="        width: 100%;
-        background-color: #FF5502;
-        border-radius: 1em;
-" id="paycode" onclick="return false;">
-                    <span>@T("微信支付")</span>
-                    <i class="fa fa-angle-right ml-3"></i>
-                </button>*@
-            </div>
+                <div class="col-sm-6 col-lg-4 ml-lg-auto">
+                    <button class="btn btn-danger btn-lg btn-block btn-buy hide" id="confirmbtn" style="display: none; width: 100%; background-color: #FF5502; border-radius: 1em; " onclick="return false;">
+                        <span>@T("Checkout.ConfirmButton")</span>
+                        <i class="fa fa-angle-right ml-3"></i>
+                    </button>
+                    <button class="btn btn-danger btn-lg btn-block btn-pay" style="width: 100%; background-color: #FF5502; border-radius: 1em; " id="pay" onclick="return false;">
+                        <span>@T("支付")</span>
+                        <i class="fa fa-angle-right ml-3"></i>
+                    </button>
+                    @*<button class="btn btn-danger btn-lg btn-block btn-pay" style="        width: 100%;
+                            background-color: #FF5502;
+                            border-radius: 1em;
+                    " id="paycode" onclick="return false;">
+                                        <span>@T("微信支付")</span>
+                                        <i class="fa fa-angle-right ml-3"></i>
+                                    </button>*@
+                </div>
             }
         </div>
 
@@ -256,7 +256,7 @@
 <script>
     var payjson = "";
     $("paycode").click(function () {
-        window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8953723b60205284&redirect_uri=http://www.michat520.cn/Checkout/Confirm&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
+        GetNewCode();
     });
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -266,7 +266,7 @@
     $(function () {
         var codetest = getQueryString("code");
         if (!codetest || codetest.length <= 0) {
-            window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8953723b60205284&redirect_uri=http://www.michat520.cn/Checkout/Confirm&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
+            GetNewCode();
         }
     }
     );
@@ -285,7 +285,7 @@
                 },
             error: function (xhr, ajaxOptions, thrownError) {
                 $("#pay").show();
-                    alert('Failed to add order note.')
+                GetNewCode();
 				},
 				complete: function () {
 					$('#addrecord-window').modal('hide');
@@ -300,7 +300,7 @@
             jsonObj,//josn串
             function (res) {
                 WeixinJSBridge.log(res.err_msg);
-                alert(res.err_code + res.err_desc + res.err_msg);
+                //alert(res.err_code + res.err_desc + res.err_msg);
                 if (res.err_msg == "get_brand_wcpay_request:ok") {
                     // 使用以上方式判断前端返回,微信团队郑重提示：
                     //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
@@ -308,12 +308,16 @@
                     $("#confirmbtn").click();
                 } else
                 {
+                    GetNewCode();
                     $("#pay").show();
                 }
             }
         );
     }
-
+    function GetNewCode()
+    {
+        //window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8953723b60205284&redirect_uri=http://www.michat520.cn/Checkout/Confirm&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
+    }
     //function callpay() {
     //    if (typeof WeixinJSBridge == "undefined") {
     //        if (document.addEventListener) {

@@ -100,17 +100,20 @@ namespace SmartStore.Web.Controllers
         private readonly ICAPTCHACodeService _captcha;
         private readonly IDiscountService _discountService;
         private readonly ICustomerDiscountService _ICustomerDiscountService;
-        //private readonly ICheckInService _checkinService;
+        private readonly ICheckInService _checkinService;
+        private readonly ILuckMoneyService _luckService;
+        private readonly IWalletService _walletService;
+        
         #endregion
 
         #region Ctor
 
         public CustomerController(
-            IAuthenticationService authenticationService, IDeclarationProductService productService, //ICheckInService checkinService,
+            IAuthenticationService authenticationService, IDeclarationProductService productService, ICheckInService checkinService,
             IDateTimeHelper dateTimeHelper, IDailyCustomerContributionDetailService iDailyCustomerContributionDetailService,
-            DateTimeSettings dateTimeSettings, TaxSettings taxSettings,
+            DateTimeSettings dateTimeSettings, TaxSettings taxSettings, ILuckMoneyService luckService,
             ILocalizationService localizationService, ICustomerPointsTotalService points,
-            ICAPTCHACodeService captcha,
+            ICAPTCHACodeService captcha, IWalletService walletService,
             IWorkContext workContext, IStoreContext storeContext, ICustomerPointsDetailService pointsDetail,
             IDiscountService discountService, ICustomerDiscountService ICustomerDiscountService,
             ICustomerService customerService, CatalogHelper helper,
@@ -139,9 +142,11 @@ namespace SmartStore.Web.Controllers
             IWithdrawalDetailService detailService, IWithdrawalTotalService totalService
             )
         {
+            _walletService = walletService;
+            _luckService = luckService;
             _ICustomerDiscountService = ICustomerDiscountService;
             _discountService = discountService;
-            //_checkinService = checkinService;
+            _checkinService = checkinService;
             _captcha = captcha;
             _pointsDetail = pointsDetail;
             _helper = helper;
@@ -1322,10 +1327,10 @@ namespace SmartStore.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult CheckinAdd(CheckInModel model)
+        public JsonResult CheckinAddPost()
         {
-            if (!IsCurrentUserRegistered())
-                return new HttpUnauthorizedResult();
+            //if (!IsCurrentUserRegistered())
+            //    return new HttpUnauthorizedResult();
 
             var customer = _workContext.CurrentCustomer;
 
@@ -1341,18 +1346,57 @@ namespace SmartStore.Web.Controllers
                 //    address.StateProvinceId = null;
                 //customer.Addresses.Add(address);
                 var modelor = new CheckIn();
-                modelor.Date = model.Date;
-                modelor.CustomerId = model.CustomerId;
-                //_checkinService.Insert(modelor);
-
-                return RedirectToAction("NewInfo");
+                modelor.CheckDate = DateTime.Now;
+                modelor.Customer = customer.Id;
+                _checkinService.Insert(modelor);
+                //return RedirectToAction("NewInfo");
+                return Json("OK");
             }
-
-
             // If we got this far, something failed, redisplay form
 
-            return View(model);
+            return Json("");
         }
+        [HttpPost]
+        public JsonResult CheckLuckMoneyPost()
+        {
+            ///查询可领取的红包，并返回id
+            if (!IsCurrentUserRegistered()) { return Json(""); }
+              var customer = _workContext.CurrentCustomer;
+            {
+                var luck = _luckService.GetLuckMoneyByCustomer(customer.Id);
+                if (luck != null) {
+                    luck.StartTimeStr = luck.StartTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    luck.EndTimeStr =luck.EndTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    return Json(luck); }
+                else { return Json(""); }
+                //var modelor = new CheckIn();
+                //modelor.CheckDate = DateTime.Now;
+                //modelor.Customer = customer.Id;
+                //_checkinService.Insert(modelor);
+                ////return RedirectToAction("NewInfo");
+                //return Json("OK");
+            }
+            // If we got this far, something failed, redisplay form
+            return Json("");
+        }
+        [HttpPost]
+        public JsonResult GetLuckMoneyPost(int id)
+        {
+            //传入id查询并标记为已领取，返回model
+            var customer = _workContext.CurrentCustomer;
+            if (ModelState.IsValid)
+            {
+                var luck = _luckService.GetLuckMoneyById(id);
+                _walletService.GetRewardFromWallet(luck,customer);
+                if (luck != null) { return Json(luck); }
+                else { return Json(""); }
+            }
+            // If we got this far, something failed, redisplay form
+
+            return Json("");
+        }
+
+
         #endregion
         [RewriteUrl(SslRequirement.Yes)]
         public ActionResult AddressAdd()

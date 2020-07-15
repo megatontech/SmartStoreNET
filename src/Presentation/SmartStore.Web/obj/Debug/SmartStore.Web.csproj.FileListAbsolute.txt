@@ -452,7 +452,6 @@ C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartSt
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\System.Web.WebPages.Razor.xml
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\HtmlSanitizer.xml
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\AngleSharp.xml
-C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\log4net.xml
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\NReco.PdfGenerator.xml
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\ImageProcessor.xml
 C:\Users\ZJ\Downloads\报单系统\源码\SmartStoreNET\src\Presentation\SmartStore.Web\bin\MaxMind.GeoIP2.xml

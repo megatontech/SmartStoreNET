@@ -10,7 +10,7 @@
     ViewBag.PageTitle = T("签到").Text;
 }
 
-@using (Html.BeginForm("CheckInModel", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
+@using (Html.BeginForm("CheckinAddPost", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
 {
     @Html.AntiForgeryToken()
 
@@ -57,7 +57,11 @@ if (!String.IsNullOrEmpty(Model.Result))
 else { 
     <div class="form-group row">
         <div class="col">
-            <button type="submit" class="btn btn-lg btn-primary">
+            <button type="submit" style="display:none;" class="btn btn-lg btn-primary">
+                <i class="fa fa-check"></i>
+                <span>@T("立刻签到")</span>
+            </button>
+            <button id="check" class="btn btn-lg btn-primary">
                 <i class="fa fa-check"></i>
                 <span>@T("立刻签到")</span>
             </button>
@@ -65,3 +69,23 @@ else {
     </div>
     }
 }
+<script>
+    $("#check").click(function () {
+        $.ajax({
+                cache:false,
+                type: "POST",
+            url: "@(Url.Action("CheckinAddPost", "Customer"))",
+            data: {},
+            success: function (data) {
+                if (data == "OK") { alert("签到成功！"); window.location.href = "/Customer/NewInfo"; }
+                },
+            error: function (xhr, ajaxOptions, thrownError) {
+                $("#pay").show();
+                   // alert('Failed to add order note.')
+				},
+				complete: function () {
+					$('#addrecord-window').modal('hide');
+				}
+            });
+    });
+</script>

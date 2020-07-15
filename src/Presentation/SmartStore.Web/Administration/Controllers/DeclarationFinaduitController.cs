@@ -1131,7 +1131,7 @@ namespace SmartStore.Admin.Controllers
                         _customerService.UpdateCustomer(customer);
                         _CalcRewardService.CalcRewardOne(customer, order);
                         //发优惠券
-                        if (string.IsNullOrEmpty(discountstr) || discountstr.Length>1)
+                        if (!string.IsNullOrEmpty(discountstr) || discountstr.Length>=1)
                         {
                             var strArr = discountstr.Split(',').ToList();
                             foreach (var item in strArr)

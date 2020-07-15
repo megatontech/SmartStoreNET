@@ -193,15 +193,7 @@
                         <div class="cart-body">
                             @foreach (var item in Model.Items)
                             {
-                                if (item.ProductType == ProductType.BundledProduct)
-                                {
                                     @SimpleProduct(item)
-                                    @BundleProducts(item)
-                                }
-                                else
-                                {
-                                    @SimpleProduct(item)
-                                }
                             }
                         </div>
                     </div>
@@ -229,13 +221,13 @@
                                             <td class="cart-summary-value">@Model.OrderSubTotalDiscount</td>
                                         </tr>
                                     }
-                                    @if (Model.IsShippable)
-                                    {
-                                        <tr class="cart-summary-shipping cart-summary-neg">
-                                            <td class="cart-summary-label">@T("Order.Shipping"):</td>
-                                            <td class="cart-summary-value">@Model.OrderShipping</td>
-                                        </tr>
-                                    }
+                                    @*@if (Model.IsShippable)
+        {
+            <tr class="cart-summary-shipping cart-summary-neg">
+                <td class="cart-summary-label">@T("Order.Shipping"):</td>
+                <td class="cart-summary-value">@Model.OrderShipping</td>
+            </tr>
+        }*@
                                     @if (Model.PaymentMethodAdditionalFee.HasValue())
                                     {
                                         <tr class="cart-summary-payfee cart-summary-neg">
@@ -243,7 +235,7 @@
                                             <td class="cart-summary-value">@Model.PaymentMethodAdditionalFee</td>
                                         </tr>
                                     }
-                                    @if (Model.DisplayTaxRates && Model.TaxRates.Count > 0)
+                                    @*@if (Model.DisplayTaxRates && Model.TaxRates.Count > 0)
                                     {
                                         foreach (var taxRate in Model.TaxRates)
                                         {
@@ -252,7 +244,7 @@
                                                 <td class="cart-summary-value">@taxRate.Value</td>
                                             </tr>
                                         }
-                                    }
+                                    }*@
                                     @if (Model.DisplayTax)
                                     {
                                         <tr class="cart-summary-tax">
@@ -263,7 +255,7 @@
                                     @if (Model.OrderTotalDiscount.HasValue())
                                     {
                                         <tr class="cart-summary-totaldiscount cart-summary-pos">
-                                            <td class="cart-summary-label">@T("Order.TotalDiscount"):</td>
+                                            <td class="cart-summary-label">@T("实际付款金额"):</td>
                                             <td class="cart-summary-value">@Model.OrderTotalDiscount</td>
                                         </tr>
                                     }
@@ -287,18 +279,19 @@
                                             <td class="cart-summary-value">@Model.RedeemedRewardPointsAmount</td>
                                         </tr>
                                     }
+                                   
                                     @if (Model.CreditBalance.HasValue())
                                     {
                                         <tr class="cart-summary-credit-balance cart-summary-pos">
-                                            <td class="cart-summary-label">@T("ShoppingCart.Totals.CreditBalance"):</td>
+                                            <td class="cart-summary-label">@T("优惠券抵扣金额"):</td>
                                             <td class="cart-summary-value" style="color:red;">@Model.CreditBalance</td>
                                         </tr>
                                     }
-                                    @if (Model.OrderTotalRounding.HasValue())
+                                    @if (Model.RefundedAmount.HasValue())
                                     {
                                         <tr class="cart-summary-totalrounding cart-summary-pos">
-                                            <td class="cart-summary-label">@T("ShoppingCart.Totals.Rounding"):</td>
-                                            <td class="cart-summary-value" style="color:red;">@Model.OrderTotalRounding</td>
+                                            <td class="cart-summary-label">@T("积分抵扣金额"):</td>
+                                            <td class="cart-summary-value" style="color:red;">¥-@Model.RefundedAmount</td>
                                         </tr>
                                     }
                                     <tr class="cart-summary-total">

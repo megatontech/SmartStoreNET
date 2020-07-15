@@ -29,7 +29,7 @@ namespace SmartStore.Services.Customers
         public CheckIn Get(int customerid)
         {
             var date = DateTime.Now.Date;
-            return _checkRepository.Table.Where(x=>x.CustomerId==customerid&&x.Date.Date== date).FirstOrDefault();
+            return _checkRepository.Table.Where(x => x.Customer == customerid && x.CheckDate.Date == date).FirstOrDefault();
         }
 
         #endregion Private Fields

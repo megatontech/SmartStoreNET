@@ -4,11 +4,13 @@
     //var path = CommonHelper.MapPath("~" + basePath, false);
 }
 @{
-//Html.AddScriptParts("~/bundles/smart-gallery");
+    //Html.AddScriptParts("~/bundles/smart-gallery");
 }
-<script src="~/Content/vendors/jquery/jquery.event.swipe.js"></script>
-
-<script src="~/Content/vendors/jquery/unslider.min.js"></script>
+@*<script src="~/Content/vendors/jquery/jquery.event.swipe.js"></script>*@
+<link href="~/Content/vendors/jquery/swiper.min.css" rel="stylesheet" />
+@*<script src="~/Content/vendors/jquery/swiper.min.js"></script>*@
+@*<script src="~/Content/vendors/jquery/unslider.min.js"></script>*@
+@*<link crossorigin="anonymous" integrity="sha384-9iGP7ka8jww+zVWo+4U2FzcguZFiSBZAAOBGvqRUWh+dJSuSjpnc5RS83z8DJhU1" href="https://lib.baomitu.com/Swiper/5.4.5/css/swiper.min.css" rel="stylesheet">*@
 
 <div class="page home-page">
     <div class="page-body">
@@ -17,133 +19,122 @@
 
             Html.RenderAction("TopicBlock", "Topic", new { systemName = "HomePageText", isLead = true });
             Html.RenderWidget("home_page_after_intro");
+            <script crossorigin="anonymous" integrity="sha384-mfqHQKKCvtACT9e259uqxs4vvAzCvhvAC0MUXo8Y4Q4zczGXVt1Mum6Oz2BKFczm" src="https://lib.baomitu.com/Swiper/5.4.5/js/swiper.min.js"></script>
 
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="~/Media/Content/Images/01.jpg" alt="" width="355" height="200"></div>
+                    <div class="swiper-slide"><img src="~/Media/Content/Images/02.jpg" alt="" width="355" height="200"></div>
+                    <div class="swiper-slide"><img src="~/Media/Content/Images/03.jpg" alt="" width="355" height="200"></div>
+                    <div class="swiper-slide"><img src="~/Media/Content/Images/04.jpg" alt="" width="355" height="200"></div>
+                    <div class="swiper-slide"><img src="~/Media/Content/Images/05.jpg" alt="" width="355" height="200"></div>
+                </div>
 
-
-        
-
-            <div class="ban has-dots" id="b03" style="overflow: hidden; width: 100%; height: 150px;">
-                <ul style="width: 500%; position: relative; left: -7.25526%; height: 150px; overflow: hidden;">
-                    <li style="width: 20%; border-radius: 1em; "><img src="~/Media/Content/Images/01.jpg" alt="" width="300" height="150"></li>
-                    <li style="width: 20%; border-radius: 1em; "><img src="~/Media/Content/Images/02.jpg" alt="" width="300" height="150"></li>
-                    <li style="width: 20%; border-radius: 1em; "><img src="~/Media/Content/Images/03.jpg" alt="" width="300" height="150"></li>
-                    <li style="width: 20%; border-radius: 1em; "><img src="~/Media/Content/Images/04.jpg" alt="" width="300" height="150"></li>
-                    <li style="width: 20%; border-radius: 1em; "><img src="~/Media/Content/Images/05.jpg" alt="" width="300" height="150"></li>
-                </ul>
-                @*<ol class="dots"><li class="dot active">1</li><li class="dot">2</li><li class="dot">3</li><li class="dot">4</li><li class="dot">5</li></ol>*@
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
             </div>
             <style>
-                .ban {
-                    position: relative;
-                    overflow: auto;
+
+                .swiper-container {
+                    width: 105%;
+                    height: 100%;
+                    margin-left: -10px;
                 }
 
-                    .ban li {
-                        list-style: none;
-                    }
-
-                    .ban ul li {
-                        float: left;
-                    }
-                #b03 .dots {
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    bottom: 20px;
+                .swiper-slide {
+                    text-align: center;
+                    font-size: 18px;
+                    /* Center slide text vertically */
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: -webkit-flex;
+                    display: flex;
+                    -webkit-box-pack: center;
+                    -ms-flex-pack: center;
+                    -webkit-justify-content: center;
+                    justify-content: center;
+                    -webkit-box-align: center;
+                    -ms-flex-align: center;
+                    -webkit-align-items: center;
+                    align-items: center;
                 }
-
-                    #b03 .dots li {
-                        display: inline-block;
-                        width: 10px;
-                        height: 10px;
-                        margin: 0 4px;
-                        text-indent: -999em;
-                        border: 2px solid #fff;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        opacity: .4;
-                        -webkit-transition: background .5s, opacity .5s;
-                        -moz-transition: background .5s, opacity .5s;
-                        transition: background .5s, opacity .5s;
-                    }
-
-                        #b03 .dots li.active {
-                            background: #fff;
-                            opacity: 1;
-                        }
-
-
-                /*#b03 {
-                    width: 640px;
-                }
-
-                    #b03 .dots {
-                        position: absolute;
-                        left: 0;
-                        right: 0;
-                        bottom: 20px;
-                    }
-
-                        #b03 .dots li {
-                            display: inline-block;
-                            width: 10px;
-                            height: 10px;
-                            margin: 0 4px;
-                            text-indent: -999em;
-                            border: 2px solid #fff;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            opacity: .4;
-                            -webkit-transition: background .5s, opacity .5s;
-                            -moz-transition: background .5s, opacity .5s;
-                            transition: background .5s, opacity .5s;
-                        }
-
-                            #b03 .dots li.active {
-                                background: #fff;
-                                opacity: 1;
-                            }*/
             </style>
             <script>
                 $(function () {
-                    $('.ban').unslider({
-                        speed: 500,               //  The speed to animate each slide (in milliseconds)
-                        delay: 3000,              //  The delay between slide animations (in milliseconds)
-                        complete: function () { },  //  A function that gets called after every slide animation
-                        keys: true,               //  Enable keyboard (left, right) arrow shortcuts
-                        dots: true,               //  Display dot navigation
-                        fluid: true              //  Support responsive design. May break non-responsive designs
+                    var swiper = new Swiper('.swiper-container', {
+                        pagination: {
+                            el: '.swiper-pagination',
+                        },
+                        //pagination: '.swiper-pagination',
+                        autoplay: {
+                            delay: 3500,
+                        },
+                        paginationClickable: true
                     });
                 });
-
             </script>
-            Html.RenderAction("HomepageCategories", "Catalog");
-            Html.RenderWidget("home_page_after_categories");
 
-            Html.RenderAction("DHomepageProducts", "Catalog");
-            Html.RenderWidget("home_page_after_products");
+            <link href="~/Content/vendors/jquery/component.css" rel="stylesheet" />
+            <script src="~/Content/vendors/jquery/classie.js"></script>
+            <div class="md-modal md-effect-13" id="modal-13">
+                <div class="md-content" style="">
+                    @*<h3>收到红包！</h3>*@@*<b class="md-close">x</b>*@
+                    <div>
+                        @*<p>娇典商城红包，2小时内领取有效</p>*@
+                        <div id="open"  >
+                            <img src='@Url.Content("~/Content/Images/icons/hongbao.png")' style="margin-right: 0px; width: 100%; margin-top: -100px; z-index: -99;" alt="" />
+                        </div>
+                        <div id="GetLuckMoney" style="display:none;" class="md-close">
+                            <p style="display: block;font-size: x-large;z-index: 99;position: relative;text-align:center"></p>
+                            <p style="display: block;font-size: x-large;z-index: 99;position: relative;text-align:center;top:20px;"><b id="luckAmount"></b>元</p>
+
+                            <img src='@Url.Content("~/Content/Images/icons/hongbao2.png")' style="margin-right: 0px; width: 100%; margin-top: -100px; z-index: -99;" alt="" />
+
+                            @*<p style="display: block;font-size:xx-small;z-index: 99;position: relative;text-align:center;top:-100px;">
+                                活动时间
+                                <b id="luckComment"></b>
+                                <br /><b id="luckStartTime"></b><br/><b id="luckEndTime"></b>
+                            </p>*@
+                            
+                            
+                        </div>
+                        <input type="hidden" id="luckmoneyid" value="0" />
+
+                        @*<img src="~/Media/Content/Images/icons/hongbao.png" alt="" width="355" height="200">*@
+                    </div>
+                </div>
+            </div>
+                        <button class="md-trigger" style="display:none;" data-modal="modal-13">3D Slit</button>
+                                    <div class="md-overlay"></div>
+                                    <script src="~/Content/vendors/jquery/modalEffects.js"></script>
+                                   
+                                    Html.RenderAction("HomepageCategories", "Catalog");
+                                    Html.RenderWidget("home_page_after_categories");
+
+                                    Html.RenderAction("DHomepageProducts", "Catalog");
+                                    Html.RenderWidget("home_page_after_products");
 
 
-            Html.RenderAction("HomepageProducts", "Catalog");
-            Html.RenderAction("HomepageBestSellers", "Catalog");
-            Html.RenderWidget("home_page_after_bestsellers");
+                                    Html.RenderAction("HomepageProducts", "Catalog");
+                                    Html.RenderAction("HomepageBestSellers", "Catalog");
+                                    Html.RenderWidget("home_page_after_bestsellers");
 
-            Html.RenderAction("HomepageManufacturers", "Catalog");
-            Html.RenderWidget("home_page_after_manufacturers");
+                                    Html.RenderAction("HomepageManufacturers", "Catalog");
+                                    Html.RenderWidget("home_page_after_manufacturers");
 
-            Html.RenderAction("PopularProductTags", "Catalog", new { area = "" });
-            Html.RenderWidget("home_page_after_tags");
+                                    Html.RenderAction("PopularProductTags", "Catalog", new { area = "" });
+                                    Html.RenderWidget("home_page_after_tags");
 
-            Html.RenderAction("HomePageNews", "News");
-            Html.RenderWidget("home_page_after_news");
+                                    Html.RenderAction("HomePageNews", "News");
+                                    Html.RenderWidget("home_page_after_news");
 
-            Html.RenderAction("HomePagePolls", "Poll");
-            Html.RenderWidget("home_page_after_polls");
+                                    Html.RenderAction("HomePagePolls", "Poll");
+                                    Html.RenderWidget("home_page_after_polls");
 
-            @* TODO: (mc) find more intelligent way of rendering RecentlyViewedProductsBlock globally *@
-            Html.RenderAction("RecentlyViewedProductsBlock", "Catalog", new { area = "" });
+                                    @* TODO: (mc) find more intelligent way of rendering RecentlyViewedProductsBlock globally *@
+                                    Html.RenderAction("RecentlyViewedProductsBlock", "Catalog", new { area = "" });
 
-            Html.RenderWidget("home_page_bottom");
+                                    Html.RenderWidget("home_page_bottom");
         }
     </div>
 </div>
@@ -165,5 +156,80 @@
         $(".art-price").each(function () {
             $(this).html('<span class="big_price">' + $(this).html().split('.').join('.</span><span class="small_price">') + '</span>');
         });
+        //
+        setTimeout(function () {
+            $.ajax({
+                cache:false,
+                type: "POST",
+            url: "@(Url.Action("CheckLuckMoneyPost", "Customer"))",
+            data: {},
+                success: function (data) {
+                    if (data) {
+                        console.log("luck money found");
+                        console.log("data" + data);
+                        $("#luckmoney").show();
+                        $("#luckmoney").css("display", "block");
+                        $("#luckmoneyid").val(data.Id);
+                        $(".md-trigger").click();
+                        $("#luckStartTime").text(data.StartTimeStr);
+                        $("#luckEndTime").text(data.EndTimeStr);
+                        $("#luckAmount").text(data.Amount);
+                        $("#luckComment").text(data.Comment);
+                    }
+                },
+            error: function (xhr, ajaxOptions, thrownError) {
+                   // alert('Failed to add order note.')
+				},
+				complete: function () {
+				}
+            });
+        }, 1000)
+        var id = setInterval(function () {
+            console.log("get luck money");
+            $.ajax({
+                cache:false,
+                type: "POST",
+            url: "@(Url.Action("CheckLuckMoneyPost", "Customer"))",
+            data: {},
+                success: function (data) {
+                    if (data) {
+                        console.log("luck money found"); console.log("data" + data);
+                        $("#luckStartTime").text(data.StartTimeStr);
+                        $("#luckEndTime").text(data.EndTimeStr); $("#luckComment").text(data.Comment);
+                        $("#luckAmount").text(data.Amount);
+                        $("#luckmoney").show(); $(".md-trigger").click(); $("#luckmoneyid").val(data.Id);
+                    }
+                },
+            error: function (xhr, ajaxOptions, thrownError) {
+                   // alert('Failed to add order note.')
+				},
+				complete: function () {
+				}
+            });
+        }, 120000);
+        $("#GetLuckMoney").click(function () {
+            $.ajax({
+                    cache:false,
+                    type: "POST",
+                url: "@(Url.Action("GetLuckMoneyPost", "Customer"))",
+                data: { id: $("#luckmoneyid").val()},
+                success: function (data) {
+                    console.log("data" + data);
+                    //if (data) { alert("成功领取" + data.Amount+"元！"); $("#luckmoney").hide();  }
+                    },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    //$("#pay").show();
+                       // alert('Failed to add order note.')
+				    },
+				    complete: function () {
+					    //$('#addrecord-window').modal('hide');
+				    }
+            });
+        });
+        $("#open").click(function () {
+            $("#open").hide();
+            $("#GetLuckMoney").css("display", "block");
+        });
+       
     })
 </script>

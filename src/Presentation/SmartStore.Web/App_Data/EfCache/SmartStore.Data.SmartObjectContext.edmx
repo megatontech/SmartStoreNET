@@ -2128,8 +2128,8 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CustomerId" Type="Int32" Nullable="false" />
-          <Property Name="Date" Type="DateTime" Nullable="false" />
+          <Property Name="Customer" Type="Int32" Nullable="false" />
+          <Property Name="CheckDate" Type="DateTime" Nullable="false" />
         </EntityType>
         <EntityType Name="CAPTCHACode" customannotation:ClrType="SmartStore.Core.Domain.Customers.CAPTCHACode, SmartStore.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=null">
           <Key>
@@ -6502,8 +6502,8 @@
             <EntityTypeMapping TypeName="SmartStore.Data.CheckIn">
               <MappingFragment StoreEntitySet="CheckIn">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="CheckDate" ColumnName="CheckDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -8657,8 +8657,8 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="CustomerId" Type="int" Nullable="false" />
-          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="Customer" Type="int" Nullable="false" />
+          <Property Name="CheckDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="CAPTCHACode" customannotation:Index="{ }">
           <Key>

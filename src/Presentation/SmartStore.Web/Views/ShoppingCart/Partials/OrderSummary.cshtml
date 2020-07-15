@@ -239,26 +239,51 @@
                     Html.RenderPartial("_RefreshCartScript");
                 }
                 <script>
+                    function changeTwoDecimal_f(x) {
+                        var f_x = parseFloat(x);
+                        if (isNaN(f_x)) {
+                            alert('function:changeTwoDecimal->parameter error');
+                            return false;
+                        }
+                        f_x = Math.round(f_x * 100) / 100;
+                        var s_x = f_x.toString();
+                        var pos_decimal = s_x.indexOf('.');
+                        if (pos_decimal < 0) {
+                            pos_decimal = s_x.length;
+                            s_x += '.';
+                        }
+                        while (s_x.length <= pos_decimal + 2) {
+                            s_x += '0';
+                        }
+                        return parseFloat(s_x);
+                    }
                     function calcTotal() {
                         console.log("calc");
                         var total = parseFloat($("#OrderTotal").attr("value"));
+                        total = changeTwoDecimal_f(total);
+                        $("#RealOrderTotalVal").val(total);
                         var discount = 0;
                         var point = 0;
                         if ($("#discountcouponcode").find("option:selected").attr("data-val")) {
                             var selectText = $("#discountcouponcode").find("option:selected").attr("data-val");
                             discount = parseFloat(selectText);
+                            discount = changeTwoDecimal_f(discount);
                             console.log(discount);
                         }
                         if ($("#UseRewardPoints").prop("checked")) {
                             point = parseFloat($("#usepointval").val());
+                            point = changeTwoDecimal_f(point);
                             console.log(point);
                         }
                         total = total - discount - point;
+                        total = changeTwoDecimal_f(total);
                         console.log(total);
                         $("#OrderTotal")[0].innerText = "¥" + total;
                         $("#OrderTotalVal").val(total);
                         $("#UsePointsTotalVal").val(point);
                         $("#UseDiscountVal").val($("#discountcouponcode").val());
+                        if (total == 0) { $("#pay").hide(); $("#confirmbtn").css("display", "block"); }
+                        else { $("#confirmbtn").hide(); $("#pay").show();}
                     }
                 </script>
                 @if (Model.DisplayCommentBox && !Model.IsEditable)

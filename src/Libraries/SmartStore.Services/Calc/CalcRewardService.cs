@@ -84,10 +84,10 @@ namespace SmartStore.Services.Calc
                 return (double)Math.Round(_leftMoneyPackage.remainMoney * 100) / 100;
             }
             Random r = new Random();
-            double min = 0.01;
+            double min = 0.00;
             double max = _leftMoneyPackage.remainMoney / _leftMoneyPackage.remainSize * 2;
             double money = r.NextDouble() * max;
-            money = money <= min ? 0.01 : money;
+            money = money <= min ? 0.00 : money;
             money = Math.Floor(money * 100) / 100;
             _leftMoneyPackage.remainSize--;
             _leftMoneyPackage.remainMoney -= money;
@@ -185,8 +185,7 @@ namespace SmartStore.Services.Calc
                     item.TotalPointsValue4 = (decimal)getRandomMoney(package);
                 }
             }
-
-            _walletService.SendRewardToWalletFour(customers);
+            if (StoreTotal != 0M) { _walletService.SendRewardToWalletFour(customers); }
         }
 
         /// <summary>
@@ -479,7 +478,7 @@ namespace SmartStore.Services.Calc
             var order = from d in _OrderRepository.Table
                          where d.PaidDateUtc.Value <= today && d.PaidDateUtc.Value >= yestoday 
                         select d;
-            todayAmount = order.ToList().Where(x=> x.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid).Sum(x => x.OrderTotal );
+            todayAmount = order.ToList().Where(x=> x.PaymentStatus == Core.Domain.Payments.PaymentStatus.Paid).Sum(x => x.OrderTax );
             return todayAmount; 
         }
     }

@@ -15,6 +15,7 @@ namespace SmartStore.Services.Customers
     {
         #region Public Methods
         public void Insert(CustomerDiscount model);
+        public CustomerDiscount GetOne(int id);
         public List<CustomerDiscount> Get(int customerid);
         public void Delete(CustomerDiscount model);
         public void Use(CustomerDiscount model);

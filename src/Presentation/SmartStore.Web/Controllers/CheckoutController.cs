@@ -752,6 +752,7 @@ namespace SmartStore.Web.Controllers
 				}
 
 				return RedirectToAction("Confirm");
+                //return Redirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8953723b60205284&redirect_uri=http://www.michat520.cn/Checkout/Confirm&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect");
             }
 
             checkoutState.IsPaymentSelectionSkipped = false;
@@ -934,6 +935,7 @@ namespace SmartStore.Web.Controllers
 				placeOrderExtraData["OrderTotalVal"] = form["OrderTotalVal"];
 				placeOrderExtraData["UsePointsTotalVal"] = form["UsePointsTotalVal"];
                 placeOrderExtraData["UseDiscountVal"] = form["UseDiscountVal"];
+                placeOrderExtraData["RealOrderTotalVal"] = form["RealOrderTotalVal"];
                 
                 placeOrderResult = _orderProcessingService.PlaceOrder(processPaymentRequest, placeOrderExtraData);
 

@@ -44,7 +44,10 @@ namespace SmartStore.Services.Customers
         {
             return _checkRepository.Table.Where(x=>x.Customer==customerid).ToList();
         }
-
+        public CustomerDiscount GetOne(int id) 
+        {
+            return _checkRepository.Table.Where(x => x.Id == id).FirstOrDefault();
+        }
         #endregion Private Fields
 
 

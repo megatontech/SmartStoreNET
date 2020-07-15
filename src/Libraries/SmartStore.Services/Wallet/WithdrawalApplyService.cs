@@ -208,8 +208,8 @@ namespace SmartStore.Services.Wallet
             total.TotalFreezeAmount -= withdrawal.Amount;
             total.UpdateTime = DateTime.Now;
             _IWithdrawalTotalService.Update(total);
-            var pointVal = 0f;
-            pointVal = (float)withdrawal.Amount * (float)((float)_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent;
+            var pointVal = 0d;
+            pointVal = Math.Round((float)withdrawal.Amount * (float)((float)_calcrule.WithDrawApplyToPointPercent / 100) * (float)_calcrule.WithDrawToPointPercent);
             _ICustomerPointsTotalService.AddPointsToCustomer((int)pointVal, customer.Id);
             _ICustomerPointsDetailService.CreateDetail(new CustomerPointsDetail()
             {
@@ -317,8 +317,8 @@ namespace SmartStore.Services.Wallet
             total.TotalAmount -= amount;
             total.UpdateTime = DateTime.Now;
             _IWithdrawalTotalService.Update(total);
-            var pointVal = 0f;
-            pointVal = (float)amount * (float)((float)_calcrule.WithDrawToPointPercent / 100) * 100;
+            var pointVal = 0d;
+            pointVal = Math.Round((float)amount * (float)((float)_calcrule.WithDrawToPointPercent / 100) * 100);
             _ICustomerPointsTotalService.AddPointsToCustomer((int)pointVal, customer.Id);
             _ICustomerPointsDetailService.CreateDetail(new CustomerPointsDetail()
             {
@@ -332,7 +332,19 @@ namespace SmartStore.Services.Wallet
                 PointUseType = PointUseType.Shop,
                 UpdateTime = DateTime.Now
             });
-           
+            _IWithdrawalDetailService.Add(new WithdrawalDetail()
+            {
+                Amount = amount,
+                Customer = customer.Id,
+                Comment = "转积分" + amount + "获得了商城积分" + (int)pointVal,
+                CustomerID = customer.CustomerGuid,
+                IsCount = false,
+                isOut = true,
+                Operater = customer.Id,
+                OperaterID = customer.CustomerGuid,
+                WithdrawTime = DateTime.Now,
+                WithdrawType = 5
+            });
 
         }
         #endregion Public Constructors

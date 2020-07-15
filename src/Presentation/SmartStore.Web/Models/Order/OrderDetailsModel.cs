@@ -71,6 +71,7 @@ namespace SmartStore.Web.Models.Order
 		public string CreditBalance { get; set; }
 		public string OrderTotalRounding { get; set; }
         public string OrderTotal { get; set; }
+        public string RefundedAmount { get; set; }
         public string CustomerComment { get; set; }
 		public int CustomerLanguageId { get; set; }
 

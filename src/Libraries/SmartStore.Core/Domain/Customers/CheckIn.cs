@@ -12,6 +12,7 @@ namespace SmartStore.Core.Domain.Customers
 	/// <summary>
 	/// Represents a digital wallet history entry.
 	/// </summary>
+	[DataContract]
 	public class CheckIn : BaseEntity
 	{
 
@@ -19,12 +20,12 @@ namespace SmartStore.Core.Domain.Customers
 		/// <summary>
 		/// Gets or sets the customer identifier.
 		/// </summary>
-		[DataMember] public int CustomerId { get; set; }
+		[DataMember] public int Customer { get; set; }
 
 		/// <summary>
 		/// Gets or sets the order identifier.
 		/// </summary>
-		[DataMember] public DateTime Date { get; set; }
+		[DataMember] public DateTime CheckDate { get; set; }
 
 	}
 }

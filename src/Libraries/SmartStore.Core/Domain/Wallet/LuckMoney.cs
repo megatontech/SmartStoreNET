@@ -76,6 +76,10 @@ namespace SmartStore.Core.Domain.Wallet
         /// </summary>
         [DataMember]
         public DateTime StartTime { get; set; }
+        [NotMapped]
+        public string StartTimeStr { get; set; }
+        [NotMapped] 
+        public string EndTimeStr { get; set; }
         /// <summary>
         /// 发放结束时间
         /// </summary>

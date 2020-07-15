@@ -74,7 +74,7 @@
                 <div class="cms-menu cms-menu-listgroup" data-menu-name="myaccount">
                     <div class="card">
                         <div class="list-group list-group-flush has-icons" style=" display: inline-block; ">
-                            <div style=" display: inline-block;width:24%; ">
+                            <div style=" display: inline-block;width:23%; ">
                                 <a href="/Customer/RewardPoints" class="list-group-item list-group-item-action menu-link" style="display:table;border:none;">
 
                                     <div style="text-align:center;">
@@ -84,7 +84,7 @@
                                     <div style="        text-align: center; white-space: nowrap; "><span>购物积分</span></div>
                                 </a>
                             </div>
-                            <div style="        display: inline-block; width: 24%; ">
+                            <div style="        display: inline-block; width: 23%; ">
                                 <a href="/Customer/dOrders" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none;">
 
                                     <div style="text-align:center;">
@@ -94,17 +94,17 @@
                                     <div style="        text-align: center; white-space: nowrap; "><span>报单订单</span></div>
                                 </a>
                             </div>
-                            <div style="        display: inline-block; width: 24%;  ">
+                            <div style="        display: inline-block; width: 23%;  ">
                                 <a href="/Customer/ProxyOrders" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none;">
 
                                     <div style="text-align:center;">
                                         <img src='@Url.Content("~/Content/Images/icons/design14.png")' style="margin-right:0px;" alt="" />
-                                    @*<i class="fal fa-fw fal fa-flag list-group-item-icon"></i>*@
+                                        @*<i class="fal fa-fw fal fa-flag list-group-item-icon"></i>*@
                                     </div>
                                     <div style="        text-align: center; white-space: nowrap; "><span>代客报单</span></div>
                                 </a>
                             </div>
-                            <div style="        display: inline-block; width: 24%; ">
+                            <div style="        display: inline-block; width: 23%; ">
                                 <a href="/Customer/MyTeam" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none;">
 
                                     <div style="text-align:center;">
@@ -114,7 +114,7 @@
                                     <div style="        text-align: center; white-space: nowrap; "><span>我的团队</span></div>
                                 </a>
                             </div>
-                            <div style="        display: inline-block; width: 24%; ">
+                            <div style="        display: inline-block; width: 23%; ">
                                 <a href="/Customer/MyPoster" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none;">
 
                                     <div style="text-align:center;">
@@ -125,7 +125,7 @@
                                 </a>
                             </div>
 
-                            <div style="        display: inline-block; width: 24%;">
+                            <div style="        display: inline-block; width: 23%;">
                                 <a href="/Customer/Orders" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none; ">
                                     <div style="text-align:center;">
                                         <img src='@Url.Content("~/Content/Images/icons/design13.png")' style="margin-right:0px;" alt="" />
@@ -134,7 +134,7 @@
                                     <div style="        text-align: center; white-space: nowrap; "><span>商城订单</span></div>
                                 </a>
                             </div>
-                            <div style="        display: inline-block; width: 24%;">
+                            <div style="        display: inline-block; width: 23%;">
 
                                 <a href="/Customer/Discount" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none;">
 
@@ -143,6 +143,18 @@
                                         @*<i class="fal fa-fw fal fa-bell list-group-item-icon"></i>*@
                                     </div>
                                     <div style="text-align:center;white-space:nowrap;"><span>优惠券</span></div>
+                                </a>
+                            </div>
+                            <div style="        display: none;
+        width: 23%;">
+
+                                <a href="/Customer/CheckinAdd" class="list-group-item list-group-item-action menu-link" style="        display: table; border: none;">
+
+                                    <div style="text-align:center;">
+                                        <img src='@Url.Content("~/Content/Images/icons/design15.png")' style="margin-right:0px;" alt="" />
+                                        @*<i class="fal fa-fw fal fa-bell list-group-item-icon"></i>*@
+                                    </div>
+                                    <div style="text-align:center;white-space:nowrap;"><span>每日签到</span></div>
                                 </a>
                             </div>
                         </div>
@@ -158,28 +170,40 @@
                                 @*<i class="fal fa-fw fal fa-user list-group-item-icon"></i>*@
                                 <img src='@Url.Content("~/Content/Images/icons/design7.png")' style="margin-right:0px;" alt="" />
                                 <span>我的资料</span>
-                                <div style="float:right;">&gt;</div>
+                                <div style="        float: right;
+        display: inline-block;
+        padding: 15px;
+">&gt;</div>
                             </a>
                             <a href="/Customer/Addresses" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
                                 @*<i class="fal fa-fw fal fa-address-book list-group-item-icon"></i>*@
                                 <img src='@Url.Content("~/Content/Images/icons/design2.png")' style="margin-right:0px;" alt="" />
-                                <span>收货地址</span><div style="float:right;">&gt;</div>
+                                <span>收货地址</span><div style="        float: right;
+        display: inline-block;
+        padding: 15px;
+">&gt;</div>
                             </a>
 
                             <a href="/Customer/ChangePassword" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
                                 @*<i class="fal fa-fw fal fa-unlock-alt list-group-item-icon"></i>*@
                                 <img src='@Url.Content("~/Content/Images/icons/design6.png")' style="margin-right:0px;" alt="" />
-                                <span>修改密码</span><div style="float:right;">&gt;</div>
+                                <span>修改密码</span><div style="        float: right;
+        display: inline-block;
+        padding: 15px;
+">&gt;</div>
                             </a>
                             <a href="/Customer/Avatar" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
                                 @*<i class="fal fa-fw fal fa-user-circle list-group-item-icon"></i>*@
                                 <img src='@Url.Content("~/Content/Images/icons/design7.png")' style="margin-right:0px;" alt="" />
-                                <span>修改头像</span><div style="float:right;">&gt;</div>
+                                <span>修改头像</span><div style="float: right;display: inline-block;padding:15px;">&gt;</div>
                             </a>
                             <a href="/logout" class="list-group-item list-group-item-action menu-link" style="display:inline-block">
                                 @*<i class="fal fa-fw fal fa-sign-out-alt fa-fw list-group-item-icon"></i>*@
                                 <img src='@Url.Content("~/Content/Images/icons/design8.png")' style="margin-right:0px;" alt="" />
-                                <span>注销</span><div style="float:right;">&gt;</div>
+                                <span>注销</span><div style="        float: right;
+        display: inline-block;
+        padding: 15px;
+">&gt;</div>
                             </a>
                         </div>
                     </div>

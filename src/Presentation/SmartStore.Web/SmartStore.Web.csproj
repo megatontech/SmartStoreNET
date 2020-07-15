@@ -942,6 +942,8 @@
     <Content Include="Content\Images\icons\design8.png" />
     <Content Include="Content\Images\icons\design9.png" />
     <Content Include="Content\Images\icons\design18.png" />
+    <Content Include="Content\Images\icons\hongbao.png" />
+    <Content Include="Content\Images\icons\hongbao2.png" />
     <Content Include="Content\placeholder.txt" />
     <Content Include="Content\print-rtl.css" />
     <Content Include="Content\vendors\aos\js\aos.js" />
@@ -1001,8 +1003,14 @@
     <Content Include="Content\vendors\colorpicker\js\bootstrap-colorpicker.js" />
     <Content Include="Content\vendors\datetimepicker\js\tempusdominus-bootstrap-4.js" />
     <Content Include="Content\vendors\datetimepicker\js\tempusdominus-bootstrap-4.min.js" />
+    <Content Include="Content\vendors\jquery\classie.js" />
+    <Content Include="Content\vendors\jquery\component.css" />
+    <Content Include="Content\vendors\jquery\jquery.event.swipe.js" />
     <Content Include="Content\vendors\jquery\jquery.jOrgChart.css" />
     <Content Include="Content\vendors\jquery\jquery.jOrgChart.js" />
+    <Content Include="Content\vendors\jquery\modalEffects.js" />
+    <Content Include="Content\vendors\jquery\swiper.min.css" />
+    <Content Include="Content\vendors\jquery\swiper.min.js" />
     <Content Include="Content\vendors\jquery\unslider.min.js" />
     <Content Include="Content\vendors\moment\locale\ar-dz.js" />
     <Content Include="Content\vendors\moment\locale\ar-kw.js" />

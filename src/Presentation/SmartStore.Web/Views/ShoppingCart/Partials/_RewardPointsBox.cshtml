@@ -19,8 +19,8 @@
     <div class="cart-action-body collapse@(isExpanded ? " show" : "")" id="cart-action-rewardpoints-body" aria-expanded="@isExpanded">
         <div class="reward-points alert alert-info">
             <div class="form-check">
-                @Html.CheckBoxFor(model => model.UseRewardPoints, new { @class = "form-check-input", @checked= "checked" })
-                <label class="form-check-label" for="@Html.IdFor(model => model.RewardPointsAmount)">
+                @Html.CheckBoxFor(model => model.UseRewardPoints, new { @class = "form-check-input", @checked = "checked" })
+                <label class="form-check-label" for="@Html.IdFor(model => model.RewardPointsAmount)" style="margin-top:.3rem;">
                     使用积分抵扣订单金额，可用积分 @Model.RewardPointsAmount
                     @*@Model.RewardPointsAmount*@
                     @*@Html.Raw(string.Format(T("Checkout.UseRewardPoints").Text, "<strong>" + Model.RewardPointsBalance + "</strong>", "<strong>" + Model.RewardPointsAmount + "</strong>"))*@
@@ -52,15 +52,27 @@
             if ($("#UseRewardPoints").prop("checked")) {
                 calcTotal();
                 $("#usepointval").removeAttr("disabled");;
-            } else { calcTotal();$("#usepointval").val(0);$("#usepointval").attr("disabled", "disabled"); }
+            } else { calcTotal(); $("#usepointval").val(0); $("#usepointval").attr("disabled", "disabled"); }
         });
         $("#usepointval").change(function () {
             $("#usepointval").val($("#usepointval").val().replace(/\D/g, ''));
             var input = parseFloat($("#usepointval").val());
             var limit = parseFloat($("#RewardPointsBalance").val());
-            if (isNaN(input)) { $("#usepointval").val(0);}
+            var total = parseFloat($("#OrderTotal").attr("value"));
+            var discount = 0;
+            if ($("#discountcouponcode").find("option:selected").attr("data-val")) {
+                var selectText = $("#discountcouponcode").find("option:selected").attr("data-val");
+                discount = parseFloat(selectText);
+                discount = changeTwoDecimal_f(discount);
+                console.log(discount);
+            }
+            total = changeTwoDecimal_f(total - discount);
+            total = Math.floor(total);
+            limit = Math.floor(limit);
+            if (isNaN(input)) { $("#usepointval").val(0); }
+            if (total <= limit) { limit = total; }
             if (input >= limit) {
-                $("#usepointval").val($("#RewardPointsBalance").val());
+                $("#usepointval").val(limit);
             }
             if ($("#UseRewardPoints").prop("checked")) {
                 calcTotal();

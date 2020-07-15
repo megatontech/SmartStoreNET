@@ -726,11 +726,21 @@ namespace SmartStore.Services.Orders
                 processPaymentRequest.OrderGuid = Guid.NewGuid();
             }
             //订单实际总金额
-            var OrderTotalVal = extraData["OrderTotalVal"].ToDecimal();
+            var OrderTotalVal = extraData["RealOrderTotalVal"].ToDecimal();
+            //微信实付金额
+            var RealOrderTotalVal = extraData["OrderTotalVal"].ToDecimal();
+            var profit = 0M;//利润存入 OrderTax 
             //用了多少积分，需要从用户扣除
+            var UsePointsTotalValDec = extraData["UsePointsTotalVal"].ToDecimal();
             var UsePointsTotalVal = extraData["UsePointsTotalVal"].ToInt();
             //用了优惠券的id
             var UseDiscountVal = extraData["UseDiscountVal"].ToInt();
+            var discountVal = 0M;
+            if (UseDiscountVal > 0) { var discount = _ICustomerDiscountService.GetOne(UseDiscountVal);
+                var all = _discountService.GetAllDiscounts(null, "", true);
+                discount.discount = all.FirstOrDefault(x => x.Id == discount.Discount);
+                if (discount!=null) { discountVal = discount.discount.DiscountAmount; }
+            }
             var result = new PlaceOrderResult();
 			var utcNow = DateTime.Now;
 
@@ -963,13 +973,13 @@ namespace SmartStore.Services.Orders
                 }
                 cartTotal = new ShoppingCartTotal(0M);
                 processPaymentRequest.OrderTotal = cartTotal.TotalAmount.Value;
-
+                profit = cart.Select(x => x.Item.Product.Price).Sum()- cart.Select(x => x.Item.Product.ProductCost).Sum();
                 #endregion
 
-				#region Addresses & pre-payment workflow
-				
-				// Give payment processor the opportunity to fullfill billing address.
-				var preProcessPaymentResult = _paymentService.PreProcessPayment(processPaymentRequest);
+                #region Addresses & pre-payment workflow
+
+                // Give payment processor the opportunity to fullfill billing address.
+                var preProcessPaymentResult = _paymentService.PreProcessPayment(processPaymentRequest);
 
 				if (!preProcessPaymentResult.Success)
 				{
@@ -1139,12 +1149,12 @@ namespace SmartStore.Services.Orders
                             PaymentMethodAdditionalFeeExclTax = paymentAdditionalFeeExclTax,
 							PaymentMethodAdditionalFeeTaxRate = paymentAdditionalFeeTaxRate,
                             TaxRates = taxRates,
-                            OrderTax = orderTaxTotal,
+                            OrderTax = profit,//利润
                             OrderTotalRounding = cartTotal.RoundingAmount,
-                            OrderTotal = OrderTotalVal,
-                            RefundedAmount = decimal.Zero,
-                            OrderDiscount = cartTotal.DiscountAmount,
-							CreditBalance = cartTotal.CreditBalance,
+                            OrderTotal = OrderTotalVal,//订单总额
+                            RefundedAmount = (decimal)UsePointsTotalVal,//积分抵
+                            OrderDiscount = RealOrderTotalVal,//微信付钱
+							CreditBalance = discountVal,//优惠券抵
                             CheckoutAttributeDescription = checkoutAttributeDescription,
                             CheckoutAttributesXml = checkoutAttributesXml,
                             CustomerCurrencyCode = customerCurrencyCode,

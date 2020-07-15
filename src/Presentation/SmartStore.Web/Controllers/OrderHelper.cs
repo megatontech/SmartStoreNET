@@ -383,12 +383,12 @@ namespace SmartStore.Web.Controllers
                         //var labelKey = "ShoppingCart.Totals.TaxRateLine" + (_services.WorkContext.TaxDisplayType == TaxDisplayType.IncludingTax ? "Incl" : "Excl");
                         var labelKey = (_services.WorkContext.TaxDisplayType == TaxDisplayType.IncludingTax ? "ShoppingCart.Totals.TaxRateLineIncl" : "ShoppingCart.Totals.TaxRateLineExcl");
 
-                        model.TaxRates.Add(new OrderDetailsModel.TaxRate
-                        {
-                            Rate = rate,
-                            Label = T(labelKey).Text.FormatCurrent(rate),
-                            Value = _priceFormatter.FormatPrice(_currencyService.ConvertCurrency(tr.Value, order.CurrencyRate), true, order.CustomerCurrencyCode, false, language),
-                        });
+                        //model.TaxRates.Add(new OrderDetailsModel.TaxRate
+                        //{
+                        //    Rate = rate,
+                        //    Label = T(labelKey).Text.FormatCurrent(rate),
+                        //    Value = _priceFormatter.FormatPrice(_currencyService.ConvertCurrency(tr.Value, order.CurrencyRate), true, order.CustomerCurrencyCode, false, language),
+                        //});
                     }
                 }
             }
@@ -401,9 +401,10 @@ namespace SmartStore.Web.Controllers
             var orderDiscountInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderDiscount, order.CurrencyRate);
             if (orderDiscountInCustomerCurrency > decimal.Zero)
             {
-                model.OrderTotalDiscount = _priceFormatter.FormatPrice(-orderDiscountInCustomerCurrency, true, order.CustomerCurrencyCode, false, language);
+               // model.OrderTotalDiscount = order.OrderDiscount;
+               //     _priceFormatter.FormatPrice(-orderDiscountInCustomerCurrency, true, order.CustomerCurrencyCode, false, language);
             }
-
+            model.OrderTotalDiscount = order.OrderDiscount.ToString("F2");
             // Gift cards
             foreach (var gcuh in order.GiftCardUsageHistory)
             {
@@ -445,7 +446,11 @@ namespace SmartStore.Web.Controllers
             {
                 model.OrderTotalRounding = _priceFormatter.FormatPrice(roundingAmount, true, order.CustomerCurrencyCode, false, language);
             }
-
+            if (order.RefundedAmount != decimal.Zero)
+            {
+                model.RefundedAmount = order.RefundedAmount.ToString("F2");
+            }
+            
             // Checkout attributes
             model.CheckoutAttributeInfo = HtmlUtils.ConvertPlainTextToTable(HtmlUtils.ConvertHtmlToPlainText(order.CheckoutAttributeDescription));
 
