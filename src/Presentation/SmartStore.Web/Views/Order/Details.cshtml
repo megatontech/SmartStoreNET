@@ -24,7 +24,7 @@
                         <table class="cart-summary" style="margin:10px;">
                             <tr class="cart-summary-subtotal">
                                 <td class="cart-summary-label">@T("订单号"):</td>
-                                <td class="cart-summary-value">@Model.OrderNumber</td>
+                                <td class="cart-summary-value" style="padding-right:35px;">@Model.OrderNumber</td>
                             </tr>
                         </table>
 
@@ -39,7 +39,7 @@
         <table class="cart-summary" style="margin:10px;">
             <tr class="cart-summary-subtotal">
                 <td class="cart-summary-label">@T("订单日期"):</td>
-                <td class="cart-summary-value">@Model.CreatedOn.ToShortDateString().ReplaceNativeDigits()</td>
+                <td class="cart-summary-value" style="padding-right:35px;">@Model.CreatedOn.ToShortDateString().ReplaceNativeDigits()</td>
             </tr>
         </table>
 
@@ -55,7 +55,7 @@
                               <table class="cart-summary"  style="margin:10px;">
                                   <tr class="cart-summary-subtotal">
                                       <td class="cart-summary-label">@T("订单状态"):</td>
-                                      <td class="cart-summary-value" style="color:red;">@Model.OrderStatus</td>
+                                      <td class="cart-summary-value" style="color: red;padding-right:35px;">@Model.OrderStatus</td>
                                   </tr>
                               </table>
 

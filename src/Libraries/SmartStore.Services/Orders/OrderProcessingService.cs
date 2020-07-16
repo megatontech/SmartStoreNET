@@ -1195,8 +1195,10 @@ namespace SmartStore.Services.Orders
                             VatNumber = vatNumber,
                             CustomerOrderComment = extraData.ContainsKey("CustomerComment") ? extraData["CustomerComment"] : ""
                         };
-
-						if (extraData.ContainsKey("AcceptThirdPartyEmailHandOver") && _shoppingCartSettings.ThirdPartyEmailHandOver != CheckoutThirdPartyEmailHandOver.None)
+                        var no = _orderService.GetOrdersMaxNo();
+                        string seriNo = (no + 1).ToString().PadLeft(6, '0'); ;
+                        order.OrderNumber = DateTime.Now.ToString("yyyyMMdd") + seriNo;
+                        if (extraData.ContainsKey("AcceptThirdPartyEmailHandOver") && _shoppingCartSettings.ThirdPartyEmailHandOver != CheckoutThirdPartyEmailHandOver.None)
 						{
 							order.AcceptThirdPartyEmailHandOver = extraData["AcceptThirdPartyEmailHandOver"].ToBool();
 						}

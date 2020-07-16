@@ -22,7 +22,7 @@ namespace SmartStore.Services.Orders
         /// <param name="orderId">The order identifier</param>
         /// <returns>Order</returns>
         Order GetOrderById(int orderId);
-
+        int GetOrdersMaxNo();
         /// <summary>
         /// Gets an order either by it's formatted number or by id
         /// </summary>

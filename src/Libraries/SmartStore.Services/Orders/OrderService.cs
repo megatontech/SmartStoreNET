@@ -43,7 +43,11 @@ namespace SmartStore.Services.Orders
             _returnRequestRepository = returnRequestRepository;
             _eventPublisher = eventPublisher;
         }
-
+        public virtual int GetOrdersMaxNo()
+        {
+            var temp = _orderRepository.Table.Any() ? _orderRepository.Table.Max(x => x.Id) : 0;
+            return temp;
+        }
         public virtual Order GetOrderById(int orderId)
         {
             if (orderId == 0)
