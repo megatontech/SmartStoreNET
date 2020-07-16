@@ -114,7 +114,8 @@ namespace SmartStore.Admin.Controllers
             IOrderService orderService,
             ICustomerActivityService customerActivityService,
             IPriceCalculationService priceCalculationService,
-            IPermissionService permissionService, AdminAreaSettings adminAreaSettings,
+            IPermissionService permissionService,
+            AdminAreaSettings adminAreaSettings,
             IQueuedEmailService queuedEmailService,
             IEmailAccountService emailAccountService, ForumSettings forumSettings,
             IForumService forumService, IOpenAuthenticationService openAuthenticationService,
@@ -615,8 +616,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("changepassword")]
         public ActionResult ChangePassword(CustomerModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null)
@@ -643,8 +644,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Create()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var model = new CustomerModel();
 
@@ -661,10 +662,10 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult Create(CustomerModel model, bool continueEditing, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-            {
-                return AccessDeniedView();
-            }
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //{
+            //    return AccessDeniedView();
+            //}
 
             /// Validate unique user. <see cref="ICustomerRegistrationService.RegisterCustomer(CustomerRegistrationRequest)"/>
             //if (model.Email.HasValue() && _customerService.GetCustomerByEmail(model.Email) != null)
@@ -865,8 +866,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(id);
             if (customer == null)
@@ -903,8 +904,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Edit(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(id);
             if (customer == null /*|| customer.Deleted*/)
@@ -966,8 +967,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult Edit(CustomerModel model, bool continueEditing, FormCollection form)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null || customer.Deleted)
@@ -1143,8 +1144,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("impersonate")]
         public ActionResult Impersonate(int id)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.AllowCustomerImpersonation))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.AllowCustomerImpersonation))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(id);
             if (customer == null)
@@ -1171,10 +1172,10 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult List()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-            {
-                return AccessDeniedView();
-            }
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //{
+            //    return AccessDeniedView();
+            //}
 
             // Load registered customers by default.
             var allRoles = _customerService.GetAllCustomerRoles(true);
@@ -1216,8 +1217,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("markVatNumberAsInvalid")]
         public ActionResult MarkVatNumberAsInvalid(CustomerModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null)
@@ -1234,8 +1235,8 @@ namespace SmartStore.Admin.Controllers
         [FormValueRequired("markVatNumberAsValid")]
         public ActionResult MarkVatNumberAsValid(CustomerModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null)
@@ -1250,8 +1251,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult SendEmail(CustomerModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null)
@@ -1296,8 +1297,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult SendPm(CustomerModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.Id);
             if (customer == null)
@@ -1345,8 +1346,8 @@ namespace SmartStore.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult RewardPointsHistoryAdd(int customerId, int addRewardPointsValue, string addRewardPointsMessage)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(customerId);
             if (customer == null)
@@ -1361,8 +1362,8 @@ namespace SmartStore.Admin.Controllers
         [GridAction]
         public ActionResult RewardPointsHistorySelect(int customerId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(customerId);
             if (customer == null)
@@ -1396,8 +1397,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AddressCreate(int customerId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(customerId);
             if (customer == null)
@@ -1441,8 +1442,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult AddressCreate(CustomerAddressModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.CustomerId);
             if (customer == null)
@@ -1490,8 +1491,8 @@ namespace SmartStore.Admin.Controllers
         [GridAction]
         public ActionResult AddressDelete(int customerId, int addressId, GridCommand command)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(customerId);
             if (customer == null)
@@ -1508,8 +1509,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult AddressEdit(int addressId, int customerId)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(customerId);
             if (customer == null)
@@ -1565,8 +1566,8 @@ namespace SmartStore.Admin.Controllers
         [HttpPost]
         public ActionResult AddressEdit(CustomerAddressModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(model.CustomerId);
             if (customer == null)
@@ -1631,8 +1632,8 @@ namespace SmartStore.Admin.Controllers
         [GridAction]
         public ActionResult AddressesSelect(int customerId, GridCommand command)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(customerId);
             if (customer == null)
@@ -1939,8 +1940,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Reports()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var model = new CustomerReportsModel();
 
@@ -2034,8 +2035,8 @@ namespace SmartStore.Admin.Controllers
 
         public ActionResult Export(int id /* customerId */)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
+            //if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
+            //    return AccessDeniedView();
 
             var customer = _customerService.GetCustomerById(id);
             if (customer == null || customer.Deleted)
